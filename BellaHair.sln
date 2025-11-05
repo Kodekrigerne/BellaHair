@@ -1,11 +1,58 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Domain", "BellaHair.Domain\BellaHair.Domain.csproj", "{85ED2CFF-6447-4EB5-9EB1-A1EA1DC2E4B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Application", "BellaHair.Application\BellaHair.Application.csproj", "{072FD9F5-70A1-43E5-B7BD-B8699AE30DBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Infrastructure", "BellaHair.Infrastructure\BellaHair.Infrastructure.csproj", "{737E4B28-7AB3-44AF-8FF8-3A5522681117}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Presentation.WebUI", "BellaHair.Presentation.WebUI\BellaHair.Presentation.WebUI.csproj", "{8F9D7EB9-BD96-4E9A-AC32-C1F255245BA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Ports", "BellaHair.Ports\BellaHair.Ports.csproj", "{383E3603-839C-4F58-9D55-E90F8EEF5BDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Domain.Tests", "BellaHair.Domain.Tests\BellaHair.Domain.Tests.csproj", "{76F00F9C-304A-4615-8FDC-7C4DFF490774}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85ED2CFF-6447-4EB5-9EB1-A1EA1DC2E4B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85ED2CFF-6447-4EB5-9EB1-A1EA1DC2E4B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85ED2CFF-6447-4EB5-9EB1-A1EA1DC2E4B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85ED2CFF-6447-4EB5-9EB1-A1EA1DC2E4B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{072FD9F5-70A1-43E5-B7BD-B8699AE30DBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{072FD9F5-70A1-43E5-B7BD-B8699AE30DBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{072FD9F5-70A1-43E5-B7BD-B8699AE30DBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{072FD9F5-70A1-43E5-B7BD-B8699AE30DBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{737E4B28-7AB3-44AF-8FF8-3A5522681117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{737E4B28-7AB3-44AF-8FF8-3A5522681117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{737E4B28-7AB3-44AF-8FF8-3A5522681117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{737E4B28-7AB3-44AF-8FF8-3A5522681117}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F9D7EB9-BD96-4E9A-AC32-C1F255245BA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F9D7EB9-BD96-4E9A-AC32-C1F255245BA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F9D7EB9-BD96-4E9A-AC32-C1F255245BA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F9D7EB9-BD96-4E9A-AC32-C1F255245BA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{383E3603-839C-4F58-9D55-E90F8EEF5BDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{383E3603-839C-4F58-9D55-E90F8EEF5BDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{383E3603-839C-4F58-9D55-E90F8EEF5BDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{383E3603-839C-4F58-9D55-E90F8EEF5BDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76F00F9C-304A-4615-8FDC-7C4DFF490774} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21C7DBC5-D7B0-4152-8052-244167D0C8C4}
