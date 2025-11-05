@@ -1,80 +1,77 @@
-\- \[ ] Navngivning
+- [ ] Navngivning
 
-&nbsp;	- \[ ] Klasser
+    - [ ] Klasser
 
-&nbsp;	- \[ ] Records
+    - [ ] Records
 
-&nbsp;	- \[ ] Interface
+    - [ ] Interface
 
-&nbsp;	- \[ ] Properties
+    - [ ] Properties
 
-&nbsp;	- \[ ] Fields
+    - [ ] Fields
 
-&nbsp;	- \[ ] Metodenavne
+    - [ ] Metodenavne
 
-&nbsp;	- \[ ] Metodeparametre
+    - [ ] Metodeparametre
 
-&nbsp;	- \[ ] Primære constructors på klasser
+    - [ ] Primære constructors på klasser
 
-&nbsp;	- \[ ] Primære constructors på records
+    - [ ] Primære constructors på records
 
-\- \[ ] Placering
+- [ ] Placering
 
-&nbsp;	- \[ ] Entiteter
+    - [ ] Entiteter
 
-&nbsp;	- \[ ] Repository interfaces
+    - [ ] Repository interfaces
 
-&nbsp;	- \[ ] Repository implementeringer
+    - [ ] Repository implementeringer
 
-&nbsp;	- \[ ] CommandHandler interfaces
+    - [ ] CommandHandler interfaces
 
-&nbsp;	- \[ ] CommandHandler implementeringer
+    - [ ] CommandHandler implementeringer
 
-&nbsp;	- \[ ] QueryHandler interfaces
+    - [ ] QueryHandler interfaces
 
-&nbsp;	- \[ ] QueryHandler implementeringer
+    - [ ] QueryHandler implementeringer
 
-&nbsp;	- \[ ] DbContext
+    - [ ] DbContext
 
-&nbsp;	- \[ ] Commands
+    - [ ] Commands
 
-&nbsp;	- \[ ] Queries
+    - [ ] Queries
 
-\- \[ ] Blazor
+- [ ] Blazor
 
-&nbsp;	- \[ ] Er lokale (bruges kun i en enkelt komponent) css klasser i komponentens egen css fil?
+    - [ ] Er lokale (bruges kun i en enkelt komponent) css klasser i komponentens egen css fil?
 
-&nbsp;	- \[ ] Anvendes globale css klasser til alle komponenter som skal se ens ud?
+    - [ ] Anvendes globale css klasser til alle komponenter som skal se ens ud?
 
-\- \[ ] Er koden kommenteret?
+- [ ] Er koden kommenteret?
 
-&nbsp;	- \[ ] Hvor koden ikke er gennemskuelig
+    - [ ] Hvor koden ikke er gennemskuelig
 
-&nbsp;	- \[ ] Hvor kodebeslutningen skal begrundes
+    - [ ] Hvor kodebeslutningen skal begrundes
 
-\- \[ ] Er der skrevet summaries til typer og metoder?
+- [ ] Er der skrevet summaries til typer og metoder?
 
-\- \[ ] Er der skrevet ADR'er på væsentlige beslutninger?
+- [ ] Er der skrevet ADR'er på væsentlige beslutninger?
 
-\- \[ ] Skal der skrives resultatafsnit over features i denne PR?
+- [ ] Skal der skrives resultatafsnit over features i denne PR?
 
-\- \[ ] Er metoder som skal være public public, og private private?
+- [ ] Er metoder som skal være public public, og private private?
 
-\- \[ ] Er properties og fields som skal være nullable nullable?
+- [ ] Er properties og fields som skal være nullable nullable?
 
-\- \[ ] Fanges alle exceptions?
+- [ ] Fanges alle exceptions?
 
-\### Validering
+### Validering
 
-\#### Domain
+#### Domain
 
-\- \[ ] Invarianter
+- [ ] Invarianter
 
-\- \[ ] Er property getters og setters sat korrekt
+- [ ] Er property getters og setters sat korrekt
 
-&nbsp;	- \[ ] private set på klasser
+    - [ ] private set på klasser
 
-&nbsp;	- \[ ] private init på records
-
-
-
+    - [ ] private init på records
