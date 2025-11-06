@@ -75,3 +75,5 @@
     - [ ] private set på klasser
 
     - [ ] private init på records
+    
+- [ ] Er domæne model opdateret med ændringer til entiteter?
