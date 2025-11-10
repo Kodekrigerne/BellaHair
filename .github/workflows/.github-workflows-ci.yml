@@ -1,0 +1,28 @@
+name: CI - .NET 9 Pull Request Tests
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Restore dependencies
+        run: dotnet restore BellaHair.Domain.Tests
+
+      - name: Build
+        run: dotnet build BellaHair.Domain.Tests --no-restore
+
+      - name: Run tests
+        run: dotnet test BellaHair.Domain.Tests --no-build --logger:"console;verbosity=normal"
