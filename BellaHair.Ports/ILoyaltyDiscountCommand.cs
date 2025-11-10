@@ -1,5 +1,6 @@
 ﻿namespace BellaHair.Ports
 {
+    //Dennis
     public interface ILoyaltyDiscountCommand
     {
         Task CreateLoyaltyDiscountAsync(CreateLoyaltyDiscountCommand command);

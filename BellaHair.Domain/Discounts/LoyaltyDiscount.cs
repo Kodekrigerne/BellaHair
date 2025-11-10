@@ -18,6 +18,8 @@ namespace BellaHair.Domain.Discounts
 
         private LoyaltyDiscount(string discountName, int minimumVisits, DiscountPercent discountPercent)
         {
+            if (minimumVisits < 1) throw new LoyaltyDiscountException("Minimum visits must be at least 1");
+
             Id = Guid.NewGuid();
             Name = discountName;
             MinimumVisits = minimumVisits;
@@ -35,4 +37,6 @@ namespace BellaHair.Domain.Discounts
             return BookingDiscount.Active(Name, discountAmount);
         }
     }
+
+    public class LoyaltyDiscountException(string message) : Exception(message);
 }

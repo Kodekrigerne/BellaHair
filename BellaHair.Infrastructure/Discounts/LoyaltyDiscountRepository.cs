@@ -2,6 +2,7 @@
 
 namespace BellaHair.Infrastructure.Discounts
 {
+    //Dennis
     public class LoyaltyDiscountRepository : ILoyaltyDiscountRepository
     {
         private readonly BellaHairContext _db;

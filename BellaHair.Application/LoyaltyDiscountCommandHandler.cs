@@ -3,6 +3,7 @@ using BellaHair.Ports;
 
 namespace BellaHair.Application
 {
+    //Dennis
     class LoyaltyDiscountCommandHandler : ILoyaltyDiscountCommand
     {
         private readonly ILoyaltyDiscountRepository _loyaltyDiscountRepo;
