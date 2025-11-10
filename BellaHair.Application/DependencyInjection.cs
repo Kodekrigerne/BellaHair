@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BellaHair.Ports;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Application
 {
@@ -6,7 +7,7 @@ namespace BellaHair.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
         {
-
+            serviceCollection.AddScoped<ILoyaltyDiscountCommand, LoyaltyDiscountCommandHandler>();
 
             return serviceCollection;
         }

@@ -1,5 +1,4 @@
 ﻿using BellaHair.Domain.Discounts;
-using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Discounts
 {
@@ -26,11 +25,6 @@ namespace BellaHair.Infrastructure.Discounts
 
             if (discount is LoyaltyDiscount loyaltyDiscount) return loyaltyDiscount;
             throw new InvalidOperationException($"Discount with ID {id} is not a loyalty discount");
-        }
-
-        async Task<List<LoyaltyDiscount>> ILoyaltyDiscountRepository.GetAll()
-        {
-            return await _db.Discounts.OfType<LoyaltyDiscount>().ToListAsync();
         }
 
         async Task ILoyaltyDiscountRepository.SaveChangesAsync()
