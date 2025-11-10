@@ -1,6 +1,9 @@
 ﻿namespace BellaHair.Domain.Discounts
 {
     //Dennis
+    /// <summary>
+    /// Exposes operations for handling LoyaltyDiscounts
+    /// </summary>
     public interface ILoyaltyDiscountRepository
     {
         Task AddAsync(LoyaltyDiscount loyaltyDiscount);

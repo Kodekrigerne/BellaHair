@@ -3,6 +3,7 @@
 namespace BellaHair.Infrastructure.Discounts
 {
     //Dennis
+    /// <summary><inheritdoc cref="ILoyaltyDiscountRepository"/> on the DbContext.</summary>
     public class LoyaltyDiscountRepository : ILoyaltyDiscountRepository
     {
         private readonly BellaHairContext _db;

@@ -1,9 +1,10 @@
 ﻿using BellaHair.Domain.Discounts;
-using BellaHair.Ports;
+using BellaHair.Ports.Discounts;
 
 namespace BellaHair.Application
 {
     //Dennis
+    /// <inheritdoc cref="ILoyaltyDiscountCommand"/>
     class LoyaltyDiscountCommandHandler : ILoyaltyDiscountCommand
     {
         private readonly ILoyaltyDiscountRepository _loyaltyDiscountRepo;
