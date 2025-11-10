@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BellaHair.Domain.Bookings;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Infrastructure
 {
@@ -7,6 +8,7 @@ namespace BellaHair.Infrastructure
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddDbContext<BellaHairContext>();
+            serviceCollection.AddScoped<IDiscountCalculatorService, DiscountCalculatorService>();
 
             return serviceCollection;
         }
