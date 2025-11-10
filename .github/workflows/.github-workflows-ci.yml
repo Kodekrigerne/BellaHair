@@ -18,11 +18,20 @@ jobs:
         with:
           dotnet-version: '9.x'
 
-      - name: Restore dependencies
+      - name: Restore dependencies (Domain)
         run: dotnet restore BellaHair.Domain.Tests
 
-      - name: Build
+      - name: Restore dependencies (Infrastructure)
+        run: dotnet restore BellaHair.Infrastructure.Tests
+
+      - name: Build (Domain)
         run: dotnet build BellaHair.Domain.Tests --no-restore
 
-      - name: Run tests
+      - name: Build (Infrastructure)
+        run: dotnet build BellaHair.Infrastructure.Tests --no-restore
+
+      - name: Run tests (Domain)
         run: dotnet test BellaHair.Domain.Tests --no-build --logger:"console;verbosity=normal"
+
+      - name: Run tests (Infrastructure)
+        run: dotnet test BellaHair.Infrastructure.Tests --no-build --logger:"console;verbosity=normal"
