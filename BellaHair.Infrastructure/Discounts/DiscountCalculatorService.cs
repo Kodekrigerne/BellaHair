@@ -1,7 +1,7 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 
-namespace BellaHair.Infrastructure
+namespace BellaHair.Infrastructure.Discounts
 {
     //Dennis
     /// <inheritdoc cref="IDiscountCalculatorService"/>
