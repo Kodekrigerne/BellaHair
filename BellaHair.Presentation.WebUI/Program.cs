@@ -1,4 +1,7 @@
+using BellaHair.Application;
+using BellaHair.Infrastructure;
 using BellaHair.Presentation.WebUI.Components;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -11,6 +14,14 @@ namespace BellaHair.Presentation.WebUI
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            var options = new DbContextOptionsBuilder<BellaHairContext>()
+                .UseSqlite("Data Source=:memory:")
+                .Options;
+
+            builder.Services.AddSingleton(options);
+            builder.Services.AddApplicationServices();
+            builder.Services.AddInfrastructureServices();
 
             var app = builder.Build();
 
