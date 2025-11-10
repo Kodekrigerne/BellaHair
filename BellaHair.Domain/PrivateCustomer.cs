@@ -2,7 +2,7 @@
 {
     public class PrivateCustomer : EntityBase
     {
-        //Udregn denne ud fra mængden af fuldførte bookings, get => Bookings.Count ??
+        //Udregn denne ud fra mængden af fuldførte bookings, get => Bookings.Count ?? Eller som DB computed value
         public int Visits { get; private set; }
 
         private PrivateCustomer()
