@@ -22,7 +22,7 @@ namespace BellaHair.Domain.Tests.Discounts
         }
 
         [Test]
-        public void Given_InActiveFactory_Then_ConstructsInActiveBookingDiscount()
+        public void Given_InactiveFactory_Then_ConstructsInActiveBookingDiscount()
         {
             var name = "Test Name";
 
