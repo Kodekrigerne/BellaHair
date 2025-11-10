@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Domain.Tests", "B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Infrastructure.Tests", "BellaHair.Infrastructure.Tests\BellaHair.Infrastructure.Tests.csproj", "{424C09C3-78B1-4157-88F9-C92FD8951BF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,12 +49,17 @@ Global
 		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76F00F9C-304A-4615-8FDC-7C4DFF490774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{76F00F9C-304A-4615-8FDC-7C4DFF490774} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{424C09C3-78B1-4157-88F9-C92FD8951BF6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21C7DBC5-D7B0-4152-8052-244167D0C8C4}
