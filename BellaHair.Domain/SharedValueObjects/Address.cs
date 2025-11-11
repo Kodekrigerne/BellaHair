@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain.SharedValueObjects
 {
+    /// <summary>
+    /// Represents an immutable postal address, including street name, street number, city, zip code, and optional floor
+    /// information. Provides validation of each property.
+    /// </summary>
     public partial record Address
     {
         public string StreetName { get; private init; }
@@ -17,12 +21,18 @@ namespace BellaHair.Domain.SharedValueObjects
         public int ZipCode { get; private init; }
         public string FullAddress { get; private init; }
 
-
+        // Constructor til EF.
         #pragma warning disable CS8618
         private Address() { }
         #pragma warning restore CS8618
 
 
+        // Offentlig metode til oprettelse af Address-objekt. Kalder privat constructor.
+        public static Address FromInputs(string streetName, string city, string streetNumber, int zipCode,
+            int? floor = null) => new(streetName, city, streetNumber, zipCode, floor);
+
+
+        // Privat constructor kalder validering af parametre, og sætter properties.
         private Address(string streetName, string city, string streetNumber, int zipCode, int? floor = null)
         {
             ValidateStreetAndCity(streetName);
@@ -44,7 +54,8 @@ namespace BellaHair.Domain.SharedValueObjects
             FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
         }
 
-
+        // Returnerer én samlet adresse-string sammensat af properties vha. StringBuilder.
+        // Udelader floor såfremt denne er null.
         private string BuildFullAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
         {
             var sb = new StringBuilder();
@@ -92,10 +103,8 @@ namespace BellaHair.Domain.SharedValueObjects
         }
 
 
-        public static Address FromInputs(string streetName, string city, string streetNumber, int zipCode,
-            int? floor = null) => new(streetName, city, streetNumber, zipCode, floor);
-
-
+        // Regular Expression anvendt til trim af dobbelt whitespace.
+        // Køres compile-time for at spare ressourcer ved runtime.
         [GeneratedRegex(@"\s+")]
         private static partial Regex WhiteSpaceRegex();
     }
