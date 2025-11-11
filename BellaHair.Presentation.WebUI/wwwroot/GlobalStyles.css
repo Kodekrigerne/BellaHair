@@ -34,25 +34,33 @@
 
 .btn-select:hover{
     background-color:#f7f7f7;
-    cursor:pointer;
+    cursor:default;
 }
 
-    .btn-select:active {
-        background-color: #990dff;
 
-    }
-
-
-.container {
+.container, .container-nested {
     font-family: system-ui;
-    background-color: white;
     border-radius: 15px;
     border: none;
     outline: none;
-    box-shadow: 0px 0px 3px rgba(0,0,0,0.50);
     padding: 20px;
     margin: 20px;
 }
+
+.container {
+    background-color: white;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.50);
+}
+
+.container-nested {
+    background-color: #f9fafc;
+    box-shadow: 0px 0px 1px rgba(0,0,0,0.50);
+}
+
+    .container-nested:hover {
+        background-color: #f1f3f9;
+    }
+
 
 .dropdown {
 
