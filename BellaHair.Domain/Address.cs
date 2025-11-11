@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
@@ -6,20 +6,25 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace BellaHair.Domain.SharedValueObjects
+namespace BellaHair.Domain
 {
     /// <summary>
-    /// Represents an immutable postal address, including street name, street number, city, zip code, and optional floor
+    /// Represents a postal address, including street name, street number, city, zip code, and optional floor
     /// information. Provides validation of each property.
     /// </summary>
-    public partial record Address
+    // Mikkel Dahlmann
+    public class Address : EntityBase
     {
-        public string StreetName { get; private init; }
-        public string City { get; private init; }
-        public string StreetNumber { get; private init; }
-        public int? Floor { get; private init; }
-        public int ZipCode { get; private init; }
-        public string FullAddress { get; private init; }
+        public string StreetName { get; private set; }
+        public string City { get; private set; }
+        public string StreetNumber { get; private set; }
+        public int? Floor { get; private set; }
+        public int ZipCode { get; private set; }
+        public string FullAddress { get; private set; }
+        
+        // Regular Expression anvendt til trim af dobbelt whitespace.
+        // Køres compile-time for at spare ressourcer ved runtime.
+        private static readonly Regex WhiteSpaceRegex = new((@"\s+"), RegexOptions.Compiled);
 
         // Constructor til EF.
         #pragma warning disable CS8618
@@ -28,7 +33,7 @@ namespace BellaHair.Domain.SharedValueObjects
 
 
         // Offentlig metode til oprettelse af Address-objekt. Kalder privat constructor.
-        public static Address FromInputs(string streetName, string city, string streetNumber, int zipCode,
+        public static Address Create(string streetName, string city, string streetNumber, int zipCode,
             int? floor = null) => new(streetName, city, streetNumber, zipCode, floor);
 
 
@@ -42,10 +47,10 @@ namespace BellaHair.Domain.SharedValueObjects
             if (floor != null) ValidateFloor(floor);
 
             StreetName = streetName.Trim();
-            StreetName = WhiteSpaceRegex().Replace(StreetName, " ");
+            StreetName = WhiteSpaceRegex.Replace(StreetName, " ");
 
             City = city.Trim();
-            City = WhiteSpaceRegex().Replace(City, " ");
+            City = WhiteSpaceRegex.Replace(City, " ");
             
             StreetNumber = streetNumber;
             ZipCode = zipCode;
@@ -102,13 +107,26 @@ namespace BellaHair.Domain.SharedValueObjects
                 throw new AddressException("Floor is invalid, must be between 1 and 100.");
         }
 
+        public void UpdateAddress(string streetName, string city, string streetNumber, int zipCode, int? floor)
+        {
+            ValidateStreetAndCity(streetName);
+            ValidateStreetAndCity(city);
+            ValidateStreetNumber(streetNumber);
+            ValidateZipCode(zipCode);
+            if (floor != null) ValidateFloor(floor);
 
-        // Regular Expression anvendt til trim af dobbelt whitespace.
-        // Køres compile-time for at spare ressourcer ved runtime.
-        [GeneratedRegex(@"\s+")]
-        private static partial Regex WhiteSpaceRegex();
+            StreetName = streetName.Trim();
+            StreetName = WhiteSpaceRegex.Replace(StreetName, " ");
+
+            City = city.Trim();
+            City = WhiteSpaceRegex.Replace(City, " ");
+
+            StreetNumber = streetNumber;
+            ZipCode = zipCode;
+            Floor = floor;
+
+            FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
+        }
     }
-
-
     public class AddressException(string message) : Exception(message);
 }
