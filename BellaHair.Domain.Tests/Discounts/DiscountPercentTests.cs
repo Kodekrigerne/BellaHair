@@ -1,5 +1,5 @@
-﻿using BellaHair.Domain.Discounts;
-using System.Globalization;
+﻿using System.Globalization;
+using BellaHair.Domain.Discounts;
 
 namespace BellaHair.Domain.Tests.Discounts
 {
@@ -11,10 +11,13 @@ namespace BellaHair.Domain.Tests.Discounts
         [TestCase("1.0")]
         public void Given_ValidNumber_Then_ReturnsDiscountPercent(string percentStr)
         {
+            //Arrange
             var percent = decimal.Parse(percentStr, CultureInfo.InvariantCulture);
 
+            //Act
             var discountPercent = DiscountPercent.FromDecimal(percent);
 
+            //Assert
             Assert.That(discountPercent.Value, Is.EqualTo(percent));
         }
 
@@ -22,8 +25,10 @@ namespace BellaHair.Domain.Tests.Discounts
         [TestCase("1.1")]
         public void Given_InvalidNumber_Then_ThrowsException(string percentStr)
         {
+            //Arrange
             var percent = decimal.Parse(percentStr, CultureInfo.InvariantCulture);
 
+            //Act & Assert
             Assert.Throws<DiscountPercentException>(() => DiscountPercent.FromDecimal(percent));
         }
     }
