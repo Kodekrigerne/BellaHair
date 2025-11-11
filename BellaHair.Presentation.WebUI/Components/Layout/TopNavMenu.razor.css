@@ -1,0 +1,42 @@
+﻿
+
+:root {
+    --bg-color-black: #fbf5ff;
+}
+
+
+.navbar {
+    background-color: #f2f2f2;
+    font-family:system-ui;
+    width: 100%; 
+    position: fixed; 
+    top: 0; 
+    height:70px;
+    overflow: hidden;
+}
+
+    .navbar ::deep a {
+        color: #434141;
+        text-align: center;
+        padding: 14px;
+        text-decoration: none;
+    }
+        .navbar ::deep a:hover {
+            background: #fbf5ff;
+            border-radius: 20px;
+            transition: background-color 0.5s;
+        }
+
+        .navbar ::deep a.active {
+            background: #fbf5ff;
+            color: #c216c2;
+            border-radius: 16px;
+            transition: background-color 0.5s;
+        }
+
+main {
+    margin: 0;
+    padding-top:50px;
+}
+
+
