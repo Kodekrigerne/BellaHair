@@ -17,9 +17,11 @@ namespace BellaHair.Domain.SharedValueObjects
         public int ZipCode { get; private init; }
         public string FullAddress { get; private init; }
 
+
         #pragma warning disable CS8618
         private Address() { }
         #pragma warning restore CS8618
+
 
         private Address(string streetName, string city, string streetNumber, int zipCode, int? floor = null)
         {
@@ -39,16 +41,11 @@ namespace BellaHair.Domain.SharedValueObjects
             ZipCode = zipCode;
             Floor = floor;
 
-            FullAddress = BuildAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
+            FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
         }
 
-        private void ValidateFloor(int? floor)
-        {
-            if (floor < 1 || floor > 100)
-                throw new AddressException("Floor is invalid, must be between 1 and 100.");
-        }
 
-        private string BuildAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
+        private string BuildFullAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
         {
             var sb = new StringBuilder();
 
@@ -64,6 +61,7 @@ namespace BellaHair.Domain.SharedValueObjects
             return sb.ToString();
         }
 
+
         private void ValidateStreetAndCity(string name)
         {
             if (!name.Any(x => char.IsLetter(x) || x == ' ')) 
@@ -73,11 +71,13 @@ namespace BellaHair.Domain.SharedValueObjects
                 throw new AddressException("Name can not be longer than 30 characters.");
         }
 
+
         private void ValidateStreetNumber(string streetNumber)
         {
             if (!streetNumber.Any(char.IsLetterOrDigit))
                 throw new AddressException("Streetnumber can only consist of numbers and letters.");
         }
+
 
         private void ValidateZipCode(int zipCode)
         {
@@ -85,12 +85,21 @@ namespace BellaHair.Domain.SharedValueObjects
                 throw new AddressException("Zipcode is invalid.");
         }
 
+        private void ValidateFloor(int? floor)
+        {
+            if (floor < 1 || floor > 100)
+                throw new AddressException("Floor is invalid, must be between 1 and 100.");
+        }
+
+
         public static Address FromInputs(string streetName, string city, string streetNumber, int zipCode,
             int? floor = null) => new(streetName, city, streetNumber, zipCode, floor);
+
 
         [GeneratedRegex(@"\s+")]
         private static partial Regex WhiteSpaceRegex();
     }
+
 
     public class AddressException(string message) : Exception(message);
 }
