@@ -1,0 +1,94 @@
+﻿/* Mikkel Klitgaard */ 
+
+:root {
+
+}
+
+/* Headers */
+h1{
+
+}
+
+h2 {
+
+}
+
+h3{
+
+}
+
+/* Tilføj-knap til bookings, kunder, medarbejdere, etc */ 
+.btn-add {
+    background-color: #990dff;
+    border-style: none;
+    border-radius: 10px;
+    color: white;
+    padding: 0.6rem;
+}
+
+    .btn-add:hover {
+        background-color: #8300da;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.25);
+        cursor: pointer;
+    }
+
+    .btn-add:active {
+        transform: translate(1px, 1px);
+    }
+
+/* Select-knappe til at navigere mellem sider */ 
+.btn-select, .btn-select-active {
+    box-shadow: 0px 0px 2px rgba(0,0,0,0.50);
+    border-style:none;
+    border-radius:8px;
+    padding-left: 15px;
+    padding-right:15px;
+    padding-top: 5px;
+    padding-bottom:5px;
+}
+
+.btn-select {
+    background-color: white;
+}
+
+.btn-select:hover{
+    background-color:#f7f7f7;
+    cursor:default;
+}
+
+.btn-select-active {
+    background-color: #990dff;
+}
+
+/* Div-containers med indhold */
+.container, .container-nested {
+    font-family: system-ui;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    padding: 20px;
+    margin: 20px;
+}
+
+.container {
+    background-color: white;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.50);
+}
+
+.container-nested {
+    background-color: #f9fafc;
+    box-shadow: 0px 0px 1px rgba(0,0,0,0.50);
+}
+
+    .container-nested:hover {
+        background-color: #f1f3f9;
+    }
+
+
+.dropdown {
+
+}
+
+p {
+
+}
