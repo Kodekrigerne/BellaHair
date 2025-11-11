@@ -35,7 +35,8 @@ namespace BellaHair.Infrastructure.Discounts
                 {
                     var curBookingDiscount = discount.CalculateBookingDiscount(booking);
 
-                    if (bestBookingDiscount == null || curBookingDiscount.Amount > bestBookingDiscount.Amount)
+                    if (curBookingDiscount.DiscountActive &&
+                    (bestBookingDiscount == null || curBookingDiscount.Amount > bestBookingDiscount.Amount))
                     {
                         // Vi anvender en Lock for at løse den opståede race condition
                         lock (_lock)
