@@ -8,11 +8,14 @@ namespace BellaHair.Domain.Tests.Discounts
         [Test]
         public void Given_ActiveFactory_Then_ConstructsActiveBookingDiscount()
         {
+            //Arrange
             var name = "Test Name";
             var discountAmount = 5.25m;
 
+            //Act
             var bookingDiscount = BookingDiscount.Active(name, discountAmount);
 
+            //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(bookingDiscount.Name, Is.EqualTo(name));
@@ -24,10 +27,13 @@ namespace BellaHair.Domain.Tests.Discounts
         [Test]
         public void Given_InactiveFactory_Then_ConstructsInActiveBookingDiscount()
         {
+            //Arrange
             var name = "Test Name";
 
+            //Act
             var bookingDiscount = BookingDiscount.Inactive(name);
 
+            //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(bookingDiscount.Name, Is.EqualTo(name));
