@@ -1,7 +1,10 @@
-﻿:root {
+﻿/* Mikkel Klitgaard */ 
+
+:root {
 
 }
 
+/* Headers */
 h1{
 
 }
@@ -14,7 +17,7 @@ h3{
 
 }
 
-
+/* Tilføj-knap til bookings, kunder, medarbejdere, etc */ 
 .btn-add {
     background-color: #990dff;
     border-style: none;
@@ -33,6 +36,7 @@ h3{
         transform: translate(1px, 1px);
     }
 
+/* Select-knappe til at navigere mellem sider */ 
 .btn-select, .btn-select-active {
     box-shadow: 0px 0px 2px rgba(0,0,0,0.50);
     border-style:none;
@@ -56,7 +60,7 @@ h3{
     background-color: #990dff;
 }
 
-
+/* Div-containers med indhold */
 .container, .container-nested {
     font-family: system-ui;
     border-radius: 15px;

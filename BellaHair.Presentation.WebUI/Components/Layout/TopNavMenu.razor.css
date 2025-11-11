@@ -1,10 +1,10 @@
-﻿
+﻿/* Mikkel Klitgaard */
 
 :root {
-    --bg-color-black: #fbf5ff;
+
 }
 
-
+/* Navigationsbar */
 .navbar {
     background-color: #f2f2f2;
     font-family: system-ui;
@@ -15,6 +15,9 @@
     overflow: hidden;
 }
 
+/* Vi bruger ::deep til hvert element fordi vi bruger .css isolation (TopNavMenu.razor har sin egen .css klasse) 
+    <NavLink> renderes som et a-tag
+*/
     .navbar ::deep a {
         color: #434141;
         text-align: center;
@@ -34,6 +37,7 @@
             transition: background-color 0.5s;
         }
 
+/* Main content (padding-top for at kunne se indhold under navigationsbar) */
 main {
     margin: 0;
     padding-top:50px;
