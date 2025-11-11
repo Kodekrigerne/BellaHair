@@ -1,4 +1,4 @@
-﻿using System;
+﻿    using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
@@ -75,7 +75,7 @@ namespace BellaHair.Domain.SharedValueObjects
 
         private void ValidateStreetAndCity(string name)
         {
-            if (!name.Any(x => char.IsLetter(x) || x == ' ')) 
+            if (name.Any(x => !char.IsLetter(x) && x != '-' && x != ' ')) 
                 throw new AddressException("Name can only consist of letters.");
             
             if (name.Length > 50) 
@@ -85,7 +85,7 @@ namespace BellaHair.Domain.SharedValueObjects
 
         private void ValidateStreetNumber(string streetNumber)
         {
-            if (!streetNumber.Any(char.IsLetterOrDigit))
+            if (streetNumber.Any(x => !char.IsLetterOrDigit(x)))
                 throw new AddressException("Streetnumber can only consist of numbers and letters.");
         }
 
