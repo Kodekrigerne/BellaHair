@@ -23,9 +23,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
         [TestCase("Bo", "Jensen", "Børge@")]
         public void Given_FirstLastOrMiddleNameContainsInvalidCharacter_Then_ThrowsException(string firstName, string lastName, string middleName)
         {
-            //Arrange - ?
-
-            //Act & Assert
+            //Arrange, Act & Assert
             Assert.Throws<NameException>(() => Name.FromStrings(firstName, lastName, middleName));
         }
 
