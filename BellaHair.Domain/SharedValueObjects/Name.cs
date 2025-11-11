@@ -20,7 +20,7 @@ namespace BellaHair.Domain.SharedValueObjects
         public string? MiddleName { get; private init; }
         public string FullName { get; private init; }
 
-        // A compiled regular expression used to validate that a name part contains only acceptable characters.
+        // Et kompileret regulært udtryk, der bruges til at validere, at en del af navnet kun indeholder acceptable tegn.
         private static readonly Regex ValidNamePartRegex = new(@"^[\p{L}\s.'-]+$", RegexOptions.Compiled);
 
 #pragma warning disable CS8618
