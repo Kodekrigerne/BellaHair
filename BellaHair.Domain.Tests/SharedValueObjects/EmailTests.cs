@@ -14,7 +14,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
         [TestCase("a@gmail.com")]
         [TestCase("123@aaa.dk")]
         [TestCase("jørgen@123.net")]
-        public void Given_ValidNumber_Then_CreatesEmail(string value)
+        public void Given_ValidEmail_Then_CreatesEmail(string value)
         {
             //Act
             Email createdEmail = Email.FromString(value);
@@ -22,5 +22,20 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             //Assert
             Assert.That(createdEmail.Value, Is.EqualTo(value));
         }
+
+        [TestCase("@gmail.com")]
+        [TestCase("123@.dk")]
+        [TestCase("jørgen@123.")]
+        [TestCase("")]
+        [TestCase("!!!@?.com")]
+        public void Given_InvalidEmail_Then_CreatesEmail(string value)
+        {
+            //Act
+            Email createdEmail = Email.FromString(value);
+
+            //Assert
+            Assert.That(createdEmail.Value, Is.EqualTo(value));
+        }
+
     }
 }

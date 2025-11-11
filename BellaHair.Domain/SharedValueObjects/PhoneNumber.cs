@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain.SharedValueObjects
 {
-
     /// <summary>
     /// Phone number value object with validation logic.
     /// </summary>
@@ -18,25 +17,25 @@ namespace BellaHair.Domain.SharedValueObjects
         protected PhoneNumber() { }
 #pragma warning restore CS8618
 
-        private PhoneNumber(string number)
+        private PhoneNumber(string value)
         {
-            ValidateNumberLength(number);
-            Value = number;
+            ValidateNumberLength(value);
+            Value = value;
         }
 
-        public static PhoneNumber FromString(string number) => new(number);
+        public static PhoneNumber FromString(string value) => new(value);
 
         /// <summary>
         /// Checks if number is 8 digits and throws exceptions if its under or below.
         /// Checks if number only contains digits and throws exception if it contains other characters
         /// </summary>
-        /// <param name="number"></param>
+        /// <param name="value"></param>
         /// <exception cref="NumberException"></exception>
-        private void ValidateNumberLength(string number)
+        private void ValidateNumberLength(string value)
         {
-            if (number.Length > 8) throw new NumberException("The number is too long.");
-            if (number.Length < 8) throw new NumberException("The number is not long enough.");
-            if (!number.All(Char.IsDigit)) throw new NumberException("The number has invalid characters."); 
+            if (value.Length > 8) throw new NumberException("The number is too long.");
+            if (value.Length < 8) throw new NumberException("The number is not long enough.");
+            if (!value.All(Char.IsDigit)) throw new NumberException("The number has invalid characters."); 
         }
     }
 
