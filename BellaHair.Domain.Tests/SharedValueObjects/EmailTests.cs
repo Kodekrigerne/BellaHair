@@ -7,8 +7,6 @@ using BellaHair.Domain.SharedValueObjects;
 
 namespace BellaHair.Domain.Tests.SharedValueObjects
 {
-
-    // TODO: Create more Email tests
     internal sealed class EmailTests
     {
         [TestCase("a@gmail.com")]
@@ -26,16 +24,11 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
         [TestCase("@gmail.com")]
         [TestCase("123@.dk")]
         [TestCase("jørgen@123.")]
-        [TestCase("")]
-        [TestCase("!!!@?.com")]
-        public void Given_InvalidEmail_Then_CreatesEmail(string value)
+        [TestCase("@@?.com")]
+        public void Given_InvalidEmail_Then_ThrowsException(string value)
         {
-            //Act
-            Email createdEmail = Email.FromString(value);
-
-            //Assert
-            Assert.That(createdEmail.Value, Is.EqualTo(value));
+            //Act & Assert
+            Assert.Throws<EmailException>(() => Email.FromString(value));
         }
-
     }
 }

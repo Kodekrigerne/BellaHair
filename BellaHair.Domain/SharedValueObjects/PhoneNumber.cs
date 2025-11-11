@@ -31,7 +31,7 @@ namespace BellaHair.Domain.SharedValueObjects
         /// </summary>
         /// <param name="value"></param>
         /// <exception cref="NumberException"></exception>
-        private void ValidateNumberLength(string value)
+        private static void ValidateNumberLength(string value)
         {
             if (value.Length > 8) throw new NumberException("The number is too long.");
             if (value.Length < 8) throw new NumberException("The number is not long enough.");

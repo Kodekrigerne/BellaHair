@@ -21,7 +21,7 @@ namespace BellaHair.Domain.SharedValueObjects
         public string FullName { get; private init; }
 
         // A compiled regular expression used to validate that a name part contains only acceptable characters.
-        private static readonly Regex ValidNamePartRegex = new Regex(@"^[\p{L}\s.'-]+$", RegexOptions.Compiled);
+        private static readonly Regex ValidNamePartRegex = new(@"^[\p{L}\s.'-]+$", RegexOptions.Compiled);
 
 #pragma warning disable CS8618
         private Name() { }
