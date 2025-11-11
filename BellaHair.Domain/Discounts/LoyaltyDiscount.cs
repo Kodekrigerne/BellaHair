@@ -30,7 +30,6 @@ namespace BellaHair.Domain.Discounts
 
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
-            //TODO: Uncomment after implementing customer visits counter
             if (booking.Customer.Visits < MinimumVisits) return BookingDiscount.Inactive(Name);
 
             var discountAmount = booking.Total * DiscountPercent.Value;
