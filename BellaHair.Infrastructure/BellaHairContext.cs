@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BellaHair.Domain.Bookings;
+using BellaHair.Domain.Discounts;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure
 {
@@ -6,11 +8,16 @@ namespace BellaHair.Infrastructure
     {
         public BellaHairContext(DbContextOptions<BellaHairContext> options) : base(options) { }
 
+        public DbSet<DiscountBase> Discounts { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            //TPC mapping vælges så alle nedarvere af DiscountBase får deres egen tabel, og ingen tabel for baseklassen oprettes.
+            modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount);
         }
     }
 }
