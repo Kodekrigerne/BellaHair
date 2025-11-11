@@ -14,7 +14,7 @@
             Value = value;
         }
 
-        public static Duration FromInt(int value) => new Duration(value);
+        public static Duration FromInt(int duration) => new Duration(duration);
 
 
         public static void ValidateDuration(int value)
