@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BellaHair.Domain.SharedValueObjects;
 
-namespace BellaHair.Domain.Tests.SharedValueObjects
+namespace BellaHair.Domain.Tests
 {
     internal sealed class AddressTests
     {
@@ -20,7 +19,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             var zipCode = 7100;
 
             // Act
-            var testAddress = Address.FromInputs(streetName, city, streetNumber, zipCode, floor);
+            var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
             Assert.Multiple(() =>
@@ -43,7 +42,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             var zipCode = 7100;
 
             // Act
-            var testAddress = Address.FromInputs(streetName, city, streetNumber, zipCode);
+            var testAddress = Address.Create(streetName, city, streetNumber, zipCode);
 
             // Assert
             Assert.Multiple(() =>
@@ -51,7 +50,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
                 Assert.That(testAddress.StreetName, Is.EqualTo(streetName));
                 Assert.That(testAddress.City, Is.EqualTo(city));
                 Assert.That(testAddress.StreetNumber, Is.EqualTo(streetNumber));
-                Assert.That(testAddress.Floor, Is.EqualTo(null));
+                Assert.That(testAddress.Floor, Is.Null);
                 Assert.That(testAddress.ZipCode, Is.EqualTo(zipCode));
             });
         }
@@ -67,7 +66,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             var zipCode = 7100;
 
             // Act
-            var testAddress = Address.FromInputs(streetName, city, streetNumber, zipCode, floor);
+            var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
             Assert.Multiple(() =>
@@ -91,7 +90,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             var zipCode = 7100;
 
             // Act
-            var testAddress = Address.FromInputs(streetName, city, streetNumber, zipCode, floor);
+            var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
             Assert.Multiple(() =>
@@ -115,7 +114,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             var zipCode = 7100;
 
             // Act
-            var testAddress = Address.FromInputs(streetName, city, streetNumber, zipCode, floor);
+            var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
             Assert.That(testAddress.FullAddress, Is.EqualTo($"{streetName} {streetNumber}, {floor}. sal, {zipCode} {city}"));
@@ -131,7 +130,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             var zipCode = 7100;
 
             // Act
-            var testAddress = Address.FromInputs(streetName, city, streetNumber, zipCode);
+            var testAddress = Address.Create(streetName, city, streetNumber, zipCode);
 
             // Assert
             Assert.That(testAddress.FullAddress, Is.EqualTo($"{streetName} {streetNumber}, {zipCode} {city}"));
@@ -146,7 +145,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             string streetNumber, int floor, int zipCode)
         {
             // Arrange & Act & Assert
-            Assert.Throws<AddressException>(() => Address.FromInputs(streetName, city, streetNumber, zipCode, floor));
+            Assert.Throws<AddressException>(() => Address.Create(streetName, city, streetNumber, zipCode, floor));
         }
 
     }
