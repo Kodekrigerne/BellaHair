@@ -15,6 +15,7 @@ namespace BellaHair.Infrastructure.Discounts
         async Task<List<LoyaltyDiscountDTO>> ILoyaltyDiscountQuery.GetLoyaltyDiscounts()
         {
             return await _db.Discounts
+                .AsNoTracking()
                 .OfType<LoyaltyDiscount>()
                 .Select(x => new LoyaltyDiscountDTO(x.Id, x.Name, x.MinimumVisits, x.DiscountPercent.Value))
                 .ToListAsync();
