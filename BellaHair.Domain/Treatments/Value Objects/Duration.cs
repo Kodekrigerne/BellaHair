@@ -29,5 +29,5 @@
 
     }
 
-    public class DurationException(string message) : Exception(message);
+    public class DurationException(string message) : DomainException(message);
 }
