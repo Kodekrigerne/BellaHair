@@ -26,5 +26,5 @@
 
     }
 
-    public class PriceException(string message) : Exception(message);
+    public class PriceException(string message) : DomainException(message);
 }
