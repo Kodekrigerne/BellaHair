@@ -1,4 +1,5 @@
 ﻿using BellaHair.Domain.Discounts;
+using BellaHair.Domain.PrivateCustomers;
 
 namespace BellaHair.Domain.Bookings
 {

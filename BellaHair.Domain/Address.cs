@@ -13,7 +13,7 @@ namespace BellaHair.Domain
     /// information. Provides validation of each property.
     /// </summary>
     // Mikkel Dahlmann
-    public class Address : EntityBase
+    public class Address
     {
         public string StreetName { get; private set; }
         public string City { get; private set; }
