@@ -1,6 +1,6 @@
 ﻿namespace BellaHair.Domain.Treatments.Value_Objects
 {
-    //Mikkel Klitgaard
+    // Mikkel Klitgaard
     public record Price
     {
         public decimal Value { get; private init; }
@@ -11,6 +11,7 @@
 
         private Price(decimal value)
         {
+            ValidatePrice(value);
             Value = value;
         }
 
@@ -18,9 +19,9 @@
 
         public static void ValidatePrice(decimal value)
         {
-            if (value < 0)
-                throw new PriceException("Price cannot be less than zero.");
-            if (value > 100000)
+            if (value < 1m)
+                throw new PriceException("Price cannot be zero or less");
+            if (value > 100_000m)
                 throw new PriceException("Price cannot exceed 100.000");
         }
 

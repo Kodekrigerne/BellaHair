@@ -10,15 +10,15 @@ namespace BellaHair.Domain.Tests.Treatments
         [TestCase(-1)]
         public void GivenDurationIsLessThan10_Then_ThrowsException(int value)
         {
-            //Act & Assert
+            // Act & Assert
             Assert.Throws<DurationException>(() => Duration.FromInt(value));
         }
 
         [TestCase(301)]
         [TestCase(2000)]
-        public void GivenDurationIsMoreThan300_Then_ThrowsException(int value)
+        public void GivenDurationIsGreaterThan300_Then_ThrowsException(int value)
         {
-            //Act & Assert
+            // Act & Assert
             Assert.Throws<DurationException>(() => Duration.FromInt(value));
         }
 
@@ -27,12 +27,10 @@ namespace BellaHair.Domain.Tests.Treatments
         [TestCase(120)]
         public void GivenDurationIsValid_Then_ConstructsDuration(int value)
         {
-            //Arrange
-
-            //Act
+            // Act
             Duration validDuration = Duration.FromInt(value);
 
-            //Assert
+            // Assert
             Assert.That(validDuration.Value, Is.EqualTo(value));
         }
     }
