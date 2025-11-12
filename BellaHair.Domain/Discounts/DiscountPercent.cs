@@ -24,5 +24,5 @@ namespace BellaHair.Domain.Discounts
         public static DiscountPercent FromDecimal(decimal discountPercent) => new(discountPercent);
     }
 
-    public class DiscountPercentException(string message) : Exception(message);
+    public class DiscountPercentException(string message) : DomainException(message);
 }
