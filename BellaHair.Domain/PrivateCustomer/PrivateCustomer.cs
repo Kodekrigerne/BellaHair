@@ -1,20 +1,33 @@
-﻿namespace BellaHair.Domain.PrivateCustomer
+﻿using BellaHair.Domain.Bookings;
+using BellaHair.Domain.SharedValueObjects;
+
+namespace BellaHair.Domain.PrivateCustomer
 {
+    // Mikkel Dahlmann
     public class PrivateCustomer : PersonBase
     {
-        public DateTime BirthDay { get; private set; }
-        
         //Udregn denne ud fra mængden af fuldførte bookings, get => Bookings.Count ?? Eller som DB computed value
-        public int Visits { get; private set; }
+        public int Visits => Bookings.Count;
+        public DateTime Birthday { get; private set; }
+        private readonly List<Booking> _bookings;
+        
+        // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
+        public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
 
-        private PrivateCustomer()
+        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
             Id = Guid.NewGuid();
+            Name = name;
+            Address = address;
+            PhoneNumber = phoneNumber;
+            Email = email;
+            Birthday = birthday;
+            _bookings = [];
         }
 
-        public static PrivateCustomer Create()
+        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
-            return new PrivateCustomer();
+            return new PrivateCustomer(name, address, phoneNumber, email, birthday);
         }
     }
 }

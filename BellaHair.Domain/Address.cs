@@ -13,6 +13,7 @@ namespace BellaHair.Domain
     /// information. Provides validation of each property.
     /// </summary>
     // Mikkel Dahlmann
+    // Nedarver ikke fra EntityBase. Bruger ikke ID. Defineres som en complextype gennem EF modelbuilder.
     public class Address
     {
         public string StreetName { get; private set; }
