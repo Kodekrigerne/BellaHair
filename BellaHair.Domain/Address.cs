@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BellaHair.Domain
 {
@@ -24,15 +19,15 @@ namespace BellaHair.Domain
         public int? Floor { get; private set; }
         public int ZipCode { get; private set; }
         public string FullAddress { get; private set; }
-        
+
         // Regular Expression anvendt til trim af dobbelt whitespace.
         // Køres compile-time for at spare ressourcer ved runtime.
         private static readonly Regex WhiteSpaceRegex = new((@"\s+"), RegexOptions.Compiled);
 
         // Constructor til EF.
-        #pragma warning disable CS8618
+#pragma warning disable CS8618
         private Address() { }
-        #pragma warning restore CS8618
+#pragma warning restore CS8618
 
 
         // Offentlig metode til oprettelse af Address-objekt. Kalder privat constructor.
@@ -54,7 +49,7 @@ namespace BellaHair.Domain
 
             City = city.Trim();
             City = WhiteSpaceRegex.Replace(City, " ");
-            
+
             StreetNumber = streetNumber;
             ZipCode = zipCode;
             Floor = floor;
@@ -83,10 +78,10 @@ namespace BellaHair.Domain
 
         private void ValidateStreetAndCity(string name)
         {
-            if (name.Any(x => !char.IsLetter(x) && x != '-' && x != ' ')) 
+            if (name.Any(x => !char.IsLetter(x) && x != '-' && x != ' '))
                 throw new AddressException("Name can only consist of letters.");
-            
-            if (name.Length > 50) 
+
+            if (name.Length > 50)
                 throw new AddressException("Name can not be longer than 30 characters.");
         }
 
@@ -131,5 +126,5 @@ namespace BellaHair.Domain
             FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
         }
     }
-    public class AddressException(string message) : Exception(message);
+    public class AddressException(string message) : DomainException(message);
 }

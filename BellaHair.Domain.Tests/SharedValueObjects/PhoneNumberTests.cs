@@ -26,7 +26,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
         public void Given_NumberTooShort_Then_ThrowsException(string value)
         {
             //Act & Assert
-            Assert.Throws<NumberException>(() => PhoneNumber.FromString(value));
+            Assert.Throws<PhoneNumberException>(() => PhoneNumber.FromString(value));
         }
 
         [TestCase("123456789")]
@@ -34,7 +34,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
         public void Given_NumberTooLong_Then_ThrowsException(string value)
         {
             //Act & Assert
-            Assert.Throws<NumberException>(() => PhoneNumber.FromString(value));
+            Assert.Throws<PhoneNumberException>(() => PhoneNumber.FromString(value));
         }
 
         [TestCase("abc12345")]
@@ -43,7 +43,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
         public void Given_NumberContainsNonDigits_Then_ThrowsException(string value)
         {
             //Act & Assert
-            Assert.Throws<NumberException>(() => PhoneNumber.FromString(value));
+            Assert.Throws<PhoneNumberException>(() => PhoneNumber.FromString(value));
         }
     }
 }
