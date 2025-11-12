@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
+using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure
@@ -18,6 +19,8 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount);
+            modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
+            modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Duration);
         }
     }
 }
