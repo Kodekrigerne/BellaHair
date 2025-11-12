@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Treatments.Value_Objects;
+﻿using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Domain.Treatments.ValueObjects;
 
 namespace BellaHair.Domain.Treatments
 {
