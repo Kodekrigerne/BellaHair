@@ -1,4 +1,4 @@
-﻿using BellaHair.Domain.Treatments.Value_Objects;
+﻿using BellaHair.Domain.Treatments.ValueObjects;
 
 namespace BellaHair.Domain.Tests.Treatments
 {
@@ -8,7 +8,7 @@ namespace BellaHair.Domain.Tests.Treatments
         [TestCase(9)]
         [TestCase(0)]
         [TestCase(-1)]
-        public void GivenDurationIsLessThan10_Then_ThrowsException(int value)
+        public void Given_DurationIsLessThan10_Then_ThrowsException(int value)
         {
             // Act & Assert
             Assert.Throws<DurationException>(() => Duration.FromInt(value));
@@ -16,7 +16,7 @@ namespace BellaHair.Domain.Tests.Treatments
 
         [TestCase(301)]
         [TestCase(2000)]
-        public void GivenDurationIsGreaterThan300_Then_ThrowsException(int value)
+        public void Given_DurationIsGreaterThan300_Then_ThrowsException(int value)
         {
             // Act & Assert
             Assert.Throws<DurationException>(() => Duration.FromInt(value));
@@ -25,7 +25,7 @@ namespace BellaHair.Domain.Tests.Treatments
         [TestCase(10)]
         [TestCase(300)]
         [TestCase(120)]
-        public void GivenDurationIsValid_Then_ConstructsDuration(int value)
+        public void Given_DurationIsValid_Then_ConstructsDuration(int value)
         {
             // Act
             Duration validDuration = Duration.FromInt(value);
