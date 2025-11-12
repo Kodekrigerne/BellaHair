@@ -37,5 +37,5 @@ namespace BellaHair.Domain.Discounts
         }
     }
 
-    public class LoyaltyDiscountException(string message) : Exception(message);
+    public class LoyaltyDiscountException(string message) : DomainException(message);
 }

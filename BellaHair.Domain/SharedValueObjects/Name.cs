@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace BellaHair.Domain.SharedValueObjects
 {
@@ -12,7 +7,6 @@ namespace BellaHair.Domain.SharedValueObjects
     /// Name value object that contains firstname, lastname and optional (nullable) middle name.
     /// Has validation logic - currently only letters and one last name are allowed.
     /// </summary>
-    
     public record Name
     {
         public string FirstName { get; private init; }
@@ -25,7 +19,7 @@ namespace BellaHair.Domain.SharedValueObjects
 
 #pragma warning disable CS8618
         private Name() { }
-        #pragma warning restore CS8618
+#pragma warning restore CS8618
 
         private Name(string firstName, string lastName, string? middleName = null)
         {
@@ -40,7 +34,7 @@ namespace BellaHair.Domain.SharedValueObjects
             LastName = lastName;
             MiddleName = middleName;
 
-            if (middleName == null) FullName = $"{FirstName} {LastName}";       
+            if (middleName == null) FullName = $"{FirstName} {LastName}";
             else FullName = $"{FirstName} {MiddleName} {LastName}";
         }
 
@@ -54,5 +48,5 @@ namespace BellaHair.Domain.SharedValueObjects
         }
     }
 
-    public class NameException(string message): Exception(message);
+    public class NameException(string message) : DomainException(message);
 }
