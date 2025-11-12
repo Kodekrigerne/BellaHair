@@ -11,7 +11,12 @@ namespace BellaHair.Infrastructure.Tests
                 .UseSqlite("Data Source=:memory:")
                 .Options;
 
-            Assert.DoesNotThrow(() => new BellaHairContext(options));
+            Assert.DoesNotThrow(() =>
+            {
+                var db = new BellaHairContext(options);
+                db.Database.OpenConnection();
+                db.Database.EnsureCreated();
+            });
         }
     }
 }
