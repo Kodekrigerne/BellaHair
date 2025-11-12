@@ -1,5 +1,6 @@
-﻿using BellaHair.Domain.Treatments;
-using BellaHair.Domain.Treatments.Value_Objects;
+﻿using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Domain.Treatments;
+using BellaHair.Domain.Treatments.ValueObjects;
 
 namespace BellaHair.Domain.Tests.Treatments
 {
@@ -24,7 +25,6 @@ namespace BellaHair.Domain.Tests.Treatments
         public void GivenValidTreatment_Then_CreatesTreatment()
         {
             // Arrange
-            var name =
 
             // Act
 

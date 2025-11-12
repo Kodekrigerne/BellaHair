@@ -9,11 +9,9 @@ namespace BellaHair.Domain.Treatments
         public Price Price { get; private set; }
         public Duration Duration { get; private set; }
 
-
 #pragma warning disable CS8618
         public Treatment() { }
 #pragma warning restore CS8618
-
 
         private Treatment(string treatmentName, Price price, Duration duration)
         {
@@ -27,9 +25,6 @@ namespace BellaHair.Domain.Treatments
         }
 
         public static Treatment Create(string treatmentName, Price price, Duration duration) => new(treatmentName, price, duration);
-
     }
-
-
     public class TreatmentException(string message) : DomainException(message);
 }
