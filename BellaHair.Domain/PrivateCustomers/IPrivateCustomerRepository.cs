@@ -16,7 +16,7 @@ namespace BellaHair.Domain.PrivateCustomers
     {
         Task AddAsync(PrivateCustomer privateCustomer);
         void Delete(PrivateCustomer privateCustomer);
-        Task<PrivateCustomer> Get(Guid id);
+        Task<PrivateCustomer> GetAsync(Guid id);
         Task SaveChangesAsync();
     }
 }

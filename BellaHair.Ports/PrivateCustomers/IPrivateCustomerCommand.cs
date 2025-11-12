@@ -28,7 +28,7 @@ namespace BellaHair.Ports.PrivateCustomers
         Email Email,
         DateTime Birthday);
 
-    public class UpdatePrivateCustomerCommand(
+    public record UpdatePrivateCustomerCommand(
         Guid Id, 
         Name Name,
         Address Address,
@@ -36,6 +36,6 @@ namespace BellaHair.Ports.PrivateCustomers
         Email Email,
         DateTime Birthday);
 
-    public class DeletePrivateCustomerCommand(Guid Id);
+    public record DeletePrivateCustomerCommand(Guid Id);
 
 }

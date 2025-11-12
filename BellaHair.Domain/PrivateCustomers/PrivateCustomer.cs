@@ -29,5 +29,14 @@ namespace BellaHair.Domain.PrivateCustomers
         {
             return new PrivateCustomer(name, address, phoneNumber, email, birthday);
         }
+
+        public void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        {
+            Name = name;
+            Address = address;
+            PhoneNumber = phoneNumber;
+            Email = email;
+            Birthday = birthday;
+        }
     }
 }

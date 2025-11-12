@@ -27,7 +27,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _db.PrivateCustomers.Remove(privateCustomer);
         }
 
-        async Task<PrivateCustomer> IPrivateCustomerRepository.Get(Guid id)
+        async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
             var privateCustomer = await _db.PrivateCustomers.FindAsync(id)
                                   ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
