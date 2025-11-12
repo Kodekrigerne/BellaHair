@@ -1,7 +1,7 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 
-namespace BellaHair.Domain.PrivateCustomer
+namespace BellaHair.Domain.PrivateCustomers
 {
     // Mikkel Dahlmann
     public class PrivateCustomer : PersonBase

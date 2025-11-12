@@ -1,6 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
-using BellaHair.Domain.PrivateCustomer;
+using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure

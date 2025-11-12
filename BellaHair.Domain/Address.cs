@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain
 {
+    // Mikkel Dahlmann
+
     /// <summary>
     /// Represents a postal address, including street name, street number, city, zip code, and optional floor
     /// information. Provides validation of each property.
     /// </summary>
-    // Mikkel Dahlmann
+    
     // Nedarver ikke fra EntityBase. Bruger ikke ID. Defineres som en complextype gennem EF modelbuilder.
     public class Address
     {
