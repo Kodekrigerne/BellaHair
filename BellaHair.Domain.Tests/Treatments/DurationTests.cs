@@ -2,6 +2,7 @@
 
 namespace BellaHair.Domain.Tests.Treatments
 {
+    //Mikkel Klitgaard
     internal sealed class DurationTests
     {
         [TestCase(9)]
