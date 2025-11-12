@@ -1,0 +1,59 @@
+﻿@using BellaHair.Domain;
+
+@page "/discounts"
+@rendermode InteractiveServer
+
+<h3>Rabatter</h3>
+<p>Administrer rabatter og kampagner</p>
+<button class="btn-add">Ny rabat</button> @*TODO: + Icon and component *@
+
+<div>
+	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter</button>
+	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter</button>
+</div>
+
+<div class="kk-container">
+	@if (_activeTab == DiscountTab.Loyalty)
+	{
+		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
+		{
+			<p>@loyaltyDiscount.Name</p>
+		}
+	}
+	else if (_activeTab == DiscountTab.Campaign)
+	{
+		@foreach (var campaignDiscount in _discounts.OfType<CampaignDiscountViewModel>())
+		{
+
+		}
+	}
+</div>
+
+@code {
+	private enum DiscountTab { Loyalty, Campaign }
+
+	private DiscountTab _activeTab;
+
+	private List<IDiscountViewModel> _discounts = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		HandleLoyaltySelectorClick();
+	}
+
+	private void HandleLoyaltySelectorClick()
+	{
+		_activeTab = DiscountTab.Loyalty;
+	}
+
+	private void HandleCampaignSelectorClick()
+	{
+		_activeTab = DiscountTab.Campaign;
+	}
+
+	public interface IDiscountViewModel;
+	public record LoyaltyDiscountViewModel(Guid Id, string Name, int MinimumVisits, decimal DiscountPercent) : IDiscountViewModel;
+	public record CampaignDiscountViewModel() : IDiscountViewModel;
+}
