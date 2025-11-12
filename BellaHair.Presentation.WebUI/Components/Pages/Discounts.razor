@@ -1,7 +1,8 @@
-﻿@using BellaHair.Domain;
-
-@page "/discounts"
+﻿@page "/discounts"
+@using BellaHair.Domain
+@using BellaHair.Ports.Discounts
 @rendermode InteractiveServer
+@inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
 
 <h3>Rabatter</h3>
 <p>Administrer rabatter og kampagner</p>
@@ -13,6 +14,7 @@
 </div>
 
 <div class="kk-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p> }
 	@if (_activeTab == DiscountTab.Loyalty)
 	{
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
@@ -33,6 +35,7 @@
 	private enum DiscountTab { Loyalty, Campaign }
 
 	private DiscountTab _activeTab;
+	private string? _errorMessage;
 
 	private List<IDiscountViewModel> _discounts = [];
 
@@ -40,16 +43,28 @@
 	{
 		await base.OnInitializedAsync();
 
-		HandleLoyaltySelectorClick();
+		await HandleLoyaltySelectorClick();
 	}
 
-	private void HandleLoyaltySelectorClick()
+	private async Task HandleLoyaltySelectorClick()
 	{
-		_activeTab = DiscountTab.Loyalty;
+		try
+		{
+			var discounts = await _loyaltyDiscountQuery.GetLoyaltyDiscounts();
+
+			_discounts = discounts.Select(d =>
+				(IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent))).ToList();
+
+			_activeTab = DiscountTab.Loyalty;
+		}
+		catch (DomainException ex) { _errorMessage = ex.Message; }
+		catch (Exception ex) { _errorMessage = ex.Message; } @*TODO: "Noget gik galt. "*@
 	}
 
 	private void HandleCampaignSelectorClick()
 	{
+		_discounts = [];
+
 		_activeTab = DiscountTab.Campaign;
 	}
 
