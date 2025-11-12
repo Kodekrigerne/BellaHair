@@ -1,5 +1,6 @@
 ﻿namespace BellaHair.Domain.Treatments.Value_Objects
 {
+    //Mikkel Klitgaard
     public record Duration
     {
         public int Value { get; private init; }
