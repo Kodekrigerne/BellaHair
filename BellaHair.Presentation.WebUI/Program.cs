@@ -16,7 +16,7 @@ namespace BellaHair.Presentation.WebUI
                 .AddInteractiveServerComponents();
 
             var options = new DbContextOptionsBuilder<BellaHairContext>()
-                .UseSqlite("Data Source=:memory:")
+                .UseSqlite("Data Source=C:\\users\\denni\\desktop\\sqlite.db")
                 .Options;
 
             builder.Services.AddSingleton(options);
@@ -24,6 +24,12 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddInfrastructureServices();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
+                context.Database.EnsureCreated();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

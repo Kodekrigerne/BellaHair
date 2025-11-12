@@ -1,12 +1,14 @@
 ﻿@page "/discounts"
+
 @using BellaHair.Domain
 @using BellaHair.Ports.Discounts
+@using BellaHair.Presentation.WebUI.Components.Shared
+
 @rendermode InteractiveServer
+
 @inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
 
-<h3>Rabatter</h3>
-<p>Administrer rabatter og kampagner</p>
-<button class="btn-add">Ny rabat</button> @*TODO: + Icon and component *@
+<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny rabat" OnNewButtonClicked="@(() => { })"/>
 
 <div>
 	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter</button>
