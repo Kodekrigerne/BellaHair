@@ -17,7 +17,6 @@
     - CommandHandler implementeringer
     - QueryHandler interfaces
     - QueryHandler implementeringer
-    - DbContext
     - Commands
     - Queries
 
@@ -33,6 +32,7 @@
     - Hvor koden ikke er gennemskuelig
     - Hvor kodebeslutningen skal begrundes
 
+- [ ] Udviklernavn på klasser
 - [ ] Er der skrevet summaries til typer og metoder?
 - [ ] Er der skrevet ADR'er på væsentlige beslutninger?
 - [ ] Skal der skrives resultatafsnit over features i denne PR?
