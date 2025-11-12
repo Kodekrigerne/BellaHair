@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BellaHair.Domain.SharedValueObjects
+﻿namespace BellaHair.Domain.SharedValueObjects
 {
     /// <summary>
     /// Phone number value object with validation logic.
@@ -30,14 +24,14 @@ namespace BellaHair.Domain.SharedValueObjects
         /// Checks if number only contains digits and throws exception if it contains other characters
         /// </summary>
         /// <param name="value"></param>
-        /// <exception cref="NumberException"></exception>
+        /// <exception cref="PhoneNumberException"></exception>
         private static void ValidateNumberLength(string value)
         {
-            if (value.Length > 8) throw new NumberException("The number is too long.");
-            if (value.Length < 8) throw new NumberException("The number is not long enough.");
-            if (!value.All(Char.IsDigit)) throw new NumberException("The number has invalid characters."); 
+            if (value.Length > 8) throw new PhoneNumberException("The number is too long.");
+            if (value.Length < 8) throw new PhoneNumberException("The number is not long enough.");
+            if (!value.All(Char.IsDigit)) throw new PhoneNumberException("The number has invalid characters.");
         }
     }
 
-    public class NumberException(string message) : Exception(message);
+    public class PhoneNumberException(string message) : DomainException(message);
 }
