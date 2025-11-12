@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain.Bookings;
-using BellaHair.Domain.Discounts;
+﻿using BellaHair.Domain.Discounts;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure
@@ -16,8 +15,7 @@ namespace BellaHair.Infrastructure
 
             //TPC mapping vælges så alle nedarvere af DiscountBase får deres egen tabel, og ingen tabel for baseklassen oprettes.
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
-
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount);
+            modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
         }
     }
 }
