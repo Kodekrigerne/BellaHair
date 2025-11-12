@@ -15,7 +15,7 @@ namespace BellaHair.Infrastructure.Tests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite("Data Source=:memory:").Options;
+            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite("Data Source=\"C:\"").Options;
             _db = new BellaHairContext(_options);
             _db.Database.OpenConnection();
             _db.Database.EnsureCreated();
