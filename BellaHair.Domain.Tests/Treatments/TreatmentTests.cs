@@ -12,7 +12,7 @@ namespace BellaHair.Domain.Tests.Treatments
             // Arrange
             var name = "Beh@ndling";
             var price = Price.FromDecimal(450m);
-            var duration = Duration.FromInt(120);
+            var duration = DurationMinutes.FromInt(120);
 
             // Act
             var invalidTreatment = Treatment.Create(name, price, duration);

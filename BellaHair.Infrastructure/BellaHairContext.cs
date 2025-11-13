@@ -20,7 +20,7 @@ namespace BellaHair.Infrastructure
 
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
-            modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Duration);
+            modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
         }
     }
 }
