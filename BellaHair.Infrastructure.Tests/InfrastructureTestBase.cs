@@ -31,6 +31,7 @@ namespace BellaHair.Infrastructure.Tests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
+            _db.Database.CloseConnection();
             _db.Dispose();
         }
     }
