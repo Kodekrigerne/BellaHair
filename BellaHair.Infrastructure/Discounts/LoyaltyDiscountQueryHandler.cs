@@ -12,7 +12,7 @@ namespace BellaHair.Infrastructure.Discounts
 
         public LoyaltyDiscountQueryHandler(BellaHairContext db) => _db = db;
 
-        async Task<List<LoyaltyDiscountDTO>> ILoyaltyDiscountQuery.GetLoyaltyDiscounts()
+        async Task<List<LoyaltyDiscountDTO>> ILoyaltyDiscountQuery.GetAllAsync()
         {
             return await _db.Discounts
                 .AsNoTracking()
