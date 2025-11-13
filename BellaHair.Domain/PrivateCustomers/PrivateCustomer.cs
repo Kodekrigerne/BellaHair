@@ -26,6 +26,8 @@ namespace BellaHair.Domain.PrivateCustomers
 
         private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
+            ValidateBirthday(birthday);
+            
             Id = Guid.NewGuid();
             Name = name;
             Address = address;
@@ -42,11 +44,22 @@ namespace BellaHair.Domain.PrivateCustomers
 
         public void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
+            ValidateBirthday(birthday);
+
             Name = name;
             Address = address;
             PhoneNumber = phoneNumber;
             Email = email;
             Birthday = birthday;
         }
+
+        // Kunden skal minimum være 18 år gammel.
+        private static void ValidateBirthday(DateTime birthday)
+        {
+            if (birthday > DateTime.Now.AddYears(-18))
+                throw new PrivateCustomerException("Customers must be 18 years of age");
+        }
     }
+
+    public class PrivateCustomerException(string message) : DomainException(message);
 }

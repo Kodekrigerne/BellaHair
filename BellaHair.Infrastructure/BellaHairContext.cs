@@ -24,26 +24,21 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount, b => b.IsRequired());
+            
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
+            
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Name);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Email);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.PhoneNumber);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Address);
+            
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Address);
-
-
-            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Address);
-            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
-            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
-            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
             
             modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
-
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount, b => b.IsRequired());
         }
     }
 }

@@ -64,7 +64,7 @@ namespace BellaHair.Domain
 
         // Returnerer én samlet adresse-string sammensat af properties vha. StringBuilder.
         // Udelader floor såfremt denne er null.
-        private string BuildFullAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
+        private static string BuildFullAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
         {
             var sb = new StringBuilder();
 
@@ -81,7 +81,7 @@ namespace BellaHair.Domain
         }
 
 
-        private void ValidateStreetAndCity(string name)
+        private static void ValidateStreetAndCity(string name)
         {
             if (name.Any(x => !char.IsLetter(x) && x != '-' && x != ' '))
                 throw new AddressException("Name can only consist of letters.");
@@ -91,20 +91,20 @@ namespace BellaHair.Domain
         }
 
 
-        private void ValidateStreetNumber(string streetNumber)
+        private static void ValidateStreetNumber(string streetNumber)
         {
             if (streetNumber.Any(x => !char.IsLetterOrDigit(x)))
                 throw new AddressException("Streetnumber can only consist of numbers and letters.");
         }
 
 
-        private void ValidateZipCode(int zipCode)
+        private static void ValidateZipCode(int zipCode)
         {
             if (zipCode > 9999 || zipCode < 1000)
                 throw new AddressException("Zipcode is invalid.");
         }
 
-        private void ValidateFloor(int? floor)
+        private static void ValidateFloor(int? floor)
         {
             if (floor < 1 || floor > 100)
                 throw new AddressException("Floor is invalid, must be between 1 and 100.");
