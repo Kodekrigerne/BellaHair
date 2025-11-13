@@ -28,6 +28,8 @@ namespace BellaHair.Presentation.WebUI
                 var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
                 context.Database.EnsureCreated();
             }
+            var dataProvider = new DataProvider(app.Services.GetRequiredService<BellaHairContext>());
+            dataProvider.AddData();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
