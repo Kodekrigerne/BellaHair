@@ -19,9 +19,10 @@ namespace BellaHair.Infrastructure
             //TPC mapping vælges så alle nedarvere af DiscountBase får deres egen tabel, og ingen tabel for baseklassen oprettes.
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount);
-
-            // TODO : Fix dbset
+            modelBuilder.Entity<Employee>().ComplexProperty(e => e.Name);
+            modelBuilder.Entity<Employee>().ComplexProperty(e => e.Email);
+            modelBuilder.Entity<Employee>().ComplexProperty(e => e.PhoneNumber);
+            modelBuilder.Entity<Employee>().ComplexProperty(e => e.Address);
         }
     }
 }

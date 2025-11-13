@@ -21,5 +21,7 @@ namespace BellaHair.Domain
         public Email Email { get; protected set; }
         public PhoneNumber PhoneNumber { get; protected set; }
         public Address Address { get; protected set; }
+
+#pragma warning restore CS8618
     }
 }
