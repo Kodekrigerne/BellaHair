@@ -26,6 +26,7 @@ namespace BellaHair.Presentation.WebUI
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
+                context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
                 var dataProvider = new DataProvider(context);
