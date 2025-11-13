@@ -4,6 +4,11 @@ using BellaHair.Domain.SharedValueObjects;
 namespace BellaHair.Domain.PrivateCustomers
 {
     // Mikkel Dahlmann
+
+    /// <summary>
+    /// Represents a private customer with personal information and booking history.
+    /// </summary>
+
     public class PrivateCustomer : PersonBase
     {
         //Udregn denne ud fra mængden af fuldførte bookings, get => Bookings.Count ?? Eller som DB computed value

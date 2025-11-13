@@ -1,6 +1,4 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.SharedValueObjects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,18 +20,30 @@ namespace BellaHair.Ports.PrivateCustomers
     }
     
     public record CreatePrivateCustomerCommand(
-        Name Name,
-        Address Address,
-        PhoneNumber PhoneNumber,
-        Email Email,
+        string FirstName,
+        string? MiddleName,
+        string LastName,
+        string streetName, 
+        string city, 
+        string streetNumber, 
+        int zipCode, 
+        int? floor,
+        string PhoneNumber,
+        string Email,
         DateTime Birthday);
 
     public record UpdatePrivateCustomerCommand(
-        Guid Id, 
-        Name Name,
-        Address Address,
-        PhoneNumber PhoneNumber,
-        Email Email,
+        Guid Id,
+        string FirstName,
+        string? MiddleName,
+        string LastName,
+        string streetName,
+        string city,
+        string streetNumber,
+        int zipCode,
+        int? floor,
+        string PhoneNumber,
+        string Email,
         DateTime Birthday);
 
     public record DeletePrivateCustomerCommand(Guid Id);

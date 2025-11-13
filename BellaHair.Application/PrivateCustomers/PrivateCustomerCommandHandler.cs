@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.PrivateCustomers;
 
 namespace BellaHair.Application.PrivateCustomers
 {
+    // Mikkel Dahlmann
+
+    /// <summary>
+    /// Handles commands related to creating, updating, and deleting private customer entities.
+    /// </summary>
+    
     public class PrivateCustomerCommandHandler : IPrivateCustomerCommand
     {
         private readonly IPrivateCustomerRepository _privateCustomerRepo;
@@ -17,7 +25,26 @@ namespace BellaHair.Application.PrivateCustomers
 
         async Task IPrivateCustomerCommand.CreatePrivateCustomerAsync(CreatePrivateCustomerCommand command)
         {
-            var customerToCreate = PrivateCustomer.Create(command.Name, command.Address, command.PhoneNumber, command.Email,
+            var name = Name.FromStrings(
+                command.FirstName,
+                command.LastName,
+                command.MiddleName);
+            
+            var address = Address.Create(
+                command.streetName,
+                command.city,
+                command.streetNumber,
+                command.zipCode,
+                command.floor);
+            
+            var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
+            var email = Email.FromString(command.Email);
+
+            var customerToCreate = PrivateCustomer.Create(
+                name,
+                address,
+                phoneNumber,
+                email,
                 command.Birthday);
 
             await _privateCustomerRepo.AddAsync(customerToCreate);
@@ -37,7 +64,26 @@ namespace BellaHair.Application.PrivateCustomers
         {
             var customerToUpdate = await _privateCustomerRepo.GetAsync(command.Id);
 
-            customerToUpdate.Update(command.Name, command.Address, command.PhoneNumber, command.Email,
+            var updatedName = Name.FromStrings(
+                command.FirstName,
+                command.LastName,
+                command.MiddleName);
+            
+            var updatedAddress = Address.Create(
+                command.streetName,
+                command.city,
+                command.streetNumber,
+                command.zipCode,
+                command.floor);
+            
+            var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
+            var updatedEmail = Email.FromString(command.Email);
+
+            customerToUpdate.Update(
+                updatedName,
+                updatedAddress,
+                updatedPhoneNumber,
+                updatedEmail,
                 command.Birthday);
 
             await _privateCustomerRepo.SaveChangesAsync();
