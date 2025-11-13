@@ -13,8 +13,8 @@
 <PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny rabat" OnNewButtonClicked="@(() => { })"/>
 
 <div>
-	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter</button>
-	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter</button>
+	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
+	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter (@CampaignCount)</button>
 </div>
 
 <div class="kk-container">
@@ -43,11 +43,14 @@
 	private string? _errorMessage;
 
 	private List<IDiscountViewModel>? _discounts = null;
+	private int LoyaltyCount;
+	private int CampaignCount;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
+		await UpdateCounts();
 		await HandleLoyaltySelectorClick();
 	}
 
@@ -63,7 +66,8 @@
 			_activeTab = DiscountTab.Loyalty;
 		}
 		catch (DomainException ex) { _errorMessage = ex.Message; }
-		catch (Exception ex) { _errorMessage = ex.Message; } @*TODO: "Noget gik galt. "*@
+		catch (Exception ex) { _errorMessage = ex.Message; } 
+		@*TODO: "Noget gik galt. "*@
 	}
 
 	private void HandleCampaignSelectorClick()
@@ -71,5 +75,10 @@
 		_discounts = [];
 
 		_activeTab = DiscountTab.Campaign;
+	}
+
+	private async Task UpdateCounts()
+	{
+		LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
 	}
 }

@@ -20,5 +20,10 @@ namespace BellaHair.Infrastructure.Discounts
                 .Select(x => new LoyaltyDiscountDTO(x.Id, x.Name, x.MinimumVisits, x.DiscountPercent.Value))
                 .ToListAsync();
         }
+
+        async Task<int> ILoyaltyDiscountQuery.GetCount()
+        {
+            return await _db.Discounts.CountAsync();
+        }
     }
 }
