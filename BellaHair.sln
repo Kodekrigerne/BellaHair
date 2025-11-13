@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11206.111 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Domain", "BellaHair.Domain\BellaHair.Domain.csproj", "{85ED2CFF-6447-4EB5-9EB1-A1EA1DC2E4B2}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Infrastructure.Tests", "BellaHair.Infrastructure.Tests\BellaHair.Infrastructure.Tests.csproj", "{424C09C3-78B1-4157-88F9-C92FD8951BF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BellaHair.Application.Tests", "BellaHair.Application.Tests\BellaHair.Application.Tests.csproj", "{6AD1D85E-9727-47DE-83DB-E5101A0EB8E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{424C09C3-78B1-4157-88F9-C92FD8951BF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD1D85E-9727-47DE-83DB-E5101A0EB8E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD1D85E-9727-47DE-83DB-E5101A0EB8E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD1D85E-9727-47DE-83DB-E5101A0EB8E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD1D85E-9727-47DE-83DB-E5101A0EB8E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{76F00F9C-304A-4615-8FDC-7C4DFF490774} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{424C09C3-78B1-4157-88F9-C92FD8951BF6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{6AD1D85E-9727-47DE-83DB-E5101A0EB8E6} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21C7DBC5-D7B0-4152-8052-244167D0C8C4}

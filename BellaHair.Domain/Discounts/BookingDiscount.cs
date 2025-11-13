@@ -10,6 +10,10 @@
         public decimal Amount { get; private init; }
         public bool DiscountActive { get; private init; }
 
+#pragma warning disable CS8618
+        private BookingDiscount() { }
+#pragma warning restore CS8618
+
         private BookingDiscount(string discountName, decimal discountAmount, bool discountActive)
         {
             Name = discountName;

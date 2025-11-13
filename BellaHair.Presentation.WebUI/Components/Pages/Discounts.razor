@@ -1,0 +1,81 @@
+﻿@attribute [StreamRendering]
+
+@page "/discounts"
+
+@using BellaHair.Domain
+@using BellaHair.Ports.Discounts
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@rendermode InteractiveServer
+
+@inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
+
+<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny rabat" OnNewButtonClicked="@(() => { })"/>
+
+<div>
+	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter</button>
+	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter</button>
+</div>
+
+<div class="kk-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p> }
+	@if (_discounts == null) { <p>Loading</p> }
+	else if (_activeTab == DiscountTab.Loyalty)
+	{
+		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
+		{
+			<div>
+			<p>@loyaltyDiscount.Name</p>
+			</div>
+		}
+	}
+	else if (_activeTab == DiscountTab.Campaign)
+	{
+		@foreach (var campaignDiscount in _discounts.OfType<CampaignDiscountViewModel>())
+		{
+
+		}
+	}
+</div>
+
+@code {
+	private enum DiscountTab { Loyalty, Campaign }
+
+	private DiscountTab _activeTab;
+	private string? _errorMessage;
+
+	private List<IDiscountViewModel>? _discounts = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await HandleLoyaltySelectorClick();
+	}
+
+	private async Task HandleLoyaltySelectorClick()
+	{
+		try
+		{
+			var discounts = await _loyaltyDiscountQuery.GetLoyaltyDiscounts();
+
+			_discounts = discounts.Select(d =>
+				(IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent))).ToList();
+
+			_activeTab = DiscountTab.Loyalty;
+		}
+		catch (DomainException ex) { _errorMessage = ex.Message; }
+		catch (Exception ex) { _errorMessage = ex.Message; } @*TODO: "Noget gik galt. "*@
+	}
+
+	private void HandleCampaignSelectorClick()
+	{
+		_discounts = [];
+
+		_activeTab = DiscountTab.Campaign;
+	}
+
+	public interface IDiscountViewModel;
+	public record LoyaltyDiscountViewModel(Guid Id, string Name, int MinimumVisits, decimal DiscountPercent) : IDiscountViewModel;
+	public record CampaignDiscountViewModel() : IDiscountViewModel;
+}
