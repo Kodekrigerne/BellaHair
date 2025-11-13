@@ -10,9 +10,11 @@ namespace BellaHair.Application.Tests
     /// Handles setup and disposure of database connection.
     /// Ensures a clean-slate database for each test run.
     /// </summary>
-   
+
     public abstract class ApplicationTestBase
     {
+        private readonly static string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
         protected DbContextOptions<BellaHairContext> _options;
         protected BellaHairContext _db;
 
@@ -20,7 +22,7 @@ namespace BellaHair.Application.Tests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite("Data Source=:memory:").Options;
+            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
             _db = new BellaHairContext(_options);
             _db.Database.EnsureCreated();
         }

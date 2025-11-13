@@ -1,4 +1,5 @@
-﻿using BellaHair.Application.PrivateCustomers;
+﻿using BellaHair.Application.Discounts;
+using BellaHair.Application.PrivateCustomers;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.Extensions.DependencyInjection;
