@@ -32,7 +32,7 @@ namespace BellaHair.Application
 
         async Task IEmployeeCommand.DeleteEmployeeCommand(DeleteEmployeeCommand command)
         {
-            var employee = await _employeeRepo.Get(command.Id);
+            var employee = await _employeeRepo.GetAsync(command.Id);
 
             _employeeRepo.Delete(employee);
 
