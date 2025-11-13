@@ -11,6 +11,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Employees
 {
+    /// <summary>
+    /// Handles queries for retrieving employee information.
+    /// </summary>
+    /// <remarks>Provides implementations of the IEmployeeQuery interface for accessing employee
+    /// data. 
+    
+    // Linnea
     public class EmployeeQueryHandler : IEmployeeQuery
     {
         private readonly BellaHairContext _db;
@@ -19,16 +26,16 @@ namespace BellaHair.Infrastructure.Employees
 
         // TODO : Add treatments
 
-        Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimple()
+        // Denne er til at hente alle employees med få informationer til listevisningen af alle
+        async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
         {
-            return  _db.Employees
+            return  await _db.Employees
                 .AsNoTracking()
-                .OfType<Employee>()
                 .Select(x => new EmployeeDTOSimple(x.Name.FullName, x.PhoneNumber.Value, x.Email.Value))
                 .ToListAsync();
         }
 
-        async Task<EmployeeDTOFull> IEmployeeQuery.GetEmployee(GetEmployeeByIdQuery query)
+        async Task<EmployeeDTOFull> IEmployeeQuery.GetEmployeeAsync(GetEmployeeByIdQuery query)
         {
             var employee = await _db.Employees.FindAsync(query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
 

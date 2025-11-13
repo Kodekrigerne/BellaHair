@@ -23,7 +23,7 @@ namespace BellaHair.Infrastructure.Employees
             _db.Employees.Remove(employee);
         }
 
-        async Task<Employee> IEmployeeRepository.Get(Guid id)
+        async Task<Employee> IEmployeeRepository.GetAsync(Guid id)
         {
             var employee = await _db.Employees.FindAsync(id)
                 ?? throw new KeyNotFoundException($"No employee exists with ID {id}");

@@ -8,8 +8,8 @@ namespace BellaHair.Ports.Employees
 {
     public interface IEmployeeQuery
     {
-        Task<List<EmployeeDTOSimple>> GetAllEmployeesSimple();
-        Task<EmployeeDTOFull> GetEmployee(GetEmployeeByIdQuery query);
+        Task<List<EmployeeDTOSimple>> GetAllEmployeesSimpleAsync();
+        Task<EmployeeDTOFull> GetEmployeeAsync(GetEmployeeByIdQuery query);
     }
 }
 

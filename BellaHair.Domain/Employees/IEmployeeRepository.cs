@@ -10,7 +10,7 @@ namespace BellaHair.Domain.Employees
     {
         Task AddAsync(Employee employee);
         void Delete(Employee employee);
-        Task<Employee> Get(Guid id);
+        Task<Employee> GetAsync(Guid id);
         Task SaveChangesAsync();
     }
 }
