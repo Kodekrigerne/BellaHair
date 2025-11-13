@@ -2,6 +2,7 @@
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure;
+using BellaHair.Domain;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -14,6 +15,7 @@ namespace BellaHair.Presentation.WebUI
         public void AddData()
         {
             AddLoyaltyDiscounts();
+            AddEmployees();
 
             _db.SaveChangesAsync();
         }
@@ -27,7 +29,10 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddEmployees()
         {
-            _db.Add(Employee.Create(Name.FromStrings("Henny", "Hansen")));
+            _db.Add(Employee.Create(Name.FromStrings("Henny", "Hansen"), Email.FromString("hennyh@frisor.dk"), PhoneNumber.FromString("42501113"), Address.Create("Nørrebro", "København H", "47", 2000)));
+            _db.Add(Employee.Create(Name.FromStrings("Peter", "Pedersen"), Email.FromString("peterp@snedker.dk"), PhoneNumber.FromString("20456789"), Address.Create("Vestergade", "Aarhus C", "10", 8000)));
+            _db.Add(Employee.Create(Name.FromStrings("Maria", "Jensen"), Email.FromString("mariaj@bageri.dk"), PhoneNumber.FromString("55123456"), Address.Create("Østerbrogade", "København Ø", "15B", 2100)));
+            _db.Add(Employee.Create(Name.FromStrings("Søren", "Mikkelsen"), Email.FromString("sorenm@mekaniker.dk"), PhoneNumber.FromString("77889900"), Address.Create("Industrivej", "Odense M", "5", 5260)));
         }
     }
 }
