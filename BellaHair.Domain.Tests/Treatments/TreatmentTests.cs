@@ -10,7 +10,7 @@ namespace BellaHair.Domain.Tests.Treatments
     {
         [TestCase("Beh@ndling", 450, 120)]
         [TestCase("Behandling#¤%", 450, 120)]
-        [TestCase("  ", 450, 120)]
+        [TestCase("()", 450, 120)]
         public void Given_InvalidTreatmentName_Then_ThrowsException(string name, decimal price, int duration)
         {
             // Arrange
