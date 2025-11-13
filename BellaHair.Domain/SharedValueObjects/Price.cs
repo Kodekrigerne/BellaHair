@@ -3,7 +3,7 @@
     // Mikkel Klitgaard
 
     /// <summary>
-    /// Represents a price value withing a valid range (between 1 - 100.000).
+    /// Represents a price value within a valid range (between 1 - 100.000).
     /// Instances of this type are immutable and can only be created using the <see cref="FromDecimal(decimal)"/> method,
     /// which validates the input.
     /// </summary>
