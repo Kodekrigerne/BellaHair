@@ -1,7 +1,7 @@
 ﻿<div>
 	<p>@LoyaltyDiscount.Name</p>
-	<p>@LoyaltyDiscount.MinimumVisits</p>
-	<p>@LoyaltyDiscount.DiscountPercent</p>
+	<p>Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
+	<p>@((LoyaltyDiscount.DiscountPercent * 100).ToString("0"))%</p>
 	<button @onclick="() => { }">Delete</button>
 </div>
 
