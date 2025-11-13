@@ -3,6 +3,10 @@ using BellaHair.Infrastructure;
 
 namespace BellaHair.Presentation.WebUI
 {
+    //Dennis
+    /// <summary>
+    /// Provides a method for adding hardcoded example data to BellaHairContext.
+    /// </summary>
     public class DataProvider
     {
         private readonly BellaHairContext _db;
