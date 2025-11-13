@@ -24,9 +24,7 @@
 	{
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
-			<div>
-			<p>@loyaltyDiscount.Name</p>
-			</div>
+			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount"/>
 		}
 	}
 	else if (_activeTab == DiscountTab.Campaign)
@@ -74,8 +72,4 @@
 
 		_activeTab = DiscountTab.Campaign;
 	}
-
-	public interface IDiscountViewModel;
-	public record LoyaltyDiscountViewModel(Guid Id, string Name, int MinimumVisits, decimal DiscountPercent) : IDiscountViewModel;
-	public record CampaignDiscountViewModel() : IDiscountViewModel;
 }

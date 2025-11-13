@@ -1,0 +1,11 @@
+﻿<div>
+	<p>@LoyaltyDiscount.Name</p>
+	<p>@LoyaltyDiscount.MinimumVisits</p>
+	<p>@LoyaltyDiscount.DiscountPercent</p>
+	<button @onclick="() => { }">Delete</button>
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required LoyaltyDiscountViewModel LoyaltyDiscount { get; set; }
+}
