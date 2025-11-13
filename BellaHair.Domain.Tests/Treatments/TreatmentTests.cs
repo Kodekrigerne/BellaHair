@@ -4,31 +4,46 @@ using BellaHair.Domain.Treatments.ValueObjects;
 
 namespace BellaHair.Domain.Tests.Treatments
 {
+    // Mikkel Klitgaard
+
     internal sealed class TreatmentTests
     {
-        [Test]
-        public void GivenInvalidTreatment_Then_ThrowsException()
+        [TestCase("Beh@ndling", 450, 120)]
+        [TestCase("Behandling#¤%", 450, 120)]
+        [TestCase("  ", 450, 120)]
+        public void Given_InvalidTreatmentName_Then_ThrowsException(string name, decimal price, int duration)
         {
             // Arrange
-            var name = "Beh@ndling";
-            var price = Price.FromDecimal(450m);
-            var duration = DurationMinutes.FromInt(120);
+            var invalidName = name;
+            var validPrice = Price.FromDecimal(price);
+            var validDuration = DurationMinutes.FromInt(duration);
 
-            // Act
-            var invalidTreatment = Treatment.Create(name, price, duration);
-
-            // Assert
+            // Act & Assert
+            Assert.Throws<TreatmentException>(() =>
+                Treatment.Create(invalidName, validPrice, validDuration));
 
         }
 
-        [Test]
-        public void GivenValidTreatment_Then_CreatesTreatment()
+        [TestCase("Behandling", 450, 120)]
+        [TestCase("Behandling 1", 450, 120)]
+        [TestCase("12345", 450, 120)]
+        public void Given_ValidTreatment_Then_CreatesTreatment(string name, decimal price, int duration)
         {
             // Arrange
+            var validName = name;
+            var validPrice = Price.FromDecimal(price);
+            var validDuration = DurationMinutes.FromInt(duration);
 
             // Act
+            var treatment = Treatment.Create(validName, validPrice, validDuration);
 
             // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(treatment.Name, Is.EqualTo(validName));
+                Assert.That(treatment.Price.Value, Is.EqualTo(validPrice.Value));
+                Assert.That(treatment.DurationMinutes.Value, Is.EqualTo(validDuration.Value));
+            });
         }
     }
 }

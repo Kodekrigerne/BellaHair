@@ -3,6 +3,14 @@ using BellaHair.Domain.Treatments.ValueObjects;
 
 namespace BellaHair.Domain.Treatments
 {
+    // Mikkel Klitgaard
+
+    /// <summary>
+    /// Represents a domain-entity Treatment with a unique Id, a display Name, a Price and a Duration in minutes.
+    /// Instances are immutable after creation; use the static Create factory to construct a Treatment. The factory
+    /// (and the private constructor) validates the treatment name to only contain letters, digits and spaces and
+    /// throws a TreatmentException when the name is invalid.
+    /// </summary>
     public class Treatment : EntityBase
     {
         public string Name { get; private set; }
@@ -15,7 +23,7 @@ namespace BellaHair.Domain.Treatments
 
         private Treatment(string treatmentName, Price price, DurationMinutes durationMinutes)
         {
-            if (treatmentName.Any(c => !char.IsLetterOrDigit(c) || c != ' '))
+            if (treatmentName.Any(c => !char.IsLetterOrDigit(c) && c != ' '))
                 throw new TreatmentException("Name of treatment should only consist of letters or numbers");
 
             Id = Guid.NewGuid();
