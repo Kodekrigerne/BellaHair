@@ -1,6 +1,6 @@
 ﻿using BellaHair.Domain.Discounts;
-using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure
@@ -11,6 +11,7 @@ namespace BellaHair.Infrastructure
 
         public DbSet<DiscountBase> Discounts { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Treatment> Treatments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
