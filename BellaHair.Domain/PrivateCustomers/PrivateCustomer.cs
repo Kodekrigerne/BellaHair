@@ -19,6 +19,11 @@ namespace BellaHair.Domain.PrivateCustomers
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
         public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
 
+        #pragma warning disable CS8618
+        private PrivateCustomer() { }
+        #pragma warning restore CS8618
+
+
         private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
             Id = Guid.NewGuid();
