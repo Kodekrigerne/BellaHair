@@ -18,4 +18,8 @@
     <ProjectReference Include="..\BellaHair.Ports\BellaHair.Ports.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Treatments\" />
+  </ItemGroup>
+
 </Project>
