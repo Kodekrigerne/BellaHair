@@ -13,6 +13,6 @@ namespace BellaHair.Ports.Employees
     }
 }
 
-public record EmployeeDTOSimple(string Name, string PhoneNumber, string Email);
-public record EmployeeDTOFull(string FirstName, string MiddleName, string LastName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, int? Floor = null);
+public record EmployeeDTOSimple(Guid Id, string Name, string PhoneNumber, string Email);
+public record EmployeeDTOFull(Guid Id, string FirstName, string MiddleName, string LastName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, int? Floor = null);
 public record GetEmployeeByIdQuery(Guid Id);
