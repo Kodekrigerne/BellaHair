@@ -1,7 +1,6 @@
 ﻿namespace BellaHair.Ports.Treatments;
 
 // Mikkel Klitgaard
-
 /// <summary>
 /// Defines a contract for executing treatment-related commands.
 /// </summary>

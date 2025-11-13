@@ -3,7 +3,6 @@
 namespace BellaHair.Infrastructure.Treatments
 {
     // Mikkel Klitgaard
-
     /// <summary>
     /// Provides methods for managing treatments in the BellaHair database.
     /// </summary>

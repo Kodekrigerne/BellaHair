@@ -1,7 +1,6 @@
 ﻿namespace BellaHair.Ports.Treatments;
 
 // Mikkel Klitgaard
-
 /// <summary>
 /// Defines a contract for querying treatment data.
 /// </summary>
