@@ -25,6 +25,8 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
             
             modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
+
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount, b => b.IsRequired());
         }
     }
 }
