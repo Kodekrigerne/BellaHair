@@ -1,0 +1,17 @@
+﻿<h3>@HeaderText</h3>
+<p>@HeaderSubText</p>
+<button @onClick="@OnNewButtonClicked" class="btn-add">@NewButtonText</button> @*TODO: + Icon *@
+
+@code {
+	[Parameter, EditorRequired]
+	public required string HeaderText { get; set; }
+
+	[Parameter, EditorRequired]
+	public required string HeaderSubText { get; set; }
+
+	[Parameter, EditorRequired]
+	public required string NewButtonText { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnNewButtonClicked { get; set; }
+}

@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain.Bookings;
-using BellaHair.Domain.Discounts;
+﻿using BellaHair.Domain.Discounts;
 using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +24,7 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
+            modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
         }
     }
 }
