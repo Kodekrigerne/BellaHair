@@ -3,7 +3,7 @@
 namespace BellaHair.Domain.Tests.Treatments
 {
     //Mikkel Klitgaard
-    internal sealed class DurationTests
+    internal sealed class DurationMinutesTests
     {
         [TestCase(9)]
         [TestCase(0)]
@@ -11,7 +11,7 @@ namespace BellaHair.Domain.Tests.Treatments
         public void Given_DurationIsLessThan10_Then_ThrowsException(int value)
         {
             // Act & Assert
-            Assert.Throws<DurationException>(() => Duration.FromInt(value));
+            Assert.Throws<DurationException>(() => DurationMinutes.FromInt(value));
         }
 
         [TestCase(301)]
@@ -19,7 +19,7 @@ namespace BellaHair.Domain.Tests.Treatments
         public void Given_DurationIsGreaterThan300_Then_ThrowsException(int value)
         {
             // Act & Assert
-            Assert.Throws<DurationException>(() => Duration.FromInt(value));
+            Assert.Throws<DurationException>(() => DurationMinutes.FromInt(value));
         }
 
         [TestCase(10)]
@@ -28,10 +28,10 @@ namespace BellaHair.Domain.Tests.Treatments
         public void Given_DurationIsValid_Then_ConstructsDuration(int value)
         {
             // Act
-            Duration validDuration = Duration.FromInt(value);
+            DurationMinutes validDurationMinutes = DurationMinutes.FromInt(value);
 
             // Assert
-            Assert.That(validDuration.Value, Is.EqualTo(value));
+            Assert.That(validDurationMinutes.Value, Is.EqualTo(value));
         }
     }
 }
