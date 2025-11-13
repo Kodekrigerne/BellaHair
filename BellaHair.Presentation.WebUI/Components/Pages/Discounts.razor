@@ -1,4 +1,6 @@
-﻿@page "/discounts"
+﻿@attribute [StreamRendering]
+
+@page "/discounts"
 
 @using BellaHair.Domain
 @using BellaHair.Ports.Discounts
@@ -17,11 +19,14 @@
 
 <div class="kk-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p> }
-	@if (_activeTab == DiscountTab.Loyalty)
+	@if (_discounts == null) { <p>Loading</p> }
+	else if (_activeTab == DiscountTab.Loyalty)
 	{
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
+			<div>
 			<p>@loyaltyDiscount.Name</p>
+			</div>
 		}
 	}
 	else if (_activeTab == DiscountTab.Campaign)
@@ -39,7 +44,7 @@
 	private DiscountTab _activeTab;
 	private string? _errorMessage;
 
-	private List<IDiscountViewModel> _discounts = [];
+	private List<IDiscountViewModel>? _discounts = null;
 
 	protected override async Task OnInitializedAsync()
 	{
