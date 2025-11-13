@@ -14,7 +14,8 @@ namespace BellaHair.Infrastructure.Treatments
     {
         private readonly BellaHairContext _db;
 
-        public TreatmentRepository(BellaHairContext db) => _db = db;
+        public TreatmentRepository(BellaHairContext db)
+            => _db = db;
 
         async Task ITreatmentRepository.AddAsync(Treatment treatment)
         {
