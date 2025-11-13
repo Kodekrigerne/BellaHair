@@ -22,6 +22,9 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount);
 
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Address);
+            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
+            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
+            modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
         }
     }
 }
