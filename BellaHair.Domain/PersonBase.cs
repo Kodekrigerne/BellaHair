@@ -16,9 +16,12 @@ namespace BellaHair.Domain
     /// </remarks>
     public abstract class PersonBase : EntityBase
     {
+        #pragma warning disable CS8618
         public Name Name { get; protected set; }
         public Email Email { get; protected set; }
         public PhoneNumber PhoneNumber { get; protected set; }
         public Address Address { get; protected set; }
+
+#pragma warning restore CS8618
     }
 }

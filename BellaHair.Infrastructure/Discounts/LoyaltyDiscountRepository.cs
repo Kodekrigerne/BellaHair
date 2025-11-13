@@ -7,7 +7,7 @@ namespace BellaHair.Infrastructure.Discounts
     public class LoyaltyDiscountRepository : ILoyaltyDiscountRepository
     {
         private readonly BellaHairContext _db;
-
+        
         public LoyaltyDiscountRepository(BellaHairContext db) => _db = db;
 
         async Task ILoyaltyDiscountRepository.AddAsync(LoyaltyDiscount loyaltyDiscount)
