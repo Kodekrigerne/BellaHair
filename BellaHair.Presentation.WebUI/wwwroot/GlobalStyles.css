@@ -49,6 +49,7 @@ h3{
 
 .btn-select {
     background-color: white;
+    transition: background-color 0.2s;
 }
 
 .btn-select:hover{
@@ -58,6 +59,8 @@ h3{
 
 .btn-select-active {
     background-color: #990dff;
+    transition: background-color 0.2s;
+    color: white;
 }
 
 /* Div-containers med indhold */
