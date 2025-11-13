@@ -17,8 +17,8 @@ namespace BellaHair.Infrastructure.Tests
     
     public abstract class InfrastructureTestBase
     {
-        private DbContextOptions<BellaHairContext> _options;
-        private BellaHairContext _db;
+        protected DbContextOptions<BellaHairContext> _options;
+        protected BellaHairContext _db;
 
         // Setup af dbcontext ved start af test-suite. Gemmer kopi af test-database på C-drevet.
         [OneTimeSetUp]
