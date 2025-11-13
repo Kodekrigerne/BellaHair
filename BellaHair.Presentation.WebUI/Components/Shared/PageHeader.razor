@@ -1,6 +1,6 @@
 ﻿<div class="ph-container">
-<h3>@HeaderText</h3>
-<p>@HeaderSubText</p>
+<h3 class="ph-header">@HeaderText</h3>
+<p class="ph-sub">@HeaderSubText</p>
 <button @onClick="@OnNewButtonClicked" class="btn-add ph-btn">@NewButtonText</button> @*TODO: + Icon *@
 </div>
 
@@ -29,6 +29,14 @@
 	.ph-btn {
 		position: absolute;
 		right: 0px;
-		top: 0px;
+		top: 5px;
+	}
+
+	.ph-sub {
+		color: oklch(.21 .034 264.665);
+	}
+
+	.ph-sub {
+		color: oklch(.446 .03 256.802);
 	}
 </style>
