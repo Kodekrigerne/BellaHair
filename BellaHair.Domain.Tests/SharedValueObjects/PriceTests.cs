@@ -1,6 +1,6 @@
 ﻿using BellaHair.Domain.SharedValueObjects;
 
-namespace BellaHair.Domain.Tests.Treatments
+namespace BellaHair.Domain.Tests.SharedValueObjects
 {
     // Mikkel Klitgaard
     internal sealed class PriceTests
