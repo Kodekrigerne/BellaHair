@@ -23,6 +23,9 @@ namespace BellaHair.Presentation.WebUI
 
             var app = builder.Build();
 
+            var dataProvider = new DataProvider(app.Services.GetRequiredService<BellaHairContext>());
+            dataProvider.AddData();
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

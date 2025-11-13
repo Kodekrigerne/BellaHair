@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BellaHair.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace BellaHair.Infrastructure.Tests
+namespace BellaHair.Application.Tests
 {
     // Mikkel Dahlmann
 
     /// <summary>
-    /// Provides an abstract baseclass for integration testclasses in the infrastructurelayer.
+    /// Provides an abstract baseclass for integration testclasses in the applicationlayer.
     /// Handles setup and disposure of database connection.
     /// Ensures a clean-slate database for each test run.
     /// </summary>
-    
-    public abstract class InfrastructureTestBase
+   
+    public abstract class ApplicationTestBase
     {
         private DbContextOptions<BellaHairContext> _options;
         private BellaHairContext _db;
