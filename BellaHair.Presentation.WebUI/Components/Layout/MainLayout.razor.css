@@ -2,6 +2,8 @@
     position: relative;
     display: flex;
     flex-direction: row;
+    background-color: oklch(.985 .002 247.839);
+    min-height: 100vh;
 }
 
 main {

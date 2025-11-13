@@ -6,13 +6,16 @@
 
 /* Navigationsbar */
 .navbar {
-    background-color: #f2f2f2;
+    background-color: white;
     font-family: system-ui;
-    width: 100%; 
-    position: fixed; 
-    top: 0; 
-    height:70px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    height: 70px;
     overflow: hidden;
+    border-bottom-width: 1px;
+    border-bottom-color: oklch(0.9249 0 0);
+    border-bottom-style: solid;
 }
 
 /* Vi bruger ::deep til hvert element fordi vi bruger .css isolation (TopNavMenu.razor har sin egen .css klasse) 
