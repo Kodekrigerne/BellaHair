@@ -15,11 +15,9 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            var options = new DbContextOptionsBuilder<BellaHairContext>()
-                .UseSqlite("Data Source=C:\\users\\denni\\desktop\\sqlite.db")
-                .Options;
+            builder.Services.AddDbContext<BellaHairContext>(options
+                => options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext")));
 
-            builder.Services.AddSingleton(options);
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
 

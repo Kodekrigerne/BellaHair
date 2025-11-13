@@ -10,7 +10,6 @@ namespace BellaHair.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceCollection)
         {
-            serviceCollection.AddDbContext<BellaHairContext>();
             serviceCollection.AddScoped<IDiscountCalculatorService, DiscountCalculatorService>();
             serviceCollection.AddScoped<ILoyaltyDiscountRepository, LoyaltyDiscountRepository>();
             serviceCollection.AddScoped<ILoyaltyDiscountQuery, LoyaltyDiscountQueryHandler>();
