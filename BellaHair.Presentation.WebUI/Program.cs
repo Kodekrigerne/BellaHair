@@ -15,15 +15,22 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            var options = new DbContextOptionsBuilder<BellaHairContext>()
-                .UseSqlite("Data Source=:memory:")
-                .Options;
+            builder.Services.AddDbContext<BellaHairContext>(options
+                => options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext")));
 
-            builder.Services.AddSingleton(options);
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
+                context.Database.EnsureCreated();
+
+                var dataProvider = new DataProvider(context);
+                dataProvider.AddData();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
