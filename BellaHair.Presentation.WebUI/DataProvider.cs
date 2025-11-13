@@ -12,6 +12,8 @@ namespace BellaHair.Presentation.WebUI
         public void AddData()
         {
             AddLoyaltyDiscounts();
+
+            _db.SaveChangesAsync();
         }
 
         private void AddLoyaltyDiscounts()
