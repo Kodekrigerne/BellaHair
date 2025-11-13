@@ -1,6 +1,8 @@
-﻿<h3>@HeaderText</h3>
+﻿<div class="ph-container">
+<h3>@HeaderText</h3>
 <p>@HeaderSubText</p>
-<button @onClick="@OnNewButtonClicked" class="btn-add">@NewButtonText</button> @*TODO: + Icon *@
+<button @onClick="@OnNewButtonClicked" class="btn-add ph-btn">@NewButtonText</button> @*TODO: + Icon *@
+</div>
 
 @code {
 	[Parameter, EditorRequired]
@@ -15,3 +17,18 @@
 	[Parameter, EditorRequired]
 	public required EventCallback OnNewButtonClicked { get; set; }
 }
+
+<style>
+	.ph-container {
+		position: relative;
+		flex: 1;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.ph-btn {
+		position: absolute;
+		right: 0px;
+		top: 0px;
+	}
+</style>
