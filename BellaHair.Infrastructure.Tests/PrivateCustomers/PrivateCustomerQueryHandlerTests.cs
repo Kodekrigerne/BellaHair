@@ -38,7 +38,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
             // Assert
             Assert.Multiple(() =>
             {
-                Assert.That(privateCustomersList.Count(), Is.EqualTo(2));
+                Assert.That(privateCustomersList, Has.Count.EqualTo(2));
                 Assert.That(privateCustomersList.Any(p => p.Id == customer0.Id), Is.True);
                 Assert.That(privateCustomersList.Any(p => p.Id == customer1.Id), Is.True);
             });

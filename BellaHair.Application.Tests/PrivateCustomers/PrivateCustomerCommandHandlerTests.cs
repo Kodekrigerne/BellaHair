@@ -21,6 +21,8 @@ namespace BellaHair.Application.Tests.PrivateCustomers
         public void Given_PrivateCustomerData_Then_CreatesPrivateCustomerInDatabase()
         {
             // Arrange
+            
+            // Castes til IPrivateCustomerRepository, fordi metodekaldene på repo er eksplicitte.
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
             var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo);
             var command = new CreatePrivateCustomerCommand("Mikkel", null, "Dahlmann",

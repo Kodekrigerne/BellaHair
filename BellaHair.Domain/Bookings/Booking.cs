@@ -1,11 +1,12 @@
 ﻿using BellaHair.Domain.Discounts;
+using BellaHair.Domain.PrivateCustomers;
 
 namespace BellaHair.Domain.Bookings
 {
     public class Booking : EntityBase
     {
         public BookingDiscount? Discount { get; private set; }
-        public PrivateCustomers.PrivateCustomer Customer { get; private init; }
+        public PrivateCustomer Customer { get; private init; }
         public decimal Total { get; private set; }
 
 #pragma warning disable CS8618

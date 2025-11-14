@@ -30,9 +30,9 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 
             // Act
             repo.AddAsync(customer);
-            repo.SaveChangesAsync();
 
             // Assert
+            _db.SaveChangesAsync();
             var actualCustomer = _db.PrivateCustomers.First();
             Assert.That(actualCustomer.Id, Is.EqualTo(customer.Id));
         }
@@ -51,8 +51,8 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 
             var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
 
-            repo.AddAsync(customer);
-            repo.SaveChangesAsync();
+            _db.AddAsync(customer);
+            _db.SaveChangesAsync();
 
             // Act
             var returnedCustomer = repo.GetAsync(customer.Id).GetAwaiter().GetResult();
@@ -75,8 +75,8 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 
             var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
 
-            repo.AddAsync(customer);
-            repo.SaveChangesAsync();
+            _db.AddAsync(customer);
+            _db.SaveChangesAsync();
 
             var customerToDelete = _db.PrivateCustomers.First();
 
