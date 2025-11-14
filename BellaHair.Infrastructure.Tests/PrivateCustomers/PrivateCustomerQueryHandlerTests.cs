@@ -11,6 +11,8 @@ using BellaHair.Ports.PrivateCustomers;
 
 namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 {
+    // Mikkel Dahlmann
+    
     internal sealed class PrivateCustomerQueryHandlerTests : InfrastructureTestBase
     {
         [Test]

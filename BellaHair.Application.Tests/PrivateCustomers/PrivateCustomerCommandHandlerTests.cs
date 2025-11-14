@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Application.Tests.PrivateCustomers
 {
+    // Mikkel Dahlmann
+
     internal sealed class PrivateCustomerCommandHandlerTests : ApplicationTestBase
     {
         [Test]

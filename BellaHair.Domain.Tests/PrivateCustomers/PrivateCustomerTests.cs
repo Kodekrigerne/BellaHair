@@ -8,6 +8,8 @@ using BellaHair.Domain.SharedValueObjects;
 
 namespace BellaHair.Domain.Tests.PrivateCustomers
 {
+    // Mikkel Dahlmann
+    
     internal sealed class PrivateCustomerTests
     {
         [Test]

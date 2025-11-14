@@ -8,8 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BellaHair.Infrastructure.Tests.PrivateCustomerTests
+namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 {
+    // Mikkel Dahlmann
+    
     internal sealed class PrivateCustomerRepositoryTests : InfrastructureTestBase
     {
         [Test]
