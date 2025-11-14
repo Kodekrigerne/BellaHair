@@ -59,23 +59,23 @@ namespace BellaHair.Domain
             ZipCode = zipCode;
             Floor = floor;
 
-            FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
+            FullAddress = BuildFullAddressString();
         }
 
         // Returnerer én samlet adresse-string sammensat af properties vha. StringBuilder.
         // Udelader floor såfremt denne er null.
-        private static string BuildFullAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
+        private string BuildFullAddressString()
         {
             var sb = new StringBuilder();
 
-            sb.Append($"{streetName} {streetNumber}");
+            sb.Append($"{StreetName} {StreetNumber}");
 
-            if (!string.IsNullOrEmpty(floor.ToString()))
+            if (!string.IsNullOrEmpty(Floor.ToString()))
             {
-                sb.Append($", {floor}. sal");
+                sb.Append($", {Floor}. sal");
             }
 
-            sb.Append($", {zipCode} {city}");
+            sb.Append($", {ZipCode} {City}");
 
             return sb.ToString();
         }
@@ -128,7 +128,7 @@ namespace BellaHair.Domain
             ZipCode = zipCode;
             Floor = floor;
 
-            FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
+            FullAddress = BuildFullAddressString();
         }
     }
     public class AddressException(string message) : DomainException(message);
