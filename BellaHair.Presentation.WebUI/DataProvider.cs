@@ -1,6 +1,8 @@
-﻿using BellaHair.Domain.Discounts;
-using BellaHair.Domain.Employees;
+using BellaHair.Domain.Discounts;
 using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Domain.Treatments;
+using BellaHair.Domain.Treatments.ValueObjects;
+using BellaHair.Domain.Employees;
 using BellaHair.Infrastructure;
 using BellaHair.Domain;
 
@@ -19,6 +21,7 @@ namespace BellaHair.Presentation.WebUI
         public void AddData()
         {
             AddLoyaltyDiscounts();
+            AddTreatment();
             AddEmployees();
 
             _db.SaveChangesAsync();
@@ -38,6 +41,13 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(Employee.Create(Name.FromStrings("Maria", "Jensen"), Email.FromString("mariaj@frisor.dk"), PhoneNumber.FromString("55123456"), Address.Create("Østerbrogade", "København Ø", "15B", 2100)));
             _db.Add(Employee.Create(Name.FromStrings("Søren", "Mikkelsen"), Email.FromString("sorenm@frisor.dk"), PhoneNumber.FromString("77889900"), Address.Create("Industrivej", "Odense M", "5", 5260)));
             _db.Add(Employee.Create(Name.FromStrings("Søren", "Jensen"), Email.FromString("sorenj@frisor.dk"), PhoneNumber.FromString("23132322"), Address.Create("Industrigade", "Vejle", "12", 7100)));
+        }
+
+        private void AddTreatment()
+        {
+            _db.Add(Treatment.Create("Herreklip", Price.FromDecimal(450m), DurationMinutes.FromInt(30)));
+            _db.Add(Treatment.Create("Dameklip", Price.FromDecimal(600m), DurationMinutes.FromInt(60)));
+            _db.Add(Treatment.Create("Dame Hårfarvning", Price.FromDecimal(400m), DurationMinutes.FromInt(90)));
         }
     }
 }

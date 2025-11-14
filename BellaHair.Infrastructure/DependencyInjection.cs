@@ -2,12 +2,15 @@
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Treatments;
 using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
 using BellaHair.Infrastructure.PrivateCustomers;
+using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
+using BellaHair.Ports.Treatments;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Infrastructure
@@ -22,6 +25,9 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
+
+            serviceCollection.AddScoped<ITreatmentRepository, TreatmentRepository>();
+            serviceCollection.AddScoped<ITreatmentQuery, TreatmentQueryHandler>();
 
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
