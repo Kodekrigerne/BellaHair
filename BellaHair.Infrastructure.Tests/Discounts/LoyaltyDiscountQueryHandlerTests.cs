@@ -19,7 +19,7 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             _db.SaveChanges();
 
             //Act
-            var discounts = handler.GetLoyaltyDiscounts().GetAwaiter().GetResult();
+            var discounts = handler.GetAllAsync().GetAwaiter().GetResult();
 
             //Assert
             Assert.Multiple(() =>
