@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Infrastructure.Tests.PrivateCustomerTests
 {
-    internal sealed class RepositoryTests : InfrastructureTestBase
+    internal sealed class PrivateCustomerRepositoryTests : InfrastructureTestBase
     {
         [Test]
         public void Given_NewPrivateCustomer_Then_AddsPrivateCustomerToDatabase()
@@ -84,6 +84,17 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomerTests
 
             // Assert
             Assert.That(_db.PrivateCustomers.Find(customerToDelete.Id), Is.Null);
+        }
+
+        [Test]
+        public void Given_PrivateCustomerDoesNotExists_Then_ThrowsPrivateCustomerException()
+        {
+            // Arrange
+            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var invalidId = Guid.NewGuid();
+
+            // Act & Assert
+            Assert.ThrowsAsync<KeyNotFoundException>(() => repo.GetAsync(invalidId));
         }
     }
 }
