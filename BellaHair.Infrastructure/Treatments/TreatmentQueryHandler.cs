@@ -17,10 +17,12 @@ namespace BellaHair.Infrastructure.Treatments
         public TreatmentQueryHandler(BellaHairContext db)
             => _db = db;
 
-        async Task<List<TreatmentDTO>> ITreatmentQuery.GetTreatments()
+        async Task<List<TreatmentDTO>> ITreatmentQuery.GetAll()
         {
             return await _db.Treatments.AsNoTracking()
-                .Select(t => new TreatmentDTO(t.Id, t.Name, t.Price.Value, t.DurationMinutes.Value)).ToListAsync();
+                .Select(t => new TreatmentDTO
+                    (t.Id, t.Name, t.Price.Value, t.DurationMinutes.Value))
+                .ToListAsync();
         }
     }
 }
