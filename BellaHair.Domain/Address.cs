@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain
 {
+    // Mikkel Dahlmann
+
     /// <summary>
     /// Represents a postal address, including street name, street number, city, zip code, and optional floor
     /// information. Provides validation of each property.
     /// </summary>
-    // Mikkel Dahlmann
+    
+    // Nedarver ikke fra EntityBase. Bruger ikke ID. Defineres som en complextype gennem EF modelbuilder.
     public class Address
     {
         public string StreetName { get; private set; }
@@ -56,29 +59,29 @@ namespace BellaHair.Domain
             ZipCode = zipCode;
             Floor = floor;
 
-            FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
+            FullAddress = BuildFullAddressString();
         }
 
         // Returnerer én samlet adresse-string sammensat af properties vha. StringBuilder.
         // Udelader floor såfremt denne er null.
-        private string BuildFullAddressString(string streetName, string city, string streetNumber, int zipCode, int? floor)
+        private string BuildFullAddressString()
         {
             var sb = new StringBuilder();
 
-            sb.Append($"{streetName} {streetNumber}");
+            sb.Append($"{StreetName} {StreetNumber}");
 
-            if (!string.IsNullOrEmpty(floor.ToString()))
+            if (!string.IsNullOrEmpty(Floor.ToString()))
             {
-                sb.Append($", {floor}. sal");
+                sb.Append($", {Floor}. sal");
             }
 
-            sb.Append($", {zipCode} {city}");
+            sb.Append($", {ZipCode} {City}");
 
             return sb.ToString();
         }
 
 
-        private void ValidateStreetAndCity(string name)
+        private static void ValidateStreetAndCity(string name)
         {
             if (name.Any(x => !char.IsLetter(x) && x != '-' && x != ' '))
                 throw new AddressException("Name can only consist of letters.");
@@ -88,20 +91,20 @@ namespace BellaHair.Domain
         }
 
 
-        private void ValidateStreetNumber(string streetNumber)
+        private static void ValidateStreetNumber(string streetNumber)
         {
             if (streetNumber.Any(x => !char.IsLetterOrDigit(x)))
                 throw new AddressException("Streetnumber can only consist of numbers and letters.");
         }
 
 
-        private void ValidateZipCode(int zipCode)
+        private static void ValidateZipCode(int zipCode)
         {
             if (zipCode > 9999 || zipCode < 1000)
                 throw new AddressException("Zipcode is invalid.");
         }
 
-        private void ValidateFloor(int? floor)
+        private static void ValidateFloor(int? floor)
         {
             if (floor < 1 || floor > 100)
                 throw new AddressException("Floor is invalid, must be between 1 and 100.");
@@ -125,7 +128,7 @@ namespace BellaHair.Domain
             ZipCode = zipCode;
             Floor = floor;
 
-            FullAddress = BuildFullAddressString(StreetName, City, StreetNumber, ZipCode, Floor);
+            FullAddress = BuildFullAddressString();
         }
     }
     public class AddressException(string message) : DomainException(message);
