@@ -1,0 +1,49 @@
+﻿@if (IsVisible)
+{
+    <div class="modal-overlay" @onclick="Close">
+        <div class="modal-container" @onclick:stopPropagation>
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    private async Task Close()
+    {
+        if (OnClose.HasDelegate) await OnClose.InvokeAsync();
+    }
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.45);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: background 0.3s ease;
+    }
+
+    .modal-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 24px rgba(0,0,0,0.16);
+        padding: 2rem;
+        min-width: 320px;
+        max-width: 95vw;
+        max-height: 80vh;
+        overflow: auto;
+        transition: transform 0.2s cubic-bezier(.17,.67,.83,.67), opacity 0.2s ease;
+        transform: scale(1);
+        opacity: 1;
+    }
+</style>
