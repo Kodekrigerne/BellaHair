@@ -21,17 +21,26 @@ jobs:
       - name: Restore dependencies (Domain)
         run: dotnet restore BellaHair.Domain.Tests
 
+      - name: Restore dependencies (Application)
+        run: dotnet restore BellaHair.Application.Tests
+
       - name: Restore dependencies (Infrastructure)
         run: dotnet restore BellaHair.Infrastructure.Tests
 
       - name: Build (Domain)
         run: dotnet build BellaHair.Domain.Tests --no-restore
 
+      - name: Build (Application)
+        run: dotnet build BellaHair.Application.Tests --no-restore
+
       - name: Build (Infrastructure)
         run: dotnet build BellaHair.Infrastructure.Tests --no-restore
 
       - name: Run tests (Domain)
         run: dotnet test BellaHair.Domain.Tests --no-build --logger:"console;verbosity=normal"
+
+      - name: Run tests (Application)
+        run: dotnet test BellaHair.Application.Tests --no-build --logger:"console;verbosity=normal"
 
       - name: Run tests (Infrastructure)
         run: dotnet test BellaHair.Infrastructure.Tests --no-build --logger:"console;verbosity=normal"
