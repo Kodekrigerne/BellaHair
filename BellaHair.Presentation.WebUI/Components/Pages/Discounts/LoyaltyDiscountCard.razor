@@ -1,0 +1,46 @@
+﻿<!-- Dennis -->
+
+@using BellaHair.Ports.Discounts
+@using BellaHair.Presentation.WebUI.Components.Shared;
+
+@inject ILoyaltyDiscountCommand _loyaltyDiscountCommand
+
+<div class="ldc-card">
+	<p>@LoyaltyDiscount.Name</p>
+	<p class="ldc-visits">Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
+	<p>Rabat: @((LoyaltyDiscount.DiscountPercent * 100).ToString("0"))%</p>
+	<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required LoyaltyDiscountViewModel LoyaltyDiscount { get; set; }
+
+	// Guid type så ID'et af den slettede rabat kan sendes tilbage til Discounts siden, så denne automatisk kan opdatere.
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnDelete { get; set; }
+
+	private async Task HandleOnDeleteClick()
+	{
+		var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
+		await _loyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
+		await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
+	}
+}
+
+<style>
+	.ldc-card {
+		padding: 1rem;
+		margin-bottom: 1rem;
+		background: linear-gradient(to right, oklch(.97 .014 254.604), oklch(.977 .014 308.299)); /* blue-50, purple-50 */
+		border-style: solid;
+		border-width: 1px;
+		border-color: oklch(.882 .059 254.128); /* blue-200 */
+		border-radius: 8px;
+		position: relative;
+	}
+
+	.ldc-visits {
+		color: oklch(.446 .03 256.802); /* grey-600 */
+	}
+</style>

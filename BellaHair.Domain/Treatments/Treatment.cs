@@ -32,7 +32,8 @@ namespace BellaHair.Domain.Treatments
             DurationMinutes = durationMinutes;
         }
 
-        public static Treatment Create(string treatmentName, Price price, DurationMinutes durationMinutes) => new(treatmentName, price, durationMinutes);
+        public static Treatment Create(string treatmentName, Price price, DurationMinutes durationMinutes)
+            => new(treatmentName, price, durationMinutes);
     }
     public class TreatmentException(string message) : DomainException(message);
 }

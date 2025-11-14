@@ -1,0 +1,43 @@
+﻿<!-- Dennis -->
+
+<button class="bin-delete-button" @onclick="@OnClick">
+	<BinIcon Class="delete-icon" />
+</button>
+
+@code {
+	[Parameter]
+	public EventCallback OnClick { get; set; }
+}
+
+<style>
+	.bin-delete-button {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		width: 2.75rem;
+		height: 2.75rem;
+		border: none;
+		background-color: none;
+		background: none;
+		border-radius: 8px;
+		padding: 0px;
+		color: oklch(.708 .183 23.67); /* red-300 */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+		.bin-delete-button:hover {
+			background-color: oklch(.936 .032 17.717); /* red-100 */
+			transition: background-color 0.2s;
+		}
+
+		.bin-delete-button:active {
+			transform: translate(1px, 1px);
+		}
+
+	.delete-icon {
+		height: 1.5rem;
+		width: 1.5rem;
+	}
+</style>
