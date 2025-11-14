@@ -9,6 +9,7 @@ namespace BellaHair.Infrastructure.Tests.Discounts
         [Test]
         public void GetLoyaltyDiscounts_GetsLoyaltyDiscounts()
         {
+            //Arrange
             var handler = new LoyaltyDiscountQueryHandler(_db) as ILoyaltyDiscountQuery;
 
             var discount1 = LoyaltyDiscount.Create("First discount", 5, DiscountPercent.FromDecimal(0.05m));
@@ -17,8 +18,10 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             _db.AddRange(discount1, discount2);
             _db.SaveChanges();
 
+            //Act
             var discounts = handler.GetLoyaltyDiscounts().GetAwaiter().GetResult();
 
+            //Assert
             Assert.Multiple(() =>
             {
                 Assert.That(discounts, Has.Count.EqualTo(2));
