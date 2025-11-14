@@ -1,6 +1,8 @@
-﻿@attribute [StreamRendering]
+﻿<!-- Dennis -->
 
-@page "/discounts"
+@attribute [StreamRendering]
+
+@page "/rabatter"
 
 @using BellaHair.Domain
 @using BellaHair.Ports.Discounts
@@ -13,8 +15,8 @@
 <PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny rabat" OnNewButtonClicked="@(() => { })"/>
 
 <div>
-	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter</button>
-	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter</button>
+	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
+	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter (@CampaignCount)</button>
 </div>
 
 <div class="kk-container">
@@ -24,9 +26,7 @@
 	{
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
-			<div>
-			<p>@loyaltyDiscount.Name</p>
-			</div>
+			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteClick"/>
 		}
 	}
 	else if (_activeTab == DiscountTab.Campaign)
@@ -45,11 +45,14 @@
 	private string? _errorMessage;
 
 	private List<IDiscountViewModel>? _discounts = null;
+	private int LoyaltyCount;
+	private int CampaignCount;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
+		await UpdateCounts();
 		await HandleLoyaltySelectorClick();
 	}
 
@@ -57,10 +60,12 @@
 	{
 		try
 		{
-			var discounts = await _loyaltyDiscountQuery.GetLoyaltyDiscounts();
+			var discounts = await _loyaltyDiscountQuery.GetAllAsync();
 
-			_discounts = discounts.Select(d =>
-				(IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent))).ToList();
+			_discounts = discounts
+			.OrderBy(d => d.Name)
+			.Select(d => (IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent)))
+			.ToList();
 
 			_activeTab = DiscountTab.Loyalty;
 		}
@@ -75,7 +80,15 @@
 		_activeTab = DiscountTab.Campaign;
 	}
 
-	public interface IDiscountViewModel;
-	public record LoyaltyDiscountViewModel(Guid Id, string Name, int MinimumVisits, decimal DiscountPercent) : IDiscountViewModel;
-	public record CampaignDiscountViewModel() : IDiscountViewModel;
+	private async Task UpdateCounts()
+	{
+		LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
+	}
+
+	//EventCallback som gives til LoyaltyDiscountCard så koden automatisk kan køres når der trykkes på slet knappen.
+	private async Task HandleOnDeleteClick(Guid Id)
+	{
+		_discounts = _discounts?.Where(d => d.Id != Id).ToList();
+		await UpdateCounts();
+	}
 }
