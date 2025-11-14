@@ -16,6 +16,7 @@
 	[Parameter, EditorRequired]
 	public required LoyaltyDiscountViewModel LoyaltyDiscount { get; set; }
 
+	// Guid type så ID'et af den slettede rabat kan sendes tilbage til Discounts siden, så denne automatisk kan opdatere.
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnDelete { get; set; }
 

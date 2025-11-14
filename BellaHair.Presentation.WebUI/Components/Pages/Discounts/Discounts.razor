@@ -70,8 +70,7 @@
 			_activeTab = DiscountTab.Loyalty;
 		}
 		catch (DomainException ex) { _errorMessage = ex.Message; }
-		catch (Exception ex) { _errorMessage = ex.Message; } 
-		@*TODO: "Noget gik galt. "*@
+		catch (Exception ex) { _errorMessage = ex.Message; } @*TODO: "Noget gik galt. "*@
 	}
 
 	private void HandleCampaignSelectorClick()
@@ -86,6 +85,7 @@
 		LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
 	}
 
+	//EventCallback som gives til LoyaltyDiscountCard så koden automatisk kan køres når der trykkes på slet knappen.
 	private async Task HandleOnDeleteClick(Guid Id)
 	{
 		_discounts = _discounts?.Where(d => d.Id != Id).ToList();
