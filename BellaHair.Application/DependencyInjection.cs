@@ -1,4 +1,5 @@
 ﻿using BellaHair.Application.Discounts;
+using BellaHair.Application.Treatments;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Treatments;
 using Microsoft.Extensions.DependencyInjection;

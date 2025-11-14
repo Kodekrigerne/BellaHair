@@ -3,7 +3,7 @@ using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Ports.Treatments;
 
-namespace BellaHair.Application
+namespace BellaHair.Application.Treatments
 {
     // Mikkel Klitgaard
     /// <summary>
