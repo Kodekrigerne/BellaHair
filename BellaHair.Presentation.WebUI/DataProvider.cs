@@ -33,6 +33,7 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(Employee.Create(Name.FromStrings("Peter", "Pedersen"), Email.FromString("peterp@frisor.dk"), PhoneNumber.FromString("20456789"), Address.Create("Vestergade", "Aarhus C", "10", 8000)));
             _db.Add(Employee.Create(Name.FromStrings("Maria", "Jensen"), Email.FromString("mariaj@frisor.dk"), PhoneNumber.FromString("55123456"), Address.Create("Østerbrogade", "København Ø", "15B", 2100)));
             _db.Add(Employee.Create(Name.FromStrings("Søren", "Mikkelsen"), Email.FromString("sorenm@frisor.dk"), PhoneNumber.FromString("77889900"), Address.Create("Industrivej", "Odense M", "5", 5260)));
+            _db.Add(Employee.Create(Name.FromStrings("Søren", "Jensen"), Email.FromString("sorenj@frisor.dk"), PhoneNumber.FromString("23132322"), Address.Create("Industrigade", "Vejle", "12", 7100)));
         }
     }
 }
