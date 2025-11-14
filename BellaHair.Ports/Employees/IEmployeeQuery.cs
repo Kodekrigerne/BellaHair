@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Ports.Employees
 {
+
+    /// <summary>
+    /// Defines methods for querying employee data with varying levels of detail.
+    /// </summary>
+    
+    // Linnea
     public interface IEmployeeQuery
     {
         Task<List<EmployeeDTOSimple>> GetAllEmployeesSimpleAsync();

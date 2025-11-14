@@ -6,6 +6,8 @@ namespace BellaHair.Domain.SharedValueObjects
     /// <summary>
     /// Email value object that contains logic to validate email
     /// </summary>
+    
+    // Linnea
     public record Email
     {
         public string Value { get; private init; }
