@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BellaHair.Domain.Bookings.Booking">
+    <Position X="4.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAABAAAAAQAQAAgAAAAAAAAA=</HashCode>
+      <FileName>Bookings\Booking.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Discounts.DiscountBase">
+    <Position X="7" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Discounts\DiscountBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Discounts.DiscountPercentException" Collapsed="true">
+    <Position X="17.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Discounts\DiscountPercent.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Discounts.LoyaltyDiscount">
+    <Position X="7" Y="12" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAEAAAAAAAAAAAAQAAAAAAEAAAAAAIAAAAAA=</HashCode>
+      <FileName>Discounts\LoyaltyDiscount.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Discounts.LoyaltyDiscountException" Collapsed="true">
+    <Position X="6" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Discounts\LoyaltyDiscount.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Employees.Employee">
+    <Position X="14" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Employees\Employee.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Employees.EmployeeException" Collapsed="true">
+    <Position X="19.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Employees\Employee.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.PrivateCustomers.PrivateCustomer">
+    <Position X="11.5" Y="12.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAgAAQAAAAAAAAABAAIAEAAAAgAAAAAAAA=</HashCode>
+      <FileName>PrivateCustomers\PrivateCustomer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.PrivateCustomers.PrivateCustomerException" Collapsed="true">
+    <Position X="12.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PrivateCustomers\PrivateCustomer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.SharedValueObjects.EmailException" Collapsed="true">
+    <Position X="21.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SharedValueObjects\Email.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.SharedValueObjects.NameException" Collapsed="true">
+    <Position X="24" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SharedValueObjects\Name.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.SharedValueObjects.PhoneNumberException" Collapsed="true">
+    <Position X="3.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SharedValueObjects\PhoneNumber.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.SharedValueObjects.PriceException" Collapsed="true">
+    <Position X="8.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SharedValueObjects\Price.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Treatments.ValueObjects.DurationException" Collapsed="true">
+    <Position X="15" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Treatments\ValueObjects\DurationMinutes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Treatments.Treatment">
+    <Position X="9.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAQAgAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Treatments\Treatment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Treatments.TreatmentException" Collapsed="true">
+    <Position X="26.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Treatments\Treatment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.Address">
+    <Position X="26.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAAAQiIQAAIAAAAAAAAAkABAIAAAAAEAEA=</HashCode>
+      <FileName>Address.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.AddressException" Collapsed="true">
+    <Position X="10.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Address.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.DomainException" Collapsed="true">
+    <Position X="15" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DomainException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.EntityBase">
+    <Position X="9.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EntityBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BellaHair.Domain.PersonBase">
+    <Position X="12.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAQAQAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <FileName>PersonBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="BellaHair.Domain.Bookings.IDiscountCalculatorService">
+    <Position X="28.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bookings\IDiscountCalculatorService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BellaHair.Domain.Discounts.ILoyaltyDiscountRepository">
+    <Position X="28.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEBAAAAAAAEAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Discounts\ILoyaltyDiscountRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BellaHair.Domain.Employees.IEmployeeRepository">
+    <Position X="30.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAEAAAEAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Employees\IEmployeeRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BellaHair.Domain.PrivateCustomers.IPrivateCustomerRepository">
+    <Position X="30.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAAAAAAAEAAAEAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>PrivateCustomers\IPrivateCustomerRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
