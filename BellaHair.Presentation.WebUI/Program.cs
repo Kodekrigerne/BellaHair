@@ -1,7 +1,9 @@
+using System.Data.Common;
 using BellaHair.Application;
 using BellaHair.Infrastructure;
 using BellaHair.Presentation.WebUI.Components;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -15,8 +17,10 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddDbContext<BellaHairContext>(options
-                => options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext")));
+            builder.Services.AddDbContext<BellaHairContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext"))
+                    .AddInterceptors(new SqliteJournalModeInterceptor()) //TODO: Slet når vi er færdige med SQLite
+            );
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
@@ -50,6 +54,18 @@ namespace BellaHair.Presentation.WebUI
                 .AddInteractiveServerRenderMode();
 
             app.Run();
+        }
+    }
+
+    //TODO: Slet når vi er færdige med SQLite
+    // Custom interceptor class:
+    public class SqliteJournalModeInterceptor : DbConnectionInterceptor
+    {
+        public override void ConnectionOpened(DbConnection connection, ConnectionEndEventData eventData)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "PRAGMA journal_mode=DELETE;";
+            cmd.ExecuteNonQuery();
         }
     }
 }
