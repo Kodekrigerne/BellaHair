@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Ports.Employees
 {
+    /// <summary>
+    /// Defines operations for creating and deleting employee records asynchronously.
+    /// </summary>
+
+    // Linnea
     public interface IEmployeeCommand
     {
         Task CreateEmployeeCommand(CreateEmployeeCommand command);

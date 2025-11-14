@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain.Employees
 {
+    /// <summary>
+    /// Defines a contract for managing employee entities in a data store.
+    /// </summary>
+    
+    // Linnea
     public interface IEmployeeRepository
     {
         Task AddAsync(Employee employee);

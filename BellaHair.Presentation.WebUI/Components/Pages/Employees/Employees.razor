@@ -1,0 +1,85 @@
+﻿@attribute [StreamRendering]
+@using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Ports.Employees
+
+@page "/medarbejdere"
+
+@rendermode InteractiveServer
+@inject IEmployeeQuery _employeeQuery
+
+<PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { })" />
+
+<div class="kk-container employees-container">
+		@if (_errorMessage != null) { <p>@_errorMessage</p>}
+		@if (_employees == null) {<p>Loading...</p>}
+		else
+		{
+
+				@foreach (var employee in _employees)
+				{
+					<div class="employee-card">
+						
+					<div class="employee-avatar">
+						@GetEmployeeInitials(employee.name)
+						</div>
+							<div>
+ 								<h3>@employee.name</h3>
+							<div class="employee-contact-details">
+						<MailIcon Class="employee-icons" />
+						@employee.email
+							</div>
+							<div class="employee-contact-details">
+								<PhoneIcon Class="employee-icons"/>
+									@employee.phoneNumber
+							</div>
+						</div>
+					</div>
+				}
+		}
+	</div>
+
+@code {
+	private string? _errorMessage;
+
+	private string GetEmployeeInitials(string name)
+	{
+		var parts = name.Split(' ');
+		return string.Concat(parts.Select(p => p.FirstOrDefault()));
+
+	}
+
+	private List<EmployeeSimpleViewModel>? _employees = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadEmployees();
+	}
+
+	private async Task LoadEmployees()
+	{
+		try
+		{
+			var employees = await _employeeQuery.GetAllEmployeesSimpleAsync();
+			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber)).ToList();
+		}
+		catch (DomainException ex)
+		{
+
+			_errorMessage = ex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = ex.Message; // TODO: "Noget gik galt"
+		}
+	}
+
+	public record EmployeeSimpleViewModel(Guid Id, string name, string email, string phoneNumber);
+	// TODO: Add full viewmodel
+}
+
+<style>
+
+</style>

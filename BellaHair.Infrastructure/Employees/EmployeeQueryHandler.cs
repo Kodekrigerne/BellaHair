@@ -31,7 +31,7 @@ namespace BellaHair.Infrastructure.Employees
         {
             return  await _db.Employees
                 .AsNoTracking()
-                .Select(x => new EmployeeDTOSimple(x.Name.FullName, x.PhoneNumber.Value, x.Email.Value))
+                .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value))
                 .ToListAsync();
         }
 
@@ -39,7 +39,7 @@ namespace BellaHair.Infrastructure.Employees
         {
             var employee = await _db.Employees.FindAsync(query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
 
-            return new EmployeeDTOFull(employee.Name.FirstName, employee.Name.MiddleName ?? "", employee.Name.LastName, employee.Email.Value, employee.PhoneNumber.Value, employee.Address.StreetName, employee.Address.City, employee.Address.StreetNumber, employee.Address.ZipCode, employee.Address.Floor);
+            return new EmployeeDTOFull(employee.Id, employee.Name.FirstName, employee.Name.MiddleName ?? "", employee.Name.LastName, employee.Email.Value, employee.PhoneNumber.Value, employee.Address.StreetName, employee.Address.City, employee.Address.StreetNumber, employee.Address.ZipCode, employee.Address.Floor);
         }
     }
 }
