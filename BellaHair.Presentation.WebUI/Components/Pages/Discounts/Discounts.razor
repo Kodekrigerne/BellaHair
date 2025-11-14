@@ -62,8 +62,10 @@
 		{
 			var discounts = await _loyaltyDiscountQuery.GetAllAsync();
 
-			_discounts = discounts.Select(d =>
-				(IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent))).ToList();
+			_discounts = discounts
+			.OrderBy(d => d.Name)
+			.Select(d => (IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent)))
+			.ToList();
 
 			_activeTab = DiscountTab.Loyalty;
 		}
