@@ -1,17 +1,30 @@
 ﻿<!-- Dennis -->
 
+@using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Shared;
+
+@inject ILoyaltyDiscountCommand _loyaltyDiscountCommand
 
 <div class="ldc-card">
 	<p>@LoyaltyDiscount.Name</p>
 	<p class="ldc-visits">Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
 	<p>Rabat: @((LoyaltyDiscount.DiscountPercent * 100).ToString("0"))%</p>
-	<BinDeleteButton OnClick="@(() => { })"/>
+	<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 </div>
 
 @code {
 	[Parameter, EditorRequired]
 	public required LoyaltyDiscountViewModel LoyaltyDiscount { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnDelete { get; set; }
+
+	private async Task HandleOnDeleteClick()
+	{
+		var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
+		await _loyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
+		await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
+	}
 }
 
 <style>
