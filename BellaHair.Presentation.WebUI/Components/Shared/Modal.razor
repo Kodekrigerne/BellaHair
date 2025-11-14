@@ -1,7 +1,7 @@
-﻿@if (IsVisible)
+﻿@if (IsVisible || _isMounted)
 {
-    <div class="modal-overlay" @onclick="Close">
-        <div class="modal-container" @onclick:stopPropagation>
+    <div class="modal-overlay @(IsVisible && _isMounted ? "show" : "")" @onclick="Close">
+        <div class="modal-container @(IsVisible && _isMounted ? "show" : "")" @onclick:stopPropagation>
             @ChildContent
         </div>
     </div>
@@ -9,12 +9,31 @@
 
 @code {
     [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    
+
+    private bool _isMounted;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible)
+        {
+            await Task.Delay(1);
+            _isMounted = true;
+        }
+
+        else if (!IsVisible)
+        {
+            await Task.Delay(100);
+            _isMounted = false;
+        }
+    }
+
     private async Task Close()
     {
         if (OnClose.HasDelegate) await OnClose.InvokeAsync();
+        if (IsVisibleChanged.HasDelegate) await IsVisibleChanged.InvokeAsync(false);
     }
 }
 
@@ -25,13 +44,17 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0,0,0,0.45);
+        background: rgba(0,0,0,0);
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 1000;
-        transition: background 0.3s ease;
+        transition: background 0.1s ease;
     }
+
+        .modal-overlay.show {
+            background: rgba(0,0,0,0.45);
+        }
 
     .modal-container {
         background: #fff;
@@ -42,8 +65,13 @@
         max-width: 95vw;
         max-height: 80vh;
         overflow: auto;
-        transition: transform 0.2s cubic-bezier(.17,.67,.83,.67), opacity 0.2s ease;
-        transform: scale(1);
-        opacity: 1;
+        transition: transform 0.1s ease-out, opacity 0.1s ease;
+        transform: scale(0.7);
+        opacity: 0;
     }
+
+        .modal-container.show {
+            transform: scale(1);
+            opacity: 1;
+        }
 </style>
