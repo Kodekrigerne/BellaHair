@@ -23,7 +23,7 @@ namespace BellaHair.Infrastructure.Discounts
 
         async Task<int> ILoyaltyDiscountQuery.GetCount()
         {
-            return await _db.Discounts.CountAsync();
+            return await _db.Discounts.AsNoTracking().CountAsync();
         }
     }
 }
