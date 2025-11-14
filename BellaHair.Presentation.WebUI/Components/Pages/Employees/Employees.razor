@@ -10,12 +10,11 @@
 
 <PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { })" />
 
-	<div class="kk-container">
+<div class="kk-container employees-container">
 		@if (_errorMessage != null) { <p>@_errorMessage</p>}
 		@if (_employees == null) {<p>Loading...</p>}
 		else
 		{
-			<div class="employees-container">
 
 				@foreach (var employee in _employees)
 				{
@@ -27,17 +26,16 @@
 							<div>
  								<h3>@employee.name</h3>
 							<div class="employee-contact-details">
-								<MailIcon />
-									@employee.email
+						<MailIcon Class="employee-icons" />
+						@employee.email
 							</div>
 							<div class="employee-contact-details">
-								<PhoneIcon />
+								<PhoneIcon Class="employee-icons"/>
 									@employee.phoneNumber
 							</div>
 						</div>
 					</div>
 				}
-		</div>
 		}
 	</div>
 
@@ -81,3 +79,7 @@
 	public record EmployeeSimpleViewModel(Guid Id, string name, string email, string phoneNumber);
 	// TODO: Add full viewmodel
 }
+
+<style>
+
+</style>
