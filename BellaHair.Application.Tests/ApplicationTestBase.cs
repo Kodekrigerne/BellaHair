@@ -13,7 +13,7 @@ namespace BellaHair.Application.Tests
 
     public abstract class ApplicationTestBase
     {
-        private readonly static string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
         protected DbContextOptions<BellaHairContext> _options;
         protected BellaHairContext _db;
