@@ -12,7 +12,7 @@
 
 @inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
 
-<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny rabat" OnNewButtonClicked="@(() => { })"/>
+<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { })"/>
 
 <div>
 	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
@@ -40,8 +40,15 @@
 
 @code {
 	private enum DiscountTab { Loyalty, Campaign }
-
 	private DiscountTab _activeTab;
+
+	private string _newButtonText => _activeTab switch
+	{
+		DiscountTab.Loyalty => "Ny stamkunderabat",
+		DiscountTab.Campaign => "Ny kampagnerabat",
+		_ => "Ny"
+	};
+
 	private string? _errorMessage;
 
 	private List<IDiscountViewModel>? _discounts = null;
@@ -70,7 +77,7 @@
 			_activeTab = DiscountTab.Loyalty;
 		}
 		catch (DomainException ex) { _errorMessage = ex.Message; }
-		catch (Exception ex) { _errorMessage = ex.Message; } @*TODO: "Noget gik galt. "*@
+		catch (Exception ex) { _errorMessage = ex.Message; }  @*TODO: "Noget gik galt. "*@
 	}
 
 	private void HandleCampaignSelectorClick()
