@@ -96,7 +96,7 @@
 
 	private async Task UpdateCounts(DiscountTab? discount = null)
 	{
-		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
+		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await _loyaltyDiscountQuery.GetCountAsync();
 	}
 
 	//EventCallback som gives til LoyaltyDiscountCard så koden automatisk kan køres når der trykkes på slet knappen.
