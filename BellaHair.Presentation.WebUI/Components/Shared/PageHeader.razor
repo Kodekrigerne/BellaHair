@@ -3,7 +3,12 @@
 <div class="ph-container">
 <h3 class="ph-header">@HeaderText</h3>
 <p class="ph-sub">@HeaderSubText</p>
-<button @onclick="@OnNewButtonClicked" class="btn-add ph-btn">@NewButtonText</button> @*TODO: + Icon *@
+<button class="btn-add ph-btn" @onclick ="@OnNewButtonClicked">
+	<svg class="ph-plus" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.75" d="M12 4v16m8-8H4" />
+	</svg>
+	@NewButtonText
+</button>
 </div>
 
 @code {
@@ -32,6 +37,14 @@
 		position: absolute;
 		right: 0px;
 		top: 5px;
+		display: flex;
+		align-items: center;
+		gap: 0.50rem;
+	}
+
+	.ph-plus {
+		width: 1rem;
+		height: 1rem;
 	}
 
 	.ph-header {
