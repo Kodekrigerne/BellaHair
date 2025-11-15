@@ -26,7 +26,7 @@
 	{
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
-			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteClick"/>
+			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteLoyaltyClick"/>
 		}
 	}
 	else if (_activeTab == DiscountTab.Campaign)
@@ -80,15 +80,15 @@
 		_activeTab = DiscountTab.Campaign;
 	}
 
-	private async Task UpdateCounts()
+	private async Task UpdateCounts(DiscountTab? discount = null)
 	{
-		LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
+		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
 	}
 
 	//EventCallback som gives til LoyaltyDiscountCard så koden automatisk kan køres når der trykkes på slet knappen.
-	private async Task HandleOnDeleteClick(Guid Id)
+	private async Task HandleOnDeleteLoyaltyClick(Guid Id)
 	{
 		_discounts = _discounts?.Where(d => d.Id != Id).ToList();
-		await UpdateCounts();
+		await UpdateCounts(DiscountTab.Loyalty);
 	}
 }
