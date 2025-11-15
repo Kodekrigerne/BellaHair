@@ -12,7 +12,12 @@
 
 @inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
 
-<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { })"/>
+<Modal @bind-IsVisible="@_showNewModal">
+	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
+	@if (_activeTab == DiscountTab.Campaign) { <p>Ny kampagnerabat</p> }
+</Modal>
+
+<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
 
 <div>
 	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
@@ -49,6 +54,7 @@
 		_ => "Ny"
 	};
 
+	private bool _showNewModal = false;
 	private string? _errorMessage;
 
 	private List<IDiscountViewModel>? _discounts = null;
@@ -77,7 +83,8 @@
 			_activeTab = DiscountTab.Loyalty;
 		}
 		catch (DomainException ex) { _errorMessage = ex.Message; }
-		catch (Exception ex) { _errorMessage = ex.Message; }  @*TODO: "Noget gik galt. "*@
+		catch (Exception ex) { _errorMessage = ex.Message; }  
+	@*TODO: "Noget gik galt. "*@
 	}
 
 	private void HandleCampaignSelectorClick()
