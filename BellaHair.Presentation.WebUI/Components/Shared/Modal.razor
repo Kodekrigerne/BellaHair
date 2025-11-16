@@ -21,7 +21,8 @@
     // Kaldes når IsVisible (eller andre props) ændres
     protected override async Task OnParametersSetAsync()
     {
-        // Hvis IsVisible er blevet sat til true sættes _isMounted også til true (delay er nødvendigt, men hvorfor?)
+        // Hvis IsVisible er blevet sat til true sættes _isMounted også til true
+        // Delay er nødvendigt for at modalen først vises uden .show klassen, da animationen ellers ikke afspilles
         if (IsVisible)
         {
             await Task.Delay(1);
