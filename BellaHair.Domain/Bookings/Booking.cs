@@ -30,21 +30,26 @@ namespace BellaHair.Domain.Bookings
         private Booking() { }
 #pragma warning restore CS8618
 
-        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime createdDate)
+        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime createdDate, DateTime currentDate)
         {
+            if (createdDate.Date < currentDate.Date.AddDays(-1))
+                throw new BookingException($"Cannot create bookings that are more than 1 day old {createdDate}.");
+
+            //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
+            //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
+            //    throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
+
             Customer = customer;
             CustomerSnapshot = CustomerSnapshot.FromCustomer(customer);
             Employee = employee;
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(employee);
             Treatment = treatment;
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
-            CreatedDate = createdDate; //TODO: Brug currentDateTime til invariant, ikke til createdDate, pass createdDate (invariant -1 dag)
-
-            //TODO: Invariant på at employee har Treatment
+            CreatedDate = createdDate;
         }
 
-        public static Booking Create(PrivateCustomer customer, Employee employee, Treatment treatment, ICurrentDateTimeProvider currentDateTimeProvider)
-            => new(customer, employee, treatment, currentDateTimeProvider.GetCurrentDateTime());
+        public static Booking Create(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime createdDate, ICurrentDateTimeProvider currentDateTimeProvider)
+            => new(customer, employee, treatment, createdDate, currentDateTimeProvider.GetCurrentDateTime());
 
         public void FindBestDiscount(IDiscountCalculatorService discountCalculatorService)
         {
