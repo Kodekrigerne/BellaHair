@@ -41,6 +41,10 @@
 						<MailIcon Class="privatecustomer-icons" />
 						@customer.Email
 					</div>
+					<div class="privatecustomer-contact-details">
+						<VisitsIcon Class="privatecustomer-icons" />
+						Antal besøg: @customer.Visits
+					</div>
 				</div>
 				</div>
 			</div>
@@ -72,7 +76,7 @@
 		try
 		{
 			var customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress)).ToList();
+			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists)).ToList();
 		}
 		catch (DomainException ex)
 		{
@@ -85,5 +89,5 @@
 		}
 	}
 
-	public record PrivateCustomerViewModel(Guid Id, string FullName, DateTime Birthday, string Email, string PhoneNumber, string FullAddress);
+	public record PrivateCustomerViewModel(Guid Id, string FullName, DateTime Birthday, string Email, string PhoneNumber, string FullAddress, int Visits);
 }

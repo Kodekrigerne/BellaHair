@@ -38,7 +38,8 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                     x.Address.FullAddress,
                     x.PhoneNumber.Value,
                     x.Email.Value,
-                    x.Birthday))
+                    x.Birthday,
+                    x.Visits))
                 .ToListAsync();
         }
     }

@@ -31,5 +31,6 @@ namespace BellaHair.Ports.PrivateCustomers
         string FullAddress,
         string PhoneNumber,
         string Email,
-        DateTime Birthday);
+        DateTime Birthday,
+        int Visists);
 }
