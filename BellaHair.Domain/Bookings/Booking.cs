@@ -24,7 +24,9 @@ namespace BellaHair.Domain.Bookings
         // 1a. Hvis alle priser er i value objekter: Total => { udregn }
         // 1b. Hvis nogen er navigations properties: .Include navigations properties i query når du skal bruge Total
         // 2.  GetTotal(IBookingTotalCalculator _) metode
-        // 3.  Udregn og set hver gang ordren opdateres
+        // 3.  Udregn og set hver gang ordren opdateres med noget der påvirker pris
+        // 3 vælges da det er den eneste strategi der resulterer i at Total gemmes i databasen
+        // Med de andre skal Total udregnes igen hver gang booking vises, selv gamle bookings
         public decimal Total { get; private set; }
 
 #pragma warning disable CS8618
