@@ -1,4 +1,5 @@
 ﻿@attribute [StreamRendering]
+@using BellaHair.Domain
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 
@@ -20,33 +21,22 @@
 			<div class="employee-card">
 
 				<div class="employee-avatar">
-					<ScissorsIcon Class="treatment-icon"/>
+					<FemaleHairIcon Class="test-icon"/>
 				</div>
 				<div>
 					<h3>@treatment.Name</h3>
 					<div class="employee-contact-details">
-						<MailIcon Class="employee-icons" />
+						<MailIcon Class="treatment-icon" />
 						@treatment.Price.ToString("C")
 					</div>
 					<div class="employee-contact-details">
-						<PhoneIcon Class="employee-icons" />
+						<PhoneIcon Class="treatment-icon" />
 						@treatment.DurationMinutes min
 					</div>
 				</div>
 			</div>
 			}
-	}}
-
-
-
-
-		<ScissorsIcon Class="treatment-icon"/>
-		<ScissorsIcon Class="treatment-icon"/>
-		<BinIcon Class="treatment-icon"/>
-
-
-
-
+	}
 	</div>
 
 
@@ -75,8 +65,12 @@
 			var treatments = await _treatmentQuery.GetAllAsync();
 			_treatments = treatments
 				.OrderBy(t => t.Name)
-				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.DurationMinutes))
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
 				.ToList();
+		}
+		catch (DomainException dex)
+		{
+			_errorMessage = dex.Message;
 		}
 		catch (Exception ex)
 		{

@@ -1,4 +1,16 @@
-﻿::deep .treatment-icon {
+﻿/* SIDEN SKAL REFAKTORERES */
+/* SIDEN SKAL REFAKTORERES */
+/* SIDEN SKAL REFAKTORERES */
+
+
+::deep .treatment-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+
+}
+
+::deep .test-icon {
     width: 36px;
     height: 36px;
     display: inline-block;
@@ -41,7 +53,7 @@
     width: 4rem;
     height: 4rem;
     border-radius: 9999px;
-    background: linear-gradient(to bottom right, #c084fc, #ec4899);
+    background: linear-gradient(to bottom right, #a91ce4, #c9abe7);
     display: flex;
     align-items: center;
     justify-content: center;
