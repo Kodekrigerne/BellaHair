@@ -5,7 +5,7 @@
 {
     <div class="modal-overlay @(IsVisible && _isMounted ? "show" : "")" @onclick="Close">
         <div class="modal-container @(IsVisible && _isMounted ? "show" : "")" @onclick:stopPropagation>
-            @ChildContent
+            @ChildContent @* Vis indlejret html *@
         </div>
     </div>
 }
@@ -14,7 +14,7 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; } //Tag imod indlejret html
 
     private bool _isMounted;
 
