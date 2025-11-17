@@ -24,7 +24,7 @@ public class Employee : PersonBase
         _treatments = treatments.ToList();
     }
 
-    public static Employee Create(Name name, Email email, PhoneNumber phoneNumber, Address address, IEnumerable<Treatment> treatments) => new(name, email, phoneNumber, address, treatments);
+    public static Employee Create(Name name, Email email, PhoneNumber phoneNumber, Address address, List<Treatment> treatments) => new(name, email, phoneNumber, address, treatments);
     }
 
 public class EmployeeException(string message) : DomainException(message);

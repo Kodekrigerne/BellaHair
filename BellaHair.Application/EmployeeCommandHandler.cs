@@ -30,7 +30,7 @@ namespace BellaHair.Application
             var address = Address.Create(command.StreetName, command.City, command.StreetNumber, command.ZipCode, command.Floor);
             var treatments = await _treatmentRepo.Get(command.TreatmentIds);
 
-            var employee = Employee.Create(name, email, phoneNumber, address, treatments);
+            var employee = Employee.Create(name, email, phoneNumber, address, treatments.ToList());
 
             await _employeeRepo.AddAsync(employee);
 

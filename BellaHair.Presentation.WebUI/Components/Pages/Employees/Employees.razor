@@ -15,33 +15,34 @@
 		@if (_employees == null) {<p>Loading...</p>}
 		else
 		{
-
-				@foreach (var employee in _employees)
-				{
-					<div class="employee-card">
+			@foreach (var employee in _employees)
+			{
+				<div class="employee-card">
 						
-					<div class="employee-avatar">
-						@GetEmployeeInitials(employee.name)
-						</div>
-							<div>
- 								<h3>@employee.name</h3>
+				<div class="employee-avatar">
+					@GetEmployeeInitials(employee.name)
+					</div>
+						<div>
+ 							<h3>@employee.name</h3>
 							<div class="employee-contact-details">
-						<MailIcon Class="employee-icons" />
-						@employee.email
-							</div>
-							<div class="employee-contact-details">
-								<PhoneIcon Class="employee-icons"/>
+								<div class="employee-single-contact-detail">
+									<MailIcon Class="employee-icons" />
+									@employee.email
+									</div>
+								<div class="employee-single-contact-detail">
+									<PhoneIcon Class="employee-icons"/>
 									@employee.phoneNumber
+								</div>
 							</div>
-							<div class="treatment-employee-card">
+							<div class="treatments-employees-container">
 								@foreach (var treatment in employee.treatmentNames)
 								{
-									@treatment
+									<div class="treatment-employee-card">@treatment</div>
 								}
 							</div>
 						</div>
 					</div>
-				}
+			}
 		}
 	</div>
 
@@ -69,7 +70,7 @@
 		try
 		{
 			var employees = await _employeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber, e.treatmentNames)).ToList();
+			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber, e.TreatmentNames)).ToList();
 		}
 		catch (DomainException ex)
 		{

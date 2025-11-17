@@ -30,13 +30,15 @@ namespace BellaHair.Presentation.WebUI
         private Employee _sorenM;
         private Employee _sorenJ;
 
-        public void AddData()
+        public async Task AddData()
         {
             AddLoyaltyDiscounts();
             AddTreatment();
-            AddEmployees();
 
-            _db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
+
+            AddEmployees();
+            await _db.SaveChangesAsync();
         }
 
         private void AddLoyaltyDiscounts()
@@ -58,7 +60,7 @@ namespace BellaHair.Presentation.WebUI
                 Address.Create("Nørrebro", "København H", "47", 2000),
                 new List<Treatment> { _herreklip, _dameklip }
             );
-            _db.Add(_henny);
+            _db.Employees.Add(_henny);
 
             // Peter Pedersen: Herreklip, Dame Hårfarvning
             _peter = Employee.Create(
@@ -69,16 +71,6 @@ namespace BellaHair.Presentation.WebUI
                 new List<Treatment> { _herreklip, _farvning }
             );
             _db.Add(_peter);
-
-            // Maria Jensen: All three treatments
-            _maria = Employee.Create(
-                Name.FromStrings("Maria", "Jensen"),
-                Email.FromString("mariaj@frisor.dk"),
-                PhoneNumber.FromString("55123456"),
-                Address.Create("Østerbrogade", "København Ø", "15B", 2100),
-                new List<Treatment> { _herreklip, _dameklip, _farvning }
-            );
-            _db.Add(_maria);
 
             // Søren Mikkelsen: Herreklip only
             _sorenM = Employee.Create(
@@ -99,6 +91,16 @@ namespace BellaHair.Presentation.WebUI
                 new List<Treatment> { _dameklip, _farvning }
             );
             _db.Add(_sorenJ);
+
+            // Maria Jensen: All three treatments
+            _maria = Employee.Create(
+                Name.FromStrings("Maria", "Jensen"),
+                Email.FromString("mariaj@frisor.dk"),
+                PhoneNumber.FromString("55123456"),
+                Address.Create("Østerbrogade", "København Ø", "15B", 2100),
+                new List<Treatment> { _herreklip, _dameklip, _farvning }
+            );
+            _db.Add(_maria);
         }
 
         private void AddTreatment()

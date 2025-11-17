@@ -42,11 +42,7 @@
 }
 
 .employee-contact-details {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    padding-bottom: 5px;
+  
 }
 
 .employee-single-contact-detail {
@@ -65,7 +61,16 @@
     fill: dimgrey !important;
 }
 
+.treatments-employees-container {
+    display: flex;
+    gap: 0.3rem;
+    padding-bottom: 10px;
+    padding-top: 5px;
+}
 .treatment-employee-card {
-    flex: 0 0 1;
-
+    font-size: 10px;
+    font-weight: 500;
+    padding-inline: 5px;
+    background-color: lightgrey;
+    border-radius: 5px;
 }
