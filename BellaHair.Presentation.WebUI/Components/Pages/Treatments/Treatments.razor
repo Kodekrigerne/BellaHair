@@ -3,6 +3,7 @@
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 
+<!-- Mikkel Klitgaard -->
 
 @page "/behandlinger"
 
@@ -134,6 +135,13 @@
 			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
 		}
 	}
+
+
+	private async Task HandleCreateTreatment()
+	{
+		// TODO: Implementer logik
+	}
+
 
 record TreatmentViewModel(Guid Id, string Name, decimal Price, int DurationMinutes);
 
