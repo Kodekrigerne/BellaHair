@@ -4,7 +4,7 @@ namespace BellaHair.Domain.Bookings
 {
     public record EmployeeSnapshot
     {
-        public Guid CustomerId { get; private init; }
+        public Guid EmployeeId { get; private init; }
         public string FullName { get; private init; }
         public string Email { get; private init; }
         public string PhoneNumber { get; private init; }
@@ -16,7 +16,7 @@ namespace BellaHair.Domain.Bookings
 
         private EmployeeSnapshot(Employee employee)
         {
-            CustomerId = employee.Id;
+            EmployeeId = employee.Id;
             FullName = employee.Name.FullName;
             Email = employee.Email.Value;
             PhoneNumber = employee.PhoneNumber.Value;
