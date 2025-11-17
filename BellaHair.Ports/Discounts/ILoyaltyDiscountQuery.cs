@@ -7,7 +7,7 @@
     public interface ILoyaltyDiscountQuery
     {
         Task<List<LoyaltyDiscountDTO>> GetAllAsync();
-        Task<int> GetCount();
+        Task<int> GetCountAsync();
     }
 
     public record LoyaltyDiscountDTO(Guid Id, string Name, int MinimumVisits, decimal DiscountPercent);
