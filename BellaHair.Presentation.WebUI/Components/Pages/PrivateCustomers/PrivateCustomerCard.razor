@@ -6,6 +6,20 @@
 @inject IPrivateCustomerCommand PrivateCustomerCommand
 
 <!-- Mikkel Dahlmann -->
+
+<Modal @bind-IsVisible="@_showNewModal" CloseOnOverlayClick="false">
+		@if (_isDeleted is false)
+		{
+			<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
+			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+		}
+		else
+		{
+			<h4>Kundeprofil '@PrivateCustomer.FullName' slettet.</h4>
+			<button class="btn-remove" onclick="@CloseModal">Luk</button>
+		}
+</Modal>
+
 <div class="privatecustomer-card">
 						
 	<div class="privatecustomer-avatar">
@@ -39,7 +53,7 @@
 	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
 	
-@code {
+	@code {
 
 	[Parameter, EditorRequired]
 	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
@@ -47,10 +61,26 @@
 	[Parameter, EditorRequired]
 	public required EventCallback OnDelete { get; set; }
 
-	private async Task HandleOnDeleteClick()
+	private bool _showNewModal = false;
+
+	private bool _isDeleted = false;
+
+	private void HandleOnDeleteClick()
+	{
+		_showNewModal = true;
+	}
+
+	private async Task HandleOnDeleteConfirm()
 	{
 		var command = new DeletePrivateCustomerCommand(PrivateCustomer.Id);
 		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
+		_isDeleted = true;
+	}
+
+	private async Task CloseModal()
+	{
+		_isDeleted = false;
+		_showNewModal = false;
 		await OnDelete.InvokeAsync();
 	}
 
@@ -58,6 +88,5 @@
 	{
 		var parts = name.Split(' ');
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
-
 	}
 }

@@ -3,7 +3,7 @@
 @* Når IsVisible ændres til false vil modalen forsvinde øjeblikkeligt hvis ikke vi også bruger _isMounted *@
 @if (IsVisible || _isMounted)
 {
-    <div class="modal-overlay @(IsVisible && _isMounted ? "show" : "")" @onclick="Close">
+    <div class="modal-overlay @(IsVisible && _isMounted ? "show" : "")" @onclick="HandleOverlayClick">
         <div class="modal-container @(IsVisible && _isMounted ? "show" : "")" @onclick:stopPropagation>
             @ChildContent
         </div>
@@ -15,6 +15,7 @@
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool CloseOnOverlayClick { get; set; } = true;
 
     private bool _isMounted;
 
@@ -35,6 +36,14 @@
             await Task.Delay(100);
             _isMounted = false;
         }
+    }
+
+    private async Task HandleOverlayClick()
+    {
+	    if (CloseOnOverlayClick)
+	    {
+		    await Close();
+	    }
     }
 
     private async Task Close()
