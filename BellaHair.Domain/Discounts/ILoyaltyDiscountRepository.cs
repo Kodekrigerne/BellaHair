@@ -8,7 +8,7 @@
     {
         Task AddAsync(LoyaltyDiscount loyaltyDiscount);
         void Delete(LoyaltyDiscount loyaltyDiscount);
-        Task<LoyaltyDiscount> Get(Guid id);
+        Task<LoyaltyDiscount> GetAsync(Guid id);
         Task SaveChangesAsync();
     }
 }

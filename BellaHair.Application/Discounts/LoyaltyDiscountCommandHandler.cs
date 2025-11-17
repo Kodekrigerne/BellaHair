@@ -25,7 +25,7 @@ namespace BellaHair.Application.Discounts
 
         async Task ILoyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(DeleteLoyaltyDiscountCommand command)
         {
-            var discount = await _loyaltyDiscountRepo.Get(command.Id);
+            var discount = await _loyaltyDiscountRepo.GetAsync(command.Id);
 
             _loyaltyDiscountRepo.Delete(discount);
 
