@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
@@ -31,6 +32,8 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
+
+            serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 
 
             return serviceCollection;
