@@ -22,20 +22,26 @@
 				<div class="privatecustomer-avatar">
 					@GetCustomerInitials(customer.FullName)
 				</div>
-				<div>
-					<h3>@customer.FullName</h3>
-					<div class="privatecustomer-contact-details">
-						<MailIcon Class="privatecustomer-icons" />
-						@customer.Email
-					</div>
+				<div class="privatecustomer-details">
+				<h3>@customer.FullName</h3>
+				<div class="privatecustomer-contact-body">
 					<div class="privatecustomer-contact-details">
 						<PhoneIcon Class="privatecustomer-icons" />
 						@customer.PhoneNumber
 					</div>
 					<div class="privatecustomer-contact-details">
+						<HomeIcon Class="privatecustomer-icons" />
+						@customer.FullAddress
+					</div>
+					<div class="privatecustomer-contact-details">
 						<BirthdayIcon Class="privatecustomer-icons-birthday" />
 						@customer.Birthday.ToString("d. MMMM yyyy")
 					</div>
+					<div class="privatecustomer-contact-details">
+						<MailIcon Class="privatecustomer-icons" />
+						@customer.Email
+					</div>
+				</div>
 				</div>
 			</div>
 		}
@@ -66,7 +72,7 @@
 		try
 		{
 			var customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber)).ToList();
+			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress)).ToList();
 		}
 		catch (DomainException ex)
 		{
@@ -79,5 +85,5 @@
 		}
 	}
 
-	public record PrivateCustomerViewModel(Guid Id, string FullName, DateTime Birthday, string Email, string PhoneNumber);
+	public record PrivateCustomerViewModel(Guid Id, string FullName, DateTime Birthday, string Email, string PhoneNumber, string FullAddress);
 }

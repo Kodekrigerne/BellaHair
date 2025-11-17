@@ -37,8 +37,23 @@
     color: white;
 }
 
+.privatecustomer-contact-body {
+    display: flex;
+    flex: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 5px;
+    color: dimgrey;
+}
+
+.privatecustomer-details {
+    flex: 1;
+}
+
 .privatecustomer-contact-details {
     display: flex;
+    flex: 0 0 33%;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;

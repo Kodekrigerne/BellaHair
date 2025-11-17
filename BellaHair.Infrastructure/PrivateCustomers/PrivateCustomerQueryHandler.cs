@@ -35,6 +35,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                     x.Address.StreetNumber,
                     x.Address.ZipCode,
                     x.Address.Floor,
+                    x.Address.FullAddress,
                     x.PhoneNumber.Value,
                     x.Email.Value,
                     x.Birthday))
