@@ -15,6 +15,7 @@ namespace BellaHair.Infrastructure
         public DbSet<Employee> Employees { get; set; }
         public DbSet<PrivateCustomer> PrivateCustomers { get; set; }
         public DbSet<Treatment> Treatments { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
