@@ -25,7 +25,7 @@ namespace BellaHair.Infrastructure.Employees
 
         public EmployeeQueryHandler(BellaHairContext db) => _db = db;
 
-        // Denne er til at hente alle employees med få informationer til listevisningen af alle
+        // Denne er til at hente alle employees med få informationer til listevisningen af alle så vi har et simplificeret overblik
         async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
         {
             var emp =  await _db.Employees
