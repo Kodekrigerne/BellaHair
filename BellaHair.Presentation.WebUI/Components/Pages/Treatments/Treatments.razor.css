@@ -25,7 +25,6 @@
 }
 
 
-
 .employees-container {
     display: flex;
     flex-wrap: wrap;
@@ -60,7 +59,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #f9fafc;
 }
 
 .employee-contact-details {

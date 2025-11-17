@@ -18,35 +18,36 @@
 	else {
 			@foreach (var treatment in _treatments)
 			{
-			<div class="employee-card">
+				<div class="employee-card">
 
-				<div class="employee-avatar">
-					<TreatmentIcon Class="treatment-icon"/>
-				</div>
+					<div class="employee-avatar">
+						<TreatmentIcon Class="treatment-icon"/>
+					</div>
 
-				<div class="treatment-details">
+					<div class="treatment-details">
 
-					<h6>@treatment.Name</h6>
+						<h6>@treatment.Name</h6>
 
-					<hr class="treatment-line"/>
+						<hr class="treatment-line"/>
 
-					<div class="price-duration-wrapper">
+						<div class="price-duration-wrapper">
 
-						<div class="employee-contact-details">
+							<div class="employee-contact-details">
 
-							<PriceIcon Class="treatment-price-icon"/>
-							@treatment.Price.ToString("C")
+								<PriceIcon Class="treatment-price-icon"/>
+								@treatment.Price.ToString("C")
 
-						</div>
+							</div>
 
-						<div class="employee-contact-details">
-							<DurationIcon Class="treatment-duration-icon"/>
-							@treatment.DurationMinutes min
+							<div class="employee-contact-details">
+								<DurationIcon Class="treatment-duration-icon"/>
+								@treatment.DurationMinutes min
 
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+
 			}
 	}
 	</div>
