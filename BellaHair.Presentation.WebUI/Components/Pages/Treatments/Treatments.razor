@@ -11,19 +11,41 @@
 
 <Modal @bind-IsVisible="@_showNewModal">
 	<div class="kk-container">
+
 		<h3>Opret ny behandling</h3>
-		<hr class="treatment-line"/>
-		
-		<p>Navn</p>
-		<input type="text"/>
-		
-		<p>Pris</p>
-		<input type="number"/>
-		
-		<p>Varighed</p>
-		<input type="number"/>
-		
-		<button class="btn-add">Opret</button>
+
+		<hr class="treatment-line" />
+
+		<form>
+			<div class="treatment-modal-text">
+
+				<div class="treatment-input">
+
+					<label for="name-input">Navn</label>
+					<input id="name-input" type="text"/>
+
+				</div>
+
+				<div class="treatment-input">
+
+					<label for="price-input">Pris</label>
+					<input id="price-input" type="number"/>
+
+				</div>
+
+				<div class="treatment-input">
+
+					<label for="duration-input">Varighed</label>
+					<input id="duration-input" type="number"/>
+
+				</div>
+			</div>
+
+		</form> 
+
+		<div class="btn-wrapper">
+			<button class="btn-add" type="submit">Opret</button>
+		</div>
 
 
 	</div>
