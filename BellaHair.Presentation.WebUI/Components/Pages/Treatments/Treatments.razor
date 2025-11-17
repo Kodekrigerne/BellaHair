@@ -10,7 +10,7 @@
 @inject ITreatmentQuery _treatmentQuery
 
 
-<PageHeader HeaderText="Behandlinger" HeaderSubText="Administrer og tilføj behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { })" />
+<PageHeader HeaderText="Behandlinger" HeaderSubText="Alle tilgængelige behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { })" />
 
 	<div class="kk-container employees-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p> }
@@ -21,17 +21,29 @@
 			<div class="employee-card">
 
 				<div class="employee-avatar">
-					<FemaleHairIcon Class="test-icon"/>
+					<TreatmentIcon Class="treatment-icon"/>
 				</div>
-				<div>
-					<h3>@treatment.Name</h3>
-					<div class="employee-contact-details">
-						<PriceIcon Class="treatment-icon" />
-						@treatment.Price.ToString("C")
-					</div>
-					<div class="employee-contact-details">
-						<DurationIcon Class="treatment-icon" />
-						@treatment.DurationMinutes min
+
+				<div class="treatment-details">
+
+					<h6>@treatment.Name</h6>
+
+					<hr class="treatment-line"/>
+
+					<div class="price-duration-wrapper">
+
+						<div class="employee-contact-details">
+
+							<PriceIcon Class="treatment-price-icon"/>
+							@treatment.Price.ToString("C")
+
+						</div>
+
+						<div class="employee-contact-details">
+							<DurationIcon Class="treatment-duration-icon"/>
+							@treatment.DurationMinutes min
+
+						</div>
 					</div>
 				</div>
 			</div>
