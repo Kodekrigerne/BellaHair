@@ -11,10 +11,12 @@ using BellaHair.Ports.Treatments;
 
 namespace BellaHair.Infrastructure.Tests.Treatments
 {
+    // Mikkel Klitgaard
+
     internal sealed class TreatmentQueryHandlerTests :InfrastructureTestBase
     {
         [Test]
-        public void Given_MultipleTreatmentsExists_Then_GetsValidListOfTreatments()
+        public void Given_TreatmentsExists_Then_GetsListOfAllTreatments()
         {
             // Arrange
 
@@ -34,7 +36,7 @@ namespace BellaHair.Infrastructure.Tests.Treatments
 
             // Act
 
-            var treatmentsList = handler.GetAll().GetAwaiter().GetResult();
+            var treatmentsList = handler.GetAllAsync().GetAwaiter().GetResult();
 
             // Assert
 
