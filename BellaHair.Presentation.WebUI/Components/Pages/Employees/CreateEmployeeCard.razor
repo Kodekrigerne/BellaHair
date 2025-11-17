@@ -1,0 +1,42 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Shared
+
+<h3>Opret ny medarbejder</h3>
+<br />
+
+<div class="container" style="flex-wrap: wrap; display: flex; align-content: center; gap: 0.5rem">
+<p>Fornavn:</p>
+<input @bind-value="FirstName" placeholder="Indtast medarbejderens fornavn..." style="height: 25px; width: 300px"/>
+</div>
+
+@code {
+
+	[Parameter]
+	public string? FirstName { get; set; }
+	[Parameter]
+	public string? MiddleName { get; set; }
+	[Parameter]
+	public string? LastName { get; set; }
+	[Parameter]
+	public string? Email { get; set; }
+	[Parameter]
+	public string? PhoneNumber { get; set; }
+	[Parameter]
+	public string? StreetName { get; set; }
+	[Parameter]
+	public string? City { get; set; }
+	[Parameter]
+	public string? StreetNumber { get; set; }
+	[Parameter]
+	public int? Floor { get; set; }
+	[Parameter]
+	public int? ZipCode { get; set; }
+
+}
+
+<style>
+
+.modal-container.employees
+{
+	max-width: 100rem;
+}
+</style>
