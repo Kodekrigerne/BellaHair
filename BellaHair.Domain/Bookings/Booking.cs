@@ -17,7 +17,8 @@ namespace BellaHair.Domain.Bookings
         public TreatmentSnapshot TreatmentSnapshot { get; private set; }
 
         public BookingDiscount? Discount { get; private set; }
-        public DateTime StartDateTime { get; private init; }
+        public DateTime CreatedDateTime { get; private init; }
+        public DateTime StartDateTime { get; private set; }
 
         //TODO: Vælg en strategi
         // 1a. Hvis alle priser er i value objekter: Total => { udregn }
@@ -45,6 +46,7 @@ namespace BellaHair.Domain.Bookings
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(employee);
             Treatment = treatment;
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
+            CreatedDateTime = currentDate;
             StartDateTime = startTimeData;
         }
 
