@@ -1,4 +1,5 @@
 ﻿using BellaHair.Domain.Treatments;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Treatments
 {
@@ -30,6 +31,18 @@ namespace BellaHair.Infrastructure.Treatments
         {
             return await _db.Treatments.FindAsync(id) ??
                    throw new KeyNotFoundException($"Treatment with id {id} is not found.");
+        }
+
+        async Task<IEnumerable<Treatment>> ITreatmentRepository.Get(IEnumerable<Guid> treatmentIds)
+        {
+            List<Treatment> treatments = [];
+
+            foreach (var id in treatmentIds)
+            {
+                treatments.Add(await _db.Treatments.FindAsync(id) ?? throw new KeyNotFoundException("$Treatment with id {id} is not found."));
+            }
+
+            return treatments;
         }
 
         async Task ITreatmentRepository.SaveChangesAsync()

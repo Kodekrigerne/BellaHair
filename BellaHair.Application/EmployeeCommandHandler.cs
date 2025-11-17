@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BellaHair.Domain;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Employees;
 
 namespace BellaHair.Application
@@ -13,8 +14,13 @@ namespace BellaHair.Application
     class EmployeeCommandHandler : IEmployeeCommand
     {
         private readonly IEmployeeRepository _employeeRepo;
+        private readonly ITreatmentRepository _treatmentRepo;
 
-        public EmployeeCommandHandler(IEmployeeRepository employeeRepo) => _employeeRepo = employeeRepo;
+        public EmployeeCommandHandler(IEmployeeRepository employeeRepo, ITreatmentRepository treatmentRepo)
+        {
+            _employeeRepo = employeeRepo;
+            _treatmentRepo = treatmentRepo;
+        }
 
         async Task IEmployeeCommand.CreateEmployeeCommand(CreateEmployeeCommand command)
         {
@@ -22,8 +28,9 @@ namespace BellaHair.Application
             var email = Email.FromString(command.Email);
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var address = Address.Create(command.StreetName, command.City, command.StreetNumber, command.ZipCode, command.Floor);
+            var treatments = await _treatmentRepo.Get(command.TreatmentIds);
 
-            var employee = Employee.Create(name, email, phoneNumber, address);
+            var employee = Employee.Create(name, email, phoneNumber, address, treatments);
 
             await _employeeRepo.AddAsync(employee);
 

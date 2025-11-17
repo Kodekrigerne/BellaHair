@@ -8,6 +8,7 @@ using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.Employees;
 using Microsoft.EntityFrameworkCore;
+using BellaHair.Ports.Treatments;
 
 namespace BellaHair.Infrastructure.Employees
 {
@@ -37,9 +38,17 @@ namespace BellaHair.Infrastructure.Employees
 
         async Task<EmployeeDTOFull> IEmployeeQuery.GetEmployeeAsync(GetEmployeeByIdQuery query)
         {
-            var employee = await _db.Employees.FindAsync(query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
-            var treatments = await _db.Treatments.FindAsync(query.Id);
-            return new EmployeeDTOFull(employee.Id, employee.Name.FirstName, employee.Name.MiddleName ?? "", employee.Name.LastName, employee.Email.Value, employee.PhoneNumber.Value, employee.Address.StreetName, employee.Address.City, employee.Address.StreetNumber, employee.Address.ZipCode, employee.Treatments.Select(x => x.Name), employee.Address.Floor);
+            var employee = await _db.Employees.FirstOrDefaultAsync(e => e.Id == query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
+
+            List<TreatmentDTO> treatments = [];
+
+            foreach (var treatment in employee.Treatments)
+            {
+                var tre = await _db.Treatments.FindAsync(treatment.Id);
+                treatments.Add(new TreatmentDTO(treatment.Id, treatment.Name, treatment.Price.Value, treatment.DurationMinutes.Value));
+            }
+
+            return new EmployeeDTOFull(employee.Id, employee.Name.FirstName, employee.Name.MiddleName ?? "", employee.Name.LastName, employee.Email.Value, employee.PhoneNumber.Value, employee.Address.StreetName, employee.Address.City, employee.Address.StreetNumber, employee.Address.ZipCode, treatments, employee.Address.Floor);
         }
     }
-}
+}   
