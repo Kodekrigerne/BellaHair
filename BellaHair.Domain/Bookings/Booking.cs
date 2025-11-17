@@ -31,27 +31,38 @@ namespace BellaHair.Domain.Bookings
         private Booking() { }
 #pragma warning restore CS8618
 
-        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startTimeData, DateTime currentDate)
+        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
         {
-            if (startTimeData.Date < currentDate.Date.AddDays(-1))
-                throw new BookingException($"Cannot create bookings that are more than 1 day old {startTimeData}.");
-
-            //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
-            //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
-            //    throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
-
             Customer = customer;
             CustomerSnapshot = CustomerSnapshot.FromCustomer(customer);
             Employee = employee;
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(employee);
             Treatment = treatment;
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
-            CreatedDateTime = currentDate;
-            StartDateTime = startTimeData;
+            StartDateTime = startDateTime;
+            CreatedDateTime = currentDateTime;
         }
 
-        public static Booking Create(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, ICurrentDateTimeProvider currentDateTimeProvider)
-            => new(customer, employee, treatment, startDateTime, currentDateTimeProvider.GetCurrentDateTime());
+        public static Booking Create(
+            PrivateCustomer customer,
+            Employee employee,
+            Treatment treatment,
+            DateTime startDateTime,
+            ICurrentDateTimeProvider currentDateTimeProvider,
+            IBookingOverlapChecker bookingOverlapChecker)
+        {
+            var currentDateTime = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (startDateTime < currentDateTime)
+                throw new BookingException($"Cannot create past bookings {startDateTime}.");
+
+            //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
+            //TODO: Flyt til BookingCommandHandler.CreateBooking
+            //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
+            //    throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
+
+            return new(customer, employee, treatment, startDateTime, currentDateTime);
+        }
 
         public void FindBestDiscount(IDiscountCalculatorService discountCalculatorService)
         {
