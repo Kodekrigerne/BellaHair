@@ -47,6 +47,14 @@
     align-items: center;
     gap: 0.5rem;
     padding-bottom: 5px;
+}
+
+.employee-single-contact-detail {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 5px;
     color: dimgrey;
 }
 
@@ -55,4 +63,9 @@
     height: 16px;
     display: inline-block;
     fill: dimgrey !important;
+}
+
+.treatment-employee-card {
+    flex: 0 0 1;
+
 }

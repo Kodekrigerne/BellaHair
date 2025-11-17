@@ -21,5 +21,5 @@ namespace BellaHair.Ports.Employees
 }
 
 public record EmployeeDTOSimple(Guid Id, string Name, string PhoneNumber, string Email, List<string> treatmentNames);
-public record EmployeeDTOFull(Guid Id, string FirstName, string MiddleName, string LastName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, List<TreatmentDTO>, int? Floor = null);
+public record EmployeeDTOFull(Guid Id, string FirstName, string MiddleName, string LastName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, List<TreatmentDTO> Treatments, int? Floor = null);
 public record GetEmployeeByIdQuery(Guid Id);

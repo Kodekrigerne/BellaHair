@@ -25,8 +25,6 @@ namespace BellaHair.Infrastructure.Employees
 
         public EmployeeQueryHandler(BellaHairContext db) => _db = db;
 
-        // TODO : Add treatments
-
         // Denne er til at hente alle employees med få informationer til listevisningen af alle
         async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
         {

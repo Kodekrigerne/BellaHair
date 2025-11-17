@@ -33,6 +33,12 @@
 								<PhoneIcon Class="employee-icons"/>
 									@employee.phoneNumber
 							</div>
+							<div class="treatment-employee-card">
+								@foreach (var treatment in employee.treatmentNames)
+								{
+									@treatment
+								}
+							</div>
 						</div>
 					</div>
 				}
@@ -63,7 +69,7 @@
 		try
 		{
 			var employees = await _employeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber)).ToList();
+			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber, e.treatmentNames)).ToList();
 		}
 		catch (DomainException ex)
 		{
@@ -76,7 +82,7 @@
 		}
 	}
 
-	public record EmployeeSimpleViewModel(Guid Id, string name, string email, string phoneNumber);
+	public record EmployeeSimpleViewModel(Guid Id, string name, string email, string phoneNumber, List<string> treatmentNames);
 	// TODO: Add full viewmodel
 }
 
