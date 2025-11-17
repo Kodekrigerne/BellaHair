@@ -56,6 +56,9 @@ namespace BellaHair.Domain.Bookings
             if (startDateTime < currentDateTime)
                 throw new BookingException($"Cannot create past bookings {startDateTime}.");
 
+            //if (employee.Treatments == null || employee.Treatments.Count == 0)
+            //    throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
+
             //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
             //TODO: Flyt til BookingCommandHandler.CreateBooking (repo .GetWithTreatmentsAsync(id)
             //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
