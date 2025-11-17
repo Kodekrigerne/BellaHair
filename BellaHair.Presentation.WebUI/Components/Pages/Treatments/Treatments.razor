@@ -9,8 +9,28 @@
 @rendermode InteractiveServer
 @inject ITreatmentQuery _treatmentQuery
 
+<Modal @bind-IsVisible="@_showNewModal">
+	<div class="kk-container">
+		<h3>Opret ny behandling</h3>
+		<hr class="treatment-line"/>
+		
+		<p>Navn</p>
+		<input type="text"/>
+		
+		<p>Pris</p>
+		<input type="number"/>
+		
+		<p>Varighed</p>
+		<input type="number"/>
+		
+		<button class="btn-add">Opret</button>
 
-<PageHeader HeaderText="Behandlinger" HeaderSubText="Alle tilgængelige behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { })" />
+
+	</div>
+</Modal>
+
+
+<PageHeader HeaderText="Behandlinger" HeaderSubText="Alle tilgængelige behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
 
 	<div class="kk-container employees-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p> }
@@ -40,6 +60,7 @@
 							</div>
 
 							<div class="employee-contact-details">
+
 								<DurationIcon Class="treatment-duration-icon"/>
 								@treatment.DurationMinutes min
 
@@ -62,6 +83,7 @@
 @code {
 	private string? _errorMessage;
 	private List<TreatmentViewModel>? _treatments = null;
+	private bool _showNewModal = false; 
 
 
 	protected override async Task OnInitializedAsync()

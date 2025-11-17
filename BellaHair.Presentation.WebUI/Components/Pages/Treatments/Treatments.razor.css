@@ -74,8 +74,8 @@
 
 .price-duration-wrapper{
     display: flex;
-    justify-content:space-between;
-    align-items:center;
+    justify-content: space-between;
+    align-items: center;
 }
 
 
@@ -84,7 +84,11 @@
 }
 
 .treatment-line{
-    color:grey;
-    margin-top:3rem;
-    margin-bottom:0.5rem;
+    color: grey;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+h6{
+    margin-top: 10px;
 }
