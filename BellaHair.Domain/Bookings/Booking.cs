@@ -66,11 +66,6 @@ namespace BellaHair.Domain.Bookings
 
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
-
-        public void FindBestDiscount(IDiscountCalculatorService discountCalculatorService)
-        {
-            Discount = discountCalculatorService.GetBestDiscount(this);
-        }
     }
 
     public class BookingException(string message) : Exception(message);

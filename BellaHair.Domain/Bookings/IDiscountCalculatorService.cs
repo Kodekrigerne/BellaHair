@@ -6,8 +6,9 @@ namespace BellaHair.Domain.Bookings
     /// <summary>
     /// Domain Service for calculating the best available discount for a given Booking.
     /// </summary>
+    //TODO: Kald denne i BookingCommandHandler.CreateBooking
     public interface IDiscountCalculatorService
     {
-        BookingDiscount? GetBestDiscount(Booking booking);
+        Task<BookingDiscount?> GetBestDiscount(Booking booking);
     }
 }
