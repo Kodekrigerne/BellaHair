@@ -1,10 +1,10 @@
+using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
+using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
-using BellaHair.Domain.Employees;
 using BellaHair.Infrastructure;
-using BellaHair.Domain;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -48,6 +48,8 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(Treatment.Create("Herreklip", Price.FromDecimal(450m), DurationMinutes.FromInt(30)));
             _db.Add(Treatment.Create("Dameklip", Price.FromDecimal(600m), DurationMinutes.FromInt(60)));
             _db.Add(Treatment.Create("Dame Hårfarvning", Price.FromDecimal(400m), DurationMinutes.FromInt(90)));
+            _db.Add(Treatment.Create("Barbering", Price.FromDecimal(150m), DurationMinutes.FromInt(20)));
+            _db.Add(Treatment.Create("Børneklip", Price.FromDecimal(250m), DurationMinutes.FromInt(30)));
         }
     }
 }
