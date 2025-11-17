@@ -21,14 +21,14 @@
 	{
 		@foreach (var customer in _customers)
 		{
-			<PrivateCustomerCard PrivateCustomer="@customer"></PrivateCustomerCard>
+			<PrivateCustomerCard PrivateCustomer="@customer" OnDelete="@LoadCustomers"></PrivateCustomerCard>
 		}
 	}
 </div>
 
 @code {
 	private bool _showNewModal = false;
-	
+
 	private string? _errorMessage;
 
 	private List<PrivateCustomerViewModel>? _customers = null;

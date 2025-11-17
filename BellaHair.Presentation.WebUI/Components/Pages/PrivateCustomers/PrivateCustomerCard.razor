@@ -1,4 +1,9 @@
-﻿@using BellaHair.Presentation.WebUI.Components.Shared
+﻿@using BellaHair.Application.PrivateCustomers
+@using BellaHair.Domain.PrivateCustomers
+@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@inject IPrivateCustomerCommand PrivateCustomerCommand
 
 <div class="privatecustomer-card">
 						
@@ -30,14 +35,24 @@
 			</div>
 		</div>
 	</div>
+	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
-
+	
 @code {
 
 	[Parameter, EditorRequired]
 	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
 
-	
+	[Parameter, EditorRequired]
+	public required EventCallback OnDelete { get; set; }
+
+	private async Task HandleOnDeleteClick()
+	{
+		var command = new DeletePrivateCustomerCommand(PrivateCustomer.Id);
+		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
+		await OnDelete.InvokeAsync();
+	}
+
 	private string GetCustomerInitials(string name)
 	{
 		var parts = name.Split(' ');
