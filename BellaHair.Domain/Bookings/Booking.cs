@@ -20,13 +20,6 @@ namespace BellaHair.Domain.Bookings
         public DateTime CreatedDateTime { get; private init; }
         public DateTime StartDateTime { get; private set; }
 
-        //TODO: Vælg en strategi
-        // 1a. Hvis alle priser er i value objekter: Total => { udregn }
-        // 1b. Hvis nogen er navigations properties: .Include navigations properties i query når du skal bruge Total
-        // 2.  GetTotal(IBookingTotalCalculator _) metode
-        // 3.  Udregn og set hver gang ordren opdateres med noget der påvirker pris
-        // 3 vælges da det er den eneste strategi der resulterer i at Total gemmes i databasen
-        // Med de andre skal Total udregnes igen hver gang booking vises, selv gamle bookings
         public decimal Total { get; private set; }
 
 #pragma warning disable CS8618
@@ -43,6 +36,8 @@ namespace BellaHair.Domain.Bookings
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
             StartDateTime = startDateTime;
             CreatedDateTime = currentDateTime;
+
+            UpdateTotal();
         }
 
         public static Booking Create(
@@ -50,23 +45,29 @@ namespace BellaHair.Domain.Bookings
             Employee employee,
             Treatment treatment,
             DateTime startDateTime,
-            ICurrentDateTimeProvider currentDateTimeProvider,
-            IBookingOverlapChecker bookingOverlapChecker)
+            ICurrentDateTimeProvider currentDateTimeProvider)
         {
             var currentDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
             if (startDateTime < currentDateTime)
                 throw new BookingException($"Cannot create past bookings {startDateTime}.");
 
+            //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
             //if (employee.Treatments == null || employee.Treatments.Count == 0)
             //    throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
 
-            //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
-            //TODO: Flyt til BookingCommandHandler.CreateBooking (repo .GetWithTreatmentsAsync(id)
             //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
             //    throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
 
             return new(customer, employee, treatment, startDateTime, currentDateTime);
+        }
+
+        // Kald altid denne metode efter bookingen er opdateret
+        // Bookingen kan kun opdateres hvis den er fremtidig, dermed kan Treatment ikke være slettet fra Db
+        //TODO: Repo metode til booking GetAsync skal .Include Treatment, Employee, Customer
+        private void UpdateTotal()
+        {
+            Total = Treatment?.Price.Value ?? throw new BookingException("");
         }
     }
 
