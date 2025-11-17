@@ -1,0 +1,91 @@
+﻿@attribute [StreamRendering]
+@using BellaHair.Ports.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+
+@page "/behandlinger"
+
+@rendermode InteractiveServer
+@inject ITreatmentQuery _treatmentQuery
+
+
+<PageHeader HeaderText="Behandlinger" HeaderSubText="Administrer og tilføj behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { })" />
+
+	<div class="kk-container employees-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p> }
+	@if (_treatments == null) { <p>Loading...</p> }
+	else {
+			@foreach (var treatment in _treatments)
+			{
+			<div class="employee-card">
+
+				<div class="employee-avatar">
+					<ScissorsIcon Class="treatment-icon"/>
+				</div>
+				<div>
+					<h3>@treatment.Name</h3>
+					<div class="employee-contact-details">
+						<MailIcon Class="employee-icons" />
+						@treatment.Price.ToString("C")
+					</div>
+					<div class="employee-contact-details">
+						<PhoneIcon Class="employee-icons" />
+						@treatment.DurationMinutes min
+					</div>
+				</div>
+			</div>
+			}
+	}}
+
+
+
+
+		<ScissorsIcon Class="treatment-icon"/>
+		<ScissorsIcon Class="treatment-icon"/>
+		<BinIcon Class="treatment-icon"/>
+
+
+
+
+	</div>
+
+
+
+
+
+
+
+
+@code {
+	private string? _errorMessage;
+	private List<TreatmentViewModel>? _treatments = null;
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadTreatments();
+	}
+
+	private async Task LoadTreatments()
+	{
+		try
+		{
+			var treatments = await _treatmentQuery.GetAll();
+			_treatments = treatments
+				.OrderBy(t => t.Name)
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.DurationMinutes))
+				.ToList();
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+		}
+	}
+
+record TreatmentViewModel(Guid Id, string Name, decimal Price, int DurationMinutes);
+
+
+}
+
