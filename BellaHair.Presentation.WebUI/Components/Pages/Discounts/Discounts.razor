@@ -12,7 +12,12 @@
 
 @inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
 
-<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny rabat" OnNewButtonClicked="@(() => { })"/>
+<Modal @bind-IsVisible="@_showNewModal">
+	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
+	@if (_activeTab == DiscountTab.Campaign) { <p>Ny kampagnerabat</p> }
+</Modal>
+
+<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
 
 <div>
 	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
@@ -26,7 +31,7 @@
 	{
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
-			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteClick"/>
+			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteLoyaltyClick"/>
 		}
 	}
 	else if (_activeTab == DiscountTab.Campaign)
@@ -40,8 +45,16 @@
 
 @code {
 	private enum DiscountTab { Loyalty, Campaign }
-
 	private DiscountTab _activeTab;
+
+	private string _newButtonText => _activeTab switch
+	{
+		DiscountTab.Loyalty => "Ny stamkunderabat",
+		DiscountTab.Campaign => "Ny kampagnerabat",
+		_ => "Ny"
+	};
+
+	private bool _showNewModal = false;
 	private string? _errorMessage;
 
 	private List<IDiscountViewModel>? _discounts = null;
@@ -70,7 +83,8 @@
 			_activeTab = DiscountTab.Loyalty;
 		}
 		catch (DomainException ex) { _errorMessage = ex.Message; }
-		catch (Exception ex) { _errorMessage = ex.Message; } @*TODO: "Noget gik galt. "*@
+		catch (Exception ex) { _errorMessage = ex.Message; }  
+	@*TODO: "Noget gik galt. "*@
 	}
 
 	private void HandleCampaignSelectorClick()
@@ -80,15 +94,15 @@
 		_activeTab = DiscountTab.Campaign;
 	}
 
-	private async Task UpdateCounts()
+	private async Task UpdateCounts(DiscountTab? discount = null)
 	{
-		LoyaltyCount = await _loyaltyDiscountQuery.GetCount();
+		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await _loyaltyDiscountQuery.GetCountAsync();
 	}
 
 	//EventCallback som gives til LoyaltyDiscountCard så koden automatisk kan køres når der trykkes på slet knappen.
-	private async Task HandleOnDeleteClick(Guid Id)
+	private async Task HandleOnDeleteLoyaltyClick(Guid Id)
 	{
 		_discounts = _discounts?.Where(d => d.Id != Id).ToList();
-		await UpdateCounts();
+		await UpdateCounts(DiscountTab.Loyalty);
 	}
 }

@@ -1,0 +1,84 @@
+﻿<!-- Dennis -->
+
+@* Når IsVisible ændres til false vil modalen forsvinde øjeblikkeligt hvis ikke vi også bruger _isMounted *@
+@if (IsVisible || _isMounted)
+{
+    <div class="modal-overlay @(IsVisible && _isMounted ? "show" : "")" @onclick="Close">
+        <div class="modal-container @(IsVisible && _isMounted ? "show" : "")" @onclick:stopPropagation>
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _isMounted;
+
+    // Kaldes når IsVisible (eller andre props) ændres
+    protected override async Task OnParametersSetAsync()
+    {
+        // Hvis IsVisible er blevet sat til true sættes _isMounted også til true
+        // Delay er nødvendigt for at modalen først vises uden .show klassen, da animationen ellers ikke afspilles
+        if (IsVisible)
+        {
+            await Task.Delay(1);
+            _isMounted = true;
+        }
+
+        // Når IsVisible sættes til false venter vi med at sætte _isMounted til false, for at give animationer tid til at fuldføre
+        else if (!IsVisible)
+        {
+            await Task.Delay(100);
+            _isMounted = false;
+        }
+    }
+
+    private async Task Close()
+    {
+        if (OnClose.HasDelegate) await OnClose.InvokeAsync();
+        if (IsVisibleChanged.HasDelegate) await IsVisibleChanged.InvokeAsync(false);
+    }
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: background 0.1s ease;
+    }
+
+        .modal-overlay.show {
+            background: rgba(0,0,0,0.45);
+        }
+
+    .modal-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 24px rgba(0,0,0,0.16);
+        padding: 2rem;
+        min-width: 320px;
+        max-width: 95vw;
+        max-height: 80vh;
+        overflow: auto;
+        transition: transform 0.1s ease-out, opacity 0.1s ease;
+        transform: scale(0.7);
+        opacity: 0;
+    }
+
+        .modal-container.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+</style>

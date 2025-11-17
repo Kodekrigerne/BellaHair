@@ -16,6 +16,7 @@
     border-bottom-width: 1px;
     border-bottom-color: oklch(0.9249 0 0);
     border-bottom-style: solid;
+    z-index: 999;
 }
 
 /* Vi bruger ::deep til hvert element fordi vi bruger .css isolation (TopNavMenu.razor har sin egen .css klasse) 
