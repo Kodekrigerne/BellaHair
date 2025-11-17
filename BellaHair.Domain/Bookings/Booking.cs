@@ -57,7 +57,7 @@ namespace BellaHair.Domain.Bookings
                 throw new BookingException($"Cannot create past bookings {startDateTime}.");
 
             //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
-            //TODO: Flyt til BookingCommandHandler.CreateBooking
+            //TODO: Flyt til BookingCommandHandler.CreateBooking (repo .GetWithTreatmentsAsync(id)
             //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
             //    throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
 
