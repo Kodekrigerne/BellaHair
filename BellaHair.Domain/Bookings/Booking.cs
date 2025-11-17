@@ -17,7 +17,7 @@ namespace BellaHair.Domain.Bookings
         public TreatmentSnapshot TreatmentSnapshot { get; private set; }
 
         public BookingDiscount? Discount { get; private set; }
-        public DateTime CreatedDate { get; private init; }
+        public DateTime StartDateTime { get; private init; }
 
         //TODO: Vælg en strategi
         // 1a. Hvis alle priser er i value objekter: Total => { udregn }
@@ -30,10 +30,10 @@ namespace BellaHair.Domain.Bookings
         private Booking() { }
 #pragma warning restore CS8618
 
-        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime createdDate, DateTime currentDate)
+        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startTimeData, DateTime currentDate)
         {
-            if (createdDate.Date < currentDate.Date.AddDays(-1))
-                throw new BookingException($"Cannot create bookings that are more than 1 day old {createdDate}.");
+            if (startTimeData.Date < currentDate.Date.AddDays(-1))
+                throw new BookingException($"Cannot create bookings that are more than 1 day old {startTimeData}.");
 
             //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
             //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
@@ -45,11 +45,11 @@ namespace BellaHair.Domain.Bookings
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(employee);
             Treatment = treatment;
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
-            CreatedDate = createdDate;
+            StartDateTime = startTimeData;
         }
 
-        public static Booking Create(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime createdDate, ICurrentDateTimeProvider currentDateTimeProvider)
-            => new(customer, employee, treatment, createdDate, currentDateTimeProvider.GetCurrentDateTime());
+        public static Booking Create(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, ICurrentDateTimeProvider currentDateTimeProvider)
+            => new(customer, employee, treatment, startDateTime, currentDateTimeProvider.GetCurrentDateTime());
 
         public void FindBestDiscount(IDiscountCalculatorService discountCalculatorService)
         {
