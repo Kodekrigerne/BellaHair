@@ -72,7 +72,7 @@
 	{
 		try
 		{
-			var treatments = await _treatmentQuery.GetAll();
+			var treatments = await _treatmentQuery.GetAllAsync();
 			_treatments = treatments
 				.OrderBy(t => t.Name)
 				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.DurationMinutes))
