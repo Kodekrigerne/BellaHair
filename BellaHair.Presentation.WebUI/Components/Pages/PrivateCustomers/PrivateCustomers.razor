@@ -8,7 +8,11 @@
 @rendermode InteractiveServer
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 
-<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { })" />
+<Modal @bind-IsVisible="@_showNewModal">
+		<p>Ny kunde</p>
+</Modal>
+
+<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
 	
 <div class="kk-container privatecustomer-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p>}
@@ -53,6 +57,8 @@
 </div>
 
 @code {
+	private bool _showNewModal = false;
+	
 	private string? _errorMessage;
 
 	private string GetCustomerInitials(string name)
