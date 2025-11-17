@@ -22,6 +22,7 @@ namespace BellaHair.Ports.PrivateCustomers
         string FirstName,
         string? MiddleName,
         string LastName,
+        string FullName,
         string streetName,
         string city,
         string streetNumber,

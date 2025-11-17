@@ -1,0 +1,83 @@
+﻿@attribute [StreamRendering]
+@using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Ports.PrivateCustomers
+
+@page "/kunder"
+
+@rendermode InteractiveServer
+@inject IPrivateCustomerQuery PrivateCustomerQuery
+
+<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { })" />
+	
+<div class="kk-container privatecustomer-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p>}
+	@if (_customers == null) {<p>Loading...</p>}
+	else
+	{
+		@foreach (var customer in _customers)
+		{
+			<div class="privatecustomer-card">
+						
+				<div class="privatecustomer-avatar">
+					@GetCustomerInitials(customer.FullName)
+				</div>
+				<div>
+					<h3>@customer.FullName</h3>
+					<div class="privatecustomer-contact-details">
+						<MailIcon Class="privatecustomer-icons" />
+						@customer.Email
+					</div>
+					<div class="privatecustomer-contact-details">
+						<PhoneIcon Class="privatecustomer-icons" />
+						@customer.PhoneNumber
+					</div>
+					<div class="privatecustomer-contact-details">
+						<BirthdayIcon Class="privatecustomer-icons-birthday" />
+						@customer.Birthday.ToString("d. MMMM yyyy")
+					</div>
+				</div>
+			</div>
+		}
+	}
+</div>
+
+@code {
+	private string? _errorMessage;
+
+	private string GetCustomerInitials(string name)
+	{
+		var parts = name.Split(' ');
+		return string.Concat(parts.Select(p => p.FirstOrDefault()));
+
+	}
+
+	private List<PrivateCustomerViewModel>? _customers = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadCustomers();
+	}
+
+	private async Task LoadCustomers()
+	{
+		try
+		{
+			var customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
+			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber)).ToList();
+		}
+		catch (DomainException ex)
+		{
+
+			_errorMessage = ex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = ex.Message; // TODO: "Noget gik galt"
+		}
+	}
+
+	public record PrivateCustomerViewModel(Guid Id, string FullName, DateTime Birthday, string Email, string PhoneNumber);
+}

@@ -5,6 +5,7 @@ using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Domain.Employees;
 using BellaHair.Infrastructure;
 using BellaHair.Domain;
+using BellaHair.Domain.PrivateCustomers;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -23,6 +24,7 @@ namespace BellaHair.Presentation.WebUI
             AddLoyaltyDiscounts();
             AddTreatment();
             AddEmployees();
+            AddPrivateCustomers();
 
             _db.SaveChangesAsync();
         }
@@ -48,6 +50,14 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(Treatment.Create("Herreklip", Price.FromDecimal(450m), DurationMinutes.FromInt(30)));
             _db.Add(Treatment.Create("Dameklip", Price.FromDecimal(600m), DurationMinutes.FromInt(60)));
             _db.Add(Treatment.Create("Dame Hårfarvning", Price.FromDecimal(400m), DurationMinutes.FromInt(90)));
+        }
+
+        private void AddPrivateCustomers()
+        {
+            _db.Add(PrivateCustomer.Create(Name.FromStrings("Peter", "Svendsen", "Emil"), Address.Create("Søndergade", "Vejle", "15A", 7100, 3), PhoneNumber.FromString("12345678"), Email.FromString("peteres@gmail.com"), DateTime.Now.AddYears(-42)));
+            _db.Add(PrivateCustomer.Create(Name.FromStrings("Lis", "Mortensen", "Karin"), Address.Create("Vestergade", "Vejle", "2", 7100), PhoneNumber.FromString("87654321"), Email.FromString("lis@gmail.com"), DateTime.Now.AddYears(-68)));
+            _db.Add(PrivateCustomer.Create(Name.FromStrings("Lars", "Christiansen"), Address.Create("Østergade", "Vejle", "342", 7100, 9), PhoneNumber.FromString("43215678"), Email.FromString("Lars@hotmail.com"), DateTime.Now.AddYears(-38)));
+            _db.Add(PrivateCustomer.Create(Name.FromStrings("Oskar", "Issaksen", "Theodor"), Address.Create("Nygade", "Vejle", "6", 7100), PhoneNumber.FromString("56784321"), Email.FromString("oskartheshit@hotmail.com"), DateTime.Now.AddYears(-20)));
         }
     }
 }

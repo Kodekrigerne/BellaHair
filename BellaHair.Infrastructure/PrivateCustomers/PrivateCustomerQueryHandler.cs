@@ -29,6 +29,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                     x.Name.FirstName,
                     x.Name.MiddleName,
                     x.Name.LastName,
+                    x.Name.FullName,
                     x.Address.StreetName,
                     x.Address.City,
                     x.Address.StreetNumber,
