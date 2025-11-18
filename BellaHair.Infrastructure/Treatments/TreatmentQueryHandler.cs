@@ -17,7 +17,7 @@ namespace BellaHair.Infrastructure.Treatments
         public TreatmentQueryHandler(BellaHairContext db)
             => _db = db;
 
-        async Task<List<TreatmentDTO>> ITreatmentQuery.GetAll()
+        async Task<List<TreatmentDTO>> ITreatmentQuery.GetAllAsync()
         {
             return await _db.Treatments.AsNoTracking()
                 .Select(t => new TreatmentDTO

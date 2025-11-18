@@ -22,6 +22,8 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
 
+            builder.Services.AddScoped<DataProvider>();
+
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
