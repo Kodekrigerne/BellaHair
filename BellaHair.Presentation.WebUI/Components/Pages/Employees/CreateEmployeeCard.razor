@@ -1,12 +1,15 @@
 ﻿@using BellaHair.Presentation.WebUI.Components.Shared
 
-<h3>Opret ny medarbejder</h3>
+<h3 style="align-content: center">Opret ny medarbejder</h3>
 <br />
 
-<div class="container" style="flex-wrap: wrap; display: flex; align-content: center; gap: 0.5rem">
-<p>Fornavn:</p>
-<input @bind-value="FirstName" placeholder="Indtast medarbejderens fornavn..." style="height: 25px; width: 300px"/>
+<div style="display: flex; gap: 10px">
+<p style="margin-bottom: 2px">Fornavn</p>
+<input @bind-value="FirstName" placeholder="Indtast medarbejderens fornavn..." style="height: 25px; width: 250px"/>
+<p style="margin-bottom: 2px">Mellemnavn</p>
 </div>
+
+
 
 @code {
 
@@ -34,6 +37,7 @@
 }
 
 <style>
+
 
 .modal-container.employees
 {
