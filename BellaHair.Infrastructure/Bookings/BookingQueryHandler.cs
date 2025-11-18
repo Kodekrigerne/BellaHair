@@ -30,7 +30,7 @@ namespace BellaHair.Infrastructure.Bookings
                 b.Employee?.Name.FullName ?? b.EmployeeSnapshot.FullName,
                 b.Customer?.Name.FullName ?? b.CustomerSnapshot.FullName,
                 b.Treatment?.Name ?? b.TreatmentSnapshot.Name,
-                b.TreatmentSnapshot.DurationMinutes,
+                b.TreatmentSnapshot.DurationMinutes, //if (IsPaid) Snapshot, ellers relation
                 b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount) : null
                 ));
 

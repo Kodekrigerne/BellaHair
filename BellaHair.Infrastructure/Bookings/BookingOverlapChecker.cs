@@ -15,9 +15,9 @@ namespace BellaHair.Infrastructure.Bookings
                 throw new KeyNotFoundException($"No employee with ID {employeeId} exists");
 
             var bookings = _db.Bookings
+                .Where(b => b.Employee!.Id == employeeId)
                 .Include(b => b.Employee)
-                .Include(b => b.Treatment)
-                .Where(b => b.Employee!.Id == employeeId);
+                .Include(b => b.Treatment);
 
             if (await bookings.AnyAsync(b => startDateTime > b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
             if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
