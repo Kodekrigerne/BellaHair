@@ -8,7 +8,7 @@
 /// interface should handle the data retrieval logic, such as accessing a database or an external service.</remarks>
 public interface ITreatmentQuery
 {
-    Task<List<TreatmentDTO>> GetAll();
+    Task<List<TreatmentDTO>> GetAllAsync();
 }
 
 public record TreatmentDTO(Guid Id, string Name, decimal Price, int Duration);

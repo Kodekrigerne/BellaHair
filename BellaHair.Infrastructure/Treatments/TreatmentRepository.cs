@@ -26,7 +26,7 @@ namespace BellaHair.Infrastructure.Treatments
             _db.Remove(treatment);
         }
 
-        async Task<Treatment> ITreatmentRepository.Get(Guid id)
+        async Task<Treatment> ITreatmentRepository.GetAsync(Guid id)
         {
             return await _db.Treatments.FindAsync(id) ??
                    throw new KeyNotFoundException($"Treatment with id {id} is not found.");

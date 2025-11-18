@@ -13,5 +13,5 @@ public interface ITreatmentCommand
 }
 
 public record DeleteTreatmentCommand(Guid Id);
-public record CreateTreatmentCommand(string Name, decimal Price, int Duration);
+public record CreateTreatmentCommand(string Name, decimal Price, int DurationMinutes);
 
