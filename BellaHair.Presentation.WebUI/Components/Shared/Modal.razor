@@ -8,7 +8,6 @@
             tabindex="0"
             @ref="_modalDiv"
             @onkeydown="HandleKeyDown"
-            @onclick="@(async () => { await _modalDiv.FocusAsync(); })"
             @onclick:stopPropagation>
             @ChildContent
         </div>
