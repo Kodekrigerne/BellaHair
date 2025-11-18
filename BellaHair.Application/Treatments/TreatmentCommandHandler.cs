@@ -25,7 +25,7 @@ namespace BellaHair.Application.Treatments
         async Task ITreatmentCommand.CreateTreatmentAsync(CreateTreatmentCommand command)
         {
             var price = Price.FromDecimal(command.Price);
-            var duration = DurationMinutes.FromInt(command.Duration);
+            var duration = DurationMinutes.FromInt(command.DurationMinutes);
 
             var treatment = Treatment.Create(command.Name, price, duration);
 
@@ -35,7 +35,7 @@ namespace BellaHair.Application.Treatments
 
         async Task ITreatmentCommand.DeleteTreatmentAsync(DeleteTreatmentCommand command)
         {
-            var treatment = await _treatmentRepository.Get(command.Id);
+            var treatment = await _treatmentRepository.GetAsync(command.Id);
 
             _treatmentRepository.Delete(treatment);
 
