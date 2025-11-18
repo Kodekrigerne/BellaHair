@@ -1,0 +1,47 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Shared
+
+<!-- Mikkel Dahlmann -->
+
+<div class="privatecustomer-card">
+						
+	<div class="privatecustomer-avatar">
+		@GetCustomerInitials(PCViewModel.FullName)
+	</div>
+	<div class="privatecustomer-details">
+		<h3>@PCViewModel.FullName</h3>
+		<div class="privatecustomer-contact-body">
+			<div class="privatecustomer-contact-details">
+				<PhoneIcon Class="privatecustomer-icons" />
+				@PCViewModel.PhoneNumber
+			</div>
+			<div class="privatecustomer-contact-details">
+				<HomeIcon Class="privatecustomer-icons" />
+				@PCViewModel.FullAddress
+			</div>
+			<div class="privatecustomer-contact-details">
+				<BirthdayIcon Class="privatecustomer-icons-birthday" />
+				@PCViewModel.Birthday.ToString("d. MMMM yyyy")
+			</div>
+			<div class="privatecustomer-contact-details">
+				<MailIcon Class="privatecustomer-icons" />
+				@PCViewModel.Email
+			</div>
+			<div class="privatecustomer-contact-details">
+				<VisitsIcon Class="privatecustomer-icons" />
+				Antal besøg: @PCViewModel.Visits
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required PrivateCustomerViewModel PCViewModel { get; set; }
+
+	private string GetCustomerInitials(string name)
+	{
+		var parts = name.Split(' ');
+		return string.Concat(parts.Select(p => p.FirstOrDefault()));
+
+	}
+}

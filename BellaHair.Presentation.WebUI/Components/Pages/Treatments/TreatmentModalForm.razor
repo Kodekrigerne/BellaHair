@@ -1,0 +1,99 @@
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Treatments
+@inject ITreatmentCommand _treatmentCommand
+
+<!-- Mikkel Klitgaard -->
+
+<div class="kk-container">
+
+	<h3>Opret ny behandling</h3>
+
+	<hr class="treatment-line" />
+
+	<EditForm Model="@_newTreatmentForm" OnValidSubmit="@HandleCreateTreatment">
+		<DataAnnotationsValidator />
+
+		@if (_modalErrorMessage != null)
+		{
+			<div class="alert alert-danger" role="alert">
+				@_modalErrorMessage
+			</div>
+		}
+
+		<div class="treatment-modal-text">
+
+			<div class="treatment-input">
+
+				<label for="name-input">Navn</label>
+				<input id="name-input" type="text" @bind="_newTreatmentForm.Name" />
+				<ValidationMessage For="@(() => _newTreatmentForm.Name)" />
+
+			</div>
+
+			<div class="treatment-input">
+
+				<label for="price-input">Pris</label>
+				<input id="price-input" type="number" @bind="_newTreatmentForm.Price" />
+				<ValidationMessage For="@(() => _newTreatmentForm.Price)" />
+
+			</div>
+
+			<div class="treatment-input">
+
+				<label for="duration-input">Varighed</label>
+				<input id="duration-input" type="number" @bind="_newTreatmentForm.DurationMinutes" />
+				<ValidationMessage For="@(() => _newTreatmentForm.DurationMinutes)" />
+
+			</div>
+		</div>
+
+
+		<div class="btn-wrapper">
+			<button class="btn-add" type="submit">Opret</button>
+		</div>
+
+	</EditForm>
+
+</div>
+
+@code {
+	private string? _modalErrorMessage;
+	private bool _showNewModal = false; 
+	private NewTreatmentModel _newTreatmentForm = new NewTreatmentModel();
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		_modalErrorMessage = null;
+		_newTreatmentForm = new NewTreatmentModel();
+	}
+
+
+
+	private async Task HandleCreateTreatment()
+	{
+		try
+		{
+			var command = new CreateTreatmentCommand(
+				_newTreatmentForm.Name,
+				_newTreatmentForm.Price,
+				_newTreatmentForm.DurationMinutes);
+
+			await _treatmentCommand.CreateTreatmentAsync(command);
+
+			_showNewModal = false;
+			await OnCreate.InvokeAsync();
+		}
+		catch (DomainException dex)
+		{
+			_modalErrorMessage = dex.Message;
+		}
+		catch (Exception ex)
+		{
+			_modalErrorMessage = $"Der skete en fejl under oprettelse af behandling: {ex.Message}";
+		}
+
+	}
+}

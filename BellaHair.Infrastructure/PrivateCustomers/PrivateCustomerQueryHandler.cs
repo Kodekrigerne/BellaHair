@@ -29,14 +29,17 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                     x.Name.FirstName,
                     x.Name.MiddleName,
                     x.Name.LastName,
+                    x.Name.FullName,
                     x.Address.StreetName,
                     x.Address.City,
                     x.Address.StreetNumber,
                     x.Address.ZipCode,
                     x.Address.Floor,
+                    x.Address.FullAddress,
                     x.PhoneNumber.Value,
                     x.Email.Value,
-                    x.Birthday))
+                    x.Birthday,
+                    x.Visits))
                 .ToListAsync();
         }
     }
