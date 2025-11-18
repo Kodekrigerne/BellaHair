@@ -21,7 +21,6 @@ namespace BellaHair.Presentation.WebUI
 
         public void ReinstateData()
         {
-            Console.WriteLine("test");
             _db.Database.EnsureDeleted();
             _db.Database.EnsureCreated();
             _db.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
