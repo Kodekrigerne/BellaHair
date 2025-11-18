@@ -113,6 +113,10 @@
 				_newEmployeeModel.TreatmentIds
 			);
             await _employeeCommand.CreateEmployeeCommand(command);
+			_showNewModal = false;
+
+			await OnCreate.InvokeAsync();
+
 		}
 		catch (Exception e)
 		{
