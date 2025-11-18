@@ -48,8 +48,6 @@ namespace BellaHair.Presentation.WebUI
             AddLoyaltyDiscounts();
             AddTreatment();
 
-            await _db.SaveChangesAsync();
-
             AddEmployees();
             await _db.SaveChangesAsync();
         }
