@@ -3,7 +3,12 @@
 @if (IsVisible || _isMounted)
 {
     <div class="modal-overlay @(IsVisible && _isMounted ? "show" : "")" @onclick="Close">
-        <div class="modal-container @(IsVisible && _isMounted ? "show" : "")" @onclick:stopPropagation>
+        <div class="modal-container @(IsVisible && _isMounted ? "show" : "")"
+            tabindex="0"
+            @ref="_modalDiv"
+            @onkeydown="HandleKeyDown"
+            @onclick="@(async () => { await _modalDiv.FocusAsync(); })"
+            @onclick:stopPropagation>
             @ChildContent
         </div>
     </div>
@@ -13,9 +18,11 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; } //Tag imod indlejret html
 
     private bool _isMounted;
+    // Vi laver en ref som vi kan tilknytte til modalens container div
+    private ElementReference _modalDiv;
 
     // Kaldes når IsVisible (eller andre props) ændres
     protected override async Task OnParametersSetAsync()
@@ -26,6 +33,8 @@
         {
             await Task.Delay(1);
             _isMounted = true;
+            // Vi fokusere diven via dens ref
+            await _modalDiv.FocusAsync();
         }
 
         // Når IsVisible sættes til false venter vi med at sætte _isMounted til false, for at give animationer tid til at fuldføre
@@ -40,6 +49,13 @@
     {
         if (OnClose.HasDelegate) await OnClose.InvokeAsync();
         if (IsVisibleChanged.HasDelegate) await IsVisibleChanged.InvokeAsync(false);
+    }
+
+    // Kaldes fra onkeydown på modalens container
+    // Kalder Close hvis knappen der er trykket er Escape
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") await Close();
     }
 }
 
