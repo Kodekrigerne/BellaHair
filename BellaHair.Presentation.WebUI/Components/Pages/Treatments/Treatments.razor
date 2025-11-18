@@ -34,12 +34,8 @@
 
 					<label for="name-input">Navn</label>
 					<input id="name-input" type="text" @bind="_newTreatmentForm.Name"/>
-
-					<div class="validation-div">
-
 					<ValidationMessage For="@(() => _newTreatmentForm.Name)" />
 
-					</div>
 				</div>
 
 				<div class="treatment-input">
