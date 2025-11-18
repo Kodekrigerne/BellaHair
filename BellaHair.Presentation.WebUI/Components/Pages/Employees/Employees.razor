@@ -17,31 +17,34 @@
 		{
 			@foreach (var employee in _employees)
 			{
-				<div class="employee-card">
+				<div class="employee-card">												@*Contains the entire singular employee card layout*@
 						
-				<div class="employee-avatar">
+				<div class="employee-avatar">											@*Contains the avatar with intials*@
 					@GetEmployeeInitials(employee.name)
-					</div>
-						<div>
- 							<h3>@employee.name</h3>
-							<div class="employee-contact-details">
-								<div class="employee-single-contact-detail">
-									<MailIcon Class="employee-icons" />
-									@employee.email
-									</div>
-								<div class="employee-single-contact-detail">
-									<PhoneIcon Class="employee-icons"/>
-									@employee.phoneNumber
+				</div>
+					<div>																@*Positions other info to position next to avatar*@
+ 						<h3>@employee.name</h3>
+
+						<div class="employee-contact-details">
+							<div class="employee-single-contact-detail">
+								<MailIcon Class="employee-icons" />
+								@employee.email
 								</div>
-							</div>
-							<div class="treatments-employees-container">
-								@foreach (var treatment in employee.treatmentNames)
-								{
-									<div class="treatment-employee-card">@treatment</div>
-								}
+
+							<div class="employee-single-contact-detail">
+								<PhoneIcon Class="employee-icons"/>
+								@employee.phoneNumber
 							</div>
 						</div>
+
+						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
+							@foreach (var treatment in employee.treatmentNames)
+							{															
+								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
+							}
+						</div>
 					</div>
+				</div>
 			}
 		}
 	</div>
@@ -49,6 +52,17 @@
 @code {
 	private string? _errorMessage;
 
+	/// <summary>
+	/// List of viewmodels used to store employee view model data
+	/// </summary>
+	private List<EmployeeSimpleViewModel>? _employees = null;
+
+	/// <summary>
+	/// Provides initials needed to make employee avatar by taking a full name as a single string, 
+	///  splitting it into separate words (parts) based on spaces, and returns the first letter of
+	///  each word concatenated into a single string.
+	/// </summary>
+	/// <param name="name"></param>
 	private string GetEmployeeInitials(string name)
 	{
 		var parts = name.Split(' ');
@@ -56,12 +70,9 @@
 
 	}
 
-	private List<EmployeeSimpleViewModel>? _employees = null;
-
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
-
 		await LoadEmployees();
 	}
 
@@ -86,7 +97,3 @@
 	public record EmployeeSimpleViewModel(Guid Id, string name, string email, string phoneNumber, List<string> treatmentNames);
 	// TODO: Add full viewmodel
 }
-
-<style>
-
-</style>
