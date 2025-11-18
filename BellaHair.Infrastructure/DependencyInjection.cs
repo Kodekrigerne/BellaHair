@@ -1,12 +1,15 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
+using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Infrastructure.Treatments;
+using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
@@ -31,6 +34,11 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
+
+            serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
+
+            serviceCollection.AddScoped<IBookingQueryHandler, BookingQueryHandler>();
+            serviceCollection.AddScoped<IBookingOverlapChecker, BookingOverlapChecker>();
 
 
             return serviceCollection;

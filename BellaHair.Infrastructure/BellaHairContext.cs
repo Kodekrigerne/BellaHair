@@ -15,6 +15,7 @@ namespace BellaHair.Infrastructure
         public DbSet<Employee> Employees { get; set; }
         public DbSet<PrivateCustomer> PrivateCustomers { get; set; }
         public DbSet<Treatment> Treatments { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,7 +25,17 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount, b => b.IsRequired());
-            
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.EmployeeSnapshot, b => b.IsRequired());
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.CustomerSnapshot, b => b.IsRequired());
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.TreatmentSnapshot, b => b.IsRequired());
+
+            //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
+            modelBuilder.Entity<Booking>().Ignore(b => b.Total);
+            //Vi mapper backing fieldet i stedet for propertien
+            modelBuilder.Entity<Booking>().Property<decimal?>("_total")
+                .HasColumnName("Total")
+                .IsRequired(false);
+
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
 
@@ -32,12 +43,15 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Email);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.PhoneNumber);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Address);
+            modelBuilder.Entity<Employee>()
+                                            .HasMany(e => e.Treatments) //  Employee can be associated with many Treatment entities
+                                            .WithMany(); // Treatment entity can also be associated with many Employee entities.
 
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Address);
-            
+
             modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
         }
     }
