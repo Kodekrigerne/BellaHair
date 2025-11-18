@@ -12,12 +12,13 @@ namespace BellaHair.Infrastructure.Tests
 
     public abstract class InfrastructureTestBase
     {
-        private readonly static string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        // Sti til skrivebord på afviklende maskine hentes gennem Environment-klassen.
+        private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
         protected DbContextOptions<BellaHairContext> _options;
         protected BellaHairContext _db;
 
-        // Setup af dbcontext ved start af test-suite. Gemmer kopi af test-database på C-drevet.
+        // Setup af dbcontext ved start af test-suite. Gemmer kopi af test-database på maskinens skrivebord.
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {

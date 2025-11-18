@@ -19,7 +19,7 @@ namespace BellaHair.Domain.PrivateCustomers
         // 4. GetVisits(ICustomerVisitsCalculator _) metode
         public int Visits => Bookings.Count;
         public DateTime Birthday { get; private set; }
-        private readonly List<Booking> _bookings;
+        private readonly List<Booking> _bookings = [];
 
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
         public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();

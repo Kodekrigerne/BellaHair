@@ -22,12 +22,15 @@ namespace BellaHair.Ports.PrivateCustomers
         string FirstName,
         string? MiddleName,
         string LastName,
-        string streetName,
-        string city,
-        string streetNumber,
-        int zipCode,
-        int? floor,
+        string FullName,
+        string StreetName,
+        string City,
+        string StreetNumber,
+        int ZipCode,
+        int? Floor,
+        string FullAddress,
         string PhoneNumber,
         string Email,
-        DateTime Birthday);
+        DateTime Birthday,
+        int Visists);
 }
