@@ -1,17 +1,67 @@
 ﻿@using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Ports.Employees
+@using MudBlazor
+@inject IEmployeeCommand _employeeCommand
 
 <h3 style="align-content: center">Opret ny medarbejder</h3>
 <br />
 
 <div style="display: flex; gap: 10px">
-<p style="margin-bottom: 2px">Fornavn</p>
-<input @bind-value="FirstName" placeholder="Indtast medarbejderens fornavn..." style="height: 25px; width: 250px"/>
-<p style="margin-bottom: 2px">Mellemnavn</p>
-</div>
 
+	<EditForm Model="@_newEmployeeModel"
+		OnValidSubmit="@HandleCreateEmployee()"></EditForm>
+
+    
+    <DataAnnotationsValidator />
+    
+    <h3>Vælg behandlinger</h3>
+    
+    <MudSelect T="Guid" 
+               Label="Vælg de behandlinger, som medarbejderen kan udføre." 
+               MultiSelection="true"
+               @bind-SelectedValues="@_" 
+               Clearable="true"
+               Dense="true"
+               Required="true"
+               RequiredError="Please select at least one treatment.">
+        
+        @* Loop through the loaded treatments to populate the options *@
+        @foreach (var treatment in AvailableTreatments)
+        {
+            <MudSelectItem T="Guid" Value="@treatment.Id">
+                @treatment.Name
+            </MudSelectItem>
+        }
+    </MudSelect>
+    
+    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Class="mt-3">
+        Create Employee
+    </MudButton>
 
 
 @code {
+
+	[Parameter]
+	public NewEmployeeModel _newEmployeeModel { get; set; }
+
+	private async Task HandleCreateEmployee()
+	{
+		try
+		{
+			var command = new CreateEmployeeCommand(
+				_newEmployeeModel.FirstName,
+				_newEmployeeModel.MiddleName,
+				_newEmployeeModel.LastName,
+				_newEmployeeModel.Email,
+				_newEmployeeModel.PhoneNumber,
+				_newEmployeeModel.StreetName,
+				_newEmployeeModel.CityName,
+				_newEmployeeModel.StreetNumber,
+				_newEmployeeModel.ZipCode
+			);
+		}
+	}
+
 
 	[Parameter]
 	public string? FirstName { get; set; }
