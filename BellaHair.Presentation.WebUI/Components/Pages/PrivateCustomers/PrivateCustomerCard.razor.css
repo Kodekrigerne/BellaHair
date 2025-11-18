@@ -15,7 +15,7 @@
 }
 
     .privatecustomer-card:hover {
-        background-color: #d6e3fe3d;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.25);
         cursor: pointer;
     }
 

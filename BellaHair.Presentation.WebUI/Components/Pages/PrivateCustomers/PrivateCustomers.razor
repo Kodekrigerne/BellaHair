@@ -23,7 +23,7 @@
 	{
 		@foreach (var customer in _customers)
 		{
-			<PrivateCustomerCard PrivateCustomer="@customer" OnDelete="@LoadCustomers"></PrivateCustomerCard>
+			<PrivateCustomerCard PCViewModel="customer"></PrivateCustomerCard>
 		}
 	}
 </div>
