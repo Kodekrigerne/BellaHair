@@ -34,10 +34,6 @@ namespace BellaHair.Infrastructure.Employees
                 .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Treatments.Select(x => x.Name).ToList()))
                 .ToListAsync();
 
-            foreach (var employee in emp)
-            {
-                Console.WriteLine(string.Join(", ", employee.TreatmentNames));
-            }
             return emp;
         }
 
