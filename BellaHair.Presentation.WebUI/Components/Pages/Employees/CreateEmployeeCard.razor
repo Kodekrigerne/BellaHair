@@ -17,46 +17,65 @@
 
 <EditForm Model="@_newEmployeeModel" OnValidSubmit="@HandleCreateEmployee">
 	
+		<div class="employee-input">
     <label for="first-name-input">Fornavn</label>
 	<input id="first-name-input" type="text" @bind="_newEmployeeModel.FirstName" />
 			<ValidationMessage For="@(() => _newEmployeeModel.FirstName)" />
+		</div>
 
+		<div class="employee-input">
 	<label for="middle-name-input">Mellemnavn</label>
 	<input id="middle-name-input" type="text" @bind="_newEmployeeModel.MiddleName" />
 	<ValidationMessage For="@(() => _newEmployeeModel.MiddleName)" />
+		</div>
 
+				<div class="employee-input">
 	<label for="last-name-input">Efternavn</label>
 	<input id="last-name-input" type="text" @bind="_newEmployeeModel.LastName" />
 	<ValidationMessage For="@(() => _newEmployeeModel.LastName)" />
+		</div>
 
+				<div class="employee-input">
 	<label for="email-input">Email</label>
 	<input id="email-input" type="text" @bind="_newEmployeeModel.Email" />
 	<ValidationMessage For="@(() => _newEmployeeModel.Email)" />
+		</div>
 
+				<div class="employee-input">
 	<label for="phonenumber-input">Telefonnummer</label>
 	<input id="phonenumber-input" type="number" @bind="_newEmployeeModel.PhoneNumber" />
 	<ValidationMessage For="@(() => _newEmployeeModel.PhoneNumber)" />
+		</div>
 
+		<div class="employee-input">
 	<label for="streetname-input">Vejnavn</label>
 	<input id="streetname-input" type="text" @bind="_newEmployeeModel.StreetName" />
 	<ValidationMessage For="@(() => _newEmployeeModel.StreetName)" />
+		</div>
 
+		<div class="employee-input">
 	<label for="city-name-input">By</label>
 	<input id="city-name-input" type="text" @bind="_newEmployeeModel.CityName" />
 	<ValidationMessage For="@(() => _newEmployeeModel.CityName)" />
+		</div>
 
+		<div class="employee-input">
 	<label for="street-number-input">Vejnummer</label>
 	<input id="street-number-input" type="number" @bind="_newEmployeeModel.StreetNumber" />
 	<ValidationMessage For="@(() => _newEmployeeModel.StreetNumber)" />
+		</div>
 
+		<div class="employee-input">
 	<label for="zipcode-input">Postnummer</label>
 	<input id="zipcode-input" type="number" @bind="_newEmployeeModel.ZipCode" />
 	<ValidationMessage For="@(() => _newEmployeeModel.ZipCode)" />
+		</div>
 
+		<div class="employee-input">
 	<label for="floor-input">Dør/etage</label>
 	<input id="floor-input" type="text" @bind="_newEmployeeModel.Floor" />
 	<ValidationMessage For="@(() => _newEmployeeModel.Floor)" />
-
+		</div>
 
 	<MudSelect T="Guid" Label="Vælg hvilke behandlinger, medarbejderen kan udføre." MultiSelection="true" @bind-SelectedValues="SelectedTreatmentIds">
 

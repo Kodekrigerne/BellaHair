@@ -1,0 +1,32 @@
+﻿
+
+.employee-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+    .employee-input label {
+        width: 100px;
+        text-align: left;
+        margin-right: 15px;
+    }
+
+    .employee-input input {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        margin-right: 15px;
+    }
+
+        .employee-input input:focus {
+            outline: 1px solid #a91ce4;
+        }
+
+
+.btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
