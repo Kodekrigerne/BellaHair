@@ -1,5 +1,7 @@
 ﻿using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Domain.Treatments;
+using BellaHair.Domain.Treatments.ValueObjects;
 
 namespace BellaHair.Domain.Tests
 {
@@ -13,9 +15,13 @@ namespace BellaHair.Domain.Tests
             Address adress = Address.Create("Nørregade", "Vejle", "2", 7100);
             PhoneNumber phoneNumber = PhoneNumber.FromString("12345678");
             Email email = Email.FromString("larsnielsen@mail.com");
+            Treatment treatment1 = Treatment.Create("Klipning herre", Price.FromDecimal(200), DurationMinutes.FromInt(30));
+            Treatment treatment2 = Treatment.Create("Balyage", Price.FromDecimal(1000), DurationMinutes.FromInt(160));
+            Treatment treatment3 = Treatment.Create("Klipning dame", Price.FromDecimal(250), DurationMinutes.FromInt(45));
+            List<Treatment> treatments = [treatment1, treatment2, treatment3];
 
             //Act
-            Employee employee = Employee.Create(name, email, phoneNumber, adress);
+            Employee employee = Employee.Create(name, email, phoneNumber, adress, treatments);
 
             //Assert
             Assert.Multiple(() =>
