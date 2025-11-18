@@ -9,9 +9,11 @@
 @inject IEmployeeCommand _employeeCommand
 @inject ITreatmentQuery _treatmentQuery
 
-@* <h3 style="align-content: center">Opret ny medarbejder</h3>
+<div class="kk-container">
+
+<h3 style="align-content: center">Opret ny medarbejder</h3>
 <br />
- *@
+
 
 <EditForm Model="@_newEmployeeModel" OnValidSubmit="@HandleCreateEmployee">
 	
@@ -66,7 +68,7 @@
 	
 
 </EditForm>
-
+</div>
 
 	@code {
 	[Parameter, EditorRequired]
