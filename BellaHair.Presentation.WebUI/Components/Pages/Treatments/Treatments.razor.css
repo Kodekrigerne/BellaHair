@@ -5,7 +5,8 @@
 /* Mikkel Klitgaard */
 
 
-::deep .treatment-price-icon, ::deep .treatment-duration-icon {
+::deep .treatment-price-icon, 
+::deep .treatment-duration-icon {
     width: 16px;
     height: 16px;
     display: inline-block;
@@ -65,7 +66,7 @@
     color: #f9fafc;
 }
 
-.treatment-contact-details {
+.treatment-pd-details {
     display: flex;
     flex-wrap: wrap;
     align-items: center;

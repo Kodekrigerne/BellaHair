@@ -68,6 +68,7 @@
 				<div class="treatment-avatar">
 						<TreatmentIcon Class="treatment-icon"/>
 					</div>
+
 					<div class="treatment-details">
 
 						<h6>@treatment.Name</h6>
@@ -76,14 +77,14 @@
 
 						<div class="price-duration-wrapper">
 
-						<div class="treatment-contact-details">
+						<div class="treatment-pd-details">
 
 								<PriceIcon Class="treatment-price-icon"/>
 								@treatment.Price.ToString("C")
 
 							</div>
 
-						<div class="treatment-contact-details">
+						<div class="treatment-pd-details">
 
 								<DurationIcon Class="treatment-duration-icon"/>
 								@treatment.DurationMinutes min
@@ -143,10 +144,11 @@
 		// TODO: Implementer logik
 	}
 
-private Task HandleOnDeleteClick()
-{
-	throw new NotImplementedException();
-}
+	private Task HandleOnDeleteClick()
+	{
+		// TODO: Implementer logik
+		return Task.CompletedTask;
+	}
 
 record TreatmentViewModel(Guid Id, string Name, decimal Price, int DurationMinutes);
 
