@@ -1,11 +1,13 @@
+using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
+using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
-using BellaHair.Domain.Employees;
 using BellaHair.Infrastructure;
 using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -18,6 +20,14 @@ namespace BellaHair.Presentation.WebUI
         private readonly BellaHairContext _db;
 
         public DataProvider(BellaHairContext db) => _db = db;
+
+        public void ReinstateData()
+        {
+            _db.Database.EnsureDeleted();
+            _db.Database.EnsureCreated();
+            _db.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
+            AddData();
+        }
 
         public void AddData()
         {
