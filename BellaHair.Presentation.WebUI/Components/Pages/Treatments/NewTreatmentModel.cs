@@ -2,6 +2,12 @@
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.Treatments
 {
+    // Mikkel Klitgaard
+
+    /// <summary>
+    /// Represents the data required to create a new treatment, including name, price, and duration.
+    /// </summary>
+
     public class NewTreatmentModel
     {
         [Required(ErrorMessage = "Navn er påkrævet")]
