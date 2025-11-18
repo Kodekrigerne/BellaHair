@@ -27,7 +27,6 @@ namespace BellaHair.Domain.Bookings
         public DateTime CreatedDateTime { get; private init; }
         public DateTime StartDateTime { get; private set; }
 
-        //TODO: Set IsPaid and _total in Pay method
         public bool IsPaid;
         //_total is stored in the database, Total is ignored
         //_total is only set (and saved in the database) after booking is paid, and is therefore nullable
@@ -41,16 +40,11 @@ namespace BellaHair.Domain.Bookings
         private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
         {
             Customer = customer;
-            CustomerSnapshot = CustomerSnapshot.FromCustomer(customer);
             Employee = employee;
-            EmployeeSnapshot = EmployeeSnapshot.FromEmployee(employee);
             Treatment = treatment;
-            TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
             StartDateTime = startDateTime;
             CreatedDateTime = currentDateTime;
             IsPaid = false;
-
-            _total = CalculateTotal();
         }
 
         public static Booking Create(
@@ -75,11 +69,19 @@ namespace BellaHair.Domain.Bookings
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
 
+        //public void PayBooking()
+        //{
+        //Null checks (alt skal .Includes)
+        //Set Snapshots
+        //Set _total
+        //Set IsPaid
+        //}
+
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
         //TODO: Repo og query metode til booking GetAsync skal .Include Treatment, Employee, Customer
         private decimal CalculateTotal()
         {
-            return Treatment?.Price.Value ?? throw new BookingException("");
+            return Treatment?.Price.Value ?? throw new BookingException($"Booking must be loaded with all relations included {Id}");
         }
     }
 

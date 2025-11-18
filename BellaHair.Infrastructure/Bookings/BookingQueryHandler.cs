@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain;
-using BellaHair.Ports.Bookings;
+﻿using BellaHair.Ports.Bookings;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
@@ -9,13 +8,8 @@ namespace BellaHair.Infrastructure.Bookings
     internal class BookingQueryHandler : IBookingQueryHandler
     {
         private readonly BellaHairContext _db;
-        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
 
-        public BookingQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
-        {
-            _db = db;
-            _currentDateTimeProvider = currentDateTimeProvider;
-        }
+        public BookingQueryHandler(BellaHairContext db) => _db = db;
 
         async Task<IEnumerable<BookingSimpleDTO>> IBookingQueryHandler.GetAllAsync()
         {
@@ -40,6 +34,8 @@ namespace BellaHair.Infrastructure.Bookings
                 b.Treatment?.Name ?? b.TreatmentSnapshot?.Name
                     ?? throw new InvalidOperationException($"Booking {b.Id} does not have a treatment attached."),
 
+                // Hvis bookingen er betalt (?) bruger vi den snapshottede treatment tid da dennes historiske værdi er mest relevant
+                // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
                 b.IsPaid
                     ? b.TreatmentSnapshot?.DurationMinutes
                         ?? throw new InvalidOperationException($"Booking {b.Id} is paid but missing a TreatmentSnapshot.")
