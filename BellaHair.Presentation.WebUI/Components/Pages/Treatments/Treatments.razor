@@ -9,106 +9,36 @@
 
 @rendermode InteractiveServer
 @inject ITreatmentQuery _treatmentQuery
+@inject ITreatmentCommand _treatmentCommand
 
 <Modal @bind-IsVisible="@_showNewModal">
-	<div class="kk-container">
 
-		<h3>Opret ny behandling</h3>
+	<TreatmentModalForm OnCreate="@LoadTreatments"/>
 
-		<hr class="treatment-line" />
-
-		<form>
-			<div class="treatment-modal-text">
-
-				<div class="treatment-input">
-
-					<label for="name-input">Navn</label>
-					<input id="name-input" type="text"/>
-
-				</div>
-
-				<div class="treatment-input">
-
-					<label for="price-input">Pris</label>
-					<input id="price-input" type="number"/>
-
-				</div>
-
-				<div class="treatment-input">
-
-					<label for="duration-input">Varighed</label>
-					<input id="duration-input" type="number"/>
-
-				</div>
-			</div>
-
-		</form> 
-
-		<div class="btn-wrapper">
-			<button class="btn-add" type="submit">Opret</button>
-		</div>
-
-
-	</div>
 </Modal>
 
-
-<PageHeader HeaderText="Behandlinger" HeaderSubText="Alle tilgængelige behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
+<PageHeader HeaderText="Behandlinger" 
+	HeaderSubText="Alle tilgængelige behandlinger" 
+	NewButtonText="Ny behandling" 
+	OnNewButtonClicked= "@(() => { _showNewModal = true; })" />
 
 <div class="kk-container treatment-container">
+
 	@if (_errorMessage != null) { <p>@_errorMessage</p> }
 	@if (_treatments == null) { <p>Loading...</p> }
 	else {
 			@foreach (var treatment in _treatments)
 			{
-			<div class="treatment-card">
-
-					<BinDeleteButton OnClick="HandleOnDeleteClick" />
-
-				<div class="treatment-avatar">
-						<TreatmentIcon Class="treatment-icon"/>
-					</div>
-
-					<div class="treatment-details">
-
-						<h6>@treatment.Name</h6>
-
-						<hr class="treatment-line"/>
-
-						<div class="price-duration-wrapper">
-
-						<div class="treatment-pd-details">
-
-								<PriceIcon Class="treatment-price-icon"/>
-								@treatment.Price.ToString("C")
-
-							</div>
-
-						<div class="treatment-pd-details">
-
-								<DurationIcon Class="treatment-duration-icon"/>
-								@treatment.DurationMinutes min
-
-							</div>
-						</div>
-					</div>
-				</div>
-
+			<TreatmentCard Treatment="treatment" OnDelete="@LoadTreatments" />
 			}
 	}
 	</div>
 
 
-
-
-
-
-
-
 @code {
 	private string? _errorMessage;
+	private bool _showNewModal = false;
 	private List<TreatmentViewModel>? _treatments = null;
-	private bool _showNewModal = false; 
 
 
 	protected override async Task OnInitializedAsync()
@@ -139,18 +69,7 @@
 	}
 
 
-	private async Task HandleCreateTreatment()
-	{
-		// TODO: Implementer logik
-	}
 
-	private Task HandleOnDeleteClick()
-	{
-		// TODO: Implementer logik
-		return Task.CompletedTask;
-	}
-
-record TreatmentViewModel(Guid Id, string Name, decimal Price, int DurationMinutes);
 
 
 
