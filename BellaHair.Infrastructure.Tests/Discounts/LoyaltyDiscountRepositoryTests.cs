@@ -59,7 +59,7 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             _db.SaveChanges();
 
             //Act
-            var discountFromRepo = repo.Get(discount.Id).GetAwaiter().GetResult();
+            var discountFromRepo = repo.GetAsync(discount.Id).GetAwaiter().GetResult();
 
             //Assert
             Assert.Multiple(() =>
@@ -82,7 +82,7 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             _db.SaveChanges();
 
             //Act & Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => repo.Get(Guid.NewGuid()));
+            Assert.ThrowsAsync<KeyNotFoundException>(() => repo.GetAsync(Guid.NewGuid()));
         }
 
         //TODO: Implement when more discount types exist.
