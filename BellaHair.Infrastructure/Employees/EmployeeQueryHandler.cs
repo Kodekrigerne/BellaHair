@@ -50,7 +50,7 @@ namespace BellaHair.Infrastructure.Employees
         
         async Task<EmployeeDTOFull> IEmployeeQuery.GetEmployeeAsync(GetEmployeeByIdQuery query)
         {
-            var employee = await _db.Employees.FirstOrDefaultAsync(e => e.Id == query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
+            var employee = await _db.Employees.FindAsync(query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
 
             List<TreatmentDTO> treatments = [];
             
@@ -60,7 +60,18 @@ namespace BellaHair.Infrastructure.Employees
                 treatments.Add(new TreatmentDTO(treatment.Id, treatment.Name, treatment.Price.Value, treatment.DurationMinutes.Value));
             }
 
-            return new EmployeeDTOFull(employee.Id, employee.Name.FirstName, employee.Name.MiddleName ?? "", employee.Name.LastName, employee.Email.Value, employee.PhoneNumber.Value, employee.Address.StreetName, employee.Address.City, employee.Address.StreetNumber, employee.Address.ZipCode, treatments, employee.Address.Floor);
+            return new EmployeeDTOFull(employee.Id,
+                                       employee.Name.FirstName,
+                                       employee.Name.MiddleName ?? "",
+                                       employee.Name.LastName,
+                                       employee.Email.Value,
+                                       employee.PhoneNumber.Value,
+                                       employee.Address.StreetName,
+                                       employee.Address.City,
+                                       employee.Address.StreetNumber,
+                                       employee.Address.ZipCode,
+                                       treatments,
+                                       employee.Address.Floor);
         }
     }
 }   

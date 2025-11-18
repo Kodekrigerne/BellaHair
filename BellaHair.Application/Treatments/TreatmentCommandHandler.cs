@@ -35,7 +35,7 @@ namespace BellaHair.Application.Treatments
 
         async Task ITreatmentCommand.DeleteTreatmentAsync(DeleteTreatmentCommand command)
         {
-            var treatment = await _treatmentRepository.Get(command.Id);
+            var treatment = await _treatmentRepository.GetAsync(command.Id);
 
             _treatmentRepository.Delete(treatment);
 
