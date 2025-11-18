@@ -105,8 +105,8 @@ h6{
 
 .treatment-input{
     display: flex;
-    align-items:center;
-    margin-bottom: 40px;
+flex-direction:column;
+    margin-bottom: 20px;
 }
 
 .treatment-input label {
@@ -119,6 +119,7 @@ h6{
     border: 1px solid #ccc;
     border-radius:4px;
     padding:4px;
+    margin-right:15px;
 }
 
     .treatment-input input:focus {
@@ -131,4 +132,9 @@ h6{
     justify-content:flex-end;
     margin-top:20px;
     margin-bottom:8px;
+}
+
+
+.validation-div{
+    
 }
