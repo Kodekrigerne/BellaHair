@@ -20,12 +20,12 @@ namespace BellaHair.Presentation.WebUI
 
         public DataProvider(BellaHairContext db) => _db = db;
 
-        public void ReinstateData()
+        public async Task ReinstateData()
         {
             _db.Database.EnsureDeleted();
             _db.Database.EnsureCreated();
             _db.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
-            AddData();
+            await AddData();
         }
 
         // --- 1. Treatment Fields ---
