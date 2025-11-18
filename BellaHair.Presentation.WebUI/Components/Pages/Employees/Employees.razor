@@ -8,10 +8,10 @@
 @rendermode InteractiveServer
 @inject IEmployeeQuery _employeeQuery
 
-<PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => {_showNewModal = true;	})" />
+<PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
 
 <Modal @bind-IsVisible="@_showNewModal"> 
-	<CreateEmployeeCard OnCreate="@LoadEmployees" />
+	<CreateEmployeeCard OnCreate="@HandleCreate" />
 </Modal>
 
 <div class="kk-container employees-container">
@@ -27,11 +27,7 @@
 </div>
 
 @code {
-	private string? enteredText = null;
-	private bool disabled = true;
-
 	private bool _showNewModal = false;
-
 	private string? _errorMessage;
 
 	/// <summary>
@@ -61,5 +57,11 @@
 		{
 			_errorMessage = ex.Message; // TODO: "Noget gik galt"
 		}
+	}
+
+	private async Task HandleCreate()
+	{
+        _showNewModal = false;
+        await LoadEmployees();
 	}
 }

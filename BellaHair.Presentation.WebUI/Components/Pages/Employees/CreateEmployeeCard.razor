@@ -15,8 +15,15 @@
 <br />
 
 
+
 <EditForm Model="@_newEmployeeModel" OnValidSubmit="@HandleCreateEmployee">
-	
+        <DataAnnotationsValidator />
+
+		@if (_errorMessage != null)
+		{
+			<p>@_errorMessage</p>
+		}
+
 		<div class="employee-input">
     <label for="first-name-input">Fornavn</label>
 	<input id="first-name-input" type="text" @bind="_newEmployeeModel.FirstName" />
@@ -77,14 +84,18 @@
 	<ValidationMessage For="@(() => _newEmployeeModel.Floor)" />
 		</div>
 
-	<MudSelect T="Guid" Label="Vælg hvilke behandlinger, medarbejderen kan udføre." MultiSelection="true" @bind-SelectedValues="SelectedTreatmentIds">
+@* 	<MudSelect T="Guid" Label="Vælg hvilke behandlinger, medarbejderen kan udføre." MultiSelection="true" @bind-SelectedValues="SelectedTreatmentIds">
 
 			@foreach (var treatment in _treatments ?? Enumerable.Empty<TreatmentViewModel>())
 			{
 				<MudSelectItem T="Guid" Value="@(treatment.Id)">@treatment.Name</MudSelectItem>
             }
 	</MudSelect>		
-	
+	 *@
+
+	 <div class="btn-wrapper">
+            <button class="btn-add" type="submit">Opret</button>
+	 </div>
 
 </EditForm>
 </div>
@@ -92,34 +103,31 @@
 	@code {
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
-	private string? _errorMessage = null;
-	private bool _showNewModal = false;
-	private IEnumerable<Guid> SelectedTreatmentIds { get; set; } = new List<Guid>();
+
 	[Parameter]
 	public NewEmployeeModel _newEmployeeModel { get; set; } = new NewEmployeeModel();
-	private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
 
-	private void SetValues(HashSet<Guid> selectedIds)
-	{
-		SelectedTreatmentIds = selectedIds;
-	}
+	private string? _errorMessage = null;
+
+	// private IEnumerable<Guid> SelectedTreatmentIds { get; set; } = new List<Guid>();
+	// private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
+
+	// private void SetValues(IEnumerable<Guid> selectedIds)
+	// {
+	// 	SelectedTreatmentIds = selectedIds;
+	// }
 
 	protected override async Task OnInitializedAsync()
 	{
 		_errorMessage = null;
 		_newEmployeeModel = new NewEmployeeModel();
-        await LoadTreatments();
+        // await LoadTreatments();
 	}
 
 	private async Task HandleCreateEmployee()
 	{
 		try
 		{
-
-			if (_newEmployeeModel != null)
-			{
-				_newEmployeeModel.TreatmentIds = SelectedTreatmentIds.ToList();
-			}
 
 			var command = new CreateEmployeeCommand(
 				_newEmployeeModel.FirstName,
@@ -134,7 +142,6 @@
 				_newEmployeeModel.TreatmentIds
 			);
             await _employeeCommand.CreateEmployeeCommand(command);
-			_showNewModal = false;
 
 			await OnCreate.InvokeAsync();
 
@@ -145,20 +152,20 @@
 		}
 	}
 
-	private async Task LoadTreatments()
-	{
-		try
-		{
-			var treatments = await _treatmentQuery.GetAllAsync();
-			_treatments = treatments
-				.OrderBy(t => t.Name)
-				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
-				.ToList();
-		}
-		catch (Exception ex)
-		{
-			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
-		}
-	}
+	// private async Task LoadTreatments()
+	// {
+	// 	try
+	// 	{
+	// 		var treatments = await _treatmentQuery.GetAllAsync();
+	// 		_treatments = treatments
+	// 			.OrderBy(t => t.Name)
+	// 			.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+	// 			.ToList();
+	// 	}
+	// 	catch (Exception ex)
+	// 	{
+	// 		_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+	// 	}
+	// }
 
 }
