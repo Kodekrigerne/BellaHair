@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using BellaHair.Domain.Employees;
 
 namespace BellaHair.Infrastructure.Employees
-{
+
+{ 
+    // Linnea
+
     /// <summary>
     /// Provides methods for managing employee entities in the data store.
     /// </summary>
-    
-    // Linnea
     public class EmployeeRepository : IEmployeeRepository
     {
         private readonly BellaHairContext _db;

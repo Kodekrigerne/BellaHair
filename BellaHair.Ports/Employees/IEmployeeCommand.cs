@@ -18,7 +18,7 @@ namespace BellaHair.Ports.Employees
     }
 
     public record CreateEmployeeCommand(string FirstName, string MiddleName, string LastName, string
-        Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, int? Floor = null);
+        Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, IEnumerable<Guid> TreatmentIds, int? Floor = null);
 
     public record DeleteEmployeeCommand(Guid Id);
 }
