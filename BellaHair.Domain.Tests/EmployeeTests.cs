@@ -29,6 +29,12 @@ namespace BellaHair.Domain.Tests
                 Assert.That(employee.Name.FullName, Is.EqualTo(name.FullName));
                 Assert.That(employee.PhoneNumber.Value, Is.EqualTo(phoneNumber.Value));
                 Assert.That(employee.Email.Value, Is.EqualTo(email.Value));
+                Assert.Multiple(() =>
+                {
+                    Assert.That(employee.Treatments, Does.Contain(treatment1));
+                    Assert.That(employee.Treatments, Does.Contain(treatment2));
+                    Assert.That(employee.Treatments, Does.Contain(treatment1));
+                });
             });
         }
 
