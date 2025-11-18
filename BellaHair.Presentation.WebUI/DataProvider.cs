@@ -1,6 +1,7 @@
 using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
@@ -49,6 +50,7 @@ namespace BellaHair.Presentation.WebUI
             AddTreatment();
             AddPrivateCustomers();
             AddEmployees();
+
             await _db.SaveChangesAsync();
         }
 
