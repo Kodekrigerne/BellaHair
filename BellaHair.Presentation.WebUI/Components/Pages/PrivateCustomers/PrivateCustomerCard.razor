@@ -7,13 +7,13 @@
 
 <!-- Mikkel Dahlmann -->
 
-<Modal IsVisible="@_showNewModal">
+<Modal @bind-IsVisible="@_showNewModal">
 			<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
 			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+			<button class="btn-add" onclick="@CloseModal">Annuller</button>
 </Modal>
 
 <div class="privatecustomer-card">
-						
 	<div class="privatecustomer-avatar">
 		@GetCustomerInitials(PrivateCustomer.FullName)
 	</div>
@@ -45,7 +45,7 @@
 	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
 	
-	@code {
+@code {
 
 	[Parameter, EditorRequired]
 	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
@@ -54,8 +54,6 @@
 	public required EventCallback OnDelete { get; set; }
 
 	private bool _showNewModal = false;
-
-	// private bool _isDeleted = false;
 
 	private void HandleOnDeleteClick()
 	{
@@ -70,11 +68,7 @@
 		await OnDelete.InvokeAsync();
 	}
 
-	// private async Task CloseModal()
-	// {
-	// 	_isDeleted = false;
-		
-	// }
+	private void CloseModal() => _showNewModal = false;
 
 	private string GetCustomerInitials(string name)
 	{

@@ -5,7 +5,6 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Infrastructure;
-using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
