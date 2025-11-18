@@ -2,6 +2,11 @@
 
 namespace BellaHair.Domain.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Represents a Customer as a Snapshot in time for invoicing and historic data reasons<br/>
+    /// Contains only the relevant information for these purposes, and so omits relational data
+    /// </summary>
     public record EmployeeSnapshot
     {
         public Guid EmployeeId { get; private init; }

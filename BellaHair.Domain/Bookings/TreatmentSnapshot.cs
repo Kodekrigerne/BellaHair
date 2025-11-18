@@ -2,6 +2,10 @@
 
 namespace BellaHair.Domain.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Represents a Customer as a Snapshot in time for invoicing and historic data reasons
+    /// </summary>
     public record TreatmentSnapshot
     {
         public Guid TreatmentId { get; private init; }

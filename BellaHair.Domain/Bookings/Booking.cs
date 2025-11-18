@@ -5,6 +5,13 @@ using BellaHair.Domain.Treatments;
 
 namespace BellaHair.Domain.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Represents a Booking in the system with attached employee, treatment and customer<br/>
+    /// If the booking is marked as paid then value objects are used to store historic data for invoicing reasons<br/>
+    /// Relations are nullable as navigation properties may later be deleted, in this case snapshots can be used to retrieve latest data<br/>
+    /// Total is calculated when accessed for unpaid bookings, and fetched from Db for paid bookings
+    /// </summary>
     public class Booking : EntityBase
     {
         public PrivateCustomer? Customer { get; private set; }
@@ -22,6 +29,8 @@ namespace BellaHair.Domain.Bookings
 
         //TODO: Set IsPaid and _total in Pay method
         public bool IsPaid;
+        //_total is stored in the database, Total is ignored
+        //_total is only set (and saved in the database) after booking is paid, and is therefore nullable
         private decimal? _total;
         public decimal Total => IsPaid ? _total!.Value : CalculateTotal();
 
@@ -67,8 +76,6 @@ namespace BellaHair.Domain.Bookings
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
-        //Dette betyder at Total ikke nødvendig altid er up to date i database hvis ordren ikke er betalt,
-        // Men den vil blive opdateret så snart Total efterspørges fra Bookingen.
         //TODO: Repo og query metode til booking GetAsync skal .Include Treatment, Employee, Customer
         private decimal CalculateTotal()
         {

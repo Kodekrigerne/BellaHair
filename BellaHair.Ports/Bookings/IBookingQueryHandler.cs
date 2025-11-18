@@ -1,5 +1,9 @@
 ﻿namespace BellaHair.Ports.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Exposes queries for the Booking entity.
+    /// </summary>
     public interface IBookingQueryHandler
     {
         Task<IEnumerable<BookingSimpleDTO>> GetAllAsync();

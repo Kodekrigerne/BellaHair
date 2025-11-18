@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
 {
+    //Dennis
+    /// <inheritdoc cref="IBookingQueryHandler"/>
     internal class BookingQueryHandler : IBookingQueryHandler
     {
         private readonly BellaHairContext _db;
@@ -24,7 +26,8 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Employee)
                 .ToListAsync();
 
-            //TODO: Vælg mellem denne og nedenstående
+            // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
+            // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
             return bookings.Select(b => new BookingSimpleDTO(
                 b.StartDateTime,
                 b.Total,

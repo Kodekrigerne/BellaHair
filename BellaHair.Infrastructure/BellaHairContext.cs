@@ -28,7 +28,10 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.EmployeeSnapshot, b => b.IsRequired());
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.CustomerSnapshot, b => b.IsRequired());
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.TreatmentSnapshot, b => b.IsRequired());
+
+            //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
             modelBuilder.Entity<Booking>().Ignore(b => b.Total);
+            //Vi mapper backing fieldet i stedet for propertien
             modelBuilder.Entity<Booking>().Property<decimal?>("_total")
                 .HasColumnName("Total")
                 .IsRequired(false);
