@@ -1,6 +1,8 @@
 ﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Collections.Generic;
+@using System.ComponentModel.DataAnnotations;
+@using System.Linq;
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.Treatments
 @using MudBlazor
@@ -11,38 +13,93 @@
 <br />
  *@
 
-	<EditForm Model="@_newEmployeeModel" OnValidSubmit="(() => HandleCreateEmployee())">
+<EditForm Model="@_newEmployeeModel" OnValidSubmit="@HandleCreateEmployee">
+	
+    <label for="first-name-input">Fornavn</label>
+	<input id="first-name-input" type="text" @bind="_newEmployeeModel.FirstName" />
+			<ValidationMessage For="@(() => _newEmployeeModel.FirstName)" />
 
-    <DataAnnotationsValidator />
-    
-@* 	<MudTextField @bind-Value="_newEmployeeModel.FirstName" Label="First Name" Required="true" />
- *@
-		<MudSelect T="Guid"
-		Label="Vælg behandlinger."
-		MultiSelection="true"
-		@bind-SelectedValues="SelectedTreatmentIds"
-		Clearable="true">
+	<label for="middle-name-input">Mellemnavn</label>
+	<input id="middle-name-input" type="text" @bind="_newEmployeeModel.MiddleName" />
+	<ValidationMessage For="@(() => _newEmployeeModel.MiddleName)" />
 
-		@foreach (var treatment in collection)
-		{
-			
-		}
-	</MudSelect>
+	<label for="last-name-input">Efternavn</label>
+	<input id="last-name-input" type="text" @bind="_newEmployeeModel.LastName" />
+	<ValidationMessage For="@(() => _newEmployeeModel.LastName)" />
 
-	</EditForm>
+	<label for="email-input">Email</label>
+	<input id="email-input" type="text" @bind="_newEmployeeModel.Email" />
+	<ValidationMessage For="@(() => _newEmployeeModel.Email)" />
+
+	<label for="phonenumber-input">Telefonnummer</label>
+	<input id="phonenumber-input" type="number" @bind="_newEmployeeModel.PhoneNumber" />
+	<ValidationMessage For="@(() => _newEmployeeModel.PhoneNumber)" />
+
+	<label for="streetname-input">Vejnavn</label>
+	<input id="streetname-input" type="text" @bind="_newEmployeeModel.StreetName" />
+	<ValidationMessage For="@(() => _newEmployeeModel.StreetName)" />
+
+	<label for="city-name-input">By</label>
+	<input id="city-name-input" type="text" @bind="_newEmployeeModel.CityName" />
+	<ValidationMessage For="@(() => _newEmployeeModel.CityName)" />
+
+	<label for="street-number-input">Vejnummer</label>
+	<input id="street-number-input" type="number" @bind="_newEmployeeModel.StreetNumber" />
+	<ValidationMessage For="@(() => _newEmployeeModel.StreetNumber)" />
+
+	<label for="zipcode-input">Postnummer</label>
+	<input id="zipcode-input" type="number" @bind="_newEmployeeModel.ZipCode" />
+	<ValidationMessage For="@(() => _newEmployeeModel.ZipCode)" />
+
+	<label for="floor-input">Dør/etage</label>
+	<input id="floor-input" type="text" @bind="_newEmployeeModel.Floor" />
+	<ValidationMessage For="@(() => _newEmployeeModel.Floor)" />
+
+
+	<MudSelect T="Guid" Label="Vælg hvilke behandlinger, medarbejderen kan udføre." MultiSelection="true" @bind-SelectedValues="SelectedTreatmentIds">
+
+			@foreach (var treatment in _treatments ?? Enumerable.Empty<TreatmentViewModel>())
+			{
+				<MudSelectItem T="Guid" Value="@(treatment.Id)">@treatment.Name</MudSelectItem>
+            }
+	</MudSelect>		
+	
+
+</EditForm>
+
 
 	@code {
-
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
 	private string? _errorMessage = null;
-	private HashSet<Guid> SelectedTreatmentIds { get; set; } = new HashSet<Guid>();
+	private bool _showNewModal = false;
+	private IEnumerable<Guid> SelectedTreatmentIds { get; set; } = new List<Guid>();
 	[Parameter]
-	public NewEmployeeModel? _newEmployeeModel { get; set; }
-	private List<TreatmentViewModel>? _treatments { get; set; } 
+	public NewEmployeeModel _newEmployeeModel { get; set; } = new NewEmployeeModel();
+	private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
+
+	private void SetValues(HashSet<Guid> selectedIds)
+	{
+		SelectedTreatmentIds = selectedIds;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		_errorMessage = null;
+		_newEmployeeModel = new NewEmployeeModel();
+        await LoadTreatments();
+	}
 
 	private async Task HandleCreateEmployee()
 	{
 		try
 		{
+
+			if (_newEmployeeModel != null)
+			{
+				_newEmployeeModel.TreatmentIds = SelectedTreatmentIds.ToList();
+			}
+
 			var command = new CreateEmployeeCommand(
 				_newEmployeeModel.FirstName,
 				_newEmployeeModel.MiddleName,
@@ -55,16 +112,12 @@
 				_newEmployeeModel.ZipCode,
 				_newEmployeeModel.TreatmentIds
 			);
+            await _employeeCommand.CreateEmployeeCommand(command);
 		}
 		catch (Exception e)
 		{
-
+			_errorMessage = $"Oprettelse mislykkedes: {e.Message}";
 		}
-	}
-
-	protected override async Task OnInitializedAsync()
-	{
-		await LoadTreatments();
 	}
 
 	private async Task LoadTreatments()
@@ -84,12 +137,3 @@
 	}
 
 }
-
-<style>
-
-
-.modal-container.employees
-{
-	max-width: 100rem;
-}
-</style>
