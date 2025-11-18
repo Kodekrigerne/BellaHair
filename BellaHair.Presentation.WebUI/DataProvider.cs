@@ -29,7 +29,6 @@ namespace BellaHair.Presentation.WebUI
             AddData();
         }
 
-        public void AddData()
         // --- 1. Treatment Fields ---
         private Treatment _herreklip;
         private Treatment _dameklip;
@@ -49,9 +48,6 @@ namespace BellaHair.Presentation.WebUI
             AddEmployees();
             AddPrivateCustomers();
 
-            await _db.SaveChangesAsync();
-
-            AddEmployees();
             await _db.SaveChangesAsync();
         }
 
