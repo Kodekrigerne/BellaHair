@@ -50,15 +50,16 @@ namespace BellaHair.Infrastructure.Employees
         
         async Task<EmployeeDTOFull> IEmployeeQuery.GetEmployeeAsync(GetEmployeeByIdQuery query)
         {
-            var employee = await _db.Employees.FindAsync(query.Id) ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
+            var employee = await _db.Employees.Include(e => e.Treatments)
+                                               .FirstOrDefaultAsync(e => e.Id == query.Id)
+                                               ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
 
-            List<TreatmentDTO> treatments = [];
-            
-            foreach (var treatment in employee.Treatments)
-            {
-                var tre = await _db.Treatments.FindAsync(treatment.Id);
-                treatments.Add(new TreatmentDTO(treatment.Id, treatment.Name, treatment.Price.Value, treatment.DurationMinutes.Value));
-            }
+            List<TreatmentDTO> treatments = employee.Treatments.Select(e =>
+                                                                           new TreatmentDTO(e.Id,
+                                                                                        e.Name,
+                                                                                        e.Price.Value,
+                                                                                        e.DurationMinutes.Value))
+                                                               .ToList();
 
             return new EmployeeDTOFull(employee.Id,
                                        employee.Name.FirstName,
