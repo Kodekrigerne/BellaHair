@@ -32,7 +32,6 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
 
-
             return serviceCollection;
         }
     }

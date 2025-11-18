@@ -1,13 +1,21 @@
 ﻿@*Mikkel Klitgaard*@
 
+@inject DataProvider DataProvider
+@inject NavigationManager NavigationManager
+
+@rendermode InteractiveServer
+
 <div class="navbar">
+	<button class="btn-remove" @onclick="@(() => {
+	DataProvider.ReinstateData();
+	NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);})">Rebuild DB</button>
 	<NavLink href="" Match="NavLinkMatch.All">Hjem</NavLink>
-    <NavLink href="weather">Kalender</NavLink>          @* Husk at ændre url-sti fra weather > kalender *@
-    <NavLink href="ny-booking">Ny Booking</NavLink>
-    <NavLink href="venteliste">Venteliste</NavLink>
-    <NavLink href="kunder">Kunder</NavLink>
-    <NavLink href="medarbejdere">Medarbejdere</NavLink>
-    <NavLink href="behandlinger">Behandlinger</NavLink>
-    <NavLink href="produkter">Produkter</NavLink>
-    <NavLink href="rabatter">Rabatter</NavLink>
+	<NavLink href="weather">Kalender</NavLink> @* Husk at ændre url-sti fra weather > kalender *@
+	<NavLink href="ny-booking">Ny Booking</NavLink>
+	<NavLink href="venteliste">Venteliste</NavLink>
+	<NavLink href="kunder">Kunder</NavLink>
+	<NavLink href="medarbejdere">Medarbejdere</NavLink>
+	<NavLink href="behandlinger">Behandlinger</NavLink>
+	<NavLink href="produkter">Produkter</NavLink>
+	<NavLink href="rabatter">Rabatter</NavLink>
 </div>

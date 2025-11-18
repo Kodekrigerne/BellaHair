@@ -4,6 +4,8 @@ using BellaHair.Domain;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 
+// Linnea
+
 public class Employee : PersonBase
     {
 

@@ -9,6 +9,8 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Employees;
 
+// Linnea
+
 namespace BellaHair.Application
 {
     class EmployeeCommandHandler : IEmployeeCommand
@@ -28,7 +30,7 @@ namespace BellaHair.Application
             var email = Email.FromString(command.Email);
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var address = Address.Create(command.StreetName, command.City, command.StreetNumber, command.ZipCode, command.Floor);
-            var treatments = await _treatmentRepo.Get(command.TreatmentIds);
+            var treatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
 
             var employee = Employee.Create(name, email, phoneNumber, address, treatments.ToList());
 
