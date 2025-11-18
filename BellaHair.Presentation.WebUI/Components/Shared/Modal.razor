@@ -19,7 +19,7 @@
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; } //Tag imod indlejret html
 
     private bool _isMounted;
     // Vi laver en ref som vi kan tilknytte til modalens container div

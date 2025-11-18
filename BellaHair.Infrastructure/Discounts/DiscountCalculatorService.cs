@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Discounts
 {
@@ -12,18 +13,11 @@ namespace BellaHair.Infrastructure.Discounts
 
         public DiscountCalculatorService(BellaHairContext db) => _db = db;
 
-        BookingDiscount? IDiscountCalculatorService.GetBestDiscount(Booking booking)
-        {
-            // Vi anvender GetAwaiter().GetResult() for at returnere det rene object og ikke en Task
-            // Dette er vigtigt for at undgå at eksponere domænet for implementationsdetaljer og asynkron kode
-            return GetBestDiscount(booking).GetAwaiter().GetResult();
-        }
-
-        private async Task<BookingDiscount?> GetBestDiscount(Booking booking)
+        async Task<BookingDiscount?> IDiscountCalculatorService.GetBestDiscount(Booking booking)
         {
             BookingDiscount? bestBookingDiscount = null;
 
-            var discounts = _db.Discounts.ToList();
+            var discounts = _db.Discounts.AsNoTracking().ToList();
 
             List<Task> tasks = [];
 
