@@ -9,6 +9,7 @@
 
 @rendermode InteractiveServer
 @inject ITreatmentQuery _treatmentQuery
+@inject ITreatmentCommand _treatmentCommand
 
 <Modal @bind-IsVisible="@_showNewModal">
 	<div class="kk-container">
@@ -17,43 +18,43 @@
 
 		<hr class="treatment-line" />
 
-		<form>
+		<EditForm Model="@_newTreatmentForm" OnValidSubmit="@HandleCreateTreatment">
 			<div class="treatment-modal-text">
 
 				<div class="treatment-input">
 
 					<label for="name-input">Navn</label>
-					<input id="name-input" type="text"/>
+					<input id="name-input" type="text" @bind="_newTreatmentForm.Name"/>
 
 				</div>
 
 				<div class="treatment-input">
 
 					<label for="price-input">Pris</label>
-					<input id="price-input" type="number"/>
+					<input id="price-input" type="number" @bind="_newTreatmentForm.Price"/>
 
 				</div>
 
 				<div class="treatment-input">
 
 					<label for="duration-input">Varighed</label>
-					<input id="duration-input" type="number"/>
+					<input id="duration-input" type="number" @bind="_newTreatmentForm.DurationMinutes"/>
 
 				</div>
 			</div>
 
-		</form> 
 
 		<div class="btn-wrapper">
 			<button class="btn-add" type="submit">Opret</button>
 		</div>
 
+		</EditForm> 
 
 	</div>
 </Modal>
 
 
-<PageHeader HeaderText="Behandlinger" HeaderSubText="Alle tilgængelige behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
+<PageHeader HeaderText="Behandlinger" HeaderSubText="Alle tilgængelige behandlinger" NewButtonText="Ny behandling" OnNewButtonClicked="@OpenNewModal" />
 
 <div class="kk-container treatment-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p> }
@@ -109,6 +110,7 @@
 	private string? _errorMessage;
 	private List<TreatmentViewModel>? _treatments = null;
 	private bool _showNewModal = false; 
+	private NewTreatmentModel _newTreatmentForm = new NewTreatmentModel();
 
 
 	protected override async Task OnInitializedAsync()
@@ -138,10 +140,37 @@
 		}
 	}
 
+	private void OpenNewModal()
+	{
+		_showNewModal = true;
+		_newTreatmentForm = new NewTreatmentModel();
+	}
+
+
 
 	private async Task HandleCreateTreatment()
 	{
-		// TODO: Implementer logik
+		try
+		{
+			var command = new CreateTreatmentCommand(
+				_newTreatmentForm.Name,
+				_newTreatmentForm.Price,
+				_newTreatmentForm.DurationMinutes);
+
+			await _treatmentCommand.CreateTreatmentAsync(command);
+
+			_showNewModal = false;
+			await LoadTreatments();
+		}
+		catch (DomainException dex)
+		{
+			_errorMessage = dex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"Der skete en fejl under oprettelse af behandling: {ex.Message}";
+		}
+
 	}
 
 	private Task HandleOnDeleteClick()
