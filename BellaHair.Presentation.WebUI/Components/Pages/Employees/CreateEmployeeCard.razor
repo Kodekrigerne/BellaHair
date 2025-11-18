@@ -1,56 +1,43 @@
-﻿@using BellaHair.Presentation.WebUI.Components.Shared
+﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Collections.Generic;
 @using BellaHair.Ports.Employees
+@using BellaHair.Ports.Treatments
 @using MudBlazor
 @inject IEmployeeCommand _employeeCommand
+@inject ITreatmentQuery _treatmentQuery
 
-<h3 style="align-content: center">Opret ny medarbejder</h3>
+@* <h3 style="align-content: center">Opret ny medarbejder</h3>
 <br />
+ *@
 
-<div style="display: flex; gap: 10px">
-
-	<EditForm Model="@_newEmployeeModel"
-		OnValidSubmit="@HandleCreateEmployee()">
+	<EditForm Model="@_newEmployeeModel" OnValidSubmit="(() => HandleCreateEmployee())">
 
     <DataAnnotationsValidator />
     
-    <h3>Vælg behandlinger</h3>
-    
-@* Example of a simple text field *@
-	<MudTextField @bind-Value="NewEmployee.FirstName" Label="First Name" Required="true" />
-
-	<div class="mt-4 mb-4">
-		<h4>Treatments</h4>
-
+@* 	<MudTextField @bind-Value="_newEmployeeModel.FirstName" Label="First Name" Required="true" />
+ *@
 		<MudSelect T="Guid"
-				   Label="Select Treatments"
-				   MultiSelection="true"
-				   @bind-SelectedValues="SelectedTreatmentIds"
-				   Clearable="true"
-				   Required="true"
-				   RequiredError="Please select at least one treatment.">
+		Label="Vælg behandlinger."
+		MultiSelection="true"
+		@bind-SelectedValues="SelectedTreatmentIds"
+		Clearable="true">
 
-			@* Loop through the list loaded from the database *@
-			@foreach (var treatment in AvailableTreatments)
-			{
-				<MudSelectItem T="Guid" Value="@treatment.Id">
-					@treatment.Name
-				</MudSelectItem>
-			}
-		</MudSelect>
-	</div>
-
-	<MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Class="mt-3">
-		Save Employee
-	</MudButton>
+		@foreach (var treatment in collection)
+		{
+			
+		}
+	</MudSelect>
 
 	</EditForm>
 
-@code {
+	@code {
 
+	private string? _errorMessage = null;
 	private HashSet<Guid> SelectedTreatmentIds { get; set; } = new HashSet<Guid>();
 	[Parameter]
-	public NewEmployeeModel _newEmployeeModel { get; set; }
+	public NewEmployeeModel? _newEmployeeModel { get; set; }
+	private List<TreatmentViewModel>? _treatments { get; set; } 
 
 	private async Task HandleCreateEmployee()
 	{
@@ -65,11 +52,37 @@
 				_newEmployeeModel.StreetName,
 				_newEmployeeModel.CityName,
 				_newEmployeeModel.StreetNumber,
-				_newEmployeeModel.ZipCode
+				_newEmployeeModel.ZipCode,
 				_newEmployeeModel.TreatmentIds
 			);
 		}
+		catch (Exception e)
+		{
+
+		}
 	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadTreatments();
+	}
+
+	private async Task LoadTreatments()
+	{
+		try
+		{
+			var treatments = await _treatmentQuery.GetAllAsync();
+			_treatments = treatments
+				.OrderBy(t => t.Name)
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+				.ToList();
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+		}
+	}
+
 }
 
 <style>
