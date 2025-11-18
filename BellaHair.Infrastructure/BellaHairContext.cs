@@ -25,9 +25,13 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
             modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount, b => b.IsRequired());
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.EmployeeSnapshot);
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.CustomerSnapshot);
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.TreatmentSnapshot);
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.EmployeeSnapshot, b => b.IsRequired());
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.CustomerSnapshot, b => b.IsRequired());
+            modelBuilder.Entity<Booking>().ComplexProperty(b => b.TreatmentSnapshot, b => b.IsRequired());
+            modelBuilder.Entity<Booking>().Ignore(b => b.Total);
+            modelBuilder.Entity<Booking>().Property<decimal?>("_total")
+                .HasColumnName("Total")
+                .IsRequired(false);
 
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);

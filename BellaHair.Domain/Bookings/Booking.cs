@@ -7,20 +7,23 @@ namespace BellaHair.Domain.Bookings
 {
     public class Booking : EntityBase
     {
-        public PrivateCustomer? Customer { get; private set; } //Vi kan overveje om vi vil have navigationspropertien når vi har snapshottet
-        public CustomerSnapshot CustomerSnapshot { get; private set; }
+        public PrivateCustomer? Customer { get; private set; }
+        public CustomerSnapshot? CustomerSnapshot { get; private set; }
 
-        public Employee? Employee { get; private set; } //Vi kan overveje om vi vil have navigationspropertien når vi har snapshottet
-        public EmployeeSnapshot EmployeeSnapshot { get; private set; }
+        public Employee? Employee { get; private set; }
+        public EmployeeSnapshot? EmployeeSnapshot { get; private set; }
 
-        public Treatment? Treatment { get; private set; } //Vi kan overveje om vi vil have navigationspropertien når vi har snapshottet
-        public TreatmentSnapshot TreatmentSnapshot { get; private set; }
+        public Treatment? Treatment { get; private set; }
+        public TreatmentSnapshot? TreatmentSnapshot { get; private set; }
 
         public BookingDiscount? Discount { get; private set; }
         public DateTime CreatedDateTime { get; private init; }
         public DateTime StartDateTime { get; private set; }
 
-        public decimal Total { get; private set; }
+        //TODO: Set IsPaid and _total in Pay method
+        public bool IsPaid;
+        private decimal? _total;
+        public decimal Total => IsPaid ? _total!.Value : CalculateTotal();
 
 #pragma warning disable CS8618
         private Booking() { }
@@ -36,8 +39,9 @@ namespace BellaHair.Domain.Bookings
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(treatment);
             StartDateTime = startDateTime;
             CreatedDateTime = currentDateTime;
+            IsPaid = false;
 
-            UpdateTotal();
+            _total = CalculateTotal();
         }
 
         public static Booking Create(
@@ -62,12 +66,13 @@ namespace BellaHair.Domain.Bookings
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
 
-        // Kald altid denne metode efter bookingen er opdateret
-        // Bookingen kan kun opdateres hvis den er fremtidig, dermed kan Treatment ikke være slettet fra Db
-        //TODO: Repo metode til booking GetAsync skal .Include Treatment, Employee, Customer
-        private void UpdateTotal()
+        //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
+        //Dette betyder at Total ikke nødvendig altid er up to date i database hvis ordren ikke er betalt,
+        // Men den vil blive opdateret så snart Total efterspørges fra Bookingen.
+        //TODO: Repo og query metode til booking GetAsync skal .Include Treatment, Employee, Customer
+        private decimal CalculateTotal()
         {
-            Total = Treatment?.Price.Value ?? throw new BookingException("");
+            return Treatment?.Price.Value ?? throw new BookingException("");
         }
     }
 
