@@ -1,0 +1,8 @@
+﻿
+.privatecustomer-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 1rem;
+    max-width: stretch;
+}

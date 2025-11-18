@@ -1,0 +1,60 @@
+﻿@attribute [StreamRendering]
+@using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Ports.PrivateCustomers
+
+@page "/kunder"
+
+@rendermode InteractiveServer
+@inject IPrivateCustomerQuery PrivateCustomerQuery
+
+<Modal @bind-IsVisible="@_showNewModal">
+		<p>Ny kunde</p>
+</Modal>
+
+<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
+	
+<div class="kk-container privatecustomer-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p>}
+	@if (_customers == null) {<p>Loading...</p>}
+	else
+	{
+		@foreach (var customer in _customers)
+		{
+			<PrivateCustomerCard PCViewModel="customer"></PrivateCustomerCard>
+		}
+	}
+</div>
+
+@code {
+	private bool _showNewModal = false;
+	
+	private string? _errorMessage;
+
+	private List<PrivateCustomerViewModel>? _customers = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadCustomers();
+	}
+
+	private async Task LoadCustomers()
+	{
+		try
+		{
+			var customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
+			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists)).ToList();
+		}
+		catch (DomainException ex)
+		{
+
+			_errorMessage = ex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = ex.Message; // TODO: "Noget gik galt"
+		}
+	}
+}
