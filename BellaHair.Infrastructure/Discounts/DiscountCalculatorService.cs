@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Discounts
 {
@@ -16,7 +17,7 @@ namespace BellaHair.Infrastructure.Discounts
         {
             BookingDiscount? bestBookingDiscount = null;
 
-            var discounts = _db.Discounts.ToList();
+            var discounts = _db.Discounts.AsNoTracking().ToList();
 
             List<Task> tasks = [];
 

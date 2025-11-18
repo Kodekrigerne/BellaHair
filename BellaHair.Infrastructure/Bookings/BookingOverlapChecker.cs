@@ -15,6 +15,7 @@ namespace BellaHair.Infrastructure.Bookings
                 throw new KeyNotFoundException($"No employee with ID {employeeId} exists");
 
             var bookings = _db.Bookings
+                .AsNoTracking()
                 .Where(b => b.Employee!.Id == employeeId)
                 .Include(b => b.Employee)
                 .Include(b => b.Treatment);
