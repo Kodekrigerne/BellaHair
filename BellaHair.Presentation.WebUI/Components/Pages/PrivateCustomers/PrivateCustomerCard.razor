@@ -7,17 +7,9 @@
 
 <!-- Mikkel Dahlmann -->
 
-<Modal @bind-IsVisible="@_showNewModal" CloseOnOverlayClick="false">
-		@if (_isDeleted is false)
-		{
+<Modal IsVisible="@_showNewModal">
 			<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
 			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-		}
-		else
-		{
-			<h4>Kundeprofil '@PrivateCustomer.FullName' slettet.</h4>
-			<button class="btn-remove" onclick="@CloseModal">Luk</button>
-		}
 </Modal>
 
 <div class="privatecustomer-card">
@@ -63,7 +55,7 @@
 
 	private bool _showNewModal = false;
 
-	private bool _isDeleted = false;
+	// private bool _isDeleted = false;
 
 	private void HandleOnDeleteClick()
 	{
@@ -74,15 +66,15 @@
 	{
 		var command = new DeletePrivateCustomerCommand(PrivateCustomer.Id);
 		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
-		_isDeleted = true;
-	}
-
-	private async Task CloseModal()
-	{
-		_isDeleted = false;
 		_showNewModal = false;
 		await OnDelete.InvokeAsync();
 	}
+
+	// private async Task CloseModal()
+	// {
+	// 	_isDeleted = false;
+		
+	// }
 
 	private string GetCustomerInitials(string name)
 	{
