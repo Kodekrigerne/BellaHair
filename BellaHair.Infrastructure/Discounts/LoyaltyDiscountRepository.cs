@@ -20,7 +20,7 @@ namespace BellaHair.Infrastructure.Discounts
             _db.Discounts.Remove(loyaltyDiscount);
         }
 
-        async Task<LoyaltyDiscount> ILoyaltyDiscountRepository.Get(Guid id)
+        async Task<LoyaltyDiscount> ILoyaltyDiscountRepository.GetAsync(Guid id)
         {
             var discount = await _db.Discounts.FindAsync(id)
                 ?? throw new KeyNotFoundException($"No loyalty discount exists with ID {id}");
