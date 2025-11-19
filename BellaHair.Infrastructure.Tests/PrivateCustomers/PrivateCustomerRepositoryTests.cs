@@ -26,7 +26,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
             var email = Email.FromString("email@email.com");
             var birthday = DateTime.Now.AddYears(-19);
 
-            var customer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
 
             // Act
             repo.AddAsync(customer);
@@ -49,7 +49,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
             var email = Email.FromString("email@email.com");
             var birthday = DateTime.Now.AddYears(-19);
 
-            var customer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
 
             _db.AddAsync(customer);
             _db.SaveChangesAsync();
@@ -73,7 +73,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
             var email = Email.FromString("email@email.com");
             var birthday = DateTime.Now.AddYears(-19);
 
-            var customer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
 
             _db.AddAsync(customer);
             _db.SaveChangesAsync();

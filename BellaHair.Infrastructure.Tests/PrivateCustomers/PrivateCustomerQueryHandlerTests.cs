@@ -21,11 +21,11 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
             // Arrange
             var handler = (IPrivateCustomerQuery)new PrivateCustomerQueryHandler(_db);
 
-            var customer0 = PrivateCustomerFactory.Create(Name.FromStrings("Mikkel", "Dahlmann"),
+            var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
                 Email.FromString("email@email.com"), DateTime.Now.AddYears(-20));
 
-            var customer1 = PrivateCustomerFactory.Create(Name.FromStrings("Mikkel", "Dahlmann"),
+            var customer1 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
                 Email.FromString("email@email.com"), DateTime.Now.AddYears(-20));
 

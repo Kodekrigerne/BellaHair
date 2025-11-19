@@ -42,12 +42,12 @@ namespace BellaHair.Domain.PrivateCustomers
             _bookings = [];
         }
 
-        internal static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
             return new PrivateCustomer(name, address, phoneNumber, email, birthday);
         }
 
-        internal void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        public void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
             ValidateBirthday(birthday);
 

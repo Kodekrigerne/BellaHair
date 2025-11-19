@@ -40,7 +40,7 @@ namespace BellaHair.Application.PrivateCustomers
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var email = Email.FromString(command.Email);
 
-            var customerToCreate = PrivateCustomerFactory.Create(
+            var customerToCreate = PrivateCustomer.Create(
                 name,
                 address,
                 phoneNumber,
@@ -79,8 +79,7 @@ namespace BellaHair.Application.PrivateCustomers
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
 
-            PrivateCustomerFactory.Update(
-                customerToUpdate,
+            customerToUpdate.Update(
                 updatedName,
                 updatedAddress,
                 updatedPhoneNumber,
