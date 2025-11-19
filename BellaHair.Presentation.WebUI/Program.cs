@@ -2,7 +2,6 @@ using BellaHair.Application;
 using BellaHair.Infrastructure;
 using BellaHair.Presentation.WebUI.Components;
 using Microsoft.EntityFrameworkCore;
-using MudBlazor.Services;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -19,8 +18,6 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddDbContext<BellaHairContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext"))
             );
-
-            builder.Services.AddMudServices(); 
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
