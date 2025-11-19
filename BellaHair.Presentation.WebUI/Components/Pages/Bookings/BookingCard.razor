@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
+
 <div class="bc-container">
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
@@ -8,40 +9,41 @@
 			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
 		</div>
 	</div>
-
 	<div class="bc-body">
-		<div class="bc-treatment">
-			<TreatmentIcon Class="bc-treatment-icon" />
-			<span class="bc-treatment-name">@Booking.TreatmentName</span>
+		<div class="bc-body-left">
+			<div class="bc-treatment">
+				<TreatmentIcon Class="bc-treatment-icon" />
+				<span class="bc-treatment-name">@Booking.TreatmentName</span>
+			</div>
+
+			<div class="bc-duration">
+				<DurationIcon Class="bc-duration-icon" />
+				<span>@Booking.DurationMinutes min</span>
+			</div>
+
+			<div class="bc-employee">
+				<EmployeeIcon Class="bc-employee-icon" />
+				<span>Behandler: @Booking.EmployeeFullName</span>
+			</div>
 		</div>
 
-		<div class="bc-duration">
-			<DurationIcon Class="bc-duration-icon" />
-			<span>@Booking.DurationMinutes min</span>
-		</div>
-
-		<div class="bc-employee">
-			<EmployeeIcon Class="bc-employee-icon" />
-			<span>Behandler: @Booking.EmployeeFullName</span>
-		</div>
+		@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
+		{
+			<div class="bc-discount">
+				<DiscountIcon Class="bc-discount-icon" />
+				<span>
+					@if (Booking.DiscountName != null)
+					{
+						<span>@Booking.DiscountName</span>
+					}
+					@if (Booking.DiscountAmount != null)
+					{
+						<span class="bc-discount-amount">-@Booking.DiscountAmount dkk</span>
+					}
+				</span>
+			</div>
+		}
 	</div>
-
-	@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
-	{
-		<div class="bc-discount">
-			<DiscountIcon Class="bc-discount-icon" />
-			<span>
-				@if (Booking.DiscountName != null)
-				{
-					<strong>@Booking.DiscountName</strong>
-				}
-				@if (Booking.DiscountAmount != null)
-				{
-					<span class="bc-discount-amount">-@Booking.DiscountAmount</span>
-				}
-			</span>
-		</div>
-	}
 </div>
 
 @code {
@@ -69,6 +71,7 @@
 		justify-content: space-between;
 		align-items: flex-start;
 		margin-bottom: 1rem;
+		padding-bottom: 1rem;
 		border-bottom: 1px solid #f0f0f0;
 	}
 
@@ -95,6 +98,12 @@
 	}
 
 	.bc-body {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+
+	.bc-body-left {
 		display: flex;
 		flex-direction: row;
 		gap: 0.75rem;
@@ -129,19 +138,11 @@
 		color: #e74c3c;
 	}
 
-	.bc-discount {
-		margin-top: 0.5rem;
-		padding-top: 0.75rem;
-		border-top: 1px solid #f0f0f0;
-		color: #27ae60;
-	}
-
 	.bc-discount-icon {
-		color: #27ae60;
+		color: #177000;
 	}
 
 	.bc-discount-amount {
-		font-weight: 600;
-		margin-left: 0.25rem;
+		margin-left: 0.75rem;
 	}
 </style>
