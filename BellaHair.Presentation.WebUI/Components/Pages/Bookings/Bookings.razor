@@ -80,7 +80,7 @@
 				b.DurationMinutes,
 				b.Discount?.Name,
 				b.Discount?.DiscountAmount
-			)).OrderByDescending(b => b.StartDateTime).ToList();
+			)).OrderBy(b => b.StartDateTime).ToList();
 		}
 		catch (DomainException ex)
 		{

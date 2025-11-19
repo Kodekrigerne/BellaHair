@@ -1,8 +1,147 @@
-﻿<div>
-	@Booking.EmployeeFullName
+﻿@using System.Globalization
+@using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
+<div class="bc-container">
+	<div class="bc-header">
+		<p class="bc-customer">@Booking.CustomerFullName</p>
+		<div>
+			<p class="bc-date">@Booking.Date.ToString("dddd, MMMM dd, yyyy", new CultureInfo("da-DK"))</p>
+			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
+		</div>
+	</div>
+
+	<div class="bc-body">
+		<div class="bc-treatment">
+			<TreatmentIcon Class="bc-treatment-icon" />
+			<span class="bc-treatment-name">@Booking.TreatmentName</span>
+		</div>
+
+		<div class="bc-duration">
+			<DurationIcon Class="bc-duration-icon" />
+			<span>@Booking.DurationMinutes min</span>
+		</div>
+
+		<div class="bc-employee">
+			<EmployeeIcon Class="bc-employee-icon" />
+			<span>Behandler: @Booking.EmployeeFullName</span>
+		</div>
+	</div>
+
+	@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
+	{
+		<div class="bc-discount">
+			<DiscountIcon Class="bc-discount-icon" />
+			<span>
+				@if (Booking.DiscountName != null)
+				{
+					<strong>@Booking.DiscountName</strong>
+				}
+				@if (Booking.DiscountAmount != null)
+				{
+					<span class="bc-discount-amount">-@Booking.DiscountAmount</span>
+				}
+			</span>
+		</div>
+	}
 </div>
 
 @code {
 	[Parameter, EditorRequired]
 	public required BookingSimpleViewModel Booking { get; set; }
 }
+
+<style>
+	.bc-container {
+		border: 1px solid #e0e0e0;
+		border-radius: 12px;
+		padding: 1.25rem;
+		margin-bottom: 1rem;
+		background: #fff;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+		transition: box-shadow 0.2s ease;
+	}
+
+		.bc-container:hover {
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+
+	.bc-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 1rem;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	.bc-customer {
+		margin: 0;
+		font-size: 1.15rem;
+		font-weight: 550;
+		color: #2c3e50;
+	}
+
+	.bc-date {
+		text-align: right;
+		margin: 0;
+		font-size: 1.10rem;
+		font-weight: 500;
+		color: #34495e;
+	}
+
+	.bc-time {
+		text-align: right;
+		margin-top: 0.25rem;
+		font-size: 1.10rem;
+		color: #3b3b3b;
+	}
+
+	.bc-body {
+		display: flex;
+		flex-direction: row;
+		gap: 0.75rem;
+	}
+
+	.bc-treatment,
+	.bc-duration,
+	.bc-employee,
+	.bc-discount {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: black;
+		margin-right: 1rem;
+		font-size: 1.10rem;
+	}
+
+	.bc-treatment-name {
+		font-size: 1.05rem;
+		font-weight: 500;
+	}
+
+	.bc-treatment-icon {
+		color: #8e44ad;
+	}
+
+	.bc-duration-icon {
+		color: #3498db;
+	}
+
+	.bc-employee-icon {
+		color: #e74c3c;
+	}
+
+	.bc-discount {
+		margin-top: 0.5rem;
+		padding-top: 0.75rem;
+		border-top: 1px solid #f0f0f0;
+		color: #27ae60;
+	}
+
+	.bc-discount-icon {
+		color: #27ae60;
+	}
+
+	.bc-discount-amount {
+		font-weight: 600;
+		margin-left: 0.25rem;
+	}
+</style>
