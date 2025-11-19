@@ -1,4 +1,6 @@
-﻿using BellaHair.Ports.Bookings;
+﻿using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
+using BellaHair.Ports.Bookings;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
@@ -8,18 +10,44 @@ namespace BellaHair.Infrastructure.Bookings
     internal class BookingQueryHandler : IBookingQuery
     {
         private readonly BellaHairContext _db;
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
 
-        public BookingQueryHandler(BellaHairContext db) => _db = db;
+        public BookingQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            _db = db;
+            _currentDateTimeProvider = currentDateTimeProvider;
+        }
 
-        async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllAsync()
+        async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllNewAsync()
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
+                .Where(b => b.Treatment != null || b.TreatmentSnapshot != null)
+                .Where(b => b.StartDateTime.AddMinutes(b.Treatment != null ? b.Treatment.DurationMinutes.Value : b.TreatmentSnapshot!.DurationMinutes) < _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
                 .ToListAsync();
 
+            return MapToBookingSimpleDTOs(bookings);
+        }
+
+        async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllOldAsync()
+        {
+            var bookings = await _db.Bookings
+                .AsNoTracking()
+                .Where(b => b.Treatment != null || b.TreatmentSnapshot != null)
+                .Where(b => b.StartDateTime.AddMinutes(b.Treatment != null ? b.Treatment.DurationMinutes.Value : b.TreatmentSnapshot!.DurationMinutes) > _currentDateTimeProvider.GetCurrentDateTime())
+                .Include(b => b.Treatment)
+                .Include(b => b.Customer)
+                .Include(b => b.Employee)
+                .ToListAsync();
+
+            return MapToBookingSimpleDTOs(bookings);
+        }
+
+        private IEnumerable<BookingSimpleDTO> MapToBookingSimpleDTOs(IEnumerable<Booking> bookings)
+        {
             // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
             // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
             return bookings.Select(b => new BookingSimpleDTO(

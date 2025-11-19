@@ -6,7 +6,8 @@
     /// </summary>
     public interface IBookingQuery
     {
-        Task<IEnumerable<BookingSimpleDTO>> GetAllAsync();
+        Task<IEnumerable<BookingSimpleDTO>> GetAllNewAsync();
+        Task<IEnumerable<BookingSimpleDTO>> GetAllOldAsync();
     }
 
     public record DiscountDTO(string Name, decimal DiscountAmount);
