@@ -7,34 +7,38 @@
 
 <!-- Mikkel Dahlmann -->
 
-<div class="privatecustomer-card">
-						
+<Modal @bind-IsVisible="@_showNewModal">
+	<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
+	<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+	<button class="btn-add" onclick="@CloseModal">Annuller</button>
+</Modal>
+
 <div class="privatecustomer-card">
 	<div class="privatecustomer-avatar">
-		@GetCustomerInitials(PCViewModel.FullName)
+		@GetCustomerInitials(PrivateCustomer.FullName)
 	</div>
 	<div class="privatecustomer-details">
-		<h3>@PCViewModel.FullName</h3>
+		<h3>@PrivateCustomer.FullName</h3>
 		<div class="privatecustomer-contact-body">
 			<div class="privatecustomer-contact-details">
 				<PhoneIcon Class="privatecustomer-icons" />
-				@PCViewModel.PhoneNumber
+				@PrivateCustomer.PhoneNumber
 			</div>
 			<div class="privatecustomer-contact-details">
 				<HomeIcon Class="privatecustomer-icons" />
-				@PCViewModel.FullAddress
+				@PrivateCustomer.FullAddress
 			</div>
 			<div class="privatecustomer-contact-details">
 				<BirthdayIcon Class="privatecustomer-icons-birthday" />
-				@PCViewModel.Birthday.ToString("d. MMMM yyyy")
+				@PrivateCustomer.Birthday.ToString("d. MMMM yyyy")
 			</div>
 			<div class="privatecustomer-contact-details">
 				<MailIcon Class="privatecustomer-icons" />
-				@PCViewModel.Email
+				@PrivateCustomer.Email
 			</div>
 			<div class="privatecustomer-contact-details">
 				<VisitsIcon Class="privatecustomer-icons" />
-				Antal besøg: @PCViewModel.Visits
+				Antal besøg: @PrivateCustomer.Visits
 			</div>
 		</div>
 	</div>
@@ -47,12 +51,28 @@
 	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
 
 	[Parameter, EditorRequired]
-	public required PrivateCustomerViewModel PCViewModel { get; set; }
+	public required EventCallback OnDelete { get; set; }
+
+	private bool _showNewModal = false;
+
+	private void HandleOnDeleteClick()
+	{
+		_showNewModal = true;
+	}
+
+	private async Task HandleOnDeleteConfirm()
+	{
+		var command = new DeletePrivateCustomerCommand(PrivateCustomer.Id);
+		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
+		_showNewModal = false;
+		await OnDelete.InvokeAsync();
+	}
+
+	private void CloseModal() => _showNewModal = false;
 
 	private string GetCustomerInitials(string name)
 	{
 		var parts = name.Split(' ');
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
-
 	}
 }

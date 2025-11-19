@@ -19,14 +19,15 @@ namespace BellaHair.Domain.PrivateCustomers
         public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email,
             DateTime birthday)
         {
-            //TODO Add check
+            // TODO Implement check
             
             return PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
         }
 
-        public static void Update(PrivateCustomer customerToUpdate, Name name, Address address, PhoneNumber phoneNumber,
-            Email email, DateTime birthday)
+        public static void Update(PrivateCustomer customerToUpdate, Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
         {
+            // TODO Implement check
+
             customerToUpdate.Update(name, address, phoneNumber, email, birthday);
         }
     }

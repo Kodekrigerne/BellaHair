@@ -11,7 +11,7 @@
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 
 <Modal @bind-IsVisible="@_showNewModal">
-		<p>Ny kunde</p>
+	<p>Ny kunde</p>
 </Modal>
 
 <PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
@@ -23,7 +23,7 @@
 	{
 		@foreach (var customer in _customers)
 		{
-			<PrivateCustomerCard PCViewModel="customer"></PrivateCustomerCard>
+			<PrivateCustomerCard PrivateCustomer="@customer" OnDelete="@LoadCustomers"></PrivateCustomerCard>
 		}
 	}
 </div>
