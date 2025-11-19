@@ -21,6 +21,7 @@ namespace BellaHair.Domain.Tests.Treatments
             // Act & Assert
             Assert.Throws<TreatmentException>(() =>
                 Treatment.Create(invalidName, validPrice, validDuration));
+
         }
 
         [TestCase("Behandling", 450, 120)]
