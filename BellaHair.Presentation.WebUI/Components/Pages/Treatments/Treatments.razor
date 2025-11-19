@@ -1,0 +1,77 @@
+﻿@attribute [StreamRendering]
+@using BellaHair.Domain
+@using BellaHair.Ports.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+<!-- Mikkel Klitgaard -->
+
+@page "/behandlinger"
+
+@rendermode InteractiveServer
+@inject ITreatmentQuery _treatmentQuery
+@inject ITreatmentCommand _treatmentCommand
+
+<Modal @bind-IsVisible="@_showNewModal">
+
+	<TreatmentModalForm OnCreate="@LoadTreatments"/>
+
+</Modal>
+
+<PageHeader HeaderText="Behandlinger" 
+	HeaderSubText="Alle tilgængelige behandlinger" 
+	NewButtonText="Ny behandling" 
+	OnNewButtonClicked= "@(() => { _showNewModal = true; })" />
+
+<div class="kk-container treatment-container">
+
+	@if (_errorMessage != null) { <p>@_errorMessage</p> }
+	@if (_treatments == null) { <p>Loading...</p> }
+	else {
+			@foreach (var treatment in _treatments)
+			{
+			<TreatmentCard Treatment="treatment" OnDelete="@LoadTreatments" />
+			}
+	}
+	</div>
+
+
+@code {
+	private string? _errorMessage;
+	private bool _showNewModal = false;
+	private List<TreatmentViewModel>? _treatments = null;
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadTreatments();
+	}
+
+	private async Task LoadTreatments()
+	{
+		try
+		{
+			var treatments = await _treatmentQuery.GetAllAsync();
+			_treatments = treatments
+				.OrderBy(t => t.Name)
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+				.ToList();
+		}
+		catch (DomainException dex)
+		{
+			_errorMessage = dex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+		}
+	}
+
+
+
+
+
+
+}
+

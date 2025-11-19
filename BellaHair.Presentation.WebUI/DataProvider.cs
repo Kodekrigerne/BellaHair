@@ -1,11 +1,11 @@
 using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Infrastructure;
-using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Presentation.WebUI
@@ -18,7 +18,9 @@ namespace BellaHair.Presentation.WebUI
     {
         private readonly BellaHairContext _db;
 
+#pragma warning disable CS8618
         public DataProvider(BellaHairContext db) => _db = db;
+#pragma warning restore CS8618
 
         public async Task ReinstateData()
         {
@@ -32,6 +34,10 @@ namespace BellaHair.Presentation.WebUI
         private Treatment _herreklip;
         private Treatment _dameklip;
         private Treatment _farvning;
+        private Treatment _barbering;
+        private Treatment _børneklip;
+        private Treatment _permanent;
+
 
         // --- 2. Employee Fields ---
         private Employee _henny;
@@ -40,12 +46,18 @@ namespace BellaHair.Presentation.WebUI
         private Employee _sorenM;
         private Employee _sorenJ;
 
+        // --- 3. Private Customer Fields ---
+        private PrivateCustomer _peterse;
+        private PrivateCustomer _lismk;
+        private PrivateCustomer _larsc;
+        private PrivateCustomer _oskarit;
+
         public async Task AddData()
         {
             AddLoyaltyDiscounts();
             AddTreatment();
-            AddEmployees();
             AddPrivateCustomers();
+            AddEmployees();
 
             await _db.SaveChangesAsync();
         }
@@ -117,18 +129,29 @@ namespace BellaHair.Presentation.WebUI
             _herreklip = Treatment.Create("Herreklip", Price.FromDecimal(450m), DurationMinutes.FromInt(30));
             _dameklip = Treatment.Create("Dameklip", Price.FromDecimal(600m), DurationMinutes.FromInt(60));
             _farvning = Treatment.Create("Dame Hårfarvning", Price.FromDecimal(400m), DurationMinutes.FromInt(90));
+            _barbering = Treatment.Create("Barbering", Price.FromDecimal(150m), DurationMinutes.FromInt(20));
+            _børneklip = Treatment.Create("Børneklip", Price.FromDecimal(250m), DurationMinutes.FromInt(30));
+            _permanent = Treatment.Create("Permanent", Price.FromDecimal(770m), DurationMinutes.FromInt(120));
 
             _db.Add(_herreklip);
             _db.Add(_dameklip);
             _db.Add(_farvning);
+            _db.Add(_barbering);
+            _db.Add(_børneklip);
+            _db.Add(_permanent);
         }
 
         private void AddPrivateCustomers()
         {
-            _db.Add(PrivateCustomerFactory.Create(Name.FromStrings("Peter", "Svendsen", "Emil"), Address.Create("Søndergade", "Vejle", "15A", 7100, 3), PhoneNumber.FromString("12345678"), Email.FromString("peteres@gmail.com"), DateTime.Now.AddYears(-42)));
-            _db.Add(PrivateCustomerFactory.Create(Name.FromStrings("Lis", "Mortensen", "Karin"), Address.Create("Vestergade", "Vejle", "2", 7100), PhoneNumber.FromString("87654321"), Email.FromString("lis@gmail.com"), DateTime.Now.AddYears(-68)));
-            _db.Add(PrivateCustomerFactory.Create(Name.FromStrings("Lars", "Christiansen"), Address.Create("Østergade", "Vejle", "342", 7100, 9), PhoneNumber.FromString("43215678"), Email.FromString("Lars@hotmail.com"), DateTime.Now.AddYears(-38)));
-            _db.Add(PrivateCustomerFactory.Create(Name.FromStrings("Oskar", "Issaksen", "Theodor"), Address.Create("Nygade", "Vejle", "6", 7100), PhoneNumber.FromString("56784321"), Email.FromString("oskartheshit@hotmail.com"), DateTime.Now.AddYears(-20)));
+            _peterse = PrivateCustomer.Create(Name.FromStrings("Peter", "Svendsen", "Emil"), Address.Create("Søndergade", "Vejle", "15A", 7100, 3), PhoneNumber.FromString("12345678"), Email.FromString("peteres@gmail.com"), DateTime.Now.AddYears(-42));
+            _lismk = PrivateCustomer.Create(Name.FromStrings("Lis", "Mortensen", "Karin"), Address.Create("Vestergade", "Vejle", "2", 7100), PhoneNumber.FromString("87654321"), Email.FromString("lis@gmail.com"), DateTime.Now.AddYears(-68));
+            _larsc = PrivateCustomer.Create(Name.FromStrings("Lars", "Christiansen"), Address.Create("Østergade", "Vejle", "342", 7100, 9), PhoneNumber.FromString("43215678"), Email.FromString("Lars@hotmail.com"), DateTime.Now.AddYears(-38));
+            _oskarit = PrivateCustomer.Create(Name.FromStrings("Oskar", "Issaksen", "Theodor"), Address.Create("Nygade", "Vejle", "6", 7100), PhoneNumber.FromString("56784321"), Email.FromString("oskartheshit@hotmail.com"), DateTime.Now.AddYears(-20));
+
+            _db.Add(_peterse);
+            _db.Add(_lismk);
+            _db.Add(_larsc);
+            _db.Add(_oskarit);
         }
     }
 }

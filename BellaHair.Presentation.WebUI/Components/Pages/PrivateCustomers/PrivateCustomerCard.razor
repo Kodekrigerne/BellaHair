@@ -8,9 +8,9 @@
 <!-- Mikkel Dahlmann -->
 
 <Modal @bind-IsVisible="@_showNewModal">
-			<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+	<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
+	<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+	<button class="btn-add" onclick="@CloseModal">Annuller</button>
 </Modal>
 
 <div class="privatecustomer-card">
@@ -44,7 +44,7 @@
 	</div>
 	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
-	
+
 @code {
 
 	[Parameter, EditorRequired]
