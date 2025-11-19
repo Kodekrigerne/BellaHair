@@ -48,7 +48,7 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
             var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo);
 
-            var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
+            var customer0 = PrivateCustomerFactory.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
                 Email.FromString("email@email.com"), DateTime.Now.AddYears(-20));
 
@@ -71,7 +71,7 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
             var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo);
 
-            var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
+            var customer0 = PrivateCustomerFactory.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
                 Email.FromString("email@email.com"), DateTime.Now.AddYears(-20));
 
