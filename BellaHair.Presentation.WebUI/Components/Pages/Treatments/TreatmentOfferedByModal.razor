@@ -30,6 +30,12 @@ else
 	[Parameter]
 	public Guid TreatmentId { get; set; }
 
+	
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadEmployeesByTreatment();
+	}
+
 
 	private async Task LoadEmployeesByTreatment()
 	{
