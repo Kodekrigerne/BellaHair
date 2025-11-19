@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain.PrivateCustomers
 {
+    // Mikkel Dahlmann
+
+    /// <summary>
+    /// Defines a contract for checking whether a customer has any future bookings.
+    /// </summary>
+    
     public interface IPCustomerFutureBookingChecker
     {
-        Task<bool> CheckFutureBookingsAsync();
+        bool CheckFutureBookingsAsync(PrivateCustomer privateCustomer);
     }
 }

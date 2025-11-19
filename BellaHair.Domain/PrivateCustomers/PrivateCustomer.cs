@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using System.Collections.ObjectModel;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 
 namespace BellaHair.Domain.PrivateCustomers
@@ -17,12 +18,12 @@ namespace BellaHair.Domain.PrivateCustomers
         // 2. Flyt Visits ud af entitet, udregn den udenfor (i query) og send med i DTO (så den findes I DTO men ikke entitet)
         // 3. Database computed value, burde være simpelt, men ingen kontrol over nutid
         // 4. GetVisits(ICustomerVisitsCalculator _) metode
-        public int Visits => Bookings.Count;
+        public int Visits => _bookings.Count;
         public DateTime Birthday { get; private set; }
-        private readonly List<Booking> _bookings = [];
+        private readonly List<Booking>? _bookings = [];
 
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
-        public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
+        public IReadOnlyCollection<Booking> Bookings => _bookings?.AsReadOnly();
 
 #pragma warning disable CS8618
         private PrivateCustomer() { }

@@ -3,15 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
+    // Mikkel Dahlmann
+
+    /// <summary>
+    /// Provides functionality to check whether a private customer has any future bookings.
+    /// </summary>
+
     public class PCustomerFutureBookingChecker : IPCustomerFutureBookingChecker
     {
-        public async Task<bool> CheckFutureBookingsAsync()
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+
+        public PCustomerFutureBookingChecker(ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            throw new NotImplementedException();
+            _currentDateTimeProvider = currentDateTimeProvider;
+        }
+
+        bool IPCustomerFutureBookingChecker.CheckFutureBookingsAsync(PrivateCustomer privateCustomer)
+        {
+            if (privateCustomer.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())) return true;
+            
+            return false;
         }
     }
 }

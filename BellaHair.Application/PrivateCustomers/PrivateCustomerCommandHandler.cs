@@ -19,13 +19,14 @@ namespace BellaHair.Application.PrivateCustomers
     public class PrivateCustomerCommandHandler : IPrivateCustomerCommand
     {
         private readonly IPrivateCustomerRepository _privateCustomerRepo;
-
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly IPCustomerFutureBookingChecker _pCustomerFutureBookingChecker;
 
-        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo, ICurrentDateTimeProvider currentDateTimeProvider)
+        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo, ICurrentDateTimeProvider currentDateTimeProvider, IPCustomerFutureBookingChecker pCustomerFutureBookingChecker)
         {
             _privateCustomerRepo = privateCustomerRepo;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _pCustomerFutureBookingChecker = pCustomerFutureBookingChecker;
         }
 
         async Task IPrivateCustomerCommand.CreatePrivateCustomerAsync(CreatePrivateCustomerCommand command)
@@ -60,6 +61,8 @@ namespace BellaHair.Application.PrivateCustomers
         async Task IPrivateCustomerCommand.DeletePrivateCustomerAsync(DeletePrivateCustomerCommand command)
         {
             var customerToDelete = await _privateCustomerRepo.GetAsync(command.Id);
+
+            _pCustomerFutureBookingChecker.CheckFutureBookingsAsync(customerToDelete);
 
             _privateCustomerRepo.Delete(customerToDelete);
 
