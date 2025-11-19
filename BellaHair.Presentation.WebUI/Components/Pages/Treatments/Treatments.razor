@@ -17,6 +17,12 @@
 
 </Modal>
 
+<Modal @bind-IsVisible="@_showOfferedByModal">
+
+	<TreatmentOfferedByModal TreatmentId="@_selectedTreatmentId"/>
+	
+	</Modal>
+
 <PageHeader HeaderText="Behandlinger" 
 	HeaderSubText="Alle tilgængelige behandlinger" 
 	NewButtonText="Ny behandling" 
@@ -29,48 +35,48 @@
 	else {
 			@foreach (var treatment in _treatments)
 			{
-			<TreatmentCard Treatment="treatment" OnDelete="@LoadTreatments" />
+			<TreatmentCard Treatment="treatment" 
+                OnDelete="@LoadTreatments" 
+                OnShowOfferedBy="@(()=>{ _showOfferedByModal = true; _selectedTreatmentId = treatment.Id; })" />
 			}
 	}
 	</div>
 
 
 @code {
-	private string? _errorMessage;
-	private bool _showNewModal = false;
-	private List<TreatmentViewModel>? _treatments = null;
+    private string? _errorMessage;
+    private bool _showNewModal = false;
+    private bool _showOfferedByModal = false;
 
+    private Guid _selectedTreatmentId;
+    private List<TreatmentViewModel>? _treatments = null;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
 
-		await LoadTreatments();
-	}
+        await LoadTreatments();
+    }
 
-	private async Task LoadTreatments()
-	{
-		try
-		{
-			var treatments = await _treatmentQuery.GetAllAsync();
-			_treatments = treatments
-				.OrderBy(t => t.Name)
-				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
-				.ToList();
-		}
-		catch (DomainException dex)
-		{
-			_errorMessage = dex.Message;
-		}
-		catch (Exception ex)
-		{
-			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
-		}
-	}
-
-
-
-
+    private async Task LoadTreatments()
+    {
+        try
+        {
+            var treatments = await _treatmentQuery.GetAllAsync();
+            _treatments = treatments
+                .OrderBy(t => t.Name)
+                .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+                .ToList();
+        }
+        catch (DomainException dex)
+        {
+            _errorMessage = dex.Message;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+        }
+    }
 
 
 }
