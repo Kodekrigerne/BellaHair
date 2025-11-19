@@ -17,6 +17,7 @@ namespace BellaHair.Presentation.WebUI
     public class DataProvider
     {
         private readonly BellaHairContext _db;
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider = new CurrentDateTimeProvider();
 
 #pragma warning disable CS8618
         public DataProvider(BellaHairContext db) => _db = db;
@@ -143,10 +144,10 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddPrivateCustomers()
         {
-            _peterse = PrivateCustomer.Create(Name.FromStrings("Peter", "Svendsen", "Emil"), Address.Create("Søndergade", "Vejle", "15A", 7100, 3), PhoneNumber.FromString("12345678"), Email.FromString("peteres@gmail.com"), DateTime.Now.AddYears(-42));
-            _lismk = PrivateCustomer.Create(Name.FromStrings("Lis", "Mortensen", "Karin"), Address.Create("Vestergade", "Vejle", "2", 7100), PhoneNumber.FromString("87654321"), Email.FromString("lis@gmail.com"), DateTime.Now.AddYears(-68));
-            _larsc = PrivateCustomer.Create(Name.FromStrings("Lars", "Christiansen"), Address.Create("Østergade", "Vejle", "342", 7100, 9), PhoneNumber.FromString("43215678"), Email.FromString("Lars@hotmail.com"), DateTime.Now.AddYears(-38));
-            _oskarit = PrivateCustomer.Create(Name.FromStrings("Oskar", "Issaksen", "Theodor"), Address.Create("Nygade", "Vejle", "6", 7100), PhoneNumber.FromString("56784321"), Email.FromString("oskartheshit@hotmail.com"), DateTime.Now.AddYears(-20));
+            _peterse = PrivateCustomer.Create(Name.FromStrings("Peter", "Svendsen", "Emil"), Address.Create("Søndergade", "Vejle", "15A", 7100, 3), PhoneNumber.FromString("12345678"), Email.FromString("peteres@gmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-42), _currentDateTimeProvider);
+            _lismk = PrivateCustomer.Create(Name.FromStrings("Lis", "Mortensen", "Karin"), Address.Create("Vestergade", "Vejle", "2", 7100), PhoneNumber.FromString("87654321"), Email.FromString("lis@gmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-68), _currentDateTimeProvider);
+            _larsc = PrivateCustomer.Create(Name.FromStrings("Lars", "Christiansen"), Address.Create("Østergade", "Vejle", "342", 7100, 9), PhoneNumber.FromString("43215678"), Email.FromString("Lars@hotmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-38), _currentDateTimeProvider);
+            _oskarit = PrivateCustomer.Create(Name.FromStrings("Oskar", "Issaksen", "Theodor"), Address.Create("Nygade", "Vejle", "6", 7100), PhoneNumber.FromString("56784321"), Email.FromString("oskartheshit@hotmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-20), _currentDateTimeProvider);
 
             _db.Add(_peterse);
             _db.Add(_lismk);
