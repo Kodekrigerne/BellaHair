@@ -4,10 +4,15 @@
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
+@inject IPCustomerFutureBookingChecker PCustomerFutureBookingChecker
 
 <!-- Mikkel Dahlmann -->
 
 <Modal @bind-IsVisible="@_showNewModal">
+	@if (_futureBookings)
+	{
+		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
+	}
 	<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
 	<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
 	<button class="btn-add" onclick="@CloseModal">Annuller</button>
@@ -54,10 +59,12 @@
 	public required EventCallback OnDelete { get; set; }
 
 	private bool _showNewModal = false;
+	private bool _futureBookings = false;
 
-	private void HandleOnDeleteClick()
+	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
+		_futureBookings = await PCustomerFutureBookingChecker.CheckFutureBookings(PrivateCustomer.Id);
 	}
 
 	private async Task HandleOnDeleteConfirm()

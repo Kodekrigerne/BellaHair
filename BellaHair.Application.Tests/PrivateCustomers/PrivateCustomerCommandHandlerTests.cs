@@ -26,7 +26,8 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             // Castes til IPrivateCustomerRepository, fordi metodekaldene på repo er eksplicitte.
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
-            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider);
+            var bookingChecker = (IPCustomerFutureBookingChecker)new PCustomerFutureBookingChecker(dateTimeProvider, repo);
+            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider, bookingChecker);
             var command = new CreatePrivateCustomerCommand("Mikkel", null, "Dahlmann",
                 "Gade", "By", "1", 7100, null, "12345678", "email@email.com", DateTime.Now.AddYears(-20));
 
@@ -49,7 +50,8 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             // Arrange
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
-            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider);
+            var bookingChecker = (IPCustomerFutureBookingChecker)new PCustomerFutureBookingChecker(dateTimeProvider, repo);
+            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider, bookingChecker);
 
             var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
@@ -73,7 +75,8 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             // Arrange
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
-            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider);
+            var bookingChecker = (IPCustomerFutureBookingChecker)new PCustomerFutureBookingChecker(dateTimeProvider, repo);
+            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider, bookingChecker);
 
             var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),

@@ -18,14 +18,18 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PCustomerFutureBookingChecker : IPCustomerFutureBookingChecker
     {
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly IPrivateCustomerRepository _privateCustomerRepository;
 
-        public PCustomerFutureBookingChecker(ICurrentDateTimeProvider currentDateTimeProvider)
+        public PCustomerFutureBookingChecker(ICurrentDateTimeProvider currentDateTimeProvider, IPrivateCustomerRepository privateCustomerRepository)
         {
             _currentDateTimeProvider = currentDateTimeProvider;
+            _privateCustomerRepository = privateCustomerRepository;
         }
 
-        bool IPCustomerFutureBookingChecker.CheckFutureBookings(PrivateCustomer privateCustomer)
+        async Task<bool> IPCustomerFutureBookingChecker.CheckFutureBookings(Guid id)
         {
+            var privateCustomer = await _privateCustomerRepository.GetAsync(id);
+
             if (privateCustomer.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())) return true;
             
             return false;
