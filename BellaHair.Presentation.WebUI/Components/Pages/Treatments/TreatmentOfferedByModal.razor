@@ -1,7 +1,15 @@
-﻿@using BellaHair.Ports.Employees
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
 
 @inject IEmployeeQuery _employeeQuery
+
+@if (_modalErrorMessage != null)
+{
+	<div class="alert alert-danger" role="alert">
+		@_modalErrorMessage
+	</div>
+}
 
 @if (_offeringEmployees == null)
 {
@@ -26,6 +34,7 @@ else
 
 @code {
 	private List<EmployeeNameDTO>? _offeringEmployees = null;
+	private string? _modalErrorMessage;
 
 	[Parameter]
 	public Guid TreatmentId { get; set; }
@@ -44,10 +53,13 @@ else
 			_offeringEmployees = await _employeeQuery.GetEmployeesByTreatmentIdAsync(new GetEmployeesByTreatmentIdQuery(TreatmentId));
 
 		}
-		catch (Exception)
+		catch (DomainException dex)
 		{
-
-			throw;
+			_modalErrorMessage = dex.Message;
+		}
+		catch (Exception ex)
+		{
+			_modalErrorMessage = $"Der skete en fejl under indhentning af medarbejdere: {ex.Message}";
 		}
 
 	}
