@@ -4,7 +4,7 @@
     /// <summary>
     /// Exposes queries for the Booking entity.
     /// </summary>
-    public interface IBookingQueryHandler
+    public interface IBookingQuery
     {
         Task<IEnumerable<BookingSimpleDTO>> GetAllAsync();
     }
