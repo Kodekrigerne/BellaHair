@@ -28,11 +28,20 @@ namespace BellaHair.Infrastructure.Employees
 
         public EmployeeQueryHandler(BellaHairContext db) => _db = db;
 
+        public async Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query)
+        {
+            return await _db.Employees
+                .AsNoTracking()
+                .Where(e => e.Treatments
+                .Any(t => t.Id == query.TreatmentId))
+                .Select(e => new EmployeeNameDTO(e.Name.FullName))
+                .ToListAsync();
+        }
+
         // Henter alle medarbejdere med færre detaljer til overblikket
         async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
         {
             var emp =  await _db.Employees
-                .Include(e => e.Treatments)
                 .AsNoTracking()
                 .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Treatments.Select(x => x.Name).ToList()))
                 .ToListAsync();
