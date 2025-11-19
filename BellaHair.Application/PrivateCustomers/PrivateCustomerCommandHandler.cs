@@ -62,7 +62,8 @@ namespace BellaHair.Application.PrivateCustomers
         {
             var customerToDelete = await _privateCustomerRepo.GetAsync(command.Id);
 
-            _pCustomerFutureBookingChecker.CheckFutureBookingsAsync(customerToDelete);
+            if (_pCustomerFutureBookingChecker.CheckFutureBookings(customerToDelete)) 
+                throw new PrivateCustomerException("Customer has future bookings. Delete bookings prior to deleting customer.");
 
             _privateCustomerRepo.Delete(customerToDelete);
 

@@ -24,7 +24,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _currentDateTimeProvider = currentDateTimeProvider;
         }
 
-        bool IPCustomerFutureBookingChecker.CheckFutureBookingsAsync(PrivateCustomer privateCustomer)
+        bool IPCustomerFutureBookingChecker.CheckFutureBookings(PrivateCustomer privateCustomer)
         {
             if (privateCustomer.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())) return true;
             

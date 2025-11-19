@@ -14,6 +14,6 @@ namespace BellaHair.Domain.PrivateCustomers
     
     public interface IPCustomerFutureBookingChecker
     {
-        bool CheckFutureBookingsAsync(PrivateCustomer privateCustomer);
+        bool CheckFutureBookings(PrivateCustomer privateCustomer);
     }
 }
