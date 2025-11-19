@@ -246,8 +246,10 @@ namespace BellaHair.Presentation.WebUI
                 new DateTime(now.Year, now.Month, now.Day, 16, 30, 0).AddDays(18), _mockPastDateTimeProvider));
 
             // Oskar Issaksen bookings
-            _db.Add(Booking.Create(_oskarit, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(2), _mockPastDateTimeProvider));
+            var b19 = Booking.Create(_oskarit, _maria, _herreklip,
+                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(2), _mockPastDateTimeProvider);
+            b19.SetDiscount(BookingDiscount.Active("Stamkunde Guld", 150));
+            _db.Add(b19);
             _db.Add(Booking.Create(_oskarit, _henny, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(12), _mockPastDateTimeProvider));
             _db.Add(Booking.Create(_oskarit, _peter, _herreklip,
