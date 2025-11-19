@@ -9,22 +9,21 @@
 @inject IEmployeeCommand _employeeCommand
 @inject ITreatmentQuery _treatmentQuery
 
-<div class="kk-container">
-
-<h3>Opret ny medarbejder</h3>
-<br />
-
-
+<h3 style="text-align: center">Opret ny medarbejder</h3>
 
 <EditForm Model="@_newEmployeeModel" OnValidSubmit="@HandleCreateEmployee">
         <DataAnnotationsValidator />
 
+		<div class="inputs-container">
+		<div class="inputs-items-container">
 		@if (_errorMessage != null)
 		{
 			<p>@_errorMessage</p>
 		}
 
-		<div class="employee-grouped-inputs">
+		<div class="kk-container">
+				<h5 style="margin-top: 2px;">Personligt info</h5>
+				<div class="employee-grouped-inputs"
 		<div class="employee-input">
     <label for="first-name-input" class="required">Fornavn</label>
 				<input id="first-name-input" type="text" @bind="_newEmployeeModel.FirstName" style="width: 150px" />
@@ -44,8 +43,6 @@
 		</div>
 		</div>
 
-		<br />
-
 		<div class="employee-grouped-inputs">
 				<div class="employee-input">
 	<label for="email-input" class="required">Email</label>
@@ -58,11 +55,14 @@
 	<input id="phonenumber-input" type="number" @bind="_newEmployeeModel.PhoneNumber" style="width: 100px; "/>
 	<ValidationMessage For="@(() => _newEmployeeModel.PhoneNumber)" />
 		</div>
+		</div>
 
 		</div>
 		<br />
 
-		<div class="employee-grouped-inputs">
+		<div class="kk-container">
+				<h5 style="margin-top: 2px;">Adresse </h5>
+				<div class="employee-grouped-inputs">
 		<div class="employee-input">
 				<label for="streetname-input" class="required">Vejnavn</label>
 	<input id="streetname-input" type="text" @bind="_newEmployeeModel.StreetName" />
@@ -76,8 +76,8 @@
 		</div>
 
 		<div class="employee-input">
-	<label for="floor-input">Dør/etage</label>
-				<input id="floor-input" type="text" @bind="_newEmployeeModel.Floor" style="width:50px" />
+	<label for="floor-input">Etage</label>
+				<input id="floor-input" type="number" @bind="_newEmployeeModel.Floor" style="width:50px" />
 	<ValidationMessage For="@(() => _newEmployeeModel.Floor)" />
 		</div>
 		</div>
@@ -95,24 +95,77 @@
 	<ValidationMessage For="@(() => _newEmployeeModel.ZipCode)" />
 			</div>
 		</div>
-		
-	<MudSelect T="Guid" Label="Vælg hvilke behandlinger, medarbejderen kan udføre." MultiSelection="true" @bind-SelectedValues="SelectedTreatmentIds">
+		</div>
+		</div>
 
-			@foreach (var treatment in _treatments ?? Enumerable.Empty<TreatmentViewModel>())
-			{
-				<MudSelectItem T="Guid" Value="@(treatment.Id)">@treatment.Name</MudSelectItem>
+
+		<div class="inputs-items-container kk-container" sstyle="border-radius: 8px; padding: 10px">
+
+    <h5 style="margin-top: 2px;">Vælg behandlinger</h5>
+<div style="height: 300px; overflow-y: scroll;">
+	<br />
+
+        <div class="treatments-container"> @* Your container for column layout *@
+            @foreach (var treatment in _treatments)
+            {
+                
+                    bool isSelected = SelectedTreatmentIds.Contains(treatment.Id);
+                    
+                    // 1. Define the full style/class string based on selection status
+                    string itemStyle = isSelected 
+						? "border: 2px solid #990dff; background-color: #f6e6fc; color: black;" // Purple border, light purple background
+                        : "border: 2px solid lightgrey; background-color: white; color: black;"; // Grey border, white background
+                
+                
+                @* 2. This DIV now acts as the clickable, styleable list item *@
+                <div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))"
+
+                     class="treatment-item py-2 px-4 mb-2 rounded-lg"
+                     style="@(itemStyle); cursor: pointer;"> @* Added cursor: pointer for UX *@
+                    
+					<div class="d-flex justify-space-between align-items-start" style="width: 100%;">
+						<div style="text-align: left;">@treatment.Name</div>
+                    <div>
+                    @* The Icons for selection status *@
+                    @if (isSelected)
+                    {
+						<CheckedCirle/>
+					}
+                    else
+                    {
+						<UncheckedCircle/>
+                    }
+					</div>
+					</div>
+
+					<div class="d-flex align-items-start" style="gap: 15px">
+					<div class="d-flex align-items-start" style="gap:5px;">
+						<DurationIcon Class="treatment-icon"/> <p class="treatment-text">@treatment.DurationMinutes min</p>
+					</div>
+
+					<div class="d-flex align-items-start" style="gap:5px;">
+						<p class="treatment-text">@treatment.Price kr</p>
+
+					</div>
+							</div>
+                </div>
             }
-	</MudSelect>		
-	
+        </div> 
 
+</div>	
+
+		<div>
+			Valgt: @SelectedTreatmentIds.Count() behandlinger
+		</div>
+		</div>
+	</div>
 	 <div class="btn-wrapper">
             <button class="btn-add" type="submit">Opret</button>
 	 </div>
-
 </EditForm>
-</div>
 
-	@code {
+
+@code {
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
 
@@ -121,10 +174,10 @@
 
 	private string? _errorMessage = null;
 
-	private IEnumerable<Guid> SelectedTreatmentIds { get; set; } = new List<Guid>();
+	private List<Guid> SelectedTreatmentIds { get; set; } = new List<Guid>();
 	private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
 
-	private void SetValues(IEnumerable<Guid> selectedIds)
+	private void SetValues(List<Guid> selectedIds)
 	{
 		SelectedTreatmentIds = selectedIds;
 	}
@@ -133,7 +186,24 @@
 	{
 		_errorMessage = null;
 		_newEmployeeModel = new NewEmployeeModel();
-        await LoadTreatments();
+		await LoadTreatments();
+	}
+
+	private void ToggleTreatmentSelection(Guid treatmentId)
+	{
+		if (SelectedTreatmentIds.Contains(treatmentId))
+		{
+			// If it's already selected, remove it
+			SelectedTreatmentIds.Remove(treatmentId);
+		}
+		else
+		{
+			// If it's not selected, add it
+			SelectedTreatmentIds.Add(treatmentId);
+		}
+
+		// Tells Blazor to re-render the component to update the checkboxes
+		StateHasChanged();
 	}
 
 	private async Task HandleCreateEmployee()
@@ -142,9 +212,10 @@
 		{
 			_newEmployeeModel.TreatmentIds = SelectedTreatmentIds;
 
+			if (_newEmployeeModel.MiddleName == string.Empty) _newEmployeeModel.MiddleName = null;
+
 			var command = new CreateEmployeeCommand(
 				_newEmployeeModel.FirstName,
-				_newEmployeeModel.MiddleName,
 				_newEmployeeModel.LastName,
 				_newEmployeeModel.Email,
 				_newEmployeeModel.PhoneNumber,
@@ -152,8 +223,11 @@
 				_newEmployeeModel.CityName,
 				_newEmployeeModel.StreetNumber,
 				_newEmployeeModel.ZipCode,
-				_newEmployeeModel.TreatmentIds
+				_newEmployeeModel.TreatmentIds,
+				_newEmployeeModel.MiddleName,
+				_newEmployeeModel.Floor
 			);
+
             await _employeeCommand.CreateEmployeeCommand(command);
 
 			await OnCreate.InvokeAsync();

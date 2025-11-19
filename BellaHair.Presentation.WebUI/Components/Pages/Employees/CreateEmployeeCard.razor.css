@@ -1,17 +1,72 @@
 ﻿
 .employee-grouped-inputs {
     display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
     gap: 0.5rem;
-    max-width: stretch;
 }
 
+.inputs-container {
+    display: flex;
+    gap: 2rem;
+}
+
+.treatment-line {
+    color: grey;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.inputs-items-container {
+    align-items: center;
+    flex-direction: column;
+}
+
+.treatment-item-content-container {
+    display: flex;
+    flex: 0 0 calc(50%-0.5rem);
+}
+
+.treatment-item-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.treatment-item {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 calc(50% - 0.5rem);
+    flex-direction: column;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.treatment-marked {
+    border: 2px solid #990dff;
+    border-radius: 10px;
+    background-color: plum;
+}
+
+.treatment-unmarked {
+    border: 2px solid lightgrey;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.treatments-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    max-width: 500px;
+    border: 5px;
+    gap: 0.5rem;
+}
 .employee-input {
     display: flex;
     flex-direction: column;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
+
+
 
     .employee-input label {
         width: 105px;
@@ -42,7 +97,13 @@
     margin: 0;
 }
 
+.treatment-text {
+    color: dimgray;
+}
 
+::deep .treatment-icon {
+    fill: dimgray;
+}
 
 .btn-wrapper {
     display: flex;
@@ -50,3 +111,4 @@
     margin-top: 20px;
     margin-bottom: 8px;
 }
+

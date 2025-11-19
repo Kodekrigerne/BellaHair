@@ -11,7 +11,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Employees
         public string FirstName { get; set; } = string.Empty;
 
         [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Mellemnavn må ikke indeholde specialtegn.")]
-        public string? MiddleName { get; set; }
+        public string? MiddleName { get; set; } = "";
 
         [Required(ErrorMessage = "Efternavn er påkrævet")]
         [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Efternavn må ikke indeholde specialtegn.")]
@@ -42,7 +42,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Employees
         [RegularExpression(@"^\d{4}$", ErrorMessage = "Postnummer skal bestå af 4 tal.")]
         public int ZipCode { get; set; }
 
-        public string? Floor { get; set; }
+        public int? Floor { get; set; }
 
         public IEnumerable<Guid> TreatmentIds { get; set; } = [];
     }
