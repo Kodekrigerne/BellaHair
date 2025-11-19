@@ -11,7 +11,7 @@
 
 <div class="kk-container">
 
-<h3 style="align-content: center">Opret ny medarbejder</h3>
+<h3>Opret ny medarbejder</h3>
 <br />
 
 
@@ -24,66 +24,77 @@
 			<p>@_errorMessage</p>
 		}
 
+		<div class="employee-grouped-inputs">
 		<div class="employee-input">
-    <label for="first-name-input">Fornavn</label>
-	<input id="first-name-input" type="text" @bind="_newEmployeeModel.FirstName" />
+    <label for="first-name-input" class="required">Fornavn</label>
+				<input id="first-name-input" type="text" @bind="_newEmployeeModel.FirstName" style="width: 150px" />
 			<ValidationMessage For="@(() => _newEmployeeModel.FirstName)" />
 		</div>
 
 		<div class="employee-input">
 	<label for="middle-name-input">Mellemnavn</label>
-	<input id="middle-name-input" type="text" @bind="_newEmployeeModel.MiddleName" />
+	<input id="middle-name-input" type="text" @bind="_newEmployeeModel.MiddleName" style="width: 150px"/>
 	<ValidationMessage For="@(() => _newEmployeeModel.MiddleName)" />
 		</div>
 
 				<div class="employee-input">
-	<label for="last-name-input">Efternavn</label>
-	<input id="last-name-input" type="text" @bind="_newEmployeeModel.LastName" />
+				<label for="last-name-input" class="required">Efternavn</label>
+				<input id="last-name-input" type="text" @bind="_newEmployeeModel.LastName" style="width: 150px" />
 	<ValidationMessage For="@(() => _newEmployeeModel.LastName)" />
 		</div>
+		</div>
 
+		<br />
+
+		<div class="employee-grouped-inputs">
 				<div class="employee-input">
-	<label for="email-input">Email</label>
+	<label for="email-input" class="required">Email</label>
 	<input id="email-input" type="text" @bind="_newEmployeeModel.Email" />
 	<ValidationMessage For="@(() => _newEmployeeModel.Email)" />
 		</div>
 
 				<div class="employee-input">
-	<label for="phonenumber-input">Telefonnummer</label>
-	<input id="phonenumber-input" type="number" @bind="_newEmployeeModel.PhoneNumber" />
+				<label for="phonenumber-input" class="required">Telefon</label>
+	<input id="phonenumber-input" type="number" @bind="_newEmployeeModel.PhoneNumber" style="width: 100px; "/>
 	<ValidationMessage For="@(() => _newEmployeeModel.PhoneNumber)" />
 		</div>
 
+		</div>
+		<br />
+
+		<div class="employee-grouped-inputs">
 		<div class="employee-input">
-	<label for="streetname-input">Vejnavn</label>
+				<label for="streetname-input" class="required">Vejnavn</label>
 	<input id="streetname-input" type="text" @bind="_newEmployeeModel.StreetName" />
 	<ValidationMessage For="@(() => _newEmployeeModel.StreetName)" />
 		</div>
 
 		<div class="employee-input">
-	<label for="city-name-input">By</label>
-	<input id="city-name-input" type="text" @bind="_newEmployeeModel.CityName" />
-	<ValidationMessage For="@(() => _newEmployeeModel.CityName)" />
-		</div>
-
-		<div class="employee-input">
-	<label for="street-number-input">Vejnummer</label>
+				<label for="street-number-input" class="required">Vejnummer</label>
 	<input id="street-number-input" type="number" @bind="_newEmployeeModel.StreetNumber" />
 	<ValidationMessage For="@(() => _newEmployeeModel.StreetNumber)" />
 		</div>
 
 		<div class="employee-input">
-	<label for="zipcode-input">Postnummer</label>
-	<input id="zipcode-input" type="number" @bind="_newEmployeeModel.ZipCode" />
-	<ValidationMessage For="@(() => _newEmployeeModel.ZipCode)" />
+	<label for="floor-input">Dør/etage</label>
+				<input id="floor-input" type="text" @bind="_newEmployeeModel.Floor" style="width:50px" />
+	<ValidationMessage For="@(() => _newEmployeeModel.Floor)" />
+		</div>
+		</div>
+		
+		<div class="employee-grouped-inputs">
+		<div class="employee-input">
+				<label for="city-name-input" class="required">By</label>
+	<input id="city-name-input" type="text" @bind="_newEmployeeModel.CityName"/>
+	<ValidationMessage For="@(() => _newEmployeeModel.CityName)" />
 		</div>
 
 		<div class="employee-input">
-	<label for="floor-input">Dør/etage</label>
-	<input id="floor-input" type="text" @bind="_newEmployeeModel.Floor" />
-	<ValidationMessage For="@(() => _newEmployeeModel.Floor)" />
+				<label for="zipcode-input" class="required">Postnummer</label>
+	<input id="zipcode-input" type="number" @bind="_newEmployeeModel.ZipCode" />
+	<ValidationMessage For="@(() => _newEmployeeModel.ZipCode)" />
+			</div>
 		</div>
-
 @* 	<MudSelect T="Guid" Label="Vælg hvilke behandlinger, medarbejderen kan udføre." MultiSelection="true" @bind-SelectedValues="SelectedTreatmentIds">
 
 			@foreach (var treatment in _treatments ?? Enumerable.Empty<TreatmentViewModel>())

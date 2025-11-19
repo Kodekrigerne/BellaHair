@@ -1,27 +1,47 @@
 ﻿
+.employee-grouped-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.5rem;
+    max-width: stretch;
+}
 
 .employee-input {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
     .employee-input label {
-        width: 100px;
+        width: 105px;
         text-align: left;
-        margin-right: 15px;
+        margin-right: 10px;
     }
 
     .employee-input input {
         border: 1px solid #ccc;
         border-radius: 4px;
         padding: 4px;
-        margin-right: 15px;
+        margin-right: 10px;
+        -webkit-appearance: none;
     }
 
         .employee-input input:focus {
             outline: 1px solid #a91ce4;
         }
+
+.required:after {
+    content: " *";
+    color:maroon;
+}
+
+
+.employee-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 
 
 .btn-wrapper {
