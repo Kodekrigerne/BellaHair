@@ -59,7 +59,7 @@ namespace BellaHair.Domain.PrivateCustomers
             Birthday = birthday;
         }
 
-        // Kunden skal minimum være 18 år gammel.
+        // Kunden skal minimum være 18 år gammel
         private static void ValidateBirthday(DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             if (birthday > currentDateTimeProvider.GetCurrentDateTime().AddYears(-18))

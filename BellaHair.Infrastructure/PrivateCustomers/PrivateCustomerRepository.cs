@@ -28,7 +28,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _db.PrivateCustomers.Remove(privateCustomer);
         }
 
-        //TODO kommentar
+        // .Include sikrer, at det hentede PrivateCustomer-objekt inkluderer alle booking-relationer
         async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
             var privateCustomer = await _db.PrivateCustomers

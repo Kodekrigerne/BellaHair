@@ -26,6 +26,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _privateCustomerRepository = privateCustomerRepository;
         }
 
+        // Returnerer en bool, der indikerer om kunden med det givne id har bookinger, der ligger i fremtiden
         async Task<bool> IPCustomerFutureBookingChecker.CheckFutureBookings(Guid id)
         {
             var privateCustomer = await _privateCustomerRepository.GetAsync(id);

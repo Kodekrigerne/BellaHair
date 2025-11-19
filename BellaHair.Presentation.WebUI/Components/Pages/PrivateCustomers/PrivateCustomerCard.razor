@@ -9,6 +9,7 @@
 
 <!-- Mikkel Dahlmann -->
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
+<!-- TODO Bedre styling -->
 <Modal @bind-IsVisible="@_showNewModal">
 	@if (_futureBookings)
 	{
@@ -65,6 +66,7 @@
 	private bool _showNewModal = false;
 	private bool _futureBookings = false;
 
+	// Viser modal, og tjekker for future-bookings.
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
