@@ -77,6 +77,22 @@
 
 .treatment-line {
     color: grey;
-    margin-top: 3rem;
+    margin-top: 1rem;
     margin-bottom: 0.5rem;
+}
+
+
+
+.offered-by-wrapper{
+   margin-top:2.5rem;
+}
+
+
+.btn-offer{
+    background-color:#f1f1f1;
+    border:none;
+    border-radius:20px;
+    color:grey;
+    padding-left:0.6rem;
+    padding-right:0.6rem;
 }
