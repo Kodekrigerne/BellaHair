@@ -89,6 +89,12 @@ namespace BellaHair.Domain.Bookings
         {
             return Treatment?.Price.Value ?? throw new BookingException($"Booking must be loaded with all relations included {Id}");
         }
+
+        public void SetDiscount(BookingDiscount discount)
+        {
+            if (IsPaid) throw new BookingException("Cannot set the discount on a paid booking");
+            Discount = discount;
+        }
     }
 
     public class BookingException(string message) : Exception(message);
