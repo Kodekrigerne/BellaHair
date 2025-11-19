@@ -1,0 +1,33 @@
+﻿@using BellaHair.Ports.Employees
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees
+
+@inject IEmployeeQuery _employeeQuery
+
+@if (_offeringEmployees == null)
+{
+	<p>Loading...</p>
+}
+else if (!_offeringEmployees.Any())
+{
+
+	<p>Ingen medarbejdere tilbyder denne behandling.</p>
+}
+else
+{
+	<h3>Medarbejdere</h3>
+	<hr class="treatment-line" />
+	
+	@foreach (var employee in _offeringEmployees)
+	{
+		<p>@employee.FullName</p>
+
+	}
+}
+
+@code {
+	private List<EmployeeNameDTO>? _offeringEmployees = null;
+
+	[Parameter]
+	public Guid TreatmentId { get; set; }
+
+}
