@@ -13,9 +13,12 @@
 	{
 		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
 	}
-	<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-	<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-	<button class="btn-add" onclick="@CloseModal">Annuller</button>
+	else
+	{
+		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
+		<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+		<button class="btn-add" onclick="@CloseModal">Annuller</button>
+	}
 </Modal>
 
 <div class="privatecustomer-card">
