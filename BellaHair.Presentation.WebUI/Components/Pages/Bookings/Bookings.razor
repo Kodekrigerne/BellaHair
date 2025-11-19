@@ -1,0 +1,94 @@
+﻿<!-- Dennis -->
+@page "/bookings"
+
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@rendermode InteractiveServer
+
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
+@inject IBookingQuery BookingQuery
+
+<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => {})" />
+
+<div>
+	<button @onclick="HandleNewSelectorClick" class="@(_activeTab == BookingTab.New? "btn-select-active" : "btn-select")">Kommende bookinger</button>
+	<button @onclick="HandleOldSelectorClick" class="@(_activeTab == BookingTab.Old ? "btn-select-active" : "btn-select")">Gamle bookinger</button>
+</div>
+
+<div class="kk-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p> }
+	@if (_bookings == null) { <p>Loading</p>
+	}
+	else
+	{
+		@foreach (var booking in _bookings)
+		{
+			<BookingCard Booking="@booking" />
+		}
+	}
+</div>
+
+@code {
+	private enum BookingTab { New, Old }
+	private BookingTab _activeTab;
+
+	private string? _errorMessage;
+
+	private DateTime _now;
+	private List<BookingSimpleViewModel> _bookings = [];
+
+	protected async override Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await HandleNewSelectorClick();
+
+		_activeTab = BookingTab.New;
+	}
+
+	private async Task HandleNewSelectorClick()
+	{
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		await LoadBookings(BookingTab.New);
+		_activeTab = BookingTab.New;
+	}
+
+	private async Task HandleOldSelectorClick()
+	{
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		await LoadBookings(BookingTab.Old);
+		_activeTab = BookingTab.Old;
+	}
+
+	private async Task LoadBookings(BookingTab bookingTab)
+	{
+		try
+		{
+			var bookings = bookingTab == BookingTab.New ? await BookingQuery.GetAllNewAsync() : await BookingQuery.GetAllOldAsync();
+
+			_bookings = bookings.Select(b => new BookingSimpleViewModel(
+				b.StartDateTime,
+				DateOnly.FromDateTime(b.StartDateTime),
+				TimeOnly.FromDateTime(b.StartDateTime),
+				TimeOnly.FromDateTime(b.StartDateTime.AddMinutes(b.DurationMinutes)),
+				b.Total,
+				b.EmployeeFullName,
+				b.CustomerFullName,
+				b.TreatmentName,
+				b.DurationMinutes,
+				b.Discount?.Name,
+				b.Discount?.DiscountAmount
+			)).OrderByDescending(b => b.StartDateTime).ToList();
+		}
+		catch (DomainException ex)
+		{
+			_errorMessage = ex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = ex.Message; /* Noget gik galt */
+		}
+	}
+}
