@@ -26,6 +26,7 @@ namespace BellaHair.Domain.Bookings
         public BookingDiscount? Discount { get; private set; }
         public DateTime CreatedDateTime { get; private init; }
         public DateTime StartDateTime { get; private set; }
+        public DateTime PaidDateTime { get; private set; }
 
         public bool IsPaid;
         //_total is stored in the database, Total is ignored
@@ -60,22 +61,27 @@ namespace BellaHair.Domain.Bookings
                 throw new BookingException($"Cannot create past bookings {startDateTime}.");
 
             //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
-            //if (employee.Treatments == null || employee.Treatments.Count == 0)
-            //    throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
+            if (employee.Treatments == null || employee.Treatments.Count == 0)
+                throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
 
-            //if (!employee.Treatments.Any(t => t.Id == treatment.Id))
-            //    throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
+            if (!employee.Treatments.Any(t => t.Id == treatment.Id))
+                throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
 
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
 
-        //public void PayBooking()
-        //{
-        //Null checks (alt skal .Includes)
-        //Set Snapshots
-        //Set _total
-        //Set IsPaid
-        //}
+        public void PayBooking(ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            if (Employee == null || Customer == null || Treatment == null)
+                throw new InvalidOperationException("all booking relations must be populated when calling PayBooking.");
+
+            EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
+            CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
+            TreatmentSnapshot = TreatmentSnapshot.FromTreatment(Treatment);
+            _total = Treatment.Price.Value;
+            IsPaid = true;
+            PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
+        }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
         //TODO: Repo og query metode til booking GetAsync skal .Include Treatment, Employee, Customer
