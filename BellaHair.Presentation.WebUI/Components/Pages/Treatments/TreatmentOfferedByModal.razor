@@ -30,4 +30,19 @@ else
 	[Parameter]
 	public Guid TreatmentId { get; set; }
 
+
+	private async Task LoadEmployeesByTreatment()
+	{
+		try
+		{
+			_offeringEmployees = await _employeeQuery.GetEmployeesByTreatmentIdAsync(new GetEmployeesByTreatmentIdQuery(TreatmentId));
+
+		}
+		catch (Exception)
+		{
+
+			throw;
+		}
+
+	}
 }
