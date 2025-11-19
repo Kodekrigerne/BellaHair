@@ -1,0 +1,75 @@
+﻿<!-- Dennis -->
+
+@page "/bookings"
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
+@inject IBookingQuery BookingQuery
+
+<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => {})" />
+
+<div class="kk-container">
+	@if (_errorMessage != null) { <p>@_errorMessage</p> }
+	@if (_bookings == null) { <p>Loading</p>
+	}
+	else
+	{
+		<p>Kommende bookinger</p>
+		@foreach (var booking in _bookings.Where(b => b.StartDateTime.AddMinutes(b.DurationMinutes) > _now))
+		{
+			<BookingCard Booking="@booking" />
+		}
+		<p>Gamle bookinger</p>
+		@foreach (var booking in _bookings.Where(b => b.StartDateTime < _now))
+		{
+			<BookingCard Booking="@booking" />
+		}
+	}
+</div>
+
+@code {
+	private string? _errorMessage;
+
+	private DateTime _now;
+	private List<BookingSimpleViewModel> _bookings = [];
+
+	protected async override Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		await LoadBookings();
+	}
+
+	private async Task LoadBookings()
+	{
+		try
+		{
+			var bookings = await BookingQuery.GetAllAsync();
+
+			_bookings = bookings.Select(b => new BookingSimpleViewModel(
+				b.StartDateTime,
+				DateOnly.FromDateTime(b.StartDateTime),
+				TimeOnly.FromDateTime(b.StartDateTime),
+				TimeOnly.FromDateTime(b.StartDateTime.AddMinutes(b.DurationMinutes)),
+				b.Total,
+				b.EmployeeFullName,
+				b.CustomerFullName,
+				b.TreatmentName,
+				b.DurationMinutes,
+				b.Discount?.Name,
+				b.Discount?.DiscountAmount
+			)).ToList();
+		}
+		catch (DomainException ex)
+		{
+			_errorMessage = ex.Message;
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = ex.Message; /* Noget gik galt */
+		}
+	}
+}

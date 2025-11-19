@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 namespace BellaHair.Infrastructure.Bookings
 {
     //Dennis
-    /// <inheritdoc cref="IBookingQueryHandler"/>
-    internal class BookingQueryHandler : IBookingQueryHandler
+    /// <inheritdoc cref="IBookingQuery"/>
+    internal class BookingQueryHandler : IBookingQuery
     {
         private readonly BellaHairContext _db;
 
         public BookingQueryHandler(BellaHairContext db) => _db = db;
 
-        async Task<IEnumerable<BookingSimpleDTO>> IBookingQueryHandler.GetAllAsync()
+        async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllAsync()
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
