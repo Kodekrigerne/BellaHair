@@ -79,7 +79,8 @@ namespace BellaHair.Application.PrivateCustomers
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
 
-            customerToUpdate.Update(
+            PrivateCustomerFactory.Update(
+                customerToUpdate,
                 updatedName,
                 updatedAddress,
                 updatedPhoneNumber,
