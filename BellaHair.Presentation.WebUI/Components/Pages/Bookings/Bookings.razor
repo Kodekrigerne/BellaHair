@@ -1,14 +1,21 @@
 ﻿<!-- Dennis -->
-
 @page "/bookings"
+
 @using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Shared
+
+@rendermode InteractiveServer
 
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider
 @inject IBookingQuery BookingQuery
 
 <PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => {})" />
+
+<div>
+	<button @onclick="HandleNewSelectorClick" class="@(_activeTab == BookingTab.New? "btn-select-active" : "btn-select")">Kommende bookinger</button>
+	<button @onclick="HandleOldSelectorClick" class="@(_activeTab == BookingTab.Old ? "btn-select-active" : "btn-select")">Gamle bookinger</button>
+</div>
 
 <div class="kk-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p> }
@@ -16,13 +23,7 @@
 	}
 	else
 	{
-		<p>Kommende bookinger</p>
-		@foreach (var booking in _bookings.Where(b => b.StartDateTime.AddMinutes(b.DurationMinutes) > _now))
-		{
-			<BookingCard Booking="@booking" />
-		}
-		<p>Gamle bookinger</p>
-		@foreach (var booking in _bookings.Where(b => b.StartDateTime < _now))
+		@foreach (var booking in _bookings)
 		{
 			<BookingCard Booking="@booking" />
 		}
@@ -30,6 +31,9 @@
 </div>
 
 @code {
+	private enum BookingTab { New, Old }
+	private BookingTab _activeTab;
+
 	private string? _errorMessage;
 
 	private DateTime _now;
@@ -39,15 +43,30 @@
 	{
 		await base.OnInitializedAsync();
 
-		_now = CurrentDateTimeProvider.GetCurrentDateTime();
-		await LoadBookings();
+		await HandleNewSelectorClick();
+
+		_activeTab = BookingTab.New;
 	}
 
-	private async Task LoadBookings()
+	private async Task HandleNewSelectorClick()
+	{
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		await LoadBookings(BookingTab.New);
+		_activeTab = BookingTab.New;
+	}
+
+	private async Task HandleOldSelectorClick()
+	{
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		await LoadBookings(BookingTab.Old);
+		_activeTab = BookingTab.Old;
+	}
+
+	private async Task LoadBookings(BookingTab bookingTab)
 	{
 		try
 		{
-			var bookings = await BookingQuery.GetAllAsync();
+			var bookings = bookingTab == BookingTab.New ? await BookingQuery.GetAllNewAsync() : await BookingQuery.GetAllOldAsync();
 
 			_bookings = bookings.Select(b => new BookingSimpleViewModel(
 				b.StartDateTime,
@@ -61,7 +80,7 @@
 				b.DurationMinutes,
 				b.Discount?.Name,
 				b.Discount?.DiscountAmount
-			)).ToList();
+			)).OrderByDescending(b => b.StartDateTime).ToList();
 		}
 		catch (DomainException ex)
 		{
