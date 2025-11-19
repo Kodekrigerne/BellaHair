@@ -11,7 +11,7 @@
 <PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
 
 <Modal @bind-IsVisible="@_showNewModal"> 
-	<CreateEmployeeCard OnCreate="@HandleCreate" />
+	<CreateEmployeeForm OnCreate="@HandleCreate" />
 </Modal>
 
 <div class="kk-container employees-container">
