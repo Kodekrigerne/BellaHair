@@ -23,7 +23,11 @@ namespace BellaHair.Infrastructure.Bookings
             var bookings = await _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.Treatment != null || b.TreatmentSnapshot != null)
-                .Where(b => b.StartDateTime.AddMinutes(b.Treatment != null ? b.Treatment.DurationMinutes.Value : b.TreatmentSnapshot!.DurationMinutes) < _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.StartDateTime.AddMinutes(
+                    b.Treatment != null
+                    ? b.Treatment.DurationMinutes.Value
+                    : b.TreatmentSnapshot!.DurationMinutes)
+                > _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -37,7 +41,11 @@ namespace BellaHair.Infrastructure.Bookings
             var bookings = await _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.Treatment != null || b.TreatmentSnapshot != null)
-                .Where(b => b.StartDateTime.AddMinutes(b.Treatment != null ? b.Treatment.DurationMinutes.Value : b.TreatmentSnapshot!.DurationMinutes) > _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.StartDateTime.AddMinutes(
+                    b.Treatment != null
+                    ? b.Treatment.DurationMinutes.Value
+                    : b.TreatmentSnapshot!.DurationMinutes)
+                < _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
