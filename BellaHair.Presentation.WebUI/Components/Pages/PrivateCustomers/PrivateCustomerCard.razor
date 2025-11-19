@@ -5,6 +5,7 @@
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
 @inject IPCustomerFutureBookingChecker PCustomerFutureBookingChecker
+@inject ISnackbar Snackbar
 
 <!-- Mikkel Dahlmann -->
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
@@ -53,7 +54,7 @@
 	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
 
-@code {
+	@code {
 
 	[Parameter, EditorRequired]
 	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
@@ -76,6 +77,7 @@
 		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
 		_showNewModal = false;
 		await OnDelete.InvokeAsync();
+		Snackbar.Add("Kundeprofilen blev slettet.", Severity.Success);
 	}
 
 	private void CloseModal() => _showNewModal = false;
