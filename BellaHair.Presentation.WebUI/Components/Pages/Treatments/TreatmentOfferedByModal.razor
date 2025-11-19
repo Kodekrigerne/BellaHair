@@ -1,6 +1,7 @@
 ﻿@using BellaHair.Domain
 @using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
+@using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IEmployeeQuery _employeeQuery
 
@@ -23,14 +24,20 @@ else if (!_offeringEmployees.Any())
 else
 {
 	<h3>Medarbejdere</h3>
+	<p class="offered-by-desc">Oversigt over medarbejdere, der tilbyder denne behandling</p>
 	<hr class="treatment-line" />
 	
 	@foreach (var employee in _offeringEmployees)
 	{
-		<p>@employee.FullName</p>
+		<div class="kk-emp-container">
+		<PersonCheckmarkIcon Class="emp-icon"/> <p>@employee.FullName</p>
+		</div>
 
 	}
 }
+<div class="btn-wrapper">
+<button class="btn-remove">Luk</button>
+</div>
 
 @code {
 	private List<EmployeeNameDTO>? _offeringEmployees = null;
