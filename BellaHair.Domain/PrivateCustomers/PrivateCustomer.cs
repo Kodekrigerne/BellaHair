@@ -29,9 +29,9 @@ namespace BellaHair.Domain.PrivateCustomers
 #pragma warning restore CS8618
 
 
-        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            ValidateBirthday(birthday);
+            ValidateBirthday(birthday, currentDateTimeProvider);
 
             Id = Guid.NewGuid();
             Name = name;
@@ -42,14 +42,14 @@ namespace BellaHair.Domain.PrivateCustomers
             _bookings = [];
         }
 
-        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            return new PrivateCustomer(name, address, phoneNumber, email, birthday);
+            return new PrivateCustomer(name, address, phoneNumber, email, birthday, currentDateTimeProvider);
         }
 
-        public void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        public void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            ValidateBirthday(birthday);
+            ValidateBirthday(birthday, currentDateTimeProvider);
 
             Name = name;
             Address = address;
@@ -59,9 +59,9 @@ namespace BellaHair.Domain.PrivateCustomers
         }
 
         // Kunden skal minimum være 18 år gammel.
-        private static void ValidateBirthday(DateTime birthday)
+        private static void ValidateBirthday(DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            if (birthday > DateTime.Now.AddYears(-18))
+            if (birthday > currentDateTimeProvider.GetCurrentDateTime().AddYears(-18))
                 throw new PrivateCustomerException("Customers must be 18 years of age");
         }
     }

@@ -20,8 +20,13 @@ namespace BellaHair.Application.PrivateCustomers
     {
         private readonly IPrivateCustomerRepository _privateCustomerRepo;
 
-        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo) =>
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+
+        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
             _privateCustomerRepo = privateCustomerRepo;
+            _currentDateTimeProvider = currentDateTimeProvider;
+        }
 
         async Task IPrivateCustomerCommand.CreatePrivateCustomerAsync(CreatePrivateCustomerCommand command)
         {
@@ -45,7 +50,8 @@ namespace BellaHair.Application.PrivateCustomers
                 address,
                 phoneNumber,
                 email,
-                command.Birthday);
+                command.Birthday,
+                _currentDateTimeProvider);
 
             await _privateCustomerRepo.AddAsync(customerToCreate);
             await _privateCustomerRepo.SaveChangesAsync();
@@ -84,7 +90,8 @@ namespace BellaHair.Application.PrivateCustomers
                 updatedAddress,
                 updatedPhoneNumber,
                 updatedEmail,
-                command.Birthday);
+                command.Birthday,
+                _currentDateTimeProvider);
 
             await _privateCustomerRepo.SaveChangesAsync();
         }

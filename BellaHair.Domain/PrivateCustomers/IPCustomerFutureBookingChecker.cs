@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain.PrivateCustomers
 {
-    public interface IFutureBookingsCheck
+    public interface IPCustomerFutureBookingChecker
     {
         Task<bool> CheckFutureBookingsAsync();
     }

@@ -7,7 +7,7 @@ using BellaHair.Domain.PrivateCustomers;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
-    public class FutureBookingsCheck : IFutureBookingsCheck
+    public class PCustomerFutureBookingChecker : IPCustomerFutureBookingChecker
     {
         public async Task<bool> CheckFutureBookingsAsync()
         {
