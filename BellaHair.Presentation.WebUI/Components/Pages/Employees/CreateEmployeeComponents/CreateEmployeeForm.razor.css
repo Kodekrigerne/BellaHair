@@ -18,6 +18,12 @@
 
 }
 
+.create-line {
+    color: grey;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+}
+
 .treatment-icon-format {
     display: flex;
     align-items: start;
