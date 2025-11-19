@@ -23,7 +23,7 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
             var birthday = DateTime.Now.AddYears(-19);
 
             // Act
-            var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
+            var privateCustomer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
 
             // Assert
             Assert.Multiple(() =>
@@ -46,12 +46,12 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
             var email = Email.FromString("email@email.com");
             var birthday = DateTime.Now.AddYears(-19);
             
-            var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
+            var privateCustomer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
 
             var newPhoneNumber = PhoneNumber.FromString("87654321");
 
             // Act
-            privateCustomer.Update(name, address, newPhoneNumber, email, birthday);
+            PrivateCustomerFactory.Update(privateCustomer, name, address, newPhoneNumber, email, birthday);
 
             // Assert
             Assert.That(privateCustomer.PhoneNumber, Is.EqualTo(newPhoneNumber));
@@ -68,7 +68,7 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
             var birthday = DateTime.Now;
 
             // Act & Assert
-            Assert.Throws<PrivateCustomerException>(() => PrivateCustomer.Create(name, address, phoneNumber, email, birthday));
+            Assert.Throws<PrivateCustomerException>(() => PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday));
         }
 
         [Test]
@@ -81,12 +81,12 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
             var email = Email.FromString("email@email.com");
             var birthday = DateTime.Now.AddYears(-19);
 
-            var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday);
+            var privateCustomer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
 
             var newBirthday = DateTime.Now;
 
             // Act & Assert
-            Assert.Throws<PrivateCustomerException>(() => privateCustomer.Update(name, address, phoneNumber, email, newBirthday));
+            Assert.Throws<PrivateCustomerException>(() => PrivateCustomerFactory.Update(privateCustomer, name, address, phoneNumber, email, newBirthday));
         }
     }
 }
