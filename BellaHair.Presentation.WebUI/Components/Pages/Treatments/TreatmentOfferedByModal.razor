@@ -1,0 +1,81 @@
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Employees
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@inject IEmployeeQuery _employeeQuery
+
+@if (_modalErrorMessage != null)
+{
+	<div class="alert alert-danger" role="alert">
+		@_modalErrorMessage
+	</div>
+}
+
+@if (_offeringEmployees == null)
+{
+	<p>Loading...</p>
+}
+else if (!_offeringEmployees.Any())
+{
+
+	<p>Ingen medarbejdere tilbyder denne behandling.</p>
+}
+else
+{
+	<h3>Medarbejdere</h3>
+	<p class="offered-by-desc">Oversigt over medarbejdere, der tilbyder denne behandling</p>
+	<hr class="treatment-line" />
+	
+	@foreach (var employee in _offeringEmployees)
+	{
+		<div class="kk-emp-container">
+		<PersonCheckmarkIcon Class="emp-icon"/> <p>@employee.FullName</p>
+		</div>
+
+	}
+}
+<div class="btn-wrapper">
+<button class="btn-remove" @onclick="HandleOnCloseClick">Luk</button>
+</div>
+
+@code {
+	private List<EmployeeNameDTO>? _offeringEmployees = null;
+	private string? _modalErrorMessage;
+
+	[Parameter]
+	public Guid TreatmentId { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnClose { get; set; }
+
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadEmployeesByTreatment();
+	}
+
+	private void HandleOnCloseClick()
+	{
+		OnClose.InvokeAsync();
+	}
+
+
+	private async Task LoadEmployeesByTreatment()
+	{
+		try
+		{
+			_offeringEmployees = await _employeeQuery.GetEmployeesByTreatmentIdAsync(new GetEmployeesByTreatmentIdQuery(TreatmentId));
+
+		}
+		catch (DomainException dex)
+		{
+			_modalErrorMessage = dex.Message;
+		}
+		catch (Exception ex)
+		{
+			_modalErrorMessage = $"Der skete en fejl under indhentning af medarbejdere: {ex.Message}";
+		}
+
+	}
+}

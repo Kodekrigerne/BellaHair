@@ -1,6 +1,4 @@
-﻿// Mikkel Dahlmann
-
-namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
+﻿namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 {
     public record PrivateCustomerViewModel(
         Guid Id,
@@ -10,5 +8,4 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
         string PhoneNumber,
         string FullAddress,
         int Visits);
-}
-
+};

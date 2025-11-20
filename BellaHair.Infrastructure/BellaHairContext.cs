@@ -24,10 +24,11 @@ namespace BellaHair.Infrastructure
             //TPC mapping vælges så alle nedarvere af DiscountBase får deres egen tabel, og ingen tabel for baseklassen oprettes.
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.Discount, b => b.IsRequired());
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.EmployeeSnapshot, b => b.IsRequired());
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.CustomerSnapshot, b => b.IsRequired());
-            modelBuilder.Entity<Booking>().ComplexProperty(b => b.TreatmentSnapshot, b => b.IsRequired());
+            //.OwnsOne er nødvendigt da .ComplexProperty endnu ikke understøtter nullable properties.
+            modelBuilder.Entity<Booking>().OwnsOne(b => b.Discount);
+            modelBuilder.Entity<Booking>().OwnsOne(b => b.EmployeeSnapshot);
+            modelBuilder.Entity<Booking>().OwnsOne(b => b.CustomerSnapshot);
+            modelBuilder.Entity<Booking>().OwnsOne(b => b.TreatmentSnapshot);
 
             //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
             modelBuilder.Entity<Booking>().Ignore(b => b.Total);
