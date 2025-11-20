@@ -76,7 +76,16 @@
     border-radius: 5px;
 }
 
-::deep .delete-button {
-    display: innline-block;
+::deep .remove.remove-buttons {
+
+}
+
+::deep .remove-buttons {
+    display: flex;
+    justify-items: center;
+    justify-content: center;
     align-content: end;
+    align-items: center;
+    position: relative;
+    
 }

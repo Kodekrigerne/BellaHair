@@ -4,12 +4,14 @@
 
 		<Modal @bind-IsVisible="@_showNewModal">
 			<h4>Slet medarbejder @employeeSimpleViewModel.Name?</h4>
-			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+			<div class="remove-buttons">
+				<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+				<button class="btn-add" onclick="@CloseModal">Annuller</button>
+			</div>
 		</Modal>
 
 
-		<div class="employee-card">												@*Contains the entire singular employee card layout*@
+		<div class="employee-card">														@*Contains the entire singular employee card layout*@
 						
 				<div class="employee-avatar">											@*Contains the avatar with intials*@
 					@GetEmployeeInitials(@employeeSimpleViewModel.Name)
