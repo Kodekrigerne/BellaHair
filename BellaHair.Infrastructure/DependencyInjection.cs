@@ -37,7 +37,7 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 
-            serviceCollection.AddScoped<IBookingQueryHandler, BookingQueryHandler>();
+            serviceCollection.AddScoped<IBookingQuery, BookingQueryHandler>();
             serviceCollection.AddScoped<IBookingOverlapChecker, BookingOverlapChecker>();
 
 

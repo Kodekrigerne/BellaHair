@@ -10,7 +10,7 @@
 
 @rendermode InteractiveServer
 
-@inject ILoyaltyDiscountQuery _loyaltyDiscountQuery
+@inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
 
 <Modal @bind-IsVisible="@_showNewModal">
 	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
@@ -73,7 +73,7 @@
 	{
 		try
 		{
-			var discounts = await _loyaltyDiscountQuery.GetAllAsync();
+			var discounts = await LoyaltyDiscountQuery.GetAllAsync();
 
 			_discounts = discounts
 			.OrderBy(d => d.Name)
@@ -98,7 +98,7 @@
 	{
 		//Hvis discount er null opdateres alle counts (første tjek)
 		//Hvis discount er angivet opdateres kun den forbundne count (andet tjek)
-		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await _loyaltyDiscountQuery.GetCountAsync();
+		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await LoyaltyDiscountQuery.GetCountAsync();
 		//if (discount == null || discount == DiscountTab.Campaign) CampaignCount = await _campaignDiscountQuery.GetCountAsync();
 	}
 

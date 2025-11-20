@@ -8,6 +8,6 @@
     /// </summary>
     public interface IBookingOverlapChecker
     {
-        Task<bool> CheckOverlap(Booking booking);
+        Task<bool> CheckOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId);
     }
 }
