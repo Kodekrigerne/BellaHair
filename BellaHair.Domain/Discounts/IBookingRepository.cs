@@ -15,7 +15,5 @@ namespace BellaHair.Domain.Discounts
         Task<Booking> GetAsync(Guid id);
         Task SaveChangesAsync();
 
-        Task<List<Booking>> GetFutureBookings();
-
     }
 }

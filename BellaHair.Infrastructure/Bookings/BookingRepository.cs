@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 
@@ -15,8 +16,6 @@ namespace BellaHair.Infrastructure.Bookings
         public BookingRepository(BellaHairContext db)
             => _db = db;
 
-
-
         public async Task AddAsync(Booking booking)
         {
             await _db.Bookings.AddAsync(booking);
@@ -27,20 +26,15 @@ namespace BellaHair.Infrastructure.Bookings
             _db.Bookings.Remove(booking);
         }
 
-
-        public Task<Booking> GetAsync(Guid id)
+        public async Task<Booking> GetAsync(Guid id)
         {
-            
+            return await _db.Bookings.FindAsync(id) ??
+                throw new KeyNotFoundException($"Booking with id {id} is not found.");
         }
 
-        public Task<List<Booking>> GetFutureBookings()
+        public async Task SaveChangesAsync()
         {
-            throw new NotImplementedException();
-        }
-
-        public Task SaveChangesAsync()
-        {
-            throw new NotImplementedException();
+            await _db.SaveChangesAsync();
         }
     }
 }
