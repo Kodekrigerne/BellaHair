@@ -26,7 +26,7 @@ namespace BellaHair.Application
 
         async Task IEmployeeCommand.CreateEmployeeCommand(CreateEmployeeCommand command)
         {
-            var name = Name.FromStrings(command.FirstName, command.MiddleName, command.LastName);
+            var name = Name.FromStrings(command.FirstName, command.LastName, command.MiddleName);
             var email = Email.FromString(command.Email);
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var address = Address.Create(command.StreetName, command.City, command.StreetNumber, command.ZipCode, command.Floor);

@@ -1,0 +1,177 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using System.Collections.Generic;
+@using System.ComponentModel.DataAnnotations;
+@using System.Linq;
+@using BellaHair.Ports.Employees
+@using BellaHair.Ports.Treatments
+@inject IEmployeeCommand _employeeCommand
+@inject ITreatmentQuery _treatmentQuery
+
+<h3 style="text-align: center; font-weight: bold">Opret ny medarbejder</h3>
+<br />
+<p style="text-align: center">Indtast oplysningerne på den medarbejder, du vil oprette.</p>
+
+<EditForm Model="@_newEmployeeModel" OnValidSubmit="@HandleCreateEmployee">
+        <DataAnnotationsValidator />
+
+		<div class="inputs-container">
+		<div class="inputs-items-container">
+			@if (_errorMessage != null)
+			{
+				<p>@_errorMessage</p>
+			}
+
+			<div>
+			<CreateEmployeeInputs EmployeeModel="_newEmployeeModel"/>
+			</div>
+
+		</div>
+
+		<div class="inputs-items-container kk-container" style="border-radius: 8px">
+
+		<h5 style="margin-top: 2px;">Vælg behandlinger</h5>
+		<div style="height: 300px; overflow-y: scroll;">
+		<br />
+
+        <div class="treatments-container"> @* Container for column layout *@
+            @foreach (var treatment in _treatments)
+            {
+					// Logic for changing layout depending on whether item is selected.
+                    bool isSelected = SelectedTreatmentIds.Contains(treatment.Id);
+					string itemStyle = isSelected 
+						? "border: 2px solid #990dff; background-color: #f6e6fc; color: black; position: relative; cursor: pointer;" // Purple border, light purple background
+						: "border: 2px solid lightgrey; background-color: white; color: black; position: relative; cursor: pointer;"; // Grey border, white background
+                
+                
+                <div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item" style="@(itemStyle)">
+                    
+						<div style="text-align: left;">@treatment.Name</div>
+							<div>
+								@if (isSelected)
+								{
+									<CheckedCirle/>
+								}
+								else
+								{
+									<UncheckedCircle/>
+								}
+							</div>
+
+						<div class="d-flex align-items-start" style="gap: 15px">
+
+						<div class="treatment-icon-format">
+							<DurationIcon Class="treatment-list-icon"/> <p class="treatment-text">@treatment.DurationMinutes min</p>
+						</div>
+
+						<div class="treatment-icon-format">
+							<p class="treatment-text">@treatment.Price.ToString("C")</p>
+						</div>
+					</div>
+
+                </div>
+            }
+			</div> 
+
+		</div>	
+			Valgt: @SelectedTreatmentIds.Count() behandlinger
+		</div>
+	</div>
+
+	 <div class="btn-wrapper">
+            <button class="btn-add" type="submit">Opret</button>
+	 </div>
+
+</EditForm>
+
+@code {
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	[Parameter]
+	public NewEmployeeModel _newEmployeeModel { get; set; } = new NewEmployeeModel();
+
+	private string? _errorMessage = null;
+
+	private List<Guid> SelectedTreatmentIds { get; set; } = new List<Guid>();
+	private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
+
+	private void SetValues(List<Guid> selectedIds)
+	{
+		SelectedTreatmentIds = selectedIds;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		_errorMessage = null;
+		_newEmployeeModel = new NewEmployeeModel();
+		await LoadTreatments();
+	}
+
+	private void ToggleTreatmentSelection(Guid treatmentId)
+	{
+		if (SelectedTreatmentIds.Contains(treatmentId))
+		{
+			// If it's already selected, remove it
+			SelectedTreatmentIds.Remove(treatmentId);
+		}
+		else
+		{
+			// If it's not selected, add it
+			SelectedTreatmentIds.Add(treatmentId);
+		}
+
+		// Tells Blazor to re-render the component to update the checkboxes
+		StateHasChanged();
+	}
+
+	private async Task HandleCreateEmployee()
+	{
+		try
+		{
+			_newEmployeeModel.TreatmentIds = SelectedTreatmentIds;
+
+			if (_newEmployeeModel.MiddleName == string.Empty) _newEmployeeModel.MiddleName = null;
+
+			var command = new CreateEmployeeCommand(
+				_newEmployeeModel.FirstName,
+				_newEmployeeModel.LastName,
+				_newEmployeeModel.Email,
+				_newEmployeeModel.PhoneNumber,
+				_newEmployeeModel.StreetName,
+				_newEmployeeModel.CityName,
+				_newEmployeeModel.StreetNumber,
+				_newEmployeeModel.ZipCode,
+				_newEmployeeModel.TreatmentIds,
+				_newEmployeeModel.MiddleName,
+				_newEmployeeModel.Floor
+			);
+
+            await _employeeCommand.CreateEmployeeCommand(command);
+
+			await OnCreate.InvokeAsync();
+
+		}
+		catch (Exception e)
+		{
+			_errorMessage = $"Oprettelse mislykkedes: {e.Message}";
+		}
+	}
+
+	private async Task LoadTreatments()
+	{
+		try
+		{
+			var treatments = await _treatmentQuery.GetAllAsync();
+			_treatments = treatments
+				.OrderBy(t => t.Name)
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+				.ToList();
+		}
+		catch (Exception ex)
+		{
+			_errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+		}
+	}
+
+}

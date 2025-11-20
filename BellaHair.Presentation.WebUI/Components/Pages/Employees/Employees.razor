@@ -1,6 +1,7 @@
 ﻿@attribute [StreamRendering]
 @using BellaHair.Domain
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents
 @using BellaHair.Ports.Employees
 
 @page "/medarbejdere"
@@ -8,7 +9,11 @@
 @rendermode InteractiveServer
 @inject IEmployeeQuery _employeeQuery
 
-<PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { })" />
+<PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
+
+<Modal @bind-IsVisible="@_showNewModal"> 
+	<CreateEmployeeForm OnCreate="@HandleCreate" />
+</Modal>
 
 <div class="kk-container employees-container">
 		@if (_errorMessage != null) { <p>@_errorMessage</p>}
@@ -23,6 +28,7 @@
 </div>
 
 @code {
+	private bool _showNewModal = false;
 	private string? _errorMessage;
 
 	/// <summary>
@@ -52,5 +58,11 @@
 		{
 			_errorMessage = ex.Message; // TODO: "Noget gik galt"
 		}
+	}
+
+	private async Task HandleCreate()
+	{
+        _showNewModal = false;
+        await LoadEmployees();
 	}
 }
