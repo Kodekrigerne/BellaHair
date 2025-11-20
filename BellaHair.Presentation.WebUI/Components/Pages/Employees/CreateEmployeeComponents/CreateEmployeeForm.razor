@@ -23,6 +23,8 @@
 			}
 
 			<div>
+				@* EmployeeInput komponentet indeholder alle inputfelter til medarbejderoplysninger og som tager imod vores NewEmployeeModel
+					for at modtage de indtastede inputs *@
 			<CreateEmployeeInputs EmployeeModel="_newEmployeeModel"/>
 			</div>
 
@@ -112,16 +114,16 @@
 	{
 		if (SelectedTreatmentIds.Contains(treatmentId))
 		{
-			// If it's already selected, remove it
+			// Hvis behandlingen er valgt, fjernes den fra de valgte behandlinger
 			SelectedTreatmentIds.Remove(treatmentId);
 		}
 		else
 		{
-			// If it's not selected, add it
+			// Hvis den ikke i forvejen er valgt, tilføjes den til de valgte behandlinger
 			SelectedTreatmentIds.Add(treatmentId);
 		}
 
-		// Tells Blazor to re-render the component to update the checkboxes
+		// Genindlæser/opdaterer komponentet med det valgte
 		StateHasChanged();
 	}
 

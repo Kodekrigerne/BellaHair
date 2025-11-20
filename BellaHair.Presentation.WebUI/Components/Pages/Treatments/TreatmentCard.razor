@@ -1,6 +1,6 @@
 ﻿@using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
-@inject ITreatmentCommand _treatmentCommand
+@using System.Threading.Tasks
 
 <!-- Mikkel Klitgaard -->
 
@@ -16,6 +16,14 @@
 					<div class="treatment-details">
 
 						<h6>@Treatment.Name</h6>
+
+						<div class="offered-by-wrapper">
+
+							<button class="btn-offer" @onclick="@HandleOfferedByClick">
+								Udbydes af
+								</button>
+						
+						</div>
 
 						<hr class="treatment-line"/>
 
@@ -46,6 +54,9 @@
 	[Parameter, EditorRequired]
 	public required EventCallback OnDelete { get; set; }
 
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnShowOfferedBy { get; set; }
+
 
 	private void HandleOnDeleteClick()
 	{
@@ -53,4 +64,13 @@
 		// TODO: Implementer logik
 		OnDelete.InvokeAsync();
 	}
+
+
+	private async Task HandleOfferedByClick()
+	{
+		await OnShowOfferedBy.InvokeAsync(Treatment.Id);
+	}
+
+
+
 }

@@ -1,4 +1,5 @@
 ﻿using BellaHair.Application.Discounts;
+using BellaHair.Application.Employees;
 using BellaHair.Application.PrivateCustomers;
 using BellaHair.Application.Treatments;
 using BellaHair.Ports.Discounts;

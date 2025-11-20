@@ -24,6 +24,7 @@ namespace BellaHair.Infrastructure
             //TPC mapping vælges så alle nedarvere af DiscountBase får deres egen tabel, og ingen tabel for baseklassen oprettes.
             modelBuilder.Entity<DiscountBase>().UseTpcMappingStrategy();
 
+            //.OwnsOne er nødvendigt da .ComplexProperty endnu ikke understøtter nullable properties.
             modelBuilder.Entity<Booking>().OwnsOne(b => b.Discount);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.EmployeeSnapshot);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.CustomerSnapshot);

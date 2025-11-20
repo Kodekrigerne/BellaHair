@@ -284,11 +284,12 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(Booking.Create(_oskarit, _sorenJ, _farvning,
                 new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(28), _mockPastDateTimeProvider));
         }
+
+        // Bruges da Bookings skal have en ICurrentDateTimeProvider som giver deres CreatedDate som skal være i fortiden i forhold til StartTime.
+        internal class PastDateTimeProvider : ICurrentDateTimeProvider
+        {
+            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-60);
+        }
     }
 
-    // Bruges da Bookings skal have en ICurrentDateTimeProvider som giver deres CreatedDate som skal være i fortiden i forhold til StartTime.
-    internal class PastDateTimeProvider : ICurrentDateTimeProvider
-    {
-        DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-60);
-    }
 }

@@ -31,7 +31,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         {
             var privateCustomer = await _privateCustomerRepository.GetAsync(id);
 
-            if (privateCustomer.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())) return true;
+            if (privateCustomer.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime() && b.StartDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
             
             return false;
         }
