@@ -21,8 +21,9 @@
 									@employeeSimpleViewModel.phoneNumber
 							</div>
 						</div>
-				<BinDeleteButton OnClick="@HandleOnDeleteClick" />
-
+			<div class="delete-button">
+						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
+			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
 						@foreach (var treatment in employeeSimpleViewModel.treatmentNames)
 							{															
