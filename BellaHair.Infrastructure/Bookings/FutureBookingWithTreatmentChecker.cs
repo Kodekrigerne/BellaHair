@@ -21,7 +21,7 @@ namespace BellaHair.Infrastructure.Bookings
             _currentDateTimeProvider = date;
         }
 
-        async Task<bool> IFutureBookingWithTreatmentChecker.CheckFutureBookings(Guid treatmentId)
+        async Task<bool> IFutureBookingWithTreatmentChecker.CheckFutureBookingsWithTreatment(Guid treatmentId)
         {
             return await _db.Bookings
                 .AsNoTracking()

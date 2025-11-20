@@ -8,6 +8,6 @@ namespace BellaHair.Domain.Discounts
 {
     public interface IFutureBookingWithTreatmentChecker
     {
-        Task<bool> CheckFutureBookings(Guid id);
+        Task<bool> CheckFutureBookingsWithTreatment(Guid id);
     }
 }
