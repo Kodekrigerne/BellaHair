@@ -13,7 +13,6 @@ namespace BellaHair.Domain.Discounts
         Task AddAsync(Booking booking);
         void Delete(Booking booking);
         Task<Booking> GetAsync(int id);
-        Task<IEnumerable<Booking>> GetAllAsync();
         Task SaveChangesAsync();
 
         Task<List<Booking>> GetFutureBookings();
