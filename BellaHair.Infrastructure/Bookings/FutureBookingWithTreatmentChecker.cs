@@ -25,7 +25,8 @@ namespace BellaHair.Infrastructure.Bookings
         {
             return await _db.Bookings
                 .AsNoTracking()
-                .AnyAsync(b => b.Treatment!.Id == treatmentId && b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
+                .AnyAsync(b => b.Treatment!.Id == treatmentId && 
+                          b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
         }
     }
 }
