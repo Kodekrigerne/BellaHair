@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BellaHair.Domain;
-using BellaHair.Domain.Discounts;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,12 +21,14 @@ namespace BellaHair.Infrastructure.Bookings
             _currentDateTimeProvider = date;
         }
 
-        async Task<bool> IFutureBookingWithTreatmentChecker.CheckFutureBookingsWithTreatment(Guid treatmentId)
+        async Task<bool> IFutureBookingWithTreatmentChecker.CheckFutureBookingsWithTreatmentAsync(Guid treatmentId)
         {
+            var currentDateTime = _currentDateTimeProvider.GetCurrentDateTime();
+
             return await _db.Bookings
                 .AsNoTracking()
-                .AnyAsync(b => b.Treatment!.Id == treatmentId && 
-                          b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
+                .Where(b => b.Treatment!.Id == treatmentId)
+                .AnyAsync(b => b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) > currentDateTime);
         }
     }
 }

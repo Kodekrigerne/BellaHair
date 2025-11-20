@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
-using BellaHair.Domain.Discounts;
 
 namespace BellaHair.Infrastructure.Bookings
 {
