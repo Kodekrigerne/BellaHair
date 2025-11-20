@@ -4,6 +4,7 @@
 @using BellaHair.Domain
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 
 @page "/kunder"
 
@@ -11,8 +12,9 @@
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
 
+<!-- Modal overlay der viser 'Opret ny kunde'-formular -->
 <Modal @bind-IsVisible="@_showNewModal">
-	<p>Ny kunde</p>
+	<CreatePrivateCustomerForm OnCreate="@HandleCreate"></CreatePrivateCustomerForm>
 </Modal>
 
 <PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
@@ -59,5 +61,11 @@
 		{
 			_errorMessage = ex.Message; // TODO: "Noget gik galt"
 		}
+	}
+
+	private async Task HandleCreate()
+	{
+		_showNewModal = false;
+		await LoadCustomers();
 	}
 }
