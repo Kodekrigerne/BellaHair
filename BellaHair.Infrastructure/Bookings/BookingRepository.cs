@@ -28,9 +28,9 @@ namespace BellaHair.Infrastructure.Bookings
         }
 
 
-        public Task<Booking> GetAsync(int id)
+        public Task<Booking> GetAsync(Guid id)
         {
-            throw new NotImplementedException();
+            
         }
 
         public Task<List<Booking>> GetFutureBookings()
