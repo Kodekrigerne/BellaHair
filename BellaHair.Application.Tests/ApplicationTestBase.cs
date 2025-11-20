@@ -1,5 +1,6 @@
 ﻿using BellaHair.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Application.Tests
 {
@@ -16,15 +17,26 @@ namespace BellaHair.Application.Tests
         // Sti til skrivebord på afviklende maskine hentes gennem Environment-klassen.
         private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
-        protected DbContextOptions<BellaHairContext> _options;
         protected BellaHairContext _db;
+        protected IServiceProvider ServiceProvider;
 
         // Setup af dbcontext ved start af test-suite. Gemmer kopi af test-database på maskinens skrivebord.
+        // Laver serviceprovider til dependency injection.
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
-            _db = new BellaHairContext(_options);
+            var services = new ServiceCollection();
+
+            var options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
+            services.AddSingleton(options);
+            services.AddDbContext<BellaHairContext>();
+
+            services.AddInfrastructureServices();
+            services.AddApplicationServices();
+            
+            ServiceProvider = services.BuildServiceProvider();
+
+            _db = ServiceProvider.GetRequiredService<BellaHairContext>();
             _db.Database.EnsureCreated();
         }
 
@@ -40,6 +52,11 @@ namespace BellaHair.Application.Tests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
+            if (ServiceProvider is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
             _db.Database.CloseConnection();
             _db.Dispose();
         }

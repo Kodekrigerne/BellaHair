@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Infrastructure.Tests
 {
@@ -17,14 +18,21 @@ namespace BellaHair.Infrastructure.Tests
         private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
         protected DbContextOptions<BellaHairContext> _options;
         protected BellaHairContext _db;
+        protected IServiceProvider ServiceProvider;
 
         // Setup af dbcontext ved start af test-suite. Gemmer kopi af test-database på maskinens skrivebord.
+        // Laver serviceprovider til dependency injection.
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            var services = new ServiceCollection();
+            services.AddInfrastructureServices();
+            ServiceProvider = services.BuildServiceProvider();
+            
             _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
             _db = new BellaHairContext(_options);
             _db.Database.EnsureCreated();
+
         }
 
         // Setup ved hver kørte test. Sletter indholdet af database-filen, så testen kører på clean-slate.
@@ -39,6 +47,11 @@ namespace BellaHair.Infrastructure.Tests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
+            if (ServiceProvider is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
             _db.Database.CloseConnection();
             _db.Dispose();
         }
