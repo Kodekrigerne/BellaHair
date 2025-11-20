@@ -1,0 +1,66 @@
+﻿
+.inputs-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.treatment-item {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 calc(50% - 0.5rem);
+    flex-direction: column;
+    border-radius: 0.5rem;
+
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+}
+
+.create-line {
+    color: grey;
+    margin-top: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.treatment-icon-format {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.treatments-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    max-width: 500px;
+    border: 5px;
+    gap: 0.5rem;
+}
+
+
+.treatment-text {
+    color: dimgray;
+    vertical-align: middle;
+    margin: 0;
+    line-height: 1
+}
+
+::deep .treatment-list-icon {
+    fill: dimgray;
+    display: inline-block;
+    justify-content: center;
+    vertical-align: middle;
+    flex: 0 0 16px;
+}
+
+.btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+

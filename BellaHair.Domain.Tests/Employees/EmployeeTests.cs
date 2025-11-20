@@ -3,7 +3,7 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 
-namespace BellaHair.Domain.Tests
+namespace BellaHair.Domain.Tests.Employees
 {
     internal sealed class EmployeeTests
     {
