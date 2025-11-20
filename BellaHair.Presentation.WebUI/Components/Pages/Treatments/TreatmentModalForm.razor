@@ -55,13 +55,7 @@
 
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
-
-	protected override async Task OnInitializedAsync()
-	{
-		_newTreatmentForm = new NewTreatmentModel();
-	}
-
-
+	
 
 	private async Task HandleCreateTreatment()
 	{
