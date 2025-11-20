@@ -22,7 +22,7 @@
 		{
 			@foreach (var employee in _employees)
 			{
-				<EmployeeCard employeeSimpleViewModel="employee"/>
+				<EmployeeCard employeeSimpleViewModel="employee" OnDelete="@HandleDeleteClick"/>
 			}
 		}
 </div>
@@ -40,6 +40,11 @@
 	{
 		await base.OnInitializedAsync();
 		await LoadEmployees();
+	}
+
+	private async Task HandleDeleteClick(Guid Id)
+	{
+		_employees = _employees?.Where(d => d.Id != Id).ToList();
 	}
 
 	private async Task LoadEmployees()

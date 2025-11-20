@@ -1,5 +1,6 @@
-﻿@using BellaHair.Ports.Discounts
+﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
+@inject IEmployeeCommand _employeeCommand
 
 		<div class="employee-card">												@*Contains the entire singular employee card layout*@
 						
@@ -20,6 +21,7 @@
 									@employeeSimpleViewModel.phoneNumber
 							</div>
 						</div>
+				<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
 						@foreach (var treatment in employeeSimpleViewModel.treatmentNames)
@@ -35,6 +37,9 @@
 	[Parameter, EditorRequired]
 	public required EmployeeSimpleViewModel employeeSimpleViewModel { get; set; }
 
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnDelete { get; set; }
+
 	/// <summary>
 	/// Provides initials needed to make employee avatar by taking a full name as a single string,
 	///  splitting it into separate words (parts) based on spaces, and returns the first letter of
@@ -46,6 +51,13 @@
 		var parts = name.Split(' ');
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
 
+	}
+
+	private async Task HandleOnDeleteClick()
+	{
+		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
+		await _employeeCommand.DeleteEmployeeCommand(command);
+		await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
 	}
 
 }
