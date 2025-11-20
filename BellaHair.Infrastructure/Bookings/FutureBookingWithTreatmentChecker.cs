@@ -6,23 +6,26 @@ using System.Threading.Tasks;
 using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Treatments;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
 {
     public class FutureBookingWithTreatmentChecker : IFutureBookingWithTreatmentChecker
     {
-        private readonly ITreatmentRepository _treatmentRepo;
+        private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
 
-        public FutureBookingWithTreatmentChecker(ITreatmentRepository treatmentRepo, ICurrentDateTimeProvider currentDateTimeProvider)
+        public FutureBookingWithTreatmentChecker(BellaHairContext db, ICurrentDateTimeProvider date)
         {
-            _treatmentRepo = treatmentRepo;
-            _currentDateTimeProvider = currentDateTimeProvider;
+            _db = db;
+            _currentDateTimeProvider = date;
         }
 
-        public Task<bool> CheckFutureBookings(Guid id)
+        async Task<bool> IFutureBookingWithTreatmentChecker.CheckFutureBookings(Guid treatmentId)
         {
-
+            return await _db.Bookings
+                .AsNoTracking()
+                .AnyAsync(b => b.Treatment!.Id == treatmentId && b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
         }
     }
 }
