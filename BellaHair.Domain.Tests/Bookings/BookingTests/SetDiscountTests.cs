@@ -1,6 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
-using FB = FixtureBuilder.FixtureBuilder;
+using FixtureBuilder;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {
@@ -10,9 +10,9 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         public void Given_UnpaidBooking_Then_DiscountIsSet()
         {
             //Arrange
-            var discount = FB.New<BookingDiscount>().With(d => d.Name, "Test Discount").Build();
+            var discount = Fixture.New<BookingDiscount>().With(d => d.Name, "Test Discount").Build();
 
-            var booking = FB.New<Booking>().With(b => b.IsPaid, false).Build();
+            var booking = Fixture.New<Booking>().With(b => b.IsPaid, false).Build();
 
             //Act
             booking.SetDiscount(discount);
@@ -29,9 +29,9 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         public void Given_PaidBooking_Then_ThrowsException()
         {
             //Arrange
-            var discount = FB.New<BookingDiscount>().Build();
+            var discount = Fixture.New<BookingDiscount>().Build();
 
-            var booking = FB.New<Booking>().With(b => b.IsPaid, true).Build();
+            var booking = Fixture.New<Booking>().With(b => b.IsPaid, true).Build();
 
             //Act & Assert
             Assert.Throws<BookingException>(() => booking.SetDiscount(discount));
