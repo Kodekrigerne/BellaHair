@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.SharedValueObjects;
+﻿using BellaHair.Domain.Bookings;
+using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Ports.Treatments;
@@ -16,10 +17,12 @@ namespace BellaHair.Application.Treatments
     {
 
         private readonly ITreatmentRepository _treatmentRepository;
+        private readonly IFutureBookingWithTreatmentChecker _bookingChecker;
 
-        public TreatmentCommandHandler(ITreatmentRepository treatmentRepository)
+        public TreatmentCommandHandler(ITreatmentRepository treatmentRepository, IFutureBookingWithTreatmentChecker bookingChecker)
         {
             _treatmentRepository = treatmentRepository;
+            _bookingChecker = bookingChecker;
         }
 
         async Task ITreatmentCommand.CreateTreatmentAsync(CreateTreatmentCommand command)
@@ -35,10 +38,15 @@ namespace BellaHair.Application.Treatments
 
         async Task ITreatmentCommand.DeleteTreatmentAsync(DeleteTreatmentCommand command)
         {
+            bool isBooked = await _bookingChecker.CheckFutureBookingsWithTreatmentAsync(command.Id);
+
+            if (isBooked)
+            {
+                throw new TreatmentInUseException($"Can't delete treatment with id {command.Id}: Treatment is used in a booking.");
+            }
+
             var treatment = await _treatmentRepository.GetAsync(command.Id);
-
             _treatmentRepository.Delete(treatment);
-
             await _treatmentRepository.SaveChangesAsync();
         }
     }
