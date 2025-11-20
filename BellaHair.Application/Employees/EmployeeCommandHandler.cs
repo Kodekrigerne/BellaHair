@@ -11,7 +11,7 @@ using BellaHair.Ports.Employees;
 
 // Linnea
 
-namespace BellaHair.Application
+namespace BellaHair.Application.Employees
 {
     class EmployeeCommandHandler : IEmployeeCommand
     {
