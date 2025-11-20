@@ -3,14 +3,8 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared
 
-@inject IEmployeeQuery _employeeQuery
-
-@if (_modalErrorMessage != null)
-{
-	<div class="alert alert-danger" role="alert">
-		@_modalErrorMessage
-	</div>
-}
+@inject IEmployeeQuery EmployeeQuery
+@inject ISnackbar Snackbar
 
 @if (_offeringEmployees == null)
 {
@@ -41,7 +35,6 @@ else
 
 @code {
 	private List<EmployeeNameDTO>? _offeringEmployees = null;
-	private string? _modalErrorMessage;
 
 	[Parameter]
 	public Guid TreatmentId { get; set; }
@@ -65,16 +58,16 @@ else
 	{
 		try
 		{
-			_offeringEmployees = await _employeeQuery.GetEmployeesByTreatmentIdAsync(new GetEmployeesByTreatmentIdQuery(TreatmentId));
+			_offeringEmployees = await EmployeeQuery.GetEmployeesByTreatmentIdAsync(new GetEmployeesByTreatmentIdQuery(TreatmentId));
 
 		}
 		catch (DomainException dex)
 		{
-			_modalErrorMessage = dex.Message;
+			Snackbar.Add(dex.Message, Severity.Error);
 		}
 		catch (Exception ex)
 		{
-			_modalErrorMessage = $"Der skete en fejl under indhentning af medarbejdere: {ex.Message}";
+			Snackbar.Add($"Der skete en fejl under indhentning af medarbejdere: {ex.Message}", Severity.Error);
 		}
 
 	}

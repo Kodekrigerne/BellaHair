@@ -1,8 +1,10 @@
-﻿@using BellaHair.Ports.Treatments
+﻿@using BellaHair.Domain.Treatments
+@using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Threading.Tasks
 
 @inject ITreatmentCommand _treatmentCommand
+@inject ISnackbar Snackbar
 <!-- Mikkel Klitgaard -->
 
 
@@ -61,18 +63,23 @@
 
 	private async Task HandleOnDeleteClick()
 	{
-		var command = new DeleteTreatmentCommand(Treatment.Id);
-		await _treatmentCommand.DeleteTreatmentAsync(command);
+		try
+		{
+			var command = new DeleteTreatmentCommand(Treatment.Id);
+			await _treatmentCommand.DeleteTreatmentAsync(command);
 
-		await OnDelete.InvokeAsync();
+			await OnDelete.InvokeAsync();
+			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
+		}
+		catch (TreatmentInUseException)
+		{
+			Snackbar.Add("Behandlingen kunne ikke slettes:\n Der findes en aktiv booking med denne behandling.", Severity.Error);
+		}
 	}
-
 
 	private async Task HandleOfferedByClick()
 	{
 		await OnShowOfferedBy.InvokeAsync(Treatment.Id);
 	}
-
-
 
 }
