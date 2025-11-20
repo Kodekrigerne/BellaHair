@@ -71,6 +71,8 @@
 	{
 		_showNewModal = true;
 		_futureBookings = await PrivateCustomerQuery.PCFutureBookingsCheck(PrivateCustomer.Id);
+		Console.WriteLine(_futureBookings);
+		Console.WriteLine(PrivateCustomer.Id);
 	}
 
 	private async Task HandleOnDeleteConfirm()
