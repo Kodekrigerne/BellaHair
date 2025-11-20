@@ -2,6 +2,13 @@
 @using BellaHair.Presentation.WebUI.Components.Shared;
 @inject IEmployeeCommand _employeeCommand
 
+		<Modal @bind-IsVisible="@_showNewModal">
+			<h4>Slet medarbejder @employeeSimpleViewModel.name?</h4>
+			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+		</Modal>
+
+
 		<div class="employee-card">												@*Contains the entire singular employee card layout*@
 						
 				<div class="employee-avatar">											@*Contains the avatar with intials*@
@@ -35,6 +42,8 @@
 
 @code
 {
+	private bool _showNewModal = false;
+
 	[Parameter, EditorRequired]
 	public required EmployeeSimpleViewModel employeeSimpleViewModel { get; set; }
 
@@ -56,9 +65,17 @@
 
 	private async Task HandleOnDeleteClick()
 	{
+		_showNewModal = true;
+	}
+
+	private async Task HandleOnDeleteConfirm()
+	{
 		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
 		await _employeeCommand.DeleteEmployeeCommand(command);
+		CloseModal();
 		await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
 	}
+
+	private void CloseModal() => _showNewModal = false;
 
 }
