@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BellaHair.Domain;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
@@ -51,11 +52,9 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task<bool> IPrivateCustomerQuery.PCFutureBookingsCheck(Guid id)
         {
-                return await _db.Bookings
-                    .AnyAsync(p => p.Customer.Id == id);
-                //.Include(p => p.Bookings)
-                //.Where(p => p.Id == id)
-                //.AnyAsync(p => p.Bookings.Count != 0);
+                return await _db.PrivateCustomers
+                    .Where(p => p.Id == id)
+                    .AnyAsync(p => p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
         }
     }
 }
