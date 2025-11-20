@@ -67,7 +67,8 @@ namespace BellaHair.Infrastructure.Employees
                                                                            new TreatmentDTO(e.Id,
                                                                                         e.Name,
                                                                                         e.Price.Value,
-                                                                                        e.DurationMinutes.Value))
+                                                                                        e.DurationMinutes.Value,
+                                                                                        e.Employees.Count()))
                                                                .ToList();
 
             return new EmployeeDTOFull(employee.Id,

@@ -20,8 +20,12 @@ namespace BellaHair.Infrastructure.Treatments
         async Task<List<TreatmentDTO>> ITreatmentQuery.GetAllAsync()
         {
             return await _db.Treatments.AsNoTracking()
-                .Select(t => new TreatmentDTO
-                    (t.Id, t.Name, t.Price.Value, t.DurationMinutes.Value))
+                .Select(t => new TreatmentDTO(
+                    t.Id,
+                    t.Name,
+                    t.Price.Value,
+                    t.DurationMinutes.Value,
+                    t.Employees.Count()))
                 .ToListAsync();
         }
     }

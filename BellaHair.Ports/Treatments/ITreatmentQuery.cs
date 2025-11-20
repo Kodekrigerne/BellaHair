@@ -11,4 +11,4 @@ public interface ITreatmentQuery
     Task<List<TreatmentDTO>> GetAllAsync();
 }
 
-public record TreatmentDTO(Guid Id, string Name, decimal Price, int Duration);
+public record TreatmentDTO(Guid Id, string Name, decimal Price, int Duration, int EmployeeCount);
