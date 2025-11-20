@@ -1,12 +1,20 @@
 ﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
 @inject IEmployeeCommand _employeeCommand
+@inject ISnackbar SnackBar
+
 
 		<Modal @bind-IsVisible="@_showNewModal">
-			<h4>Slet medarbejder @employeeSimpleViewModel.Name?</h4>
-			<div class="remove-buttons">
-				<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+			<div class="modal-centered-content">
+				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
+				<h4>Slet: @employeeSimpleViewModel.Name?</h4>
+				<p style="max-width: 22rem; text-align: center;">Er du sikker på, at du vil slette denne medarbejder?
+			Denne handling kan ikke fortrydes.
+				</p>
+				<div class="remove-confirmation-buttons">
+				<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
 				<button class="btn-add" onclick="@CloseModal">Annuller</button>
+			</div>
 			</div>
 		</Modal>
 
@@ -75,6 +83,7 @@
 		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
 		await _employeeCommand.DeleteEmployeeCommand(command);
 		CloseModal();
+		SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
 		await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
 	}
 
