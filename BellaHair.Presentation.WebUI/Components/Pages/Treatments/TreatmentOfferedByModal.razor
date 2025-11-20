@@ -36,7 +36,7 @@ else
 	}
 }
 <div class="btn-wrapper">
-<button class="btn-remove">Luk</button>
+<button class="btn-remove" @onclick="HandleOnCloseClick">Luk</button>
 </div>
 
 @code {
@@ -46,10 +46,18 @@ else
 	[Parameter]
 	public Guid TreatmentId { get; set; }
 
-	
+	[Parameter, EditorRequired]
+	public required EventCallback OnClose { get; set; }
+
+
 	protected override async Task OnInitializedAsync()
 	{
 		await LoadEmployeesByTreatment();
+	}
+
+	private void HandleOnCloseClick()
+	{
+		OnClose.InvokeAsync();
 	}
 
 
