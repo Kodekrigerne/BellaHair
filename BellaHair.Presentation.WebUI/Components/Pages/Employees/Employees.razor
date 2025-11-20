@@ -19,7 +19,12 @@
 		@if (_errorMessage != null) { <p>@_errorMessage</p>}
 		@if (_employees == null) {<p>Loading...</p>}
 		else
-		{
+		{ 
+			@if (_employees.Count == 0)
+			{
+				<p>Der er ingen medarbejdere i øjeblikket.</p>
+			}
+
 			@foreach (var employee in _employees)
 			{
 				<EmployeeCard employeeSimpleViewModel="employee" OnDelete="@HandleDeleteClick"/>
@@ -52,7 +57,7 @@
 		try
 		{
 			var employees = await _employeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber, e.TreatmentNames)).ToList();
+			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber, e.TreatmentNames)).OrderBy(e => e.Name).ToList();
 		}
 		catch (DomainException ex)
 		{

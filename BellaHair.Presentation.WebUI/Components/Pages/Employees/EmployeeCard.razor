@@ -3,7 +3,7 @@
 @inject IEmployeeCommand _employeeCommand
 
 		<Modal @bind-IsVisible="@_showNewModal">
-			<h4>Slet medarbejder @employeeSimpleViewModel.name?</h4>
+			<h4>Slet medarbejder @employeeSimpleViewModel.Name?</h4>
 			<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
 			<button class="btn-add" onclick="@CloseModal">Annuller</button>
 		</Modal>
@@ -12,27 +12,27 @@
 		<div class="employee-card">												@*Contains the entire singular employee card layout*@
 						
 				<div class="employee-avatar">											@*Contains the avatar with intials*@
-					@GetEmployeeInitials(@employeeSimpleViewModel.name)
+					@GetEmployeeInitials(@employeeSimpleViewModel.Name)
 				</div>
 					<div>																@*Positions other info to position next to avatar*@
-					<h3>@employeeSimpleViewModel.name</h3>
+					<h3>@employeeSimpleViewModel.Name</h3>
 
 						<div class="employee-contact-details">
 							<div class="employee-single-contact-detail">
 								<MailIcon Class="employee-icons" />
-									@employeeSimpleViewModel.email
+									@employeeSimpleViewModel.Email
 								</div>
 
 							<div class="employee-single-contact-detail">
 								<PhoneIcon Class="employee-icons"/>
-									@employeeSimpleViewModel.phoneNumber
+									@employeeSimpleViewModel.PhoneNumber
 							</div>
 						</div>
 			<div class="delete-button">
 						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in employeeSimpleViewModel.treatmentNames)
+						@foreach (var treatment in employeeSimpleViewModel.TreatmentNames)
 							{															
 								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
 							}
