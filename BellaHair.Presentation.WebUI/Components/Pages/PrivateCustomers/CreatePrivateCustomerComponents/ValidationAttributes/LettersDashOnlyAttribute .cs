@@ -20,9 +20,9 @@ public class LettersDashOnlyAttribute : ValidationAttribute
     protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
-        if (input is string stringValue)
+        if (input != null && input is string stringValue)
         {
-            if (string.IsNullOrWhiteSpace(stringValue) || stringValue.Any(x => !char.IsLetter(x) && x != '-'))
+            if (stringValue.Any(x => !char.IsLetter(x) && x != '-'))
             {
                 return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
             }

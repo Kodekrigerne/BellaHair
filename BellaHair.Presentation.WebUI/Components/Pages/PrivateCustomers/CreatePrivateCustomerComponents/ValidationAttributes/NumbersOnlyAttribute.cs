@@ -20,7 +20,8 @@ public class NumbersOnlyAttribute : ValidationAttribute
     protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
-        if (input is not int)
+        if (input != null && input is not int)
+
         {
             return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
         }
