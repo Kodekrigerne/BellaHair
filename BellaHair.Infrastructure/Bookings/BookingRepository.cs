@@ -8,6 +8,10 @@ using BellaHair.Domain.Bookings;
 
 namespace BellaHair.Infrastructure.Bookings
 {
+    // Mikkel Klitgaard
+    /// <summary>
+    /// Implements the booking repository for managing booking entities.
+    /// </summary>
     public class BookingRepository : IBookingRepository
     {
         private readonly BellaHairContext _db;

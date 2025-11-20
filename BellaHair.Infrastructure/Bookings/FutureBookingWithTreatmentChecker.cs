@@ -10,6 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
 {
+    // Mikkel Klitgaard
+    /// <summary>
+    /// Provides functionality to check for future bookings associated with a specific treatment.
+    /// </summary>
     public class FutureBookingWithTreatmentChecker : IFutureBookingWithTreatmentChecker
     {
         private readonly BellaHairContext _db;
