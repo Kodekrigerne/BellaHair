@@ -55,10 +55,7 @@ namespace BellaHair.Infrastructure.Tests.Employees
             var employeeFromDb = repo.GetAsync(employee.Id).GetAwaiter().GetResult();
 
             //Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(employeeFromDb.Id, Is.EqualTo(employee.Id));
-            });
+            Assert.That(employeeFromDb.Id, Is.EqualTo(employee.Id));
         }
 
     }
