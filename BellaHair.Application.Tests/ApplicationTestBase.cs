@@ -17,7 +17,6 @@ namespace BellaHair.Application.Tests
         // Sti til skrivebord på afviklende maskine hentes gennem Environment-klassen.
         private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
-        protected DbContextOptions<BellaHairContext> _options;
         protected BellaHairContext _db;
         protected IServiceProvider ServiceProvider;
 
@@ -27,11 +26,17 @@ namespace BellaHair.Application.Tests
         public void OneTimeSetUp()
         {
             var services = new ServiceCollection();
+
+            var options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
+            services.AddSingleton(options);
+            services.AddDbContext<BellaHairContext>();
+
             services.AddInfrastructureServices();
+            services.AddApplicationServices();
+            
             ServiceProvider = services.BuildServiceProvider();
 
-            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
-            _db = new BellaHairContext(_options);
+            _db = ServiceProvider.GetRequiredService<BellaHairContext>();
             _db.Database.EnsureCreated();
         }
 
