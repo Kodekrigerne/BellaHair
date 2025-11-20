@@ -19,7 +19,8 @@
 
 <Modal @bind-IsVisible="@_showOfferedByModal">
 
-	<TreatmentOfferedByModal TreatmentId="@_selectedTreatmentId"/>
+	<TreatmentOfferedByModal TreatmentId="@_selectedTreatmentId"
+        OnClose="@(() => { _showOfferedByModal = false; })"/>
 	
 	</Modal>
 
@@ -37,7 +38,7 @@
 			{
 			<TreatmentCard Treatment="treatment" 
                 OnDelete="@LoadTreatments" 
-                OnShowOfferedBy="@(()=>{ _showOfferedByModal = true; _selectedTreatmentId = treatment.Id; })" />
+                OnShowOfferedBy="@(() => { _showOfferedByModal = true; _selectedTreatmentId = treatment.Id; })"/>
 			}
 	}
 	</div>
