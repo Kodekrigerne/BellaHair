@@ -2,19 +2,29 @@
 
 <div class="page">
 
-	    <div class="navigation">
-		    <TopNavMenu />
-	    </div>
-    <main>
+	<div class="navigation">
+		<TopNavMenu />
+	</div>
+	<main>
+		<article style="flex: 1;" class="content px-4">
+			@Body
+			@* Required *@
+			<MudThemeProvider @rendermode="InteractiveServer" />
+			<MudPopoverProvider @rendermode="InteractiveServer" />
 
-        <article style="flex: 1;" class="content px-4">
-            @Body
-        </article>
-    </main>
+			@* Needed for dialogs *@
+			<MudDialogProvider @rendermode="InteractiveServer" />
+
+			@* Needed for snackbars *@
+			<MudSnackbarProvider @rendermode="InteractiveServer" />
+		</article>
+	</main>
 </div>
 
+
+
 <div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
+	An unhandled error has occurred.
+	<a href="." class="reload">Reload</a>
+	<span class="dismiss">🗙</span>
 </div>

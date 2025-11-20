@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Infrastructure;
 
 namespace BellaHair.Domain.Tests.PrivateCustomers
 {
@@ -16,14 +18,15 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
         public void Given_ValidInputs_Then_CreatesPrivateCustomer()
         {
             // Arrange
+            var dateTimeProvider = new CurrentDateTimeProvider() as ICurrentDateTimeProvider;
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now.AddYears(-19);
+            var birthday = dateTimeProvider.GetCurrentDateTime().AddYears(-19);
 
             // Act
-            var privateCustomer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
             // Assert
             Assert.Multiple(() =>
@@ -40,18 +43,19 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
         public void Given_ValidInputs_Then_UpdatesPrivateCustomer()
         {
             // Arrange
+            var dateTimeProvider = new CurrentDateTimeProvider() as ICurrentDateTimeProvider;
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now.AddYears(-19);
-            
-            var privateCustomer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var birthday = dateTimeProvider.GetCurrentDateTime().AddYears(-19);
+
+            var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
             var newPhoneNumber = PhoneNumber.FromString("87654321");
 
             // Act
-            PrivateCustomerFactory.Update(privateCustomer, name, address, newPhoneNumber, email, birthday);
+            privateCustomer.Update(name, address, newPhoneNumber, email, birthday, dateTimeProvider);
 
             // Assert
             Assert.That(privateCustomer.PhoneNumber, Is.EqualTo(newPhoneNumber));
@@ -61,32 +65,34 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
         public void Given_InvalidBirthdayOnCreation_Then_ThrowsPrivateCustomerException()
         {
             // Arrange
+            var dateTimeProvider = new CurrentDateTimeProvider() as ICurrentDateTimeProvider;
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now;
+            var birthday = dateTimeProvider.GetCurrentDateTime();
 
             // Act & Assert
-            Assert.Throws<PrivateCustomerException>(() => PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday));
+            Assert.Throws<PrivateCustomerException>(() => PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider));
         }
 
         [Test]
         public void Given_InvalidBirthdayOnUpdate_Then_ThrowsPrivateCustomerException()
         {
             // Arrange
+            var dateTimeProvider = new CurrentDateTimeProvider() as ICurrentDateTimeProvider;
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now.AddYears(-19);
+            var birthday = dateTimeProvider.GetCurrentDateTime().AddYears(-19);
 
-            var privateCustomer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
-            var newBirthday = DateTime.Now;
+            var newBirthday = dateTimeProvider.GetCurrentDateTime();
 
             // Act & Assert
-            Assert.Throws<PrivateCustomerException>(() => PrivateCustomerFactory.Update(privateCustomer, name, address, phoneNumber, email, newBirthday));
+            Assert.Throws<PrivateCustomerException>(() => privateCustomer.Update(name, address, phoneNumber, email, newBirthday, dateTimeProvider));
         }
     }
 }
