@@ -26,9 +26,9 @@ namespace BellaHair.Domain.Bookings
         public BookingDiscount? Discount { get; private set; }
         public DateTime CreatedDateTime { get; private init; }
         public DateTime StartDateTime { get; private set; }
-        public DateTime PaidDateTime { get; private set; }
+        public DateTime? PaidDateTime { get; private set; }
 
-        public bool IsPaid;
+        public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored
         //_total is only set (and saved in the database) after booking is paid, and is therefore nullable
         private decimal? _total;
@@ -74,6 +74,8 @@ namespace BellaHair.Domain.Bookings
         {
             if (Employee == null || Customer == null || Treatment == null)
                 throw new InvalidOperationException("all booking relations must be populated when calling PayBooking.");
+
+            if (IsPaid == true) throw new BookingException("Cannot pay a booking that has already been paid");
 
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
