@@ -20,14 +20,14 @@ public class EmailAttribute : ValidationAttribute
     {
     }
 
-    protected override ValidationResult IsValid(object input, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
         if (input is string stringValue)
         {
             if (!ValidEmailRegex.IsMatch(stringValue))
             {
-                return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
+                return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
             }
         }
 

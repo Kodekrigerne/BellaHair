@@ -17,12 +17,12 @@ public class NumbersOnlyAttribute : ValidationAttribute
     {
     }
 
-    protected override ValidationResult IsValid(object input, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
         if (input is not int)
         {
-                return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
+            return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
         }
 
         return ValidationResult.Success;

@@ -17,14 +17,14 @@ public class LettersNumbersOnlyAttribute : ValidationAttribute
     {
     }
 
-    protected override ValidationResult IsValid(object input, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
         if (input is string stringValue)
         {
-            if (string.IsNullOrWhiteSpace(stringValue) == stringValue.Any(x => !char.IsLetterOrDigit(x)))
+            if (stringValue.Any(x => !char.IsLetterOrDigit(x)))
             {
-                return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
+                return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
             }
         }
 

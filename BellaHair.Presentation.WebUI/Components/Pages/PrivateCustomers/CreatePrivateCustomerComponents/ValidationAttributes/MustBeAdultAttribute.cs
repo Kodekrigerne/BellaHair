@@ -19,7 +19,7 @@ public class MustBeAdultAttribute : ValidationAttribute
     {
     }
 
-    protected override ValidationResult IsValid(object input, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         if (input is DateTime dateTimeValue)
         {
@@ -34,9 +34,9 @@ public class MustBeAdultAttribute : ValidationAttribute
             var currentDateTime = dateTimeProvider.GetCurrentDateTime();
 
             // Kører validering på input.
-
+            if (dateTimeValue > currentDateTime.AddYears(-18))
             {
-                return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
+                return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
             }
         }
 

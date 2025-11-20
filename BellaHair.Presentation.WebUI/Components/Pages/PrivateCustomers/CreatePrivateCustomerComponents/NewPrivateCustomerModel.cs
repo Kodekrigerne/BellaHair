@@ -11,8 +11,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
         [LettersDashOnly]
         public string FirstName { get; set; } = string.Empty;
 
-        [LettersDashOnly]
-        public string? MiddleName { get; set; } = string.Empty;
+        [LettersDashOnly] public string? MiddleName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Efternavn er påkrævet")]
         [LettersDashOnly]
@@ -36,8 +35,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
         [ZipCode]
         public int ZipCode { get; set; } = 0;
 
-        [NumbersOnly]
-        public int? Floor { get; set; } = 0;
+        [NumbersOnly] public int? Floor { get; set; } = 0;
 
         [Required(ErrorMessage = "Telefonnummber er påkrævet")]
         [DanishPhoneNumber]
@@ -48,7 +46,8 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Alder er påkrævet")]
+        [MustBeAdult]
+        public DateTime Birthday { get; set; }
 
     }
 }
-    DateTime Birthday);

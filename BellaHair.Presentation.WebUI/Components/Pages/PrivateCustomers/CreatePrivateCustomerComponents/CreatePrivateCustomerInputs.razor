@@ -1,6 +1,99 @@
-﻿namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
+﻿<div class="kk-container">
+	
+	<h5 style="margin-top: 2px;">Personligt info</h5>
+	
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="first-name-input" class="required">Fornavn</label>
+			<input id="first-name-input" type="text" @bind="PrivateCustomerModel.FirstName" style="width: 150px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.FirstName)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="middle-name-input">Mellemnavn</label>
+			<input id="middle-name-input" type="text" @bind="PrivateCustomerModel.MiddleName" style="width: 150px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.MiddleName)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="last-name-input" class="required">Efternavn</label>
+			<input id="last-name-input" type="text" @bind="PrivateCustomerModel.LastName" style="width: 150px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.LastName)" />
+		</div>
+	
+	</div>
+
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="email-input" class="required">Email</label>
+			<input id="email-input" type="text" @bind="PrivateCustomerModel.Email" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Email)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="phonenumber-input" class="required">Telefon</label>
+			<input id="phonenumber-input" type="number" @bind="PrivateCustomerModel.PhoneNumber" style="width: 100px; " />
+			<ValidationMessage For="@(() => PrivateCustomerModel.PhoneNumber)" />
+		</div>
+		
+		<div class="pc-input">
+			<label for="birthday-input" class="required">Fødselsdato</label>
+			<input id="birthday-input" type="datetime" @bind="PrivateCustomerModel.Birthday" style="width: 100px; " />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Birthday)" />
+		</div>
+
+	</div>
+
+</div>
+
+<div class="kk-container">
+	
+	<h5 style="margin-top: 2px;">Adresse </h5>
+	
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="streetname-input" class="required">Vejnavn</label>
+			<input id="streetname-input" type="text" @bind="PrivateCustomerModel.StreetName" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.StreetName)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="street-number-input" class="required">Vejnummer</label>
+			<input id="street-number-input" type="number" @bind="PrivateCustomerModel.StreetNumber" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.StreetNumber)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="floor-input">Etage</label>
+			<input id="floor-input" type="number" @bind="PrivateCustomerModel.Floor" style="width:50px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Floor)" />
+		</div>
+
+	</div>
+
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="city-name-input" class="required">By</label>
+			<input id="city-name-input" type="text" @bind="PrivateCustomerModel.City" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.City)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="zipcode-input" class="required">Postnummer</label>
+			<input id="zipcode-input" type="number" @bind="PrivateCustomerModel.ZipCode" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.ZipCode)" />
+		</div>
+
+	</div>
+
+</div>
+
+@code 
 {
-    public class CreatePrivateCustomerInputs
-    {
-    }
+	[Parameter, EditorRequired]
+	public required NewPrivateCustomerModel PrivateCustomerModel { get; set; }
 }

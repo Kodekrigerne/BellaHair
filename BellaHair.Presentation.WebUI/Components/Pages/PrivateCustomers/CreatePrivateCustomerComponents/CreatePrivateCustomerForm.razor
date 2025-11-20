@@ -1,8 +1,83 @@
-﻿<h3>CreatePrivateCustomerForm</h3>
+﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using System.Linq;
+@using BellaHair.Ports.Employees
+@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Ports.Treatments
+@inject IPrivateCustomerCommand PrivateCustomerCommand
+
+<h3 style="text-align: center; font-weight: bold">Opret ny kunde</h3>
+<br />
+<p style="text-align: center">Indtast oplysningerne på den kunde, du vil oprette.</p>
+
+<EditForm Model="@NewPrivateCustomerModel" OnValidSubmit="@HandleCreatePCustomer">
+        <DataAnnotationsValidator />
+
+        <div class="inputs-container">
+			
+	        <div class="inputs-items-container">
+		        @if (_errorMessage != null)
+		        {
+			        <p>@_errorMessage</p>
+		        }
+
+		        <div>
+			        <CreatePrivateCustomerInputs PrivateCustomerModel="NewPrivateCustomerModel"/>
+		        </div>
+
+	        </div>
+
+        </div>
+
+	 <div class="btn-wrapper">
+            <button class="btn-add" type="submit">Opret</button>
+	 </div>
+
+</EditForm>
 
 @code {
-
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
 
+	[Parameter]
+	public NewPrivateCustomerModel NewPrivateCustomerModel { get; set; } = new NewPrivateCustomerModel();
+
+	private string? _errorMessage = null;
+
+	protected override void OnInitialized()
+	{
+		_errorMessage = null;
+		NewPrivateCustomerModel = new NewPrivateCustomerModel();
+	}
+
+	private async Task HandleCreatePCustomer()
+	{
+		try
+		{
+			if (NewPrivateCustomerModel.MiddleName == string.Empty) NewPrivateCustomerModel.MiddleName = null;
+
+			var command = new CreatePrivateCustomerCommand(
+				NewPrivateCustomerModel.FirstName,
+				NewPrivateCustomerModel.MiddleName,
+				NewPrivateCustomerModel.LastName,
+				NewPrivateCustomerModel.StreetName,
+				NewPrivateCustomerModel.City,
+				NewPrivateCustomerModel.StreetNumber,
+				NewPrivateCustomerModel.ZipCode,
+				NewPrivateCustomerModel.Floor,
+				NewPrivateCustomerModel.PhoneNumber,
+				NewPrivateCustomerModel.Email,
+				NewPrivateCustomerModel.Birthday
+			);
+
+            await PrivateCustomerCommand.CreatePrivateCustomerAsync(command);
+
+			await OnCreate.InvokeAsync();
+
+		}
+		catch (Exception e)
+		{
+			_errorMessage = $"Oprettelse mislykkedes: {e.Message}";
+		}
+	}
 }

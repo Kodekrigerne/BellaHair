@@ -19,14 +19,14 @@ public class DanishPhoneNumberAttribute : ValidationAttribute
     {
     }
 
-    protected override ValidationResult IsValid(object input, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
         if (input is string stringValue)
         {
-            if (string.IsNullOrWhiteSpace(stringValue) || stringValue.Length > 8 || stringValue.Length < 8 || !stringValue.All(Char.IsDigit))
+            if (string.IsNullOrWhiteSpace(stringValue) || stringValue.Length != 8 || !stringValue.All(Char.IsDigit))
             {
-                return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
+                return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
             }
         }
 

@@ -17,14 +17,14 @@ public class ZipCodeAttribute : ValidationAttribute
     {
     }
 
-    protected override ValidationResult IsValid(object input, ValidationContext validationContext)
+    protected override ValidationResult? IsValid(object? input, ValidationContext validationContext)
     {
         // Kører validering på input.
         if (input is int intValue)
         {
-            if (intValue > 9999 || intValue < 1000)
+            if (intValue is > 9999 or < 1000)
             {
-                return new ValidationResult(ErrorMessage, new[] { validationContext.MemberName });
+                return new ValidationResult(ErrorMessage, [validationContext.MemberName!]);
             }
         }
 
