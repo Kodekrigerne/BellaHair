@@ -2,6 +2,7 @@
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Threading.Tasks
 
+@inject ITreatmentCommand _treatmentCommand
 <!-- Mikkel Klitgaard -->
 
 
@@ -58,11 +59,12 @@
 	public required EventCallback<Guid> OnShowOfferedBy { get; set; }
 
 
-	private void HandleOnDeleteClick()
+	private async Task HandleOnDeleteClick()
 	{
-		Console.WriteLine("Jalapeños");
-		// TODO: Implementer logik
-		OnDelete.InvokeAsync();
+		var command = new DeleteTreatmentCommand(Treatment.Id);
+		await _treatmentCommand.DeleteTreatmentAsync(command);
+
+		await OnDelete.InvokeAsync();
 	}
 
 
