@@ -26,8 +26,10 @@
 
 .treatment-icon-format {
     display: flex;
-    align-items: start;
+    align-items: center;
     gap: 5px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 .treatments-container {
@@ -42,12 +44,17 @@
 
 .treatment-text {
     color: dimgray;
+    vertical-align: middle;
+    margin: 0;
+    line-height: 1
 }
 
 ::deep .treatment-list-icon {
     fill: dimgray;
     display: inline-block;
     justify-content: center;
+    vertical-align: middle;
+    flex: 0 0 16px;
 }
 
 .btn-wrapper {
