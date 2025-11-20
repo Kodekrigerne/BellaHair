@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Treatments;
 
-namespace BellaHair.Domain.Discounts
+namespace BellaHair.Domain.Bookings
 {
     public interface IBookingRepository
     {

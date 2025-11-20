@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BellaHair.Domain.Discounts
+namespace BellaHair.Domain.Bookings
 {
     public interface IFutureBookingWithTreatmentChecker
     {
-        Task<bool> CheckFutureBookingsWithTreatment(Guid id);
+        Task<bool> CheckFutureBookingsWithTreatmentAsync(Guid id);
     }
 }
