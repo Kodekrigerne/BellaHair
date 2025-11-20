@@ -36,4 +36,6 @@ namespace BellaHair.Domain.Treatments
             => new(treatmentName, price, durationMinutes);
     }
     public class TreatmentException(string message) : DomainException(message);
+
+    public class TreatmentInUseException(string message) : DomainException(message);
 }
