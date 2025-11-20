@@ -13,7 +13,7 @@ using BellaHair.Ports.Employees;
 
 namespace BellaHair.Application.Employees
 {
-    class EmployeeCommandHandler : IEmployeeCommand
+    public class EmployeeCommandHandler : IEmployeeCommand
     {
         private readonly IEmployeeRepository _employeeRepo;
         private readonly ITreatmentRepository _treatmentRepo;
