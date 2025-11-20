@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BellaHair.Domain;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,8 +18,13 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PrivateCustomerQueryHandler : IPrivateCustomerQuery
     {
         private readonly BellaHairContext _db;
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
 
-        public PrivateCustomerQueryHandler(BellaHairContext db) => _db = db;
+        public PrivateCustomerQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            _db = db;
+            _currentDateTimeProvider = currentDateTimeProvider;
+        }
 
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
@@ -41,6 +47,16 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                     x.Birthday,
                     x.Visits))
                 .ToListAsync();
+        }
+
+        async Task<bool> IPrivateCustomerQuery.PCFutureBookingsCheck(Guid id)
+        {
+            if (await _db.PrivateCustomers
+                    .Where(p => p.Id == id)
+                    .AnyAsync(p =>
+                        p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())));
+
+            return false;
         }
     }
 }

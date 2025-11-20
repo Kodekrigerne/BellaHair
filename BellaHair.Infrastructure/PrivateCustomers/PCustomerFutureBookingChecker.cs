@@ -18,21 +18,25 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PCustomerFutureBookingChecker : IPCustomerFutureBookingChecker
     {
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
-        private readonly IPrivateCustomerRepository _privateCustomerRepository;
+        private readonly BellaHairContext _db;
 
-        public PCustomerFutureBookingChecker(ICurrentDateTimeProvider currentDateTimeProvider, IPrivateCustomerRepository privateCustomerRepository)
+        public PCustomerFutureBookingChecker(ICurrentDateTimeProvider currentDateTimeProvider, BellaHairContext db)
         {
             _currentDateTimeProvider = currentDateTimeProvider;
-            _privateCustomerRepository = privateCustomerRepository;
+            _db = db;
         }
 
         // Returnerer en bool, der indikerer om kunden med det givne id har bookinger, der ligger i fremtiden
         async Task<bool> IPCustomerFutureBookingChecker.CheckFutureBookings(Guid id)
         {
-            var privateCustomer = await _privateCustomerRepository.GetAsync(id);
+            //var privateCustomer = await _db.PrivateCustomers
+            //    .FirstOrDefaultAsync(p => p.Id == id)
+            //?? throw new KeyNotFoundException($"No private customer found with ID: {id}");
 
-            if (privateCustomer.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime() && b.StartDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
-            
+            //if (privateCustomer.Bookings.Any(
+            //        b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()
+            //             /*&& b.StartDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value)*/)) return true;
+
             return false;
         }
     }
