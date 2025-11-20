@@ -44,8 +44,6 @@
 		await base.OnInitializedAsync();
 
 		await HandleNewSelectorClick();
-
-		_activeTab = BookingTab.New;
 	}
 
 	private async Task HandleNewSelectorClick()
@@ -80,7 +78,7 @@
 				b.DurationMinutes,
 				b.Discount?.Name,
 				b.Discount?.DiscountAmount
-			)).OrderByDescending(b => b.StartDateTime).ToList();
+			)).OrderBy(b => b.StartDateTime).ToList();
 		}
 		catch (DomainException ex)
 		{

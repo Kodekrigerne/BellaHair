@@ -78,7 +78,7 @@ namespace BellaHair.Domain.Bookings
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(Treatment);
-            _total = Treatment.Price.Value;
+            _total = CalculateTotal();
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
         }
@@ -88,6 +88,12 @@ namespace BellaHair.Domain.Bookings
         private decimal CalculateTotal()
         {
             return Treatment?.Price.Value ?? throw new BookingException($"Booking must be loaded with all relations included {Id}");
+        }
+
+        public void SetDiscount(BookingDiscount discount)
+        {
+            if (IsPaid) throw new BookingException("Cannot set the discount on a paid booking");
+            Discount = discount;
         }
     }
 
