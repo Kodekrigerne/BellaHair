@@ -17,8 +17,8 @@ namespace BellaHair.Ports.Employees
         Task DeleteEmployeeCommand(DeleteEmployeeCommand command);
     }
 
-    public record CreateEmployeeCommand(string FirstName, string MiddleName, string LastName, string
-        Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, IEnumerable<Guid> TreatmentIds, int? Floor = null);
+    public record CreateEmployeeCommand(string FirstName, string LastName, string
+        Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, IEnumerable<Guid> TreatmentIds, string? MiddleName = null, int? Floor = null);
 
     public record DeleteEmployeeCommand(Guid Id);
 }
