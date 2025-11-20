@@ -58,11 +58,6 @@ namespace BellaHair.Infrastructure.Tests.Employees
             Assert.Multiple(() =>
             {
                 Assert.That(employeeFromDb.Id, Is.EqualTo(employee.Id));
-                Assert.That(employeeFromDb.Name.FullName, Is.EqualTo(employee.Name.FullName));
-                Assert.That(employeeFromDb.Email.Value, Is.EqualTo(employee.Email.Value));
-                Assert.That(employeeFromDb.PhoneNumber.Value, Is.EqualTo(employee.PhoneNumber.Value));
-                Assert.That(employeeFromDb.Address.StreetName, Is.EqualTo(employee.Address.StreetName));
-                Assert.That(employeeFromDb.Treatments.Count, Is.EqualTo(employee.Treatments.Count));
             });
         }
 

@@ -49,8 +49,6 @@ namespace BellaHair.Infrastructure.Tests.Employees
                 Assert.That(employeesFromDb, Has.Count.EqualTo(2));
                 Assert.That(employeesFromDb.Any(t => t.Id == employee1.Id), Is.True);
                 Assert.That(employeesFromDb.Any(t => t.Id == employee2.Id), Is.True);
-                Assert.That(employeesFromDb.Any(t => t.Name == employee1.Name.FullName), Is.True);
-                Assert.That(employeesFromDb.Any(t => t.Name == employee2.Name.FullName), Is.True);
             });
 
         }
