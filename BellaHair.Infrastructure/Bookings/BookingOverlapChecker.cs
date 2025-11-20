@@ -1,4 +1,4 @@
-﻿using BellaHair.Domain;
+﻿    using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using Microsoft.EntityFrameworkCore;
 

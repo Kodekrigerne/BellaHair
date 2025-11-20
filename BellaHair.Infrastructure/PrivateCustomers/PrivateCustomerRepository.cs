@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BellaHair.Domain.PrivateCustomers;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
@@ -27,9 +28,12 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _db.PrivateCustomers.Remove(privateCustomer);
         }
 
+        // .Include sikrer, at det hentede PrivateCustomer-objekt inkluderer alle booking-relationer
         async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
-            var privateCustomer = await _db.PrivateCustomers.FindAsync(id)
+            var privateCustomer = await _db.PrivateCustomers
+                                      .Include(p => p.Bookings)
+                                      .SingleOrDefaultAsync(p => p.Id == id)
                                   ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
 
             return privateCustomer;

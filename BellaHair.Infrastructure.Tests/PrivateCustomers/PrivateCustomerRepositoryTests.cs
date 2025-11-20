@@ -19,14 +19,15 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         {
             // Arrange
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
 
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now.AddYears(-19);
+            var birthday = dateTimeProvider.GetCurrentDateTime().AddYears(-19);
 
-            var customer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
             // Act
             repo.AddAsync(customer);
@@ -42,14 +43,16 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         {
             // Arrange
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+
 
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now.AddYears(-19);
+            var birthday = dateTimeProvider.GetCurrentDateTime().AddYears(-19);
 
-            var customer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
             _db.AddAsync(customer);
             _db.SaveChangesAsync();
@@ -66,14 +69,15 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         {
             // Arrange
             var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
 
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
             var address = Address.Create("Vej", "By", "1", 7100, 2);
             var phoneNumber = PhoneNumber.FromString("12345678");
             var email = Email.FromString("email@email.com");
-            var birthday = DateTime.Now.AddYears(-19);
+            var birthday = dateTimeProvider.GetCurrentDateTime().AddYears(-19);
 
-            var customer = PrivateCustomerFactory.Create(name, address, phoneNumber, email, birthday);
+            var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
             _db.AddAsync(customer);
             _db.SaveChangesAsync();

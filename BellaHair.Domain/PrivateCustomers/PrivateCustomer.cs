@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using System.Collections.ObjectModel;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 
 namespace BellaHair.Domain.PrivateCustomers
@@ -17,21 +18,21 @@ namespace BellaHair.Domain.PrivateCustomers
         // 2. Flyt Visits ud af entitet, udregn den udenfor (i query) og send med i DTO (så den findes I DTO men ikke entitet)
         // 3. Database computed value, burde være simpelt, men ingen kontrol over nutid
         // 4. GetVisits(ICustomerVisitsCalculator _) metode
-        public int Visits => Bookings.Count;
+        public int Visits => _bookings.Count;
         public DateTime Birthday { get; private set; }
-        private readonly List<Booking> _bookings = [];
+        private readonly List<Booking>? _bookings = [];
 
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
-        public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
+        public IReadOnlyCollection<Booking> Bookings => _bookings?.AsReadOnly();
 
 #pragma warning disable CS8618
         private PrivateCustomer() { }
 #pragma warning restore CS8618
 
 
-        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            ValidateBirthday(birthday);
+            ValidateBirthday(birthday, currentDateTimeProvider);
 
             Id = Guid.NewGuid();
             Name = name;
@@ -42,14 +43,14 @@ namespace BellaHair.Domain.PrivateCustomers
             _bookings = [];
         }
 
-        internal static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            return new PrivateCustomer(name, address, phoneNumber, email, birthday);
+            return new PrivateCustomer(name, address, phoneNumber, email, birthday, currentDateTimeProvider);
         }
 
-        internal void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday)
+        public void Update(Name name, Address address, PhoneNumber phoneNumber, Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            ValidateBirthday(birthday);
+            ValidateBirthday(birthday, currentDateTimeProvider);
 
             Name = name;
             Address = address;
@@ -58,10 +59,10 @@ namespace BellaHair.Domain.PrivateCustomers
             Birthday = birthday;
         }
 
-        // Kunden skal minimum være 18 år gammel.
-        private static void ValidateBirthday(DateTime birthday)
+        // Kunden skal minimum være 18 år gammel
+        private static void ValidateBirthday(DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            if (birthday > DateTime.Now.AddYears(-18))
+            if (birthday > currentDateTimeProvider.GetCurrentDateTime().AddYears(-18))
                 throw new PrivateCustomerException("Customers must be 18 years of age");
         }
     }

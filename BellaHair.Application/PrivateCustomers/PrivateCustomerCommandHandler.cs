@@ -19,9 +19,15 @@ namespace BellaHair.Application.PrivateCustomers
     public class PrivateCustomerCommandHandler : IPrivateCustomerCommand
     {
         private readonly IPrivateCustomerRepository _privateCustomerRepo;
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly IPCustomerFutureBookingChecker _pCustomerFutureBookingChecker;
 
-        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo) =>
+        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo, ICurrentDateTimeProvider currentDateTimeProvider, IPCustomerFutureBookingChecker pCustomerFutureBookingChecker)
+        {
             _privateCustomerRepo = privateCustomerRepo;
+            _currentDateTimeProvider = currentDateTimeProvider;
+            _pCustomerFutureBookingChecker = pCustomerFutureBookingChecker;
+        }
 
         async Task IPrivateCustomerCommand.CreatePrivateCustomerAsync(CreatePrivateCustomerCommand command)
         {
@@ -40,12 +46,13 @@ namespace BellaHair.Application.PrivateCustomers
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var email = Email.FromString(command.Email);
 
-            var customerToCreate = PrivateCustomerFactory.Create(
+            var customerToCreate = PrivateCustomer.Create(
                 name,
                 address,
                 phoneNumber,
                 email,
-                command.Birthday);
+                command.Birthday,
+                _currentDateTimeProvider);
 
             await _privateCustomerRepo.AddAsync(customerToCreate);
             await _privateCustomerRepo.SaveChangesAsync();
@@ -54,6 +61,11 @@ namespace BellaHair.Application.PrivateCustomers
         async Task IPrivateCustomerCommand.DeletePrivateCustomerAsync(DeletePrivateCustomerCommand command)
         {
             var customerToDelete = await _privateCustomerRepo.GetAsync(command.Id);
+
+            // Tjekker for fremtidige bookinger tilknyttet kunden der ønskes slettet.
+            // Kaster en fejl, hvis kunden har fremtidige bookinger.
+            if (await _pCustomerFutureBookingChecker.CheckFutureBookings(customerToDelete.Id)) 
+                throw new PrivateCustomerException("Customer has future bookings. Delete bookings prior to deleting customer.");
 
             _privateCustomerRepo.Delete(customerToDelete);
 
@@ -79,13 +91,13 @@ namespace BellaHair.Application.PrivateCustomers
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
 
-            PrivateCustomerFactory.Update(
-                customerToUpdate,
+            customerToUpdate.Update(
                 updatedName,
                 updatedAddress,
                 updatedPhoneNumber,
                 updatedEmail,
-                command.Birthday);
+                command.Birthday,
+                _currentDateTimeProvider);
 
             await _privateCustomerRepo.SaveChangesAsync();
         }

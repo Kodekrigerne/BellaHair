@@ -4,13 +4,23 @@
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
+@inject IPCustomerFutureBookingChecker PCustomerFutureBookingChecker
+@inject ISnackbar Snackbar
 
 <!-- Mikkel Dahlmann -->
-
+<!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
+<!-- TODO Bedre styling -->
 <Modal @bind-IsVisible="@_showNewModal">
-	<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-	<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-	<button class="btn-add" onclick="@CloseModal">Annuller</button>
+	@if (_futureBookings)
+	{
+		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
+	}
+	else
+	{
+		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
+		<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
+		<button class="btn-add" onclick="@CloseModal">Annuller</button>
+	}
 </Modal>
 
 <div class="privatecustomer-card">
@@ -45,7 +55,7 @@
 	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
 
-@code {
+	@code {
 
 	[Parameter, EditorRequired]
 	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
@@ -54,10 +64,13 @@
 	public required EventCallback OnDelete { get; set; }
 
 	private bool _showNewModal = false;
+	private bool _futureBookings = false;
 
-	private void HandleOnDeleteClick()
+	// Viser modal, og tjekker for future-bookings.
+	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
+		_futureBookings = await PCustomerFutureBookingChecker.CheckFutureBookings(PrivateCustomer.Id);
 	}
 
 	private async Task HandleOnDeleteConfirm()
@@ -66,6 +79,7 @@
 		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
 		_showNewModal = false;
 		await OnDelete.InvokeAsync();
+		Snackbar.Add("Kundeprofilen blev slettet.", Severity.Success);
 	}
 
 	private void CloseModal() => _showNewModal = false;
