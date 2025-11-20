@@ -33,7 +33,7 @@ namespace BellaHair.Infrastructure.Employees
             return await _db.Employees
                 .AsNoTracking()
                 .Where(e => e.Treatments
-                .Any(t => t.Id == query.TreatmentId))
+                                        .Any(t => t.Id == query.TreatmentId))
                 .Select(e => new EmployeeNameDTO(e.Name.FullName))
                 .ToListAsync();
         }
