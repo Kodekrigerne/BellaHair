@@ -1,19 +1,10 @@
-﻿using BellaHair.Application.Treatments;
-using BellaHair.Domain.PrivateCustomers;
-using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
-using BellaHair.Infrastructure;
-using BellaHair.Infrastructure.Bookings;
-using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Treatments;
-using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using NUnit.Framework.Interfaces;
 using FixtureBuilder;
-using FixtureBuilder.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Application.Tests.Treatments
 {
@@ -81,7 +72,7 @@ namespace BellaHair.Application.Tests.Treatments
             var treatment = Treatment.Create("Voksbehandling", Price.FromDecimal(300), DurationMinutes.FromInt(30));
 
             var bookingFixture = Fixture.New<Booking>().UseConstructor()
-                                        .WithSetter(b => b.StartDateTime, DateTime.Now)
+                                        .WithSetter(b => b.StartDateTime, DateTime.Now.AddDays(1))
                                         .WithSetter(b => b.Treatment, treatment)
                                         .Build();
 
@@ -92,7 +83,7 @@ namespace BellaHair.Application.Tests.Treatments
             var deleteCommand = new DeleteTreatmentCommand(treatment.Id);
 
             // Assert 
-          Assert.ThrowsAsync<TreatmentInUseException>( async () => await handler.DeleteTreatmentAsync(deleteCommand));
+            Assert.ThrowsAsync<TreatmentInUseException>(async () => await handler.DeleteTreatmentAsync(deleteCommand));
         }
 
     }
