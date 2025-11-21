@@ -2,6 +2,7 @@
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Threading.Tasks
+@using BellaHair.Domain
 
 @inject ITreatmentCommand _treatmentCommand
 @inject ISnackbar Snackbar
@@ -91,10 +92,10 @@
 			await OnDelete.InvokeAsync();
 			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
 		}
-		catch (TreatmentInUseException)
+		catch (DomainException ex)
 		{
 			_showConfirmDelete = false;
-			Snackbar.Add("Behandlingen kunne ikke slettes:\n Der findes en aktiv booking med denne behandling.", Severity.Error);
+			Snackbar.Add(ex.Message, Severity.Error);
 		}
 		catch (Exception)
 		{
