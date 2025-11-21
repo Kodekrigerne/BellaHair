@@ -5,31 +5,35 @@
 @inject ISnackbar SnackBar
 
 
-		<Modal @bind-IsVisible="@_showNewModal">
-			<div class="modal-centered-content">
+	<Modal @bind-IsVisible="@_showNewModal">
+		<div class="modal-centered-content">
 				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
+
+			@* Hvis medarbejderen har fremtidige bookinger, vises dette. *@
 			@if (_futureBookings)
 			{
 				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @employeeSimpleViewModel.Name har fremtidige bookinger.
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
 			<button class="btn-add" onclick="@CloseModal">Annuller</button>
-
 			}
 
+			@* Hvis medarbejderen ikke har fremtidige bookinger, vises dette. *@
 			else
 			{
+
 				<h4>Slet: @employeeSimpleViewModel.Name?</h4>
-				<p style="max-width: 22rem; text-align: center;">Er du sikker på, at du vil slette denne medarbejder?
-			Denne handling kan ikke fortrydes.
-				</p>
+
+				<p style="max-width: 22rem; text-align: center;">	Er du sikker på, at du vil slette denne medarbejder?
+																	Denne handling kan ikke fortrydes.						</p>
+
 				<div class="remove-confirmation-buttons">
-				<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
-				<button class="btn-add" onclick="@CloseModal">Annuller</button>
-			</div>
+					<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
+					<button class="btn-add" onclick="@CloseModal">Annuller</button>
+				</div>
 			}
-			</div>
-		</Modal>
+		</div>
+	</Modal>
 
 
 		<div class="employee-card">														@*Contains the entire singular employee card layout*@
@@ -87,12 +91,14 @@
 
 	}
 
+	// Viser modalen og tjekker, om der er fremtidige bookinger.
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
 		_futureBookings = await _employeeQuery.EmployeeFutureBookingsCheck(employeeSimpleViewModel.Id);
 	}
 
+	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.
 	private async Task HandleOnDeleteConfirm()
 	{
 		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
@@ -103,12 +109,14 @@
 			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
 			await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
 		}
+
 		catch (Exception e)
 		{
 			SnackBar.Add(e.Message, Severity.Warning);
 		}
 	}
 
+	// Lukker modalen
 	private void CloseModal() => _showNewModal = false;
 
 }
