@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BellaHair.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Application.Tests.PrivateCustomers
 {
@@ -23,10 +25,10 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             // Arrange
             
             // Castes til IPrivateCustomerRepository, fordi metodekaldene på repo er eksplicitte.
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
-            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+            var handler = ServiceProvider.GetRequiredService<IPrivateCustomerCommand>();
             var command = new CreatePrivateCustomerCommand("Mikkel", null, "Dahlmann",
-                "Gade", "By", "1", 7100, null, "12345678", "email@email.com", DateTime.Now.AddYears(-20));
+                "Gade", "By", "1", 7100, null, "12345678", "email@email.com", dateTimeProvider.GetCurrentDateTime().AddYears(-20));
 
             // Act
             handler.CreatePrivateCustomerAsync(command).GetAwaiter().GetResult();
@@ -45,12 +47,12 @@ namespace BellaHair.Application.Tests.PrivateCustomers
         public void Given_PrivateCustomerData_Then_DeletesPrivateCustomerFromDatabase()
         {
             // Arrange
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
-            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+            var handler = ServiceProvider.GetRequiredService<IPrivateCustomerCommand>();
 
-            var customer0 = PrivateCustomerFactory.Create(Name.FromStrings("Mikkel", "Dahlmann"),
+            var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
-                Email.FromString("email@email.com"), DateTime.Now.AddYears(-20));
+                Email.FromString("email@email.com"), dateTimeProvider.GetCurrentDateTime().AddYears(-20), dateTimeProvider);
 
             _db.Add(customer0);
             _db.SaveChanges();
@@ -68,12 +70,14 @@ namespace BellaHair.Application.Tests.PrivateCustomers
         public void Given_UpdatedPrivateCustomerData_Then_UpdatesPrivateCustomerInDatabase()
         {
             // Arrange
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
-            var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+            var handler = ServiceProvider.GetRequiredService<IPrivateCustomerCommand>();
+            
+            //var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider, bookingChecker);
 
-            var customer0 = PrivateCustomerFactory.Create(Name.FromStrings("Mikkel", "Dahlmann"),
+            var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),
-                Email.FromString("email@email.com"), DateTime.Now.AddYears(-20));
+                Email.FromString("email@email.com"), dateTimeProvider.GetCurrentDateTime().AddYears(-20), dateTimeProvider);
 
             _db.Add(customer0);
             _db.SaveChanges();

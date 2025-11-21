@@ -9,13 +9,14 @@
 
 @rendermode InteractiveServer
 @inject IPrivateCustomerQuery PrivateCustomerQuery
+@inject ISnackbar Snackbar
 
 <Modal @bind-IsVisible="@_showNewModal">
 	<p>Ny kunde</p>
 </Modal>
 
 <PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
-	
+
 <div class="kk-container privatecustomer-container">
 	@if (_errorMessage != null) { <p>@_errorMessage</p>}
 	@if (_customers == null) {<p>Loading...</p>}

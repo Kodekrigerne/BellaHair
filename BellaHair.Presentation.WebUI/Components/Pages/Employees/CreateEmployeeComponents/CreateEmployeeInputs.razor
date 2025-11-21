@@ -1,0 +1,80 @@
+﻿
+
+		<div class="kk-container">
+				<h5 style="margin-top: 2px;">Personligt info</h5>
+				<div class="employee-grouped-inputs">
+		<div class="employee-input">
+    <label for="first-name-input" class="required">Fornavn</label>
+				<input id="first-name-input" type="text" @bind="EmployeeModel.FirstName" style="width: 150px" />
+			<ValidationMessage For="@(() => EmployeeModel.FirstName)" />
+		</div>
+
+		<div class="employee-input">
+	<label for="middle-name-input">Mellemnavn</label>
+	<input id="middle-name-input" type="text" @bind="EmployeeModel.MiddleName"  style="width: 150px"/>
+	<ValidationMessage For="@(() => EmployeeModel.MiddleName)"/>
+		</div>
+
+				<div class="employee-input">
+				<label for="last-name-input" class="required">Efternavn</label>
+				<input id="last-name-input" type="text" @bind="EmployeeModel.LastName" style="width: 150px" />
+	<ValidationMessage For="@(() => EmployeeModel.LastName)" />
+		</div>
+		</div>
+
+		<div class="employee-grouped-inputs">
+				<div class="employee-input">
+	<label for="email-input" class="required">Email</label>
+			<input id="email-input" type="text" @bind="EmployeeModel.Email" />
+			<ValidationMessage For="@(() => EmployeeModel.Email)" />
+		</div>
+
+				<div class="employee-input">
+				<label for="phonenumber-input" class="required">Telefon</label>
+			<input id="phonenumber-input" type="number" @bind="EmployeeModel.PhoneNumber" style="width: 100px; " />
+			<ValidationMessage For="@(() => EmployeeModel.PhoneNumber)" />
+		</div>
+		</div>
+
+		</div>
+		<div class="kk-container">
+				<h5 style="margin-top: 2px;">Adresse </h5>
+				<div class="employee-grouped-inputs">
+		<div class="employee-input">
+				<label for="streetname-input" class="required">Vejnavn</label>
+			<input id="streetname-input" type="text" @bind="EmployeeModel.StreetName" />
+	<ValidationMessage For="@(() => EmployeeModel.StreetName)" />
+		</div>
+
+		<div class="employee-input">
+				<label for="street-number-input" class="required">Vejnummer</label>
+			<input id="street-number-input" type="number" @bind="EmployeeModel.StreetNumber" />
+			<ValidationMessage For="@(() => EmployeeModel.StreetNumber)" />
+		</div>
+
+		<div class="employee-input">
+	<label for="floor-input">Etage</label>
+				<input id="floor-input" type="number" @bind="EmployeeModel.Floor" style="width:50px" />
+			<ValidationMessage For="@(() => EmployeeModel.Floor)" />
+		</div>
+		</div>
+		
+		<div class="employee-grouped-inputs">
+		<div class="employee-input">
+				<label for="city-name-input" class="required">By</label>
+			<input id="city-name-input" type="text" @bind="EmployeeModel.CityName" />
+			<ValidationMessage For="@(() => EmployeeModel.CityName)" />
+		</div>
+
+		<div class="employee-input">
+				<label for="zipcode-input" class="required">Postnummer</label>
+			<input id="zipcode-input" type="number" @bind="EmployeeModel.ZipCode" />
+			<ValidationMessage For="@(() => EmployeeModel.ZipCode)" />
+			</div>
+		</div>
+		</div>
+		
+@code {
+	[Parameter, EditorRequired]
+	public NewEmployeeModel EmployeeModel { get; set; }
+}

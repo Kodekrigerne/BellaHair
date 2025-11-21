@@ -13,6 +13,7 @@ namespace BellaHair.Ports.Employees
         Task<List<EmployeeDTOSimple>> GetAllEmployeesSimpleAsync();
         Task<List<EmployeeNameWithBookingsDTO>> GetHasTreatmentAndWithFutureBookingsAsync(Guid treatmentId);
         Task<EmployeeDTOFull> GetEmployeeAsync(GetEmployeeByIdQuery query);
+        Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query);
     }
 
     /// <summary>
@@ -21,6 +22,14 @@ namespace BellaHair.Ports.Employees
     /// </summary>
     public record EmployeeDTOSimple(Guid Id, string Name, string PhoneNumber, string Email, List<string> TreatmentNames);
 
+/// <summary>
+/// Represents a data transfer object containing all information about an employee, including personal
+/// details, contact information, address, and associated treatments.
+/// </summary>
+public record EmployeeDTOFull(Guid Id, string FirstName, string MiddleName, string LastName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, List<TreatmentDTO> Treatments, int? Floor = null);
+public record GetEmployeeByIdQuery(Guid Id);
+public record EmployeeNameDTO(string FullName);
+public record GetEmployeesByTreatmentIdQuery(Guid TreatmentId);
     /// <summary>
     /// Represents a data transfer object containing all information about an employee, including personal
     /// details, contact information, address, and associated treatments.

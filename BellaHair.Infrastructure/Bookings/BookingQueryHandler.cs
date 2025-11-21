@@ -22,12 +22,10 @@ namespace BellaHair.Infrastructure.Bookings
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.Treatment != null || b.TreatmentSnapshot != null)
+                .Where(b => b.Treatment != null)
+                //Hvor sluttiden er større end nutid, fanger også igangværende bookinger
                 .Where(b => b.StartDateTime.AddMinutes(
-                    b.Treatment != null
-                    ? b.Treatment.DurationMinutes.Value
-                    : b.TreatmentSnapshot!.DurationMinutes)
-                > _currentDateTimeProvider.GetCurrentDateTime())
+                    b.Treatment!.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -40,12 +38,9 @@ namespace BellaHair.Infrastructure.Bookings
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.Treatment != null || b.TreatmentSnapshot != null)
+                .Where(b => b.TreatmentSnapshot != null)
                 .Where(b => b.StartDateTime.AddMinutes(
-                    b.Treatment != null
-                    ? b.Treatment.DurationMinutes.Value
-                    : b.TreatmentSnapshot!.DurationMinutes)
-                < _currentDateTimeProvider.GetCurrentDateTime())
+                    b.TreatmentSnapshot!.DurationMinutes) < _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -54,7 +49,7 @@ namespace BellaHair.Infrastructure.Bookings
             return MapToBookingSimpleDTOs(bookings);
         }
 
-        private IEnumerable<BookingSimpleDTO> MapToBookingSimpleDTOs(IEnumerable<Booking> bookings)
+        private static IEnumerable<BookingSimpleDTO> MapToBookingSimpleDTOs(IEnumerable<Booking> bookings)
         {
             // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
             // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)

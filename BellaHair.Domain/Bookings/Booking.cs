@@ -80,7 +80,7 @@ namespace BellaHair.Domain.Bookings
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(Treatment);
-            _total = Treatment.Price.Value;
+            _total = CalculateTotal();
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
         }
