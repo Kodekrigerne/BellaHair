@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents.ValidationAttributes;
+namespace BellaHair.Presentation.WebUI.Components.Shared.ValidationAttributes;
 
 // Mikkel Dahlmann
 

@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents.ValidationAttributes;
+using BellaHair.Presentation.WebUI.Components.Shared.ValidationAttributes;
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 {
