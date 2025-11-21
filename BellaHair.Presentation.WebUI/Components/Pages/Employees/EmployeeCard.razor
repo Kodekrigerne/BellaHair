@@ -95,7 +95,7 @@
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
-		_futureBookings = await EmployeeQuery.EmployeeFutureBookingsCheck(employeeSimpleViewModel.Id);
+		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeSimpleViewModel.Id);
 	}
 
 	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.

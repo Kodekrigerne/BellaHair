@@ -28,16 +28,19 @@ namespace BellaHair.Infrastructure.Employees
         }
 
         /// <summary>
-        /// Determines whether the specified employee has any bookings scheduled for a future date and time.
+        /// Determines whether the specified employee has any future bookings with an associated treatment.
         /// </summary>
+        /// <remarks>A future booking is defined as a booking whose end time, based on the treatment
+        /// duration, is after the current date and time. Only bookings with a non-null treatment are
+        /// considered.</remarks>
         /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
-        /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
-         async Task<bool> IEmployeeFutureBookingsChecker.CheckFutureBookings(Guid id)
+        /// employee has at least one future booking with a treatment; otherwise, <see langword="false"/>.</returns>
+         async Task<bool> IEmployeeFutureBookingsChecker.EmployeeHasFutureBookings(Guid id)
         {
-            return (await _db.Employees.Include(e => e.Bookings)
+            return (await _db.Employees.Include(e => e.Bookings.Where(b => b.Treatment!= null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime()))
                 .FirstAsync(p => p.Id == id))
-                .Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
+                .Bookings.Any();
         }
     }
 }

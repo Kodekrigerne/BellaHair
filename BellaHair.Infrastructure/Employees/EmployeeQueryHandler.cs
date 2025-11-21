@@ -94,11 +94,11 @@ namespace BellaHair.Infrastructure.Employees
        /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
        /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
        /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
-        async Task<bool> IEmployeeQuery.EmployeeFutureBookingsCheck(Guid id)
+        async Task<bool> IEmployeeQuery.EmployeeHasFutureBookings(Guid id)
         {
-            return (await _db.Employees.Include(e => e.Bookings)
-                .FirstAsync(p => p.Id == id))
-                .Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
+            return (await _db.Employees.Include(e => e.Bookings.Where(b => b.Treatment != null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime()))
+                            .FirstAsync(p => p.Id == id))
+                            .Bookings.Any();
         }
     }
 }   

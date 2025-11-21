@@ -11,6 +11,6 @@ namespace BellaHair.Domain.Employees
     /// </summary>
     public interface IEmployeeFutureBookingsChecker
     {
-        Task<bool> CheckFutureBookings(Guid id);
+        Task<bool> EmployeeHasFutureBookings(Guid id);
     }
 }
