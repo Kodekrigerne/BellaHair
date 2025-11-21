@@ -5,7 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Employees
 {
-
+    // Linnea
+    
     /// <summary>
     /// Handles queries for retrieving employee information from the data store.
     /// </summary>
@@ -13,8 +14,7 @@ namespace BellaHair.Infrastructure.Employees
     /// employee data in both simplified and detailed forms. It is intended for use in scenarios where employee
     /// information needs to be fetched for display or processing purposes. Instances of this class are typically
     /// created with a BellaHairContext to access the underlying database.</remarks>
-
-    // Linnea
+    
     public class EmployeeQueryHandler : IEmployeeQuery
     {
         private readonly BellaHairContext _db;
@@ -25,7 +25,6 @@ namespace BellaHair.Infrastructure.Employees
             _db = db;
             _currentDateTimeProvider = currentDateTimeProvider;
         }
-
         public async Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query)
         {
             return await _db.Employees
@@ -103,6 +102,19 @@ namespace BellaHair.Infrastructure.Employees
                             )
                         .ToList()))
                 .ToListAsync();
+        }
+
+       /// <summary>
+       /// Determines whether the specified employee has any bookings scheduled for a future date and time.
+       /// </summary>
+       /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
+       /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
+       /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
+        async Task<bool> IEmployeeQuery.EmployeeHasFutureBookings(Guid id)
+        {
+            return (await _db.Employees.Include(e => e.Bookings.Where(b => b.Treatment != null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime()))
+                            .FirstAsync(p => p.Id == id))
+                            .Bookings.Any();
         }
     }
 }

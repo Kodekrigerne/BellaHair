@@ -16,6 +16,7 @@
                                        '0' (flex-shrink): Må IKKE krympe. Beholder sin bredde.
                                         'calc(50% - 0.5rem)': Sætter bredden til PRÆCIS 50% af
                                         containeren, minus halvdelen af gap.*/
+    position: relative;
 }
 
     /* Makes employee-card look clickable */
@@ -73,4 +74,40 @@
     padding-inline: 5px;
     background-color: lightgrey;
     border-radius: 5px;
+}
+
+
+::deep .remove-confirmation-buttons {
+    display: flex; 
+    gap: 1rem; 
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 0 auto;
+    width: 200px;   
+}
+
+
+.modal-centered-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+}
+
+::deep .remove-confirmation-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center; 
+    align-items: center;
+    padding-top: 15px;
+}
+
+::deep .delete-confirmation-icon {
+    width: 5rem;
+    height: 5rem;
+    color: firebrick;
+    margin-bottom: 1rem;
+
 }
