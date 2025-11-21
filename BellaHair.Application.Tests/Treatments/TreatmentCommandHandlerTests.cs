@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Application.Treatments;
+﻿using BellaHair.Application.Treatments;
+using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
+using BellaHair.Infrastructure.PrivateCustomers;
+using BellaHair.Infrastructure;
+using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Treatments;
 
@@ -22,7 +23,9 @@ namespace BellaHair.Application.Tests.Treatments
             // Arrange
 
             var repo = (ITreatmentRepository)new TreatmentRepository(_db);
-            var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+            var bookingChecker = (IFutureBookingWithTreatmentChecker)new FutureBookingWithTreatmentChecker(_db, dateTimeProvider);
+            var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo, bookingChecker);
             var command = new CreateTreatmentCommand("Herreklip", 450m, 45);
 
             // Act
@@ -46,7 +49,9 @@ namespace BellaHair.Application.Tests.Treatments
             // Arrange
 
             var repo = (ITreatmentRepository)new TreatmentRepository(_db);
-            var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo);
+            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+            var bookingChecker = (IFutureBookingWithTreatmentChecker)new FutureBookingWithTreatmentChecker(_db, dateTimeProvider);
+            var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo, bookingChecker);
             var treatment = Treatment.Create("Herreklip", Price.FromDecimal(450), DurationMinutes.FromInt(45));
 
             _db.Add(treatment);

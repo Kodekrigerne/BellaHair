@@ -42,6 +42,7 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IBookingQuery, BookingQueryHandler>();
             serviceCollection.AddScoped<IBookingOverlapChecker, BookingOverlapChecker>();
+            serviceCollection.AddScoped<IFutureBookingWithTreatmentChecker, FutureBookingWithTreatmentChecker>();
 
 
             return serviceCollection;

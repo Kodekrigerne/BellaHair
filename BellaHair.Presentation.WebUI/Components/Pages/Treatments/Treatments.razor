@@ -8,8 +8,9 @@
 @page "/behandlinger"
 
 @rendermode InteractiveServer
-@inject ITreatmentQuery _treatmentQuery
-@inject ITreatmentCommand _treatmentCommand
+@inject ITreatmentQuery TreatmentQuery
+@inject ITreatmentCommand TreatmentCommand
+@inject ISnackbar Snackbar
 
 <Modal @bind-IsVisible="@_showNewModal">
 
@@ -31,7 +32,6 @@
 
 <div class="kk-container treatment-container">
 
-	@if (_errorMessage != null) { <p>@_errorMessage</p> }
 	@if (_treatments == null) { <p>Loading...</p> }
 	else {
 			@foreach (var treatment in _treatments)
@@ -45,7 +45,6 @@
 
 
 @code {
-    private string? _errorMessage;
     private bool _showNewModal = false;
     private bool _showOfferedByModal = false;
 
@@ -61,21 +60,23 @@
 
     private async Task LoadTreatments()
     {
+        _showNewModal = false;
+
         try
         {
-            var treatments = await _treatmentQuery.GetAllAsync();
+            var treatments = await TreatmentQuery.GetAllAsync();
             _treatments = treatments
                 .OrderBy(t => t.Name)
-                .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+                .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
                 .ToList();
         }
         catch (DomainException dex)
         {
-            _errorMessage = dex.Message;
+            Snackbar.Add(dex.Message, Severity.Error);
         }
         catch (Exception ex)
         {
-            _errorMessage = $"Der skete en fejl under indlæsning af behandlinger: {ex.Message}";
+            Snackbar.Add($"Der skete en fejl under indlæsningen af behandlingerne: {ex.Message}", Severity.Error);
         }
     }
 

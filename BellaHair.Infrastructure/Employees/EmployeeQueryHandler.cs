@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BellaHair.Infrastructure.Employees
 {
     // Linnea
-    
+
     /// <summary>
     /// Handles queries for retrieving employee information from the data store.
     /// </summary>
@@ -14,7 +14,7 @@ namespace BellaHair.Infrastructure.Employees
     /// employee data in both simplified and detailed forms. It is intended for use in scenarios where employee
     /// information needs to be fetched for display or processing purposes. Instances of this class are typically
     /// created with a BellaHairContext to access the underlying database.</remarks>
-    
+
     public class EmployeeQueryHandler : IEmployeeQuery
     {
         private readonly BellaHairContext _db;
@@ -38,7 +38,7 @@ namespace BellaHair.Infrastructure.Employees
         // Henter alle medarbejdere med færre detaljer til overblikket
         async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
         {
-            var emp =  await _db.Employees
+            var emp = await _db.Employees
                 .AsNoTracking()
                 .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Treatments.Select(x => x.Name).ToList()))
                 .ToListAsync();
@@ -60,11 +60,12 @@ namespace BellaHair.Infrastructure.Employees
                 .FirstOrDefaultAsync(e => e.Id == query.Id)
                 ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
 
-            List<TreatmentDTO> treatments = employee.Treatments.Select(e =>
-                new TreatmentDTO(e.Id,
+            List<TreatmentDTO> treatments = employee.Treatments.Select(e => new TreatmentDTO(
+                    e.Id,
                     e.Name,
                     e.Price.Value,
-                    e.DurationMinutes.Value))
+                    e.DurationMinutes.Value,
+                    e.Employees.Count))
                 .ToList();
 
             return new EmployeeDTOFull(employee.Id,
@@ -104,12 +105,12 @@ namespace BellaHair.Infrastructure.Employees
                 .ToListAsync();
         }
 
-       /// <summary>
-       /// Determines whether the specified employee has any bookings scheduled for a future date and time.
-       /// </summary>
-       /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
-       /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
-       /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
+        /// <summary>
+        /// Determines whether the specified employee has any bookings scheduled for a future date and time.
+        /// </summary>
+        /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
+        /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
         async Task<bool> IEmployeeQuery.EmployeeHasFutureBookings(Guid id)
         {
             return (await _db.Employees.Include(e => e.Bookings.Where(b => b.Treatment != null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime()))

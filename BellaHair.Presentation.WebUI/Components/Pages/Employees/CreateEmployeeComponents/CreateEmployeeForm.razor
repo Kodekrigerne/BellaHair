@@ -171,7 +171,7 @@
 			var treatments = await TreatmentQuery.GetAllAsync();
 			_treatments = treatments
 				.OrderBy(t => t.Name)
-				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration))
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
 				.ToList();
 		}
 		catch (Exception ex)

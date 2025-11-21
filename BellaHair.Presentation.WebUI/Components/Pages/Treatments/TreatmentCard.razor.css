@@ -40,6 +40,7 @@
 
     .treatment-card:hover {
         box-shadow: 2px 2px 5px rgba(0,0,0,0.25);
+        background-color: #f7faff;
     }
 
 
@@ -47,7 +48,7 @@
     width: 4rem;
     height: 4rem;
     border-radius: 9999px;
-    background: linear-gradient(to bottom right, #a91ce4, #c9abe7);
+    background: linear-gradient(to bottom right, #611ce4, #c9abe7);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -100,3 +101,15 @@
         cursor: pointer;
         background-color:#efd3fb;
     }
+    
+    .btn-remove{
+        padding-left:25px;
+        padding-right:25px;
+    }
+    
+.btn-wrapper{
+    margin-top:25px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+}

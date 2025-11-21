@@ -126,7 +126,7 @@
 		if (Customer == null) return;
 
 		_treatments = (await TreatmentQuery.GetAllAsync())
-		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).ToList();
+		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount)).ToList();
 
 		_activePicker = Picker.Treatments;
 	}

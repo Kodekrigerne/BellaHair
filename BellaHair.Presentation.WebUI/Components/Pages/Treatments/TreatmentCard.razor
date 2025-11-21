@@ -1,13 +1,17 @@
-﻿@using BellaHair.Ports.Treatments
+﻿@using BellaHair.Domain.Treatments
+@using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Threading.Tasks
+@using BellaHair.Domain
 
+@inject ITreatmentCommand _treatmentCommand
+@inject ISnackbar Snackbar
 <!-- Mikkel Klitgaard -->
 
 
 			<div class="treatment-card">
 
-					<BinDeleteButton OnClick="HandleOnDeleteClick" />
+					<BinDeleteButton OnClick="@(() => {_showConfirmDelete = true;})" />
 
 				<div class="treatment-avatar">
 						<TreatmentIcon Class="treatment-icon"/>
@@ -20,7 +24,7 @@
 						<div class="offered-by-wrapper">
 
 							<button class="btn-offer" @onclick="@HandleOfferedByClick">
-								Udbydes af
+				Udbydes af (@Treatment.EmployeeCount)
 								</button>
 						
 						</div>
@@ -46,6 +50,23 @@
 					</div>
 				</div>
 
+				<Modal @bind-IsVisible="@_showConfirmDelete">
+					
+					<h3>Slet behandling</h3>
+					<hr class="treatment-line" />
+					<p>Ønsker du at slette denne behandling?</p>
+					Handlingen kan ikke fortrydes.
+
+					<div class="btn-wrapper">
+
+					<button class="btn-remove" @onclick="HandleOnDeleteClick">Slet</button>
+					<button class="btn-add" @onclick="@(() => { _showConfirmDelete = false; })">Annuller</button>
+
+					</div>
+
+				</Modal>
+
+
 
 @code {
 	[Parameter, EditorRequired]
@@ -57,20 +78,35 @@
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnShowOfferedBy { get; set; }
 
+	private bool _showConfirmDelete;
 
-	private void HandleOnDeleteClick()
+
+	private async Task HandleOnDeleteClick()
 	{
-		Console.WriteLine("Jalapeños");
-		// TODO: Implementer logik
-		OnDelete.InvokeAsync();
-	}
+		try
+		{
+			var command = new DeleteTreatmentCommand(Treatment.Id);
+			await _treatmentCommand.DeleteTreatmentAsync(command);
 
+			_showConfirmDelete = false;
+			await OnDelete.InvokeAsync();
+			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			_showConfirmDelete = false;
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+		catch (Exception)
+		{
+			_showConfirmDelete = false;
+			Snackbar.Add("Der skete en uventet fejl.", Severity.Error);
+		}
+	}
 
 	private async Task HandleOfferedByClick()
 	{
 		await OnShowOfferedBy.InvokeAsync(Treatment.Id);
 	}
-
-
 
 }

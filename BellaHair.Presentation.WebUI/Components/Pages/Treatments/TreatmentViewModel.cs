@@ -2,6 +2,6 @@
 
 // Mikkel Klitgaard
 {
-    public record TreatmentViewModel(Guid Id, string Name, decimal Price, int DurationMinutes);
+    public record TreatmentViewModel(Guid Id, string Name, decimal Price, int DurationMinutes, int EmployeeCount);
 
 }
