@@ -7,22 +7,29 @@
 @page "/medarbejdere"
 
 @rendermode InteractiveServer
-@inject IEmployeeQuery _employeeQuery
+@inject IEmployeeQuery EmployeeQuery
 
 <PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
 
+@* Modal til oprettelse af medarbejder - vises når der trykkes på opret knappen. *@
 <Modal @bind-IsVisible="@_showNewModal"> 
 	<CreateEmployeeForm OnCreate="@HandleCreate" />
 </Modal>
 
+@* Viser alle medarbejdere, hvis der findes nogen vha EmployeeCard komponentet *@
 <div class="kk-container employees-container">
 		@if (_errorMessage != null) { <p>@_errorMessage</p>}
 		@if (_employees == null) {<p>Loading...</p>}
 		else
-		{
+		{ 
+			@if (_employees.Count == 0)
+			{
+				<p>Der er ingen medarbejdere i øjeblikket.</p>
+			}
+
 			@foreach (var employee in _employees)
 			{
-				<EmployeeCard employeeSimpleViewModel="employee"/>
+				<EmployeeCard employeeSimpleViewModel="employee" OnDelete="@HandleDeleteClick"/>
 			}
 		}
 </div>
@@ -32,7 +39,7 @@
 	private string? _errorMessage;
 
 	/// <summary>
-	/// List of viewmodels used to store employee view model data
+	/// List of viewmodels used to store employee data
 	/// </summary>
 	private List<EmployeeSimpleViewModel>? _employees = null;
 
@@ -42,12 +49,23 @@
 		await LoadEmployees();
 	}
 
+	private async Task HandleDeleteClick(Guid Id)
+	{
+		_employees = _employees?.Where(d => d.Id != Id).ToList();
+	}
+
 	private async Task LoadEmployees()
 	{
 		try
 		{
-			var employees = await _employeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeSimpleViewModel(e.Id, e.Name, e.Email, e.PhoneNumber, e.TreatmentNames)).ToList();
+			var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
+			_employees = employees.Select(e => new EmployeeSimpleViewModel(	e.Id,
+																			e.Name,
+																			e.Email,
+																			e.PhoneNumber,
+																			e.TreatmentNames))
+																							.OrderBy(e => e.Name)
+																							.ToList();
 		}
 		catch (DomainException ex)
 		{

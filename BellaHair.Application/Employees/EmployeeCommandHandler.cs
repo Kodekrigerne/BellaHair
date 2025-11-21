@@ -17,11 +17,13 @@ namespace BellaHair.Application.Employees
     {
         private readonly IEmployeeRepository _employeeRepo;
         private readonly ITreatmentRepository _treatmentRepo;
+        private readonly IEmployeeFutureBookingsChecker _employeeFutureBookingsChecker;
 
-        public EmployeeCommandHandler(IEmployeeRepository employeeRepo, ITreatmentRepository treatmentRepo)
+        public EmployeeCommandHandler(IEmployeeRepository employeeRepo, ITreatmentRepository treatmentRepo, IEmployeeFutureBookingsChecker employeeFutureBookingsChecker)
         {
             _employeeRepo = employeeRepo;
             _treatmentRepo = treatmentRepo;
+            _employeeFutureBookingsChecker = employeeFutureBookingsChecker;
         }
 
         async Task IEmployeeCommand.CreateEmployeeCommand(CreateEmployeeCommand command)
@@ -42,6 +44,8 @@ namespace BellaHair.Application.Employees
         async Task IEmployeeCommand.DeleteEmployeeCommand(DeleteEmployeeCommand command)
         {
             var employee = await _employeeRepo.GetAsync(command.Id);
+            if (await _employeeFutureBookingsChecker.EmployeeHasFutureBookings(command.Id))
+                throw new EmployeeException("Medarbejderen har fremtidige bookinger. Du er nødt til at fjerne dem, før du kan slette medarbejderen.");
 
             _employeeRepo.Delete(employee);
 
