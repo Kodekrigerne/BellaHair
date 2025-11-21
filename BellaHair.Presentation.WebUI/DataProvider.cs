@@ -128,7 +128,7 @@ namespace BellaHair.Presentation.WebUI
             );
             _db.Add(_maria);
 
-            // Maria Jensen: All three treatments
+            // Dennis: No bookings
             var dennis = Employee.Create(
                 Name.FromStrings("Dennis", "Hansen"),
                 Email.FromString("dennis@frisor.dk"),
