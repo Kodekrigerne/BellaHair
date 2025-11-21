@@ -2,11 +2,6 @@
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure.PrivateCustomers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 {

@@ -15,7 +15,6 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PrivateCustomerRepository : IPrivateCustomerRepository
     {
         private readonly BellaHairContext _db;
-
         public PrivateCustomerRepository(BellaHairContext db) => _db = db;
 
         async Task IPrivateCustomerRepository.AddAsync(PrivateCustomer privateCustomer)
@@ -33,7 +32,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         {
             var privateCustomer = await _db.PrivateCustomers
                                       .Include(p => p.Bookings)
-                                      .SingleOrDefaultAsync(p => p.Id == id)
+                                      .FirstOrDefaultAsync(p => p.Id == id)
                                   ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
 
             return privateCustomer;

@@ -30,9 +30,9 @@ namespace BellaHair.Domain
         private static readonly Regex WhiteSpaceRegex = new((@"\s+"), RegexOptions.Compiled);
 
         // Constructor til EF.
-#pragma warning disable CS8618
+        #pragma warning disable CS8618
         private Address() { }
-#pragma warning restore CS8618
+        #pragma warning restore CS8618
 
 
         // Offentlig metode til oprettelse af Address-objekt. Kalder privat constructor.

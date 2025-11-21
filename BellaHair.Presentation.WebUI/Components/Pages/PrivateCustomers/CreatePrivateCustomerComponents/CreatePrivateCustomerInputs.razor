@@ -1,0 +1,120 @@
+﻿<!-- Mikkel Dahlmann -->
+
+<div class="kk-container">
+	
+	<h5 style="margin-top: 2px;">Personligt info</h5>
+	
+	<div class="pc-grouped-inputs">
+		
+		<!-- reference tilføjet til fornavn, for at kunne sætte focus på inputfelt ved åbning -->
+		<div class="pc-input">
+			<label for="first-name-input" class="required">Fornavn</label>
+			<InputText autocomplete="off" id="first-name-input" @ref="_firstNameInput" @bind-Value="PrivateCustomerModel.FirstName" style="width: 150px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.FirstName)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="middle-name-input">Mellemnavn</label>
+			<InputText autocomplete="off" id="middle-name-input" @bind-Value="PrivateCustomerModel.MiddleName" style="width: 150px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.MiddleName)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="last-name-input" class="required">Efternavn</label>
+			<InputText autocomplete="off" id="last-name-input" @bind-Value="PrivateCustomerModel.LastName" style="width: 150px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.LastName)" />
+		</div>
+	
+	</div>
+
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="email-input" class="required">Email</label>
+			<InputText autocomplete="off" id="email-input" @bind-Value="PrivateCustomerModel.Email" style="width:195px;"/>
+			<ValidationMessage For="@(() => PrivateCustomerModel.Email)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="phonenumber-input" class="required">Telefon</label>
+			<InputText autocomplete="off" id="phonenumber-input" @bind-Value="PrivateCustomerModel.PhoneNumber" style="width: 100px; " />
+			<ValidationMessage For="@(() => PrivateCustomerModel.PhoneNumber)" />
+		</div>
+			
+		<div class="pc-input">
+			<label for="birthday-input" class="required">Fødselsdato</label>
+			<InputDate autocomplete="off" id="birthday-input" @bind-Value="PrivateCustomerModel.Birthday" style="width: 100px; " />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Birthday)" />
+		</div>
+
+	</div>
+
+</div>
+
+<div class="kk-container">
+	
+	<h5 style="margin-top: 2px;">Adresse </h5>
+	
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="streetname-input" class="required">Vejnavn</label>
+			<InputText autocomplete="off" id="streetname-input" @bind-Value="PrivateCustomerModel.StreetName" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.StreetName)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="street-number-input" class="required">Vejnummer</label>
+			<InputText autocomplete="off" id="street-number-input" @bind-Value="PrivateCustomerModel.StreetNumber" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.StreetNumber)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="floor-input">Etage</label>
+			<InputNumber autocomplete="off" id="floor-input" @bind-Value="PrivateCustomerModel.Floor" style="width:50px" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Floor)" />
+		</div>
+
+	</div>
+
+	<div class="pc-grouped-inputs">
+		
+		<div class="pc-input">
+			<label for="city-name-input" class="required">By</label>
+			<InputText autocomplete="new password" id="city-name-input" @bind-Value="PrivateCustomerModel.City" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.City)" />
+		</div>
+
+		<div class="pc-input">
+			<label for="zipcode-input" class="required">Postnummer</label>
+			<InputNumber autocomplete="off" id="zipcode-input" @bind-Value="PrivateCustomerModel.ZipCode" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.ZipCode)" />
+		</div>
+
+	</div>
+
+</div>
+
+@code 
+{
+	[Parameter, EditorRequired]
+	public required NewPrivateCustomerModel PrivateCustomerModel { get; set; }
+
+	private InputText? _firstNameInput;
+	
+	// Override af componentbase metode.
+	// Metoden kaldes automatisk efter hver render af komponenten.
+	// Hvis det er første render, så 
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		// Hvis det er komponentens første render, så køres følgende.
+		if (firstRender)
+		{
+			// Sikrer at firstnameinput elementet er skabt og tilgængeligt, før der forsøges at sættes focus til det.
+			if (_firstNameInput?.Element.HasValue ?? false)
+			{
+				await _firstNameInput.Element.Value.FocusAsync();
+			}
+		}
+	}
+}

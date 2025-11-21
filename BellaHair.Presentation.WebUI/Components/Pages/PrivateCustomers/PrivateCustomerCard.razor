@@ -1,6 +1,4 @@
-﻿@using BellaHair.Application.PrivateCustomers
-@using BellaHair.Domain.PrivateCustomers
-@using BellaHair.Ports.PrivateCustomers
+﻿@using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
@@ -10,6 +8,7 @@
 <!-- Mikkel Dahlmann -->
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
 <!-- TODO Bedre styling -->
+
 <Modal @bind-IsVisible="@_showNewModal">
 	@if (_futureBookings)
 	{
@@ -18,40 +17,51 @@
 	else
 	{
 		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-		<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-		<button class="btn-add" onclick="@CloseModal">Annuller</button>
+		<button class="btn-remove" @onclick="@HandleOnDeleteConfirm">Slet</button>
+		<button class="btn-add" @onclick="@CloseModal">Annuller</button>
 	}
 </Modal>
 
 <div class="privatecustomer-card">
+	
 	<div class="privatecustomer-avatar">
 		@GetCustomerInitials(PrivateCustomer.FullName)
 	</div>
+
 	<div class="privatecustomer-details">
 		<h3>@PrivateCustomer.FullName</h3>
+		
 		<div class="privatecustomer-contact-body">
+			
 			<div class="privatecustomer-contact-details">
 				<PhoneIcon Class="privatecustomer-icons" />
 				@PrivateCustomer.PhoneNumber
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<HomeIcon Class="privatecustomer-icons" />
 				@PrivateCustomer.FullAddress
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<BirthdayIcon Class="privatecustomer-icons-birthday" />
 				@PrivateCustomer.Birthday.ToString("d. MMMM yyyy")
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<MailIcon Class="privatecustomer-icons" />
 				@PrivateCustomer.Email
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<VisitsIcon Class="privatecustomer-icons" />
 				Antal besøg: @PrivateCustomer.Visits
 			</div>
+
 		</div>
+
 	</div>
+
 	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
 
