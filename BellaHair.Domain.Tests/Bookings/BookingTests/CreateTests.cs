@@ -2,8 +2,8 @@
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
+using FixtureBuilder;
 using Moq;
-using FB = FixtureBuilder.FixtureBuilder;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {
@@ -13,9 +13,9 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         public void Given_ValidParameters_Then_CreatesBooking()
         {
             //Arrange
-            var customer = FB.New<PrivateCustomer>().With(p => p.Id, Guid.NewGuid()).Build();
-            var treatment = FB.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
-            var employee = FB.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
+            var customer = Fixture.New<PrivateCustomer>().With(p => p.Id, Guid.NewGuid()).Build();
+            var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
@@ -45,10 +45,10 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         public void Given_EmployeeNotHasTreatment_Then_ThrowsException()
         {
             //Arrange
-            var customer = FB.New<PrivateCustomer>().With(p => p.Id, Guid.NewGuid()).Build();
-            var treatment1 = FB.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
-            var treatment2 = FB.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
-            var employee = FB.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment1]).Build();
+            var customer = Fixture.New<PrivateCustomer>().With(p => p.Id, Guid.NewGuid()).Build();
+            var treatment1 = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var treatment2 = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment1]).Build();
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
