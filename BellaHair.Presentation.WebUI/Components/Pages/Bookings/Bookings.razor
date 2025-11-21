@@ -9,8 +9,9 @@
 
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider
 @inject IBookingQuery BookingQuery
+@inject NavigationManager NavigationManager
 
-<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => {})" />
+<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/new"); })" />
 
 <div>
 	<button @onclick="HandleNewSelectorClick" class="@(_activeTab == BookingTab.New? "btn-select-active" : "btn-select")">Kommende bookinger</button>
