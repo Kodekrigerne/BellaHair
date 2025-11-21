@@ -12,4 +12,6 @@
         int DurationMinutes,
         string? DiscountName,
         decimal? DiscountAmount);
+
+    public record BookingTimesOnlyViewModel(DateTime StartDateTime, DateTime EndDateTime);
 }
