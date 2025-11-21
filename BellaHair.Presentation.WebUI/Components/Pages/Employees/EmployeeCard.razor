@@ -1,12 +1,24 @@
 ﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
 @inject IEmployeeCommand _employeeCommand
+@inject IEmployeeQuery _employeeQuery
 @inject ISnackbar SnackBar
 
 
 		<Modal @bind-IsVisible="@_showNewModal">
 			<div class="modal-centered-content">
 				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
+			@if (_futureBookings)
+			{
+				<p style="max-width: 22rem; text-align: center;"> Medarbejderen @employeeSimpleViewModel.Name har fremtidige bookinger.
+					Disse skal slettes før medarbejderen 
+				</p>
+			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+
+			}
+
+			else
+			{
 				<h4>Slet: @employeeSimpleViewModel.Name?</h4>
 				<p style="max-width: 22rem; text-align: center;">Er du sikker på, at du vil slette denne medarbejder?
 			Denne handling kan ikke fortrydes.
@@ -15,6 +27,7 @@
 				<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
 				<button class="btn-add" onclick="@CloseModal">Annuller</button>
 			</div>
+			}
 			</div>
 		</Modal>
 
@@ -53,6 +66,7 @@
 @code
 {
 	private bool _showNewModal = false;
+	private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
 	public required EmployeeSimpleViewModel employeeSimpleViewModel { get; set; }
@@ -76,6 +90,7 @@
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
+		_futureBookings = await _employeeQuery.EmployeeFutureBookingsCheck(employeeSimpleViewModel.Id);
 	}
 
 	private async Task HandleOnDeleteConfirm()

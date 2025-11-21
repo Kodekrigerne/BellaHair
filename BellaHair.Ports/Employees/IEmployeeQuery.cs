@@ -18,6 +18,7 @@ namespace BellaHair.Ports.Employees
         Task<List<EmployeeDTOSimple>> GetAllEmployeesSimpleAsync();
         Task<EmployeeDTOFull> GetEmployeeAsync(GetEmployeeByIdQuery query);
         Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query);
+        Task<bool> EmployeeFutureBookingsCheck(Guid id);
     }
 }
 

@@ -25,9 +25,13 @@ namespace BellaHair.Infrastructure.Employees
     public class EmployeeQueryHandler : IEmployeeQuery
     {
         private readonly BellaHairContext _db;
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
 
-        public EmployeeQueryHandler(BellaHairContext db) => _db = db;
-
+        public EmployeeQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            _db = db;
+            _currentDateTimeProvider = currentDateTimeProvider;
+        }
         public async Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query)
         {
             return await _db.Employees
@@ -82,6 +86,13 @@ namespace BellaHair.Infrastructure.Employees
                                        employee.Address.ZipCode,
                                        treatments,
                                        employee.Address.Floor);
+        }
+
+        async Task<bool> IEmployeeQuery.EmployeeFutureBookingsCheck(Guid id)
+        {
+            return (await _db.Employees.Include(e => e.Bookings)
+                .FirstAsync(p => p.Id == id))
+                .Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime());
         }
     }
 }   

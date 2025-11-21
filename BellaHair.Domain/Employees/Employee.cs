@@ -12,8 +12,8 @@ public class Employee : PersonBase
     private readonly List<Treatment> _treatments; //Inde i
     public IReadOnlyList<Treatment> Treatments => _treatments.AsReadOnly(); //Udad
 
-    private readonly List<Booking> _bookings;
-    public IReadOnlyList<Booking> Bookings => _bookings.AsReadOnly();
+    private readonly List<Booking>? _bookings;
+    public IReadOnlyList<Booking> Bookings => _bookings?.AsReadOnly();
 
 #pragma warning disable CS8618
     private Employee() { }
