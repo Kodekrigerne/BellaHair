@@ -15,7 +15,6 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PrivateCustomerRepository : IPrivateCustomerRepository
     {
         private readonly BellaHairContext _db;
-
         public PrivateCustomerRepository(BellaHairContext db) => _db = db;
 
         async Task IPrivateCustomerRepository.AddAsync(PrivateCustomer privateCustomer)

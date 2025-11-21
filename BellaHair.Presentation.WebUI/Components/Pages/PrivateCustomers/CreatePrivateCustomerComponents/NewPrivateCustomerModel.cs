@@ -1,11 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+﻿// Mikkel Dahlmann
+
+using System.ComponentModel.DataAnnotations;
 using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents.ValidationAttributes;
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 {
+    /// <summary>
+    /// Represents the data required to create a new private customer, including personal, contact, and address
+    /// information. Applies validation through attributes and trims the input where possible.
+    /// </summary>
+    
     public class NewPrivateCustomerModel
     {
         private string _firstName = string.Empty;
@@ -46,7 +50,8 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
         [ZipCode]
         public int? ZipCode { get; set; }
 
-        [NumbersOnly] public int? Floor { get; set; }
+        [NumbersOnly]
+        public int? Floor { get; set; }
 
         [Required(ErrorMessage = "Telefonnummber er påkrævet")]
         [DanishPhoneNumber]
@@ -59,6 +64,5 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
         [Required(ErrorMessage = "Fødselsdag er påkrævet")]
         [MustBeAdult]
         public DateTime? Birthday { get; set; }
-
     }
 }

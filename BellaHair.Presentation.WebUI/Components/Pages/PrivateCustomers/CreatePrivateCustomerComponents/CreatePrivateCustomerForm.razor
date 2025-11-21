@@ -13,17 +13,15 @@
 <br />
 <p style="text-align: center">Indtast oplysningerne på den kunde, du vil oprette.</p>
 
+<!-- Editform container -->
 <EditForm Model="@NewPrivateCustomerModel" OnValidSubmit="@HandleCreatePCustomer">
         <DataAnnotationsValidator />
 
         <div class="inputs-container">
 			
 	        <div class="inputs-items-container">
-		        @if (_errorMessage != null)
-		        {
-			        <p>@_errorMessage</p>
-		        }
 
+		        <!-- Indeholdte inputs til formen -->
 		        <div>
 			        <CreatePrivateCustomerInputs PrivateCustomerModel="NewPrivateCustomerModel"/>
 		        </div>
@@ -43,17 +41,15 @@
 @code {
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
+
 	[Parameter, EditorRequired]
 	public required EventCallback OnCancel { get; set; }
 
 	[Parameter]
 	public NewPrivateCustomerModel NewPrivateCustomerModel { get; set; } = new NewPrivateCustomerModel();
 
-	private string? _errorMessage = null;
-
 	protected override void OnInitialized()
 	{
-		_errorMessage = null;
 		NewPrivateCustomerModel = new NewPrivateCustomerModel();
 	}
 
@@ -86,7 +82,7 @@
 		}
 		catch (Exception e)
 		{
-			_errorMessage = $"Oprettelse mislykkedes: {e.Message}";
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
 		}
 	}
 }

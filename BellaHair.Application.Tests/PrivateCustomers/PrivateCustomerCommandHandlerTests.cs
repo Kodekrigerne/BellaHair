@@ -1,15 +1,7 @@
-﻿using BellaHair.Application.PrivateCustomers;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
-using BellaHair.Infrastructure.PrivateCustomers;
-using BellaHair.Ports.Discounts;
 using BellaHair.Ports.PrivateCustomers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BellaHair.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 

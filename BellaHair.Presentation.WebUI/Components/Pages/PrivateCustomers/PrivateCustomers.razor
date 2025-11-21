@@ -1,31 +1,37 @@
 ﻿<!-- Mikkel Dahlmann -->
+@page "/kunder"
 
-@attribute [StreamRendering]
 @using BellaHair.Domain
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 
-@page "/kunder"
-
+@attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
+
+
+<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
+	
 
 <!-- Modal overlay der viser 'Opret ny kunde'-formular -->
 <Modal IsVisible="@_showNewModal">
 	<CreatePrivateCustomerForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreatePrivateCustomerForm>
 </Modal>
 
-<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
 
+<!-- Container til privatecustomer 'cards' -->
 <div class="kk-container privatecustomer-container">
-	@if (_errorMessage != null) { <p>@_errorMessage</p>}
-	@if (_customers == null) {<p>Loading...</p>}
+	@if (_customers is null)
+	{
+		<h1>Der kunne ikke findes nogen kunder i databasen.</h1>
+	}
 	else
 	{
-		@foreach (var customer in _customers)
+		foreach (var customer in _customers)
 		{
+			<!-- Card komponent der tager imod en customer. OnDelete er komponentens EventCallBack. -->
 			<PrivateCustomerCard PrivateCustomer="@customer" OnDelete="@LoadCustomers"></PrivateCustomerCard>
 		}
 	}
@@ -33,8 +39,6 @@
 
 @code {
 	private bool _showNewModal = false;
-
-	private string? _errorMessage;
 
 	private List<PrivateCustomerViewModel>? _customers = null;
 
@@ -47,19 +51,30 @@
 
 	private async Task LoadCustomers()
 	{
+		// Forsøger at populate _customers-listen med alle privatkunder.
 		try
 		{
 			var customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			_customers = customers.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists)).ToList();
+			
+			_customers = customers.Select(e => new PrivateCustomerViewModel(
+					e.Id, 
+					e.FullName, 
+					e.Birthday, 
+					e.Email, 
+					e.PhoneNumber, 
+					e.FullAddress, 
+					e.Visists))
+				.ToList();
 		}
+
 		catch (DomainException ex)
 		{
-
-			_errorMessage = ex.Message;
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
 		}
+
 		catch (Exception ex)
 		{
-			_errorMessage = ex.Message; // TODO: "Noget gik galt"
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
 		}
 	}
 

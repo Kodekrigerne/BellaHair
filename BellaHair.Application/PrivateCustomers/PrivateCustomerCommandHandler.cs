@@ -22,7 +22,10 @@ namespace BellaHair.Application.PrivateCustomers
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly IPCustomerFutureBookingChecker _pCustomerFutureBookingChecker;
 
-        public PrivateCustomerCommandHandler(IPrivateCustomerRepository privateCustomerRepo, ICurrentDateTimeProvider currentDateTimeProvider, IPCustomerFutureBookingChecker pCustomerFutureBookingChecker)
+        public PrivateCustomerCommandHandler(
+            IPrivateCustomerRepository privateCustomerRepo, 
+            ICurrentDateTimeProvider currentDateTimeProvider, 
+            IPCustomerFutureBookingChecker pCustomerFutureBookingChecker)
         {
             _privateCustomerRepo = privateCustomerRepo;
             _currentDateTimeProvider = currentDateTimeProvider;

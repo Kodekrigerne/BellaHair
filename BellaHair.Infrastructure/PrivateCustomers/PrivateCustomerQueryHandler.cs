@@ -50,6 +50,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                 .ToListAsync();
         }
 
+        // Checker om der findes nogen bookings for kunden, der ligger i fremtiden.
         async Task<bool> IPrivateCustomerQuery.PCFutureBookingsCheck(Guid id)
         {
                 return await _db.PrivateCustomers
