@@ -13,7 +13,7 @@
 @inject ISnackbar Snackbar
 
 <!-- Modal overlay der viser 'Opret ny kunde'-formular -->
-<Modal @bind-IsVisible="@_showNewModal">
+<Modal IsVisible="@_showNewModal" OnClose="">
 	<CreatePrivateCustomerForm OnCreate="@HandleCreate"></CreatePrivateCustomerForm>
 </Modal>
 
