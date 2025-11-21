@@ -5,32 +5,41 @@ using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
-using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Infrastructure;
 using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Treatments;
+using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
+using NUnit.Framework.Interfaces;
+using FixtureBuilder;
+using FixtureBuilder.Extensions;
 
 namespace BellaHair.Application.Tests.Treatments
 {
     // Mikkel Klitgaard
-
+    /// <summary>
+    /// 
+    /// </summary>
     internal sealed class TreatmentCommandHandlerTests : ApplicationTestBase
     {
         [Test]
-        public void Given_Treatment_Then_CreatesTreatment()
+        public async Task Given_Treatment_Then_CreatesTreatment()
         {
             // Arrange
 
-            var repo = (ITreatmentRepository)new TreatmentRepository(_db);
-            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
-            var bookingChecker = (IFutureBookingWithTreatmentChecker)new FutureBookingWithTreatmentChecker(_db, dateTimeProvider);
-            var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo, bookingChecker);
+            //var repo = (ITreatmentRepository)new TreatmentRepository(_db);
+            //var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
+            //var bookingChecker = (IFutureBookingWithTreatmentChecker)new FutureBookingWithTreatmentChecker(_db, dateTimeProvider);
+            //var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo, bookingChecker);
+
+            //Nu bruger vi en ServiceProvider (IoC) istedet for, som sørger for at alle services som ITreatmentCommand skal bruge, bliver injiceret.
+            var handler = ServiceProvider.GetRequiredService<ITreatmentCommand>();
             var command = new CreateTreatmentCommand("Herreklip", 450m, 45);
 
             // Act
 
-            handler.CreateTreatmentAsync(command).GetAwaiter().GetResult();
+            await handler.CreateTreatmentAsync(command);
             var treatmentFromDb = _db.Treatments.FirstOrDefault();
 
             // Assert
@@ -44,14 +53,11 @@ namespace BellaHair.Application.Tests.Treatments
         }
 
         [Test]
-        public void Given_Treatment_Then_DeletesTreatment()
+        public async Task Given_Treatment_Then_DeletesTreatment()
         {
             // Arrange
 
-            var repo = (ITreatmentRepository)new TreatmentRepository(_db);
-            var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
-            var bookingChecker = (IFutureBookingWithTreatmentChecker)new FutureBookingWithTreatmentChecker(_db, dateTimeProvider);
-            var handler = (ITreatmentCommand)new TreatmentCommandHandler(repo, bookingChecker);
+            var handler = ServiceProvider.GetRequiredService<ITreatmentCommand>();
             var treatment = Treatment.Create("Herreklip", Price.FromDecimal(450), DurationMinutes.FromInt(45));
 
             _db.Add(treatment);
@@ -61,10 +67,32 @@ namespace BellaHair.Application.Tests.Treatments
 
             // Act
 
-            handler.DeleteTreatmentAsync(command).GetAwaiter().GetResult();
+            await handler.DeleteTreatmentAsync(command);
 
             // Assert
             Assert.That(_db.Treatments.Any(), Is.False);
+        }
+
+        [Test]
+        public async Task Given_DeleteTreatmentWithFutureBookings_Then_ThrowsException()
+        {
+            // Arrange
+            var handler = ServiceProvider.GetRequiredService<ITreatmentCommand>();
+            var treatment = Treatment.Create("Voksbehandling", Price.FromDecimal(300), DurationMinutes.FromInt(30));
+
+            var bookingFixture = Fixture.New<Booking>().UseConstructor()
+                                        .WithSetter(b => b.StartDateTime, DateTime.Now)
+                                        .WithSetter(b => b.Treatment, treatment)
+                                        .Build();
+
+            // Act
+            await _db.AddAsync(treatment);
+            await _db.Bookings.AddAsync(bookingFixture);
+            await _db.SaveChangesAsync();
+            var deleteCommand = new DeleteTreatmentCommand(treatment.Id);
+
+            // Assert 
+          Assert.ThrowsAsync<TreatmentInUseException>( async () => await handler.DeleteTreatmentAsync(deleteCommand));
         }
 
     }
