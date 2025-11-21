@@ -5,6 +5,7 @@
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
 @inject IPrivateCustomerCommand PrivateCustomerCommand
+@inject ISnackbar Snackbar
 
 <h3 style="text-align: center; font-weight: bold">Opret ny kunde</h3>
 <br />
@@ -31,11 +32,8 @@
 
         <div class="btn-wrapper">
 	        <button class="btn-add" type="submit">Opret</button>
-        </div>
-		
-		<!-- TODO: Cancel kalder submit - skal den ikke! -->
-        <div class="btn-wrapper">
-	        <button class="btn-remove" @onclick="@OnCancel">Annuller</button>
+	        <button class="btn-remove" type="reset" >Ryd indhold</button>
+	        <button class="btn-remove" type="button" onclick="@OnCancel">Annuller</button>
         </div>
 
 </EditForm>
@@ -70,14 +68,16 @@
 				NewPrivateCustomerModel.StreetName,
 				NewPrivateCustomerModel.City,
 				NewPrivateCustomerModel.StreetNumber,
-				NewPrivateCustomerModel.ZipCode,
+				NewPrivateCustomerModel.ZipCode!.Value,
 				NewPrivateCustomerModel.Floor,
 				NewPrivateCustomerModel.PhoneNumber,
 				NewPrivateCustomerModel.Email,
-				NewPrivateCustomerModel.Birthday
+				NewPrivateCustomerModel.Birthday!.Value
 			);
 
 			await PrivateCustomerCommand.CreatePrivateCustomerAsync(command);
+
+			Snackbar.Add($"Kundeprofilen '{command.FirstName} {command.LastName}' blev oprettet", Severity.Success);
 
 			await OnCreate.InvokeAsync();
 

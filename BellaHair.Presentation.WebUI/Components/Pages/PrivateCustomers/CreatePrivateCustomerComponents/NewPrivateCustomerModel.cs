@@ -8,14 +8,14 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
 {
     public class NewPrivateCustomerModel
     {
-        private string _firstName;
+        private string _firstName = string.Empty;
         private string? _middleName;
-        private string _lastName;
-        private string _streetName;
-        private string _city;
-        private string _streetNumber;
-        private string _phoneNumber;
-        private string _email;
+        private string _lastName = string.Empty;
+        private string _streetName = string.Empty;
+        private string _city = string.Empty;
+        private string _streetNumber = string.Empty;
+        private string _phoneNumber = string.Empty;
+        private string _email = string.Empty;
 
         [Required(ErrorMessage = "Fornavn er påkrævet")]
         [LettersDashOnly]
@@ -44,7 +44,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
 
         [Required(ErrorMessage = "Postnummer er påkrævet")]
         [ZipCode]
-        public int ZipCode { get; set; }
+        public int? ZipCode { get; set; }
 
         [NumbersOnly] public int? Floor { get; set; }
 
@@ -56,9 +56,9 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
         [Email]
         public string Email { get => _email; set => _email = value.Trim(); }
 
-        [Required(ErrorMessage = "Alder er påkrævet")]
+        [Required(ErrorMessage = "Fødselsdag er påkrævet")]
         [MustBeAdult]
-        public DateTime Birthday { get; set; } = DateTime.Now.AddYears(-25);
+        public DateTime? Birthday { get; set; }
 
     }
 }

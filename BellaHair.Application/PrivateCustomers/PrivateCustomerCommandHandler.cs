@@ -37,11 +37,11 @@ namespace BellaHair.Application.PrivateCustomers
                 command.MiddleName);
             
             var address = Address.Create(
-                command.streetName,
-                command.city,
-                command.streetNumber,
-                command.zipCode,
-                command.floor);
+                command.StreetName,
+                command.City,
+                command.StreetNumber,
+                command.ZipCode,
+                command.Floor);
             
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var email = Email.FromString(command.Email);
@@ -82,11 +82,11 @@ namespace BellaHair.Application.PrivateCustomers
                 command.MiddleName);
             
             var updatedAddress = Address.Create(
-                command.streetName,
-                command.city,
-                command.streetNumber,
-                command.zipCode,
-                command.floor);
+                command.StreetName,
+                command.City,
+                command.StreetNumber,
+                command.ZipCode,
+                command.Floor);
             
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
