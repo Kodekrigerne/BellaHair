@@ -34,3 +34,9 @@
     margin-top: 20px;
     margin-bottom: 8px;
 }
+
+.treatment-input input::placeholder {
+    color: #aaaaaa; 
+    opacity: 1; 
+    font-style: italic; 
+}

@@ -10,7 +10,7 @@
 
 			<div class="treatment-card">
 
-					<BinDeleteButton OnClick="HandleOnDeleteClick" />
+					<BinDeleteButton OnClick="@(() => {_showConfirmDelete = true;})" />
 
 				<div class="treatment-avatar">
 						<TreatmentIcon Class="treatment-icon"/>
@@ -49,6 +49,23 @@
 					</div>
 				</div>
 
+				<Modal @bind-IsVisible="@_showConfirmDelete">
+					
+					<h3>Slet behandling</h3>
+					<hr class="treatment-line" />
+					<p>Ønsker du at slette denne behandling?</p>
+					Handlingen kan ikke fortrydes.
+
+					<div class="btn-wrapper">
+
+					<button class="btn-remove" @onclick="HandleOnDeleteClick">Slet</button>
+					<button class="btn-add" @onclick="@(() => { _showConfirmDelete = false; })">Annuller</button>
+
+					</div>
+
+				</Modal>
+
+
 
 @code {
 	[Parameter, EditorRequired]
@@ -60,6 +77,8 @@
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnShowOfferedBy { get; set; }
 
+	private bool _showConfirmDelete;
+
 
 	private async Task HandleOnDeleteClick()
 	{
@@ -68,12 +87,19 @@
 			var command = new DeleteTreatmentCommand(Treatment.Id);
 			await _treatmentCommand.DeleteTreatmentAsync(command);
 
+			_showConfirmDelete = false;
 			await OnDelete.InvokeAsync();
 			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
 		}
 		catch (TreatmentInUseException)
 		{
+			_showConfirmDelete = false;
 			Snackbar.Add("Behandlingen kunne ikke slettes:\n Der findes en aktiv booking med denne behandling.", Severity.Error);
+		}
+		catch (Exception)
+		{
+			_showConfirmDelete = false;
+			Snackbar.Add("Der skete en uventet fejl.", Severity.Error);
 		}
 	}
 

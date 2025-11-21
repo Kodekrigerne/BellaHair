@@ -18,7 +18,7 @@
 			<div class="treatment-input">
 
 				<label for="name-input">Navn</label>
-				<input id="name-input" type="text" @bind="_newTreatmentForm.Name" />
+				<input id="name-input" type="text" placeholder="Behandlingsnavn" @bind="_newTreatmentForm.Name" />
 				<ValidationMessage For="@(() => _newTreatmentForm.Name)" />
 						
 			</div>
