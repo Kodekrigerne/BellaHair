@@ -4,7 +4,7 @@
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
-@inject IPCustomerFutureBookingChecker PCustomerFutureBookingChecker
+@inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
 
 <!-- Mikkel Dahlmann -->
@@ -70,7 +70,7 @@
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
-		_futureBookings = await PCustomerFutureBookingChecker.CheckFutureBookings(PrivateCustomer.Id);
+		_futureBookings = await PrivateCustomerQuery.PCFutureBookingsCheck(PrivateCustomer.Id);
 	}
 
 	private async Task HandleOnDeleteConfirm()
