@@ -81,10 +81,17 @@
 	private async Task HandleOnDeleteConfirm()
 	{
 		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
-		await _employeeCommand.DeleteEmployeeCommand(command);
-		CloseModal();
-		SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
-		await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
+		try
+		{
+			await _employeeCommand.DeleteEmployeeCommand(command);
+			CloseModal();
+			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
+			await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
+		}
+		catch (Exception e)
+		{
+			SnackBar.Add(e.Message, Severity.Warning);
+		}
 	}
 
 	private void CloseModal() => _showNewModal = false;
