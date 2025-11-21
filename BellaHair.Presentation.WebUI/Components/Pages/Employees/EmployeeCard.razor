@@ -1,7 +1,7 @@
 ﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
-@inject IEmployeeCommand _employeeCommand
-@inject IEmployeeQuery _employeeQuery
+@inject IEmployeeCommand EmployeeCommand
+@inject IEmployeeQuery EmployeeQuery
 @inject ISnackbar SnackBar
 
 
@@ -95,7 +95,7 @@
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
-		_futureBookings = await _employeeQuery.EmployeeFutureBookingsCheck(employeeSimpleViewModel.Id);
+		_futureBookings = await EmployeeQuery.EmployeeFutureBookingsCheck(employeeSimpleViewModel.Id);
 	}
 
 	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.
@@ -104,7 +104,7 @@
 		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
 		try
 		{
-			await _employeeCommand.DeleteEmployeeCommand(command);
+			await EmployeeCommand.DeleteEmployeeCommand(command);
 			CloseModal();
 			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
 			await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);

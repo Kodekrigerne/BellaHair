@@ -7,7 +7,7 @@
 @page "/medarbejdere"
 
 @rendermode InteractiveServer
-@inject IEmployeeQuery _employeeQuery
+@inject IEmployeeQuery EmployeeQuery
 
 <PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
 
@@ -58,7 +58,7 @@
 	{
 		try
 		{
-			var employees = await _employeeQuery.GetAllEmployeesSimpleAsync();
+			var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
 			_employees = employees.Select(e => new EmployeeSimpleViewModel(	e.Id,
 																			e.Name,
 																			e.Email,
