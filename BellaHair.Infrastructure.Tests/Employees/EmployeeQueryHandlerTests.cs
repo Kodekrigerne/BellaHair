@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
@@ -18,8 +13,8 @@ namespace BellaHair.Infrastructure.Tests.Employees
         public void GetAllEmployeesSimpleAsync_GetsAllEmployees()
         {
             // Arrange
-            
-            var handler = (IEmployeeQuery)new EmployeeQueryHandler(_db);
+
+            var handler = (IEmployeeQuery)new EmployeeQueryHandler(_db, new CurrentDateTimeProvider());
 
             Name name1 = Name.FromStrings("Lars", "Nielsen");
             Address adress1 = Address.Create("Nørregade", "Vejle", "2", 7100);
