@@ -15,7 +15,7 @@
         margin-right: 10px;
     }
 
-    .pc-input input {
+    .pc-input ::deep input {
         border: 1px solid #ccc;
         border-radius: 4px;
         padding: 4px;

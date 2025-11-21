@@ -58,7 +58,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
 
         [Required(ErrorMessage = "Alder er påkrævet")]
         [MustBeAdult]
-        public DateTime Birthday { get; set; }
+        public DateTime Birthday { get; set; } = DateTime.Now.AddYears(-25);
 
     }
 }
