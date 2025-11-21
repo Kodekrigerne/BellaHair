@@ -61,8 +61,8 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.PhoneNumber);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Address);
             modelBuilder.Entity<Employee>()
-                                            .HasMany(e => e.Treatments) //  Employee can be associated with many Treatment entities
-                                            .WithMany(t => t.Employees); // Treatment entity can also be associated with many Employee entities.
+                                            .HasMany(e => e.Treatments) 
+                                            .WithMany(t => t.Employees); 
 
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
