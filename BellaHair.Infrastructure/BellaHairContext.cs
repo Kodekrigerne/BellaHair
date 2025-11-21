@@ -30,6 +30,22 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>().OwnsOne(b => b.CustomerSnapshot);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.TreatmentSnapshot);
 
+            //Selvom vores Booking relationer er nullable er det stadig nødvendigt at fortælle databasen at de må være null
+            modelBuilder.Entity<Booking>().HasOne(b => b.Employee).WithMany().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Booking>().HasOne(b => b.Treatment).WithMany().OnDelete(DeleteBehavior.SetNull);
+
+            //Vi fortæller eksplicit hvad foreign key på Booking tabllen skal hedde for kunden
+            modelBuilder.Entity<PrivateCustomer>()
+                .HasMany(c => c.Bookings)
+                .WithOne(b => b.Customer)
+                .HasForeignKey("CustomerId")
+                .OnDelete(DeleteBehavior.SetNull);
+
+            //Pga. nogle andre konfigurationer vi har er det nødvendigt at fortælle EF at den skal bruge backing fieldet for propertien Bookings
+            modelBuilder.Entity<PrivateCustomer>()
+                .Navigation(c => c.Bookings)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+
             //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
             modelBuilder.Entity<Booking>().Ignore(b => b.Total);
             //Vi mapper backing fieldet i stedet for propertien

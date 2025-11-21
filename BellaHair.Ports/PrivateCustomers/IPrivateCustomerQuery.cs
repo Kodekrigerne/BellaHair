@@ -15,6 +15,7 @@ namespace BellaHair.Ports.PrivateCustomers
     public interface IPrivateCustomerQuery
     {
         Task<List<PrivateCustomerDTO>> GetPrivateCustomersAsync();
+        Task<bool> PCFutureBookingsCheck(Guid id);
     }
 
     public record PrivateCustomerDTO(
