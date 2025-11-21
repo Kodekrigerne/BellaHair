@@ -127,6 +127,16 @@ namespace BellaHair.Presentation.WebUI
                 new List<Treatment> { _herreklip, _dameklip, _farvning }
             );
             _db.Add(_maria);
+
+            // Dennis: No bookings
+            var dennis = Employee.Create(
+                Name.FromStrings("Dennis", "Hansen"),
+                Email.FromString("dennis@frisor.dk"),
+                PhoneNumber.FromString("38238289"),
+                Address.Create("Vesterbro", "Byby", "11A", 1100),
+                new List<Treatment> { _dameklip}
+            );
+            _db.Add(dennis);
         }
 
         private void AddTreatment()

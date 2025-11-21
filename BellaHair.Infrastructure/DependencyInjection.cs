@@ -28,6 +28,8 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
+            serviceCollection.AddScoped<IEmployeeFutureBookingsChecker, EmployeeFutureBookingsChecker>();
+            
 
             serviceCollection.AddScoped<ITreatmentRepository, TreatmentRepository>();
             serviceCollection.AddScoped<ITreatmentQuery, TreatmentQueryHandler>();
