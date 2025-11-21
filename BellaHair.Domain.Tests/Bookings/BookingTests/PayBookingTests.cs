@@ -2,8 +2,8 @@
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
+using FixtureBuilder;
 using Moq;
-using FB = FixtureBuilder.FixtureBuilder;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {
@@ -13,13 +13,13 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         public void Given_UnpaidBooking_Then_BookingIsPaid()
         {
             //Arrange
-            var customer = FB.New<PrivateCustomer>().With(p => p.Id, Guid.NewGuid()).Build();
-            var treatment = FB.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
-            var employee = FB.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
+            var customer = Fixture.New<PrivateCustomer>().With(p => p.Id, Guid.NewGuid()).Build();
+            var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            var booking = FB.New<Booking>().With(b => b.Employee, employee).With(b => b.Treatment, treatment).With(b => b.Customer, customer).With(b => b.IsPaid, false).Build();
+            var booking = Fixture.New<Booking>().With(b => b.Employee, employee).With(b => b.Treatment, treatment).With(b => b.Customer, customer).With(b => b.IsPaid, false).Build();
 
             //Act
             booking.PayBooking(dateTimeProvider.Object);
@@ -42,12 +42,12 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         public void Given_PaidBooking_Then_ThrowsException()
         {
             //Arrange
-            var customer = FB.New<PrivateCustomer>().Build();
-            var treatment = FB.New<Treatment>().Build();
-            var employee = FB.New<Employee>().Build();
+            var customer = Fixture.New<PrivateCustomer>().Build();
+            var treatment = Fixture.New<Treatment>().Build();
+            var employee = Fixture.New<Employee>().Build();
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
 
-            var booking = FB.New<Booking>().With(b => b.Employee, employee).With(b => b.Treatment, treatment).With(b => b.Customer, customer).With(b => b.IsPaid, true).Build();
+            var booking = Fixture.New<Booking>().With(b => b.Employee, employee).With(b => b.Treatment, treatment).With(b => b.Customer, customer).With(b => b.IsPaid, true).Build();
 
             //Act
             Assert.Throws<BookingException>(() => booking.PayBooking(dateTimeProvider.Object));
