@@ -13,8 +13,8 @@
 @inject ISnackbar Snackbar
 
 <!-- Modal overlay der viser 'Opret ny kunde'-formular -->
-<Modal IsVisible="@_showNewModal" OnClose="">
-	<CreatePrivateCustomerForm OnCreate="@HandleCreate"></CreatePrivateCustomerForm>
+<Modal IsVisible="@_showNewModal">
+	<CreatePrivateCustomerForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreatePrivateCustomerForm>
 </Modal>
 
 <PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
@@ -67,5 +67,10 @@
 	{
 		_showNewModal = false;
 		await LoadCustomers();
+	}
+
+	private void HandleCancel()
+	{
+		_showNewModal = false;
 	}
 }
