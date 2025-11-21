@@ -12,6 +12,7 @@ using BellaHair.Ports.Treatments;
 
 namespace BellaHair.Infrastructure.Employees
 {
+    // Linnea
     
     /// <summary>
     /// Handles queries for retrieving employee information from the data store.
@@ -21,7 +22,6 @@ namespace BellaHair.Infrastructure.Employees
     /// information needs to be fetched for display or processing purposes. Instances of this class are typically
     /// created with a BellaHairContext to access the underlying database.</remarks>
     
-    // Linnea
     public class EmployeeQueryHandler : IEmployeeQuery
     {
         private readonly BellaHairContext _db;
@@ -88,6 +88,12 @@ namespace BellaHair.Infrastructure.Employees
                                        employee.Address.Floor);
         }
 
+       /// <summary>
+       /// Determines whether the specified employee has any bookings scheduled for a future date and time.
+       /// </summary>
+       /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
+       /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
+       /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
         async Task<bool> IEmployeeQuery.EmployeeFutureBookingsCheck(Guid id)
         {
             return (await _db.Employees.Include(e => e.Bookings)

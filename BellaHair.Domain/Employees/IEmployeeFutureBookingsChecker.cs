@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace BellaHair.Domain.Employees
 {
+    /// <summary>
+    /// Defines a method for determining whether an employee has any bookings scheduled in the future.
+    /// </summary>
     public interface IEmployeeFutureBookingsChecker
     {
         Task<bool> CheckFutureBookings(Guid id);
