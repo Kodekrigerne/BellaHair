@@ -45,7 +45,7 @@
 
 			<div class="privatecustomer-contact-details">
 				<BirthdayIcon Class="privatecustomer-icons-birthday" />
-				@PrivateCustomer.Birthday.ToString("d. MMMM yyyy")
+				@PrivateCustomer.Birthday.ToString("d. MMMM yyyy") (@CalculateAge() år)
 			</div>
 
 			<div class="privatecustomer-contact-details">
@@ -98,5 +98,22 @@
 	{
 		var parts = name.Split(' ');
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
+	}
+
+	// Beregner kundens alder
+	private int CalculateAge()
+	{
+		DateTime today = DateTime.Today;
+
+		// År udregnet fra nuværende år minus fødselsår.
+		int age = today.Year - PrivateCustomer.Birthday.Year;
+
+		// Hvis fødselsdag endnu ikke er sket i år, så træk ét år fra alder.
+		if (PrivateCustomer.Birthday.Date > today.AddYears(-age).Date)
+		{
+			age--;
+		}
+
+		return age;
 	}
 }
