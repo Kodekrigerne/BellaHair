@@ -11,8 +11,8 @@
 
 		<div class="employee-input">
 	<label for="middle-name-input">Mellemnavn</label>
-	<input id="middle-name-input" type="text" @bind="EmployeeModel.MiddleName" style="width: 150px"/>
-	<ValidationMessage For="@(() => EmployeeModel.MiddleName)" />
+	<input id="middle-name-input" type="text" @bind="EmployeeModel.MiddleName"  style="width: 150px"/>
+	<ValidationMessage For="@(() => EmployeeModel.MiddleName)"/>
 		</div>
 
 				<div class="employee-input">
@@ -74,10 +74,7 @@
 		</div>
 		</div>
 		
-	@code {
-		[Parameter, EditorRequired]
-		public NewEmployeeModel EmployeeModel { get; set; }
-
-
-
-		}
+@code {
+	[Parameter, EditorRequired]
+	public NewEmployeeModel EmployeeModel { get; set; }
+}
