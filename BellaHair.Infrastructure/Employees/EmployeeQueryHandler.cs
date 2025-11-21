@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
-using BellaHair.Domain.Employees;
-using BellaHair.Domain.SharedValueObjects;
+﻿using BellaHair.Domain;
 using BellaHair.Ports.Employees;
-using Microsoft.EntityFrameworkCore;
 using BellaHair.Ports.Treatments;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Employees
 {
@@ -60,32 +53,55 @@ namespace BellaHair.Infrastructure.Employees
         /// employee ID.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="EmployeeDTOFull"/>
         /// with the employee's details, including associated treatments.</returns>
-        
+
         async Task<EmployeeDTOFull> IEmployeeQuery.GetEmployeeAsync(GetEmployeeByIdQuery query)
         {
             var employee = await _db.Employees.Include(e => e.Treatments)
-                                               .FirstOrDefaultAsync(e => e.Id == query.Id)
-                                               ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
+                .FirstOrDefaultAsync(e => e.Id == query.Id)
+                ?? throw new KeyNotFoundException($"Employee with ID {query.Id} not found");
 
             List<TreatmentDTO> treatments = employee.Treatments.Select(e =>
-                                                                           new TreatmentDTO(e.Id,
-                                                                                        e.Name,
-                                                                                        e.Price.Value,
-                                                                                        e.DurationMinutes.Value))
-                                                               .ToList();
+                new TreatmentDTO(e.Id,
+                    e.Name,
+                    e.Price.Value,
+                    e.DurationMinutes.Value))
+                .ToList();
 
             return new EmployeeDTOFull(employee.Id,
-                                       employee.Name.FirstName,
-                                       employee.Name.MiddleName ?? "",
-                                       employee.Name.LastName,
-                                       employee.Email.Value,
-                                       employee.PhoneNumber.Value,
-                                       employee.Address.StreetName,
-                                       employee.Address.City,
-                                       employee.Address.StreetNumber,
-                                       employee.Address.ZipCode,
-                                       treatments,
-                                       employee.Address.Floor);
+                employee.Name.FirstName,
+                employee.Name.MiddleName ?? "",
+                employee.Name.LastName,
+                employee.Email.Value,
+                employee.PhoneNumber.Value,
+                employee.Address.StreetName,
+                employee.Address.City,
+                employee.Address.StreetNumber,
+                employee.Address.ZipCode,
+                treatments,
+                employee.Address.Floor);
+        }
+
+        async Task<List<EmployeeNameWithBookingsDTO>> IEmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(Guid treatmentId)
+        {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            return await _db.Employees
+                .AsNoTracking()
+
+                .Where(e => e.Treatments.Any(t => t.Id == treatmentId))
+
+                .Select(e => new EmployeeNameWithBookingsDTO(
+                    e.Id,
+                    e.Name.FullName,
+
+                    e.Bookings
+                        .Where(b => b.Treatment != null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > now)
+                        .Select(b => new BookingTimesOnlyDTO(
+                            b.StartDateTime,
+                            b.Treatment!.DurationMinutes.Value)
+                            )
+                        .ToList()))
+                .ToListAsync();
         }
 
        /// <summary>
@@ -101,4 +117,4 @@ namespace BellaHair.Infrastructure.Employees
                             .Bookings.Any();
         }
     }
-}   
+}

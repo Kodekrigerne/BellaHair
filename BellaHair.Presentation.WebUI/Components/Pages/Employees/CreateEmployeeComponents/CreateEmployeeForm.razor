@@ -7,6 +7,7 @@
 @using BellaHair.Ports.Treatments
 @inject IEmployeeCommand EmployeeCommand
 @inject ITreatmentQuery TreatmentQuery
+@inject ISnackbar Snackbar
 
 <h3 style="text-align: center; font-weight: bold">Opret ny medarbejder</h3>
 <br />
@@ -79,9 +80,10 @@
 		</div>
 	</div>
 
-	 <div class="btn-wrapper">
-            <button class="btn-add" type="submit">Opret</button>
-	 </div>
+	<div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
+		 <button class="btn-add" type="submit">Opret</button>
+		<button class="btn-remove" type="reset">Ryd felter</button>
+	</div>
 
 </EditForm>
 
@@ -152,11 +154,14 @@
 
 			await OnCreate.InvokeAsync();
 
+			Snackbar.Add($"Medarbejder oprettet", Severity.Success);
 		}
+
 		catch (Exception e)
 		{
-			_errorMessage = $"Oprettelse mislykkedes: {e.Message}";
+			Snackbar.Add($"Oprettelsen mislykkedes: {e.Message}", Severity.Error);
 		}
+
 	}
 
 	private async Task LoadTreatments()
