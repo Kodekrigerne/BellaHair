@@ -27,32 +27,38 @@ namespace BellaHair.Infrastructure.Bookings
 
         private async Task<bool> CheckEmployeeOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId)
         {
+            var endDateTime = startDateTime.AddMinutes(durationMinutes);
+
             var bookings = _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime())
                 .Where(b => b.Employee!.Id == employeeId);
 
-            // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings starttid?
-            if (await bookings.AnyAsync(b => startDateTime >= b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
-            // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings sluttid?
-            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            //ny starter < eksisterende slutter && eksisterende starter < ny slutter
+            bool overlap = await bookings.AnyAsync(b =>
+                startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) &&
+                b.StartDateTime < endDateTime
+            );
 
-            return false;
+            return overlap;
         }
 
         private async Task<bool> CheckCustomerOverlap(DateTime startDateTime, int durationMinutes, Guid customerId)
         {
+            var endDateTime = startDateTime.AddMinutes(durationMinutes);
+
             var bookings = _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime())
                 .Where(b => b.Customer!.Id == customerId);
 
-            // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings starttid?
-            if (await bookings.AnyAsync(b => startDateTime >= b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
-            // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings sluttid?
-            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            //ny starter < eksisterende slutter && eksisterende starter < ny slutter
+            bool overlap = await bookings.AnyAsync(b =>
+                startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) &&
+                b.StartDateTime < endDateTime
+            );
 
-            return false;
+            return overlap;
         }
     }
 }
