@@ -1,8 +1,8 @@
 ﻿// Mikkel Dahlmann
 
-using System.ComponentModel.DataAnnotations;
 using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents.ValidationAttributes;
 using BellaHair.Presentation.WebUI.Components.Shared.ValidationAttributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 {
@@ -10,9 +10,10 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreateP
     /// Represents the data required to create a new private customer, including personal, contact, and address
     /// information. Applies validation through attributes and trims the input where possible.
     /// </summary>
-    
+
     public class NewPrivateCustomerModel
     {
+        public Guid Id;
         private string _firstName = string.Empty;
         private string? _middleName;
         private string _lastName = string.Empty;

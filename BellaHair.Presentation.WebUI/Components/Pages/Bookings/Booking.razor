@@ -115,7 +115,7 @@
 	private async Task HandlePickCustomerClick()
 	{
 		_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists)).ToList();
+		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visits)).ToList();
 
 		_activePicker = Picker.Customers;
 

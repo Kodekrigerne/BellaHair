@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
@@ -15,7 +9,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     /// <summary>
     /// Handles queries for retrieving private customer information from the database.
     /// </summary>
-    
+
     public class PrivateCustomerQueryHandler : IPrivateCustomerQuery
     {
         private readonly BellaHairContext _db;
@@ -53,9 +47,9 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         // Checker om der findes nogen bookings for kunden, der ligger i fremtiden.
         async Task<bool> IPrivateCustomerQuery.PCFutureBookingsCheck(Guid id)
         {
-                return await _db.PrivateCustomers
-                    .Where(p => p.Id == id)
-                    .AnyAsync(p => p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
+            return await _db.PrivateCustomers
+                .Where(p => p.Id == id)
+                .AnyAsync(p => p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
         }
     }
 }
