@@ -33,7 +33,7 @@
 			<div class="pick-container">
 				@if (Treatment == null)
 				{
-					<button class="btn-pick" @onclick="HandlePickTreatmentClick">Vælg en behandling</button>
+					<button class="btn-pick @(Customer == null ? "inactive" : "")" @onclick="HandlePickTreatmentClick">Vælg en behandling</button>
 				}
 				else
 				{
@@ -45,7 +45,7 @@
 			<div class="pick-container">
 				@if (Employee == null)
 				{
-					<button class="btn-pick" @onclick="HandlePickEmployeeClick">Vælg en Medarbejder</button>
+					<button class="btn-pick @(Treatment == null ? "inactive" : "")" @onclick="HandlePickEmployeeClick">Vælg en Medarbejder</button>
 				}
 				else
 				{
@@ -55,7 +55,7 @@
 			<div class="pick-container">
 				@if (StartDateTime == null)
 				{
-					<button class="btn-pick" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
+					<button class="btn-pick @(Employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
 				}
 				else
 				{
@@ -245,7 +245,13 @@
 		border: none;
 		background:none;
 		flex: 1;
+		border-radius: 6px;
+		background-color: white;
 	}
+
+		.btn-pick.inactive {
+			background-color: lightgrey;
+		}
 
 	.body-right {
 		flex: 1;
