@@ -7,6 +7,7 @@
 @rendermode InteractiveServer
 
 @using BellaHair.Domain
+@using BellaHair.Infrastructure
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Discounts
 @using BellaHair.Ports.Employees
@@ -24,6 +25,7 @@
 @inject IBookingCommand BookingCommand;
 @inject IDiscountQuery DiscountQuery;
 @inject NavigationManager NavigationManager;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -120,7 +122,11 @@
 				else if (_activePicker == Picker.Time && Employee != null)
 				{
 					<p>Vælg en dato</p>
-					<input type="date" value="StartDate" @onchange="HandleDateChanged"/>
+					<MudDatePicker
+						@ref="_datePickerRef"
+						Date="StartDateTime"
+						DateChanged="HandleDateChanged"
+						IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
 					<p>Vælg en tid</p>
 					<input type="time" value="StartTime" @onchange="HandleTimeChanged" />
 				}
@@ -158,12 +164,18 @@
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
 
+	private DateTime _now;
+	private MudDatePicker? _datePickerRef;
+
 	[Parameter]
 	public Guid Id { get; set; }
 
 	public PrivateCustomerViewModel? Customer { get; set; }
 	public TreatmentViewModel? Treatment { get; set; }
 	public EmployeeNameWithBookingsViewModel? Employee { get; set; }
+
+	public DateTime? StartDateTime { get; set; }
+
 	public DateOnly? StartDate { get; set; }
 	public TimeOnly? StartTime { get; set; }
 
@@ -180,6 +192,7 @@
 	{
 		await base.OnInitializedAsync();
 
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 		await HandlePickCustomerClick();
 	}
 
@@ -223,11 +236,21 @@
 		_activePicker = Picker.Employee;
 	}
 
-	private void HandlePickStartDateTimeClick()
+	private async Task HandlePickStartDateTimeClick()
 	{
 		if (Employee == null) return;
 
+		if (_now.DayOfWeek == DayOfWeek.Saturday) StartDateTime = _now.Date.AddDays(2);
+		else if (_now.DayOfWeek == DayOfWeek.Sunday) StartDateTime = _now.Date.AddDays(1);
+		else StartDateTime = _now;
+
 		_activePicker = Picker.Time;
+		StateHasChanged();
+		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
+		await Task.Delay(1);
+		if (_datePickerRef != null) {
+			await _datePickerRef.OpenAsync();
+		}
 	}
 
 	private async Task HandleCustomerPickerClick(Guid customerId)
@@ -242,15 +265,18 @@
 		await HandlePickEmployeeClick();
 	}
 
-	private void HandleEmployeePickerClick(Guid employeeId)
+	private async Task HandleEmployeePickerClick(Guid employeeId)
 	{
 		Employee = _employees.Find(t => t.Id == employeeId);
-		HandlePickStartDateTimeClick();
+		await HandlePickStartDateTimeClick();
 	}
 
-	private async Task HandleDateChanged(ChangeEventArgs cea)
+	private async Task HandleDateChanged(DateTime? newDate)
 	{
-		StartDate = DateOnly.Parse((string)cea.Value!);
+		if (newDate == null) return;
+
+		StartDateTime = newDate;
+		StartDate = DateOnly.FromDateTime(newDate.Value);
 
 		if (StartTime != null)
 		{
@@ -276,6 +302,7 @@
 		var earliest = new TimeOnly(10, 0, 0);
 		var latest = new TimeOnly(18, 0, 0);
 
+		//TODO: Burde rykkes til domænet
 		if (StartTime.Value < earliest)
 		{
 			_timeIsAvailable = false;
