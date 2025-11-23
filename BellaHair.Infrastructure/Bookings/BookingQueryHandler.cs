@@ -11,11 +11,13 @@ namespace BellaHair.Infrastructure.Bookings
     {
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly IBookingOverlapChecker _bookingOverlapChecker;
 
-        public BookingQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        public BookingQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider, IBookingOverlapChecker bookingOverlapChecker)
         {
             _db = db;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _bookingOverlapChecker = bookingOverlapChecker;
         }
 
         async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllNewAsync()
@@ -47,6 +49,11 @@ namespace BellaHair.Infrastructure.Bookings
                 .ToListAsync();
 
             return MapToBookingSimpleDTOs(bookings);
+        }
+
+        async Task<bool> IBookingQuery.BookingIsAvailable(BookingIsAvailableQuery query)
+        {
+            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId);
         }
 
         private static IEnumerable<BookingSimpleDTO> MapToBookingSimpleDTOs(IEnumerable<Booking> bookings)

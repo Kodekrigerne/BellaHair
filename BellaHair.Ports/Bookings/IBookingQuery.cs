@@ -8,6 +8,7 @@
     {
         Task<IEnumerable<BookingSimpleDTO>> GetAllNewAsync();
         Task<IEnumerable<BookingSimpleDTO>> GetAllOldAsync();
+        Task<bool> BookingIsAvailable(BookingIsAvailableQuery query);
     }
 
     public record DiscountDTO(string Name, decimal DiscountAmount);
@@ -20,4 +21,6 @@
         string TreatmentName,
         int DurationMinutes,
         DiscountDTO? Discount);
+
+    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId);
 }
