@@ -118,16 +118,28 @@
 					<input type="time" value="StartTime" @onchange="HandleTimeChanged" />
 				}
 			</div>
-			@if (_timeIsAvailable != null) {
+			@if (_timeIsAvailable != null)
+			{
 				<div class="right-bottom">
-					<p>@(_timeIsAvailable.Value ? "Denne tid er ledig" : "Denne tid er allerede booket")</p>
+					<p class="availability-status">@_availabilityMessage</p>
 
-					<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
-					@if (_discount != null)
-					{
-						<p>Rabat: @_discount.Name</p>
-						<p>@_discount.Amount</p>						
-					}
+					<div class="discount-section">
+						<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
+						@if (_discount != null)
+						{
+							<p class="discount-name">Rabat: @_discount.Name</p>
+							<p class="discount-amount">Beløb: @_discount.Amount.ToString("F2") dkk</p>
+						}
+					</div>
+
+					<div class="price-section">
+						<p class="price-without-discount">Pris uden rabat: @Treatment!.Price.ToString("F2") dkk</p>
+						@if (_discount != null)
+						{
+							<p class="price-with-discount">Pris med rabat: @((Treatment!.Price - _discount.Amount).ToString("F2")) dkk</p>
+						}
+					</div>
+
 					<button class="btn-create @(_timeIsAvailable.Value ? "" : "inactive")" @onclick="HandleCreateBookingClick">Book denne tid</button>
 				</div>
 			}
@@ -147,7 +159,9 @@
 	public EmployeeNameWithBookingsViewModel? Employee { get; set; }
 	public DateOnly? StartDate { get; set; }
 	public TimeOnly? StartTime { get; set; }
+
 	private bool? _timeIsAvailable;
+	private string? _availabilityMessage;
 
 	private BookingDiscountViewModel? _discount;
 
@@ -249,10 +263,30 @@
 
 	private async Task HandleDateTimeChanged()
 	{
-		var dateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
-		var query = new BookingIsAvailableQuery(dateTime, Treatment!.DurationMinutes, Employee!.Id, Customer!.Id);
+		var startDateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
+		var treatmentEnd = StartTime.Value.AddMinutes(Treatment!.DurationMinutes);
+
+		var earliest = new TimeOnly(10, 0, 0);
+		var latest = new TimeOnly(18, 0, 0);
+
+		if (StartTime.Value < earliest)
+		{
+			_timeIsAvailable = false;
+			_availabilityMessage = "Kan ikke starte booking før åbningstid";
+			return;
+		}
+
+		if (StartTime > latest || treatmentEnd > latest)
+		{
+			_timeIsAvailable = false;
+			_availabilityMessage = "Booking skal slutte før lukketid";
+			return;
+		}
+
+		var query = new BookingIsAvailableQuery(startDateTime, Treatment!.DurationMinutes, Employee!.Id, Customer!.Id);
 
 		_timeIsAvailable = !(await BookingQuery.BookingIsAvailable(query));
+		_availabilityMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
 	}
 
 	private async Task HandleCreateBookingClick()
@@ -280,6 +314,7 @@
 		StartTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Customers;
 	}
@@ -292,6 +327,7 @@
 		StartTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Treatments;
 	}
@@ -303,6 +339,7 @@
 		StartTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Employee;
 	}
@@ -313,6 +350,7 @@
 		StartDate = null;
 		_timeIsAvailable = null;
 		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Time;
 	}
@@ -463,11 +501,92 @@
 			background: #dbeafe;
 		}
 
-	.btn-create {
-
+	.right-bottom {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
 	}
 
-		.btn-create.inactive {
+	/* Line 1: Availability status */
+	.availability-status {
+		margin: 0;
+		font-weight: 600;
+		font-size: 1rem;
+	}
 
+	/* Line 2: Discount section */
+	.discount-section {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.btn-discount {
+		padding: 8px 16px;
+		background-color: #4CAF50;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+		.btn-discount:hover {
+			background-color: #45a049;
+		}
+
+	.discount-name {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.discount-amount {
+		margin: 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+
+	/* Line 3: Price section */
+	.price-section {
+		display: flex;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+
+	.price-without-discount {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.price-with-discount {
+		margin: 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #4CAF50;
+	}
+
+	/* Line 4: Create booking button */
+	.btn-create {
+		padding: 12px 24px;
+		background-color: #2196F3;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: 600;
+		transition: background-color 0.3s ease;
+	}
+
+		.btn-create:hover {
+			background-color: #0b7dda;
+		}
+
+		.btn-create.inactive {
+			background-color: #ccc;
+			cursor: not-allowed;
+			opacity: 0.6;
 		}
 </style>
