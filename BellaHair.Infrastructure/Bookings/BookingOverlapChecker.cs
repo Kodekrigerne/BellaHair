@@ -1,4 +1,4 @@
-﻿    using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,15 +17,15 @@ namespace BellaHair.Infrastructure.Bookings
             _currentDateTimeProvider = currentDateTimeProvider;
         }
 
-        async Task<bool> IBookingOverlapChecker.CheckOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId)
+        async Task<bool> IBookingOverlapChecker.OverlapsWithBooking(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId)
         {
-            if (await CheckEmployeeOverlap(startDateTime, durationMinutes, employeeId, customerId)) return true;
-            if (await CheckCustomerOverlap(startDateTime, durationMinutes, employeeId, customerId)) return true;
+            if (await CheckEmployeeOverlap(startDateTime, durationMinutes, employeeId)) return true;
+            if (await CheckCustomerOverlap(startDateTime, durationMinutes, customerId)) return true;
 
             return false;
         }
 
-        private async Task<bool> CheckEmployeeOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId)
+        private async Task<bool> CheckEmployeeOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId)
         {
             var bookings = _db.Bookings
                 .AsNoTracking()
@@ -33,14 +33,14 @@ namespace BellaHair.Infrastructure.Bookings
                 .Where(b => b.Employee!.Id == employeeId);
 
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings starttid?
-            if (await bookings.AnyAsync(b => startDateTime > b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            if (await bookings.AnyAsync(b => startDateTime >= b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings sluttid?
-            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) >= b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
 
             return false;
         }
 
-        private async Task<bool> CheckCustomerOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId)
+        private async Task<bool> CheckCustomerOverlap(DateTime startDateTime, int durationMinutes, Guid customerId)
         {
             var bookings = _db.Bookings
                 .AsNoTracking()
@@ -48,9 +48,9 @@ namespace BellaHair.Infrastructure.Bookings
                 .Where(b => b.Customer!.Id == customerId);
 
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings starttid?
-            if (await bookings.AnyAsync(b => startDateTime > b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            if (await bookings.AnyAsync(b => startDateTime >= b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings sluttid?
-            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) >= b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
 
             return false;
         }
