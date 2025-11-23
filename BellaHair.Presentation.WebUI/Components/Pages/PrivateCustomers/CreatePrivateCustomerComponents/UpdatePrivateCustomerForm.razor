@@ -15,7 +15,7 @@
 <p style="text-align: center">Rediger kundens oplysninger.</p>
 
 <!-- Editform container -->
-<EditForm Model="@PrivateCustomer" OnValidSubmit="@UpdatePCustomer">
+<EditForm EditContext="@editContext" OnValidSubmit="@UpdatePCustomer">
 	<DataAnnotationsValidator />
 
 	<div class="inputs-container">
@@ -33,8 +33,8 @@
 
 	<div class="btn-wrapper">
 		<button class="btn-add" type="submit">Opdater</button>
-		<button class="btn-remove" type="button" @onclick="@MapDtoToModel">Nulstil ændringer</button>
-		<button class="btn-remove" type="button" onclick="@OnCancel">Annuller</button>
+		<button class="btn-remove" type="button" @onclick="@HandleReset">Nulstil ændringer</button>
+		<button class="btn-remove" type="button" @onclick="@OnCancel">Annuller</button>
 	</div>
 
 </EditForm>
@@ -51,17 +51,31 @@
 
 	public NewPrivateCustomerModel? PrivateCustomer { get; set; } = new NewPrivateCustomerModel();
 
+	private EditContext? editContext { get; set; }
+
 	protected override void OnInitialized()
 	{
 		if (CustomerToUpdate != null)
 		{
-			MapDtoToModel();
+			InitializeViewModel();
 		}
 
 		else
 		{
 			throw new Exception("CustomerToUpdate parameter is required for updating a private customer.");
 		}
+	}
+
+	private void InitializeViewModel()
+	{
+		MapDtoToModel();
+		editContext = new EditContext(PrivateCustomer!);
+	}
+
+	private void HandleReset()
+	{
+        InitializeViewModel();
+        StateHasChanged();
 	}
 
 	private async Task UpdatePCustomer()
@@ -112,7 +126,5 @@
 		PrivateCustomer.PhoneNumber = CustomerToUpdate.PhoneNumber;
 		PrivateCustomer.Email = CustomerToUpdate.Email;
 		PrivateCustomer.Birthday = CustomerToUpdate.Birthday;
-
-		StateHasChanged();
 	}
 }
