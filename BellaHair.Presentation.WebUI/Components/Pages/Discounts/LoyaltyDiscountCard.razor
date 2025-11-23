@@ -29,6 +29,7 @@
 			var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
 			await _loyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
 			await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
+			Snackbar.Add("Stamkunderabat slettet.", Severity.Success);
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
