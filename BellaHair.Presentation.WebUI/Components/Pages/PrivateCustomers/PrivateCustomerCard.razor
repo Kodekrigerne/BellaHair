@@ -21,14 +21,14 @@
 	{
 		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
 		<button class="btn-remove" @onclick="@HandleOnDeleteConfirm">Slet</button>
-		<button class="btn-add" @onclick="@CloseModal">Annuller</button>
+		<button class="btn-add" @onclick="@HandleCancel">Annuller</button>
 	}
 </Modal>
 
 
 <!-- Modal til redigering -->
 <Modal IsVisible="@showEditModal">
-	<UpdatePrivateCustomerForm OnCreate="@HandleUpdate" OnCancel="@CloseModal" CustomerToUpdate="@PrivateCustomer"></UpdatePrivateCustomerForm>
+	<UpdatePrivateCustomerForm OnUpdate="@HandleUpdate" OnCancel="@CloseModal" CustomerToUpdate="@PrivateCustomer"></UpdatePrivateCustomerForm>
 </Modal>
 
 
@@ -111,6 +111,12 @@
 	{
 		showEditModal = false;
 		await OnChange.InvokeAsync();
+	}
+
+	private void HandleCancel()
+	{
+		CloseModal();
+		Snackbar.Add("Handlingen blev afbrudt.", Severity.Warning);
 	}
 
 	private void CloseModal()

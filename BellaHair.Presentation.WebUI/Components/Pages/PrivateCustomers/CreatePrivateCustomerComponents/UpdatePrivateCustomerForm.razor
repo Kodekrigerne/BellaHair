@@ -34,14 +34,14 @@
 	<div class="btn-wrapper">
 		<button class="btn-add" type="submit">Opdater</button>
 		<button class="btn-remove" type="button" @onclick="@HandleReset">Nulstil ændringer</button>
-		<button class="btn-remove" type="button" @onclick="@OnCancel">Annuller</button>
+		<button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
 	</div>
 
 </EditForm>
 
 @code {
 	[Parameter, EditorRequired]
-	public required EventCallback OnCreate { get; set; }
+	public required EventCallback OnUpdate { get; set; }
 
 	[Parameter, EditorRequired]
 	public required EventCallback OnCancel { get; set; }
@@ -74,8 +74,14 @@
 
 	private void HandleReset()
 	{
-        InitializeViewModel();
-        StateHasChanged();
+		InitializeViewModel();
+		StateHasChanged();
+	}
+
+	private async Task HandleCancel()
+	{
+		Snackbar.Add("Redigering blev afbrudt.", Severity.Warning);
+		await OnCancel.InvokeAsync();
 	}
 
 	private async Task UpdatePCustomer()
@@ -103,7 +109,7 @@
 
 			Snackbar.Add($"Kundeprofilen '{command.FirstName} {command.LastName}' blev opdateret", Severity.Success);
 
-			await OnCreate.InvokeAsync();
+			await OnUpdate.InvokeAsync();
 
 		}
 		catch (Exception e)

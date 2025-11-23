@@ -55,16 +55,6 @@
 		try
 		{
 			_customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			
-			// _customers = customers.Select(e => new PrivateCustomerViewModel(
-			// 		e.Id, 
-			// 		e.FullName, 
-			// 		e.Birthday, 
-			// 		e.Email, 
-			// 		e.PhoneNumber, 
-			// 		e.FullAddress, 
-			// 		e.Visists))
-			// 	.ToList();
 		}
 
 		catch (DomainException ex)
@@ -87,5 +77,6 @@
 	private void HandleCancel()
 	{
 		showCreateModal = false;
+		Snackbar.Add("Handlingen blev afbrudt.", Severity.Info);
 	}
 }
