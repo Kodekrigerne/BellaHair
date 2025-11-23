@@ -84,7 +84,7 @@
 					{
 						<button class="btn-picked" @onclick="HandleChangeTimeClick">
 							<p class="picked-label">Dato og tid</p>
-							<p class="picked-text">@StartDate!.Value.Date @StartTime</p>
+							<p class="picked-text">@StartDate!.Value.ToString("yyyy-MM-dd") @StartTime?.ToString(@"hh\:mm")</p>
 						</button>
 					}
 				</div>
