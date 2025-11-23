@@ -35,7 +35,7 @@ namespace BellaHair.Infrastructure.Bookings
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings starttid?
             if (await bookings.AnyAsync(b => startDateTime >= b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings sluttid?
-            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) >= b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
 
             return false;
         }
@@ -50,7 +50,7 @@ namespace BellaHair.Infrastructure.Bookings
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings starttid?
             if (await bookings.AnyAsync(b => startDateTime >= b.StartDateTime && startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
             // Er der nogen bookings for medarbejderen som starter før og slutter efter den nye bookings sluttid?
-            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) >= b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
+            if (await bookings.AnyAsync(b => startDateTime.AddMinutes(durationMinutes) > b.StartDateTime && startDateTime.AddMinutes(durationMinutes) < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value))) return true;
 
             return false;
         }

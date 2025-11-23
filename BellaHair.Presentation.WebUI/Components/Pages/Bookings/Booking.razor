@@ -19,102 +19,108 @@
 @inject IEmployeeQuery EmployeeQuery;
 @inject IBookingQuery BookingQuery;
 
-<p>@_timeIsAvailable</p>
-<div class="kk-container body-container">
-	<div class="body-left">
-		<div class="left-container">
-			<div class="pick-container">
-				@if (Customer == null)
-				{
-					<button class="btn-pick" @onclick="HandlePickCustomerClick">Vælg en kunde</button>
-				}
-				else
-				{
-					<button class="btn-picked" @onclick="HandleChangeCustomerClick">
-						<p class="picked-label">Kunde</p>
-						<p class="picked-text">@Customer.FullName</p>
-					</button>
-				}
-			</div>
-			<div class="pick-container">
-				@if (Treatment == null)
-				{
-					<button class="btn-pick @(Customer == null ? "inactive" : "")" @onclick="HandlePickTreatmentClick">Vælg en behandling</button>
-				}
-				else
-				{
-					<button class="btn-picked" @onclick="HandleChangeTreatmentClick">
-						<p class="picked-label">Behandling</p>
-						<p class="picked-text">@Treatment.Name</p>
-					</button>
-				}
-			</div>
-		</div>
-		<div class="left-container">
-			<div class="pick-container">
-				@if (Employee == null)
-				{
-					<button class="btn-pick @(Treatment == null ? "inactive" : "")" @onclick="HandlePickEmployeeClick">Vælg en Medarbejder</button>
-				}
-				else
-				{
-					<button class="btn-picked" @onclick="HandleChangeEmployeeClick">
-						<p class="picked-label">Medarbejder</p>
-						<p class="picked-text">@Employee.Name</p>
-					</button>
-				}
-			</div>
-			<div class="pick-container">
-				@if (StartDate == null && StartTime == null)
-				{
-					<button class="btn-pick @(Employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
-				}
-				else
-				{
-					<button class="btn-picked" @onclick="HandleChangeTimeClick">
-						<p class="picked-label">Dato og tid</p>
-						<p class="picked-text">@StartDate @StartTime</p>
-					</button>
-				}
-			</div>
-		</div>
-	</div>
-	<div class="body-right">
-		<div class="right-picker">
-			@if (_activePicker == Picker.Customers)
-			{
-				@foreach (var customer in _customers)
-				{
-					<button @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
-				}
-			}
-			else if (_activePicker == Picker.Treatments)
-			{
-				@foreach (var treatment in _treatments)
-				{
-					<button @onclick="() => HandleTreatmentPickerClick(treatment.Id)">@treatment.Name</button>
-				}
-			}
-			else if (_activePicker == Picker.Employee)
-			{
-				if (Employee == null)
-				{
-					@foreach (var employee in _employees)
+<div class="kk-container">
+	<div class="body-container">
+		<div class="body-left">
+			<div class="left-container">
+				<div class="pick-container">
+					@if (Customer == null)
 					{
-						<button @onclick="() => HandleEmployeePickerClick(employee.Id)">@employee.Name</button>
+						<button class="btn-pick" @onclick="HandlePickCustomerClick">Vælg en kunde</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeCustomerClick">
+							<p class="picked-label">Kunde</p>
+							<p class="picked-text">@Customer.FullName</p>
+						</button>
+					}
+				</div>
+				<div class="pick-container">
+					@if (Treatment == null)
+					{
+						<button class="btn-pick @(Customer == null ? "inactive" : "")" @onclick="HandlePickTreatmentClick">Vælg en behandling</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeTreatmentClick">
+							<p class="picked-label">Behandling</p>
+							<p class="picked-text">@Treatment.Name</p>
+						</button>
+					}
+				</div>
+			</div>
+			<div class="left-container">
+				<div class="pick-container">
+					@if (Employee == null)
+					{
+						<button class="btn-pick @(Treatment == null ? "inactive" : "")" @onclick="HandlePickEmployeeClick">Vælg en Medarbejder</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeEmployeeClick">
+							<p class="picked-label">Medarbejder</p>
+							<p class="picked-text">@Employee.Name</p>
+						</button>
+					}
+				</div>
+				<div class="pick-container">
+					@if (StartDate == null && StartTime == null)
+					{
+						<button class="btn-pick @(Employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeTimeClick">
+							<p class="picked-label">Dato og tid</p>
+							<p class="picked-text">@StartDate @StartTime</p>
+						</button>
+					}
+				</div>
+			</div>
+		</div>
+		<div class="body-right">
+			<div class="right-picker">
+				@if (_activePicker == Picker.Customers)
+				{
+					@foreach (var customer in _customers)
+					{
+						<button class="picker-btn" @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
 					}
 				}
-			}
-			else if (_activePicker == Picker.Time && Employee != null)
-			{
-				<p>@Employee.Name</p>
-				<p>Pick a time</p>
-				<input @ref="_dateRef" type="date" value="StartDate" @onchange="HandleDateChanged"/>
-				<input @ref="_timeRef" type="time" value="StartTime" @onchange="HandleTimeChanged" />
-				@if (StartDate != null) { <p>@StartDate @StartTime</p> }
+				else if (_activePicker == Picker.Treatments)
+				{
+					@foreach (var treatment in _treatments)
+					{
+						<button class="picker-btn" @onclick="() => HandleTreatmentPickerClick(treatment.Id)">@treatment.Name</button>
+					}
+				}
+				else if (_activePicker == Picker.Employee)
+				{
+					if (Employee == null)
+					{
+						@foreach (var employee in _employees)
+						{
+							<button class="picker-btn" @onclick ="() => HandleEmployeePickerClick(employee.Id)">@employee.Name</button>
+						}
+					}
+				}
+				else if (_activePicker == Picker.Time && Employee != null)
+				{
+					<p>Vælg en dato</p>
+					<input @ref="_dateRef" type="date" value="StartDate" @onchange="HandleDateChanged"/>
+					<p>Vælg en tid</p>
+					<input @ref="_timeRef" type="time" value="StartTime" @onchange="HandleTimeChanged" />
+				}
+			</div>
+			@if (_timeIsAvailable != null) {
+				<div class="right-bottom">
+					@if (_timeIsAvailable.Value) { <p>Denne tid er ledig</p> }
+					else { <p>Denne tid er allerede booket</p> }
+					<button @onclick="HandleCreateBookingClick">Book denne tid</button>
+				</div>
 			}
 		</div>
-		<div class="right-buttons"></div>
 	</div>
 </div>
 
@@ -239,6 +245,11 @@
 		_timeIsAvailable = !(await BookingQuery.BookingIsAvailable(query));
 	}
 
+	private async Task HandleCreateBookingClick()
+	{
+		
+	}
+
 	private void HandleChangeCustomerClick()
 	{
 		Customer = null;
@@ -286,7 +297,9 @@
 	.body-container {
 		display: flex;
 		flex-direction: row;
-		padding: 1rem;
+		padding: 0rem;
+		flex: 1;
+		gap: 1rem;
 	}
 
 	.body-left {
@@ -370,5 +383,41 @@
 	.right-picker {
 		display: flex;
 		flex-direction: column;
+		height: 20rem;
+		border-style: solid;
+		border-width: 1px;
+		border-color: black;
+		border-radius: 6px;
+		overflow-x: auto;
+		overflow-y: scroll;
 	}
+
+	.picker-btn {
+		display: block;
+		width: 100%;
+		padding: 12px 20px;
+		margin: 0;
+		border: none;
+		border-bottom: 1px solid #eee;
+		background: none;
+		text-align: center;
+		font-size: 1rem;
+		color: #222;
+		transition: background 0.1s, color 0.1s;
+	}
+
+		.picker-btn:last-child {
+			border-bottom: none;
+		}
+
+		.picker-btn:hover,
+		.picker-btn:focus {
+			background: #e3eafb;
+			color: #1d4ed8;
+			outline: none;
+		}
+
+		.picker-btn:active {
+			background: #dbeafe;
+		}
 </style>
