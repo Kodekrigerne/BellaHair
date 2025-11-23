@@ -126,6 +126,7 @@
 						@ref="_datePickerRef"
 						Date="StartDateTime"
 						DateChanged="HandleDateChanged"
+						PickerVariant="PickerVariant.Dialog"
 						IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
 					<p>Vælg en tid</p>
 					<input type="time" value="StartTime" @onchange="HandleTimeChanged" />
