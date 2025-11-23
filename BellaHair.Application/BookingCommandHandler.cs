@@ -15,6 +15,7 @@ namespace BellaHair.Application
         private readonly IBookingRepository _bookingRepository;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
+        private readonly IDiscountCalculatorService _discountCalculatorService;
 
         public BookingCommandHandler(
             IEmployeeRepository employeeRepository,
@@ -22,7 +23,8 @@ namespace BellaHair.Application
             ITreatmentRepository treatmentRepository,
             IBookingRepository bookingRepository,
             ICurrentDateTimeProvider currentDateTimeProvider,
-            IBookingOverlapChecker bookingOverlapChecker)
+            IBookingOverlapChecker bookingOverlapChecker,
+            IDiscountCalculatorService discountCalculatorService)
         {
             _employeeRepository = employeeRepository;
             _privateCustomerRepository = privateCustomerRepository;
@@ -30,6 +32,7 @@ namespace BellaHair.Application
             _bookingRepository = bookingRepository;
             _currentDateTimeProvider = currentDateTimeProvider;
             _bookingOverlapChecker = bookingOverlapChecker;
+            _discountCalculatorService = discountCalculatorService;
         }
 
         async Task IBookingCommand.CreateBooking(CreateBookingCommand command)
@@ -46,6 +49,11 @@ namespace BellaHair.Application
                 throw new DomainException("Kan ikke oprette booking som overlapper med eksisterende booking.");
 
             var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider);
+
+            //Den bedste rabat findes og tilføjes til bookingen
+            var discount = await _discountCalculatorService.GetBestDiscount(booking);
+
+            if (discount != null) booking.SetDiscount(discount);
 
             await _bookingRepository.AddAsync(booking);
 

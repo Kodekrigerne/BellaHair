@@ -69,6 +69,7 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddLoyaltyDiscounts()
         {
+            _db.Add(LoyaltyDiscount.Create("Stamkunde Nikkel", 1, DiscountPercent.FromDecimal(0.01m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Guld", 15, DiscountPercent.FromDecimal(0.15m)));
@@ -134,7 +135,7 @@ namespace BellaHair.Presentation.WebUI
                 Email.FromString("dennis@frisor.dk"),
                 PhoneNumber.FromString("38238289"),
                 Address.Create("Vesterbro", "Byby", "11A", 1100),
-                new List<Treatment> { _dameklip}
+                new List<Treatment> { _dameklip }
             );
             _db.Add(dennis);
         }
