@@ -115,7 +115,9 @@
 	private async Task HandlePickCustomerClick()
 	{
 		_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists)).ToList();
+		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists))
+		.OrderBy(e => e.FullName)
+		.ToList();
 
 		_activePicker = Picker.Customers;
 
@@ -126,7 +128,9 @@
 		if (Customer == null) return;
 
 		_treatments = (await TreatmentQuery.GetAllAsync())
-		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount)).ToList();
+		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+		.OrderBy(t => t.Name)
+		.ToList();
 
 		_activePicker = Picker.Treatments;
 	}
@@ -142,6 +146,7 @@
 				e.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.StartDateTime.AddMinutes(b.DurationMinutes)))
 					.ToList()))
+			.OrderBy(e => e.Name)
 			.ToList();
 
 		_activePicker = Picker.Employee;
