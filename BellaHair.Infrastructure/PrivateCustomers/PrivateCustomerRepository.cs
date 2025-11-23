@@ -26,9 +26,9 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
             var privateCustomer = await _db.PrivateCustomers
-                                      .Include(p => p.Bookings) //TODO: Fix dette når vi har valgt en Visits strategi
-                                      .FirstOrDefaultAsync(p => p.Id == id)
-                                  ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
+                .Include(p => p.Bookings) //TODO: Fix dette når vi har valgt en Visits strategi
+                .FirstOrDefaultAsync(p => p.Id == id)
+                    ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
 
             return privateCustomer;
         }

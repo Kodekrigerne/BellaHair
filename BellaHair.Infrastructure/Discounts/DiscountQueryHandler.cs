@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +30,6 @@ namespace BellaHair.Infrastructure.Discounts
             //Det er nødvendigt at oprette en booking for at finde en rabat
             //Denne booking gemmes dog ikke
             var booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider);
-
-            Debug.WriteLine("Test " + booking.Customer.Visits);
 
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
 
