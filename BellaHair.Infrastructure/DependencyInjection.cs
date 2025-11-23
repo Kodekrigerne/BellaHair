@@ -29,7 +29,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
             serviceCollection.AddScoped<IEmployeeFutureBookingsChecker, EmployeeFutureBookingsChecker>();
-            
+
 
             serviceCollection.AddScoped<ITreatmentRepository, TreatmentRepository>();
             serviceCollection.AddScoped<ITreatmentQuery, TreatmentQueryHandler>();
@@ -41,6 +41,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 
             serviceCollection.AddScoped<IBookingQuery, BookingQueryHandler>();
+            serviceCollection.AddScoped<IBookingRepository, BookingRepository>();
             serviceCollection.AddScoped<IBookingOverlapChecker, BookingOverlapChecker>();
             serviceCollection.AddScoped<IFutureBookingWithTreatmentChecker, FutureBookingWithTreatmentChecker>();
 

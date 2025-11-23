@@ -6,6 +6,7 @@
 
 @rendermode InteractiveServer
 
+@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.PrivateCustomers
@@ -14,10 +15,12 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 
+@inject ISnackbar Snackbar;
 @inject IPrivateCustomerQuery CustomerQuery;
 @inject ITreatmentQuery TreatmentQuery;
 @inject IEmployeeQuery EmployeeQuery;
 @inject IBookingQuery BookingQuery;
+@inject IBookingCommand BookingCommand;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -108,16 +111,22 @@
 				else if (_activePicker == Picker.Time && Employee != null)
 				{
 					<p>Vælg en dato</p>
-					<input @ref="_dateRef" type="date" value="StartDate" @onchange="HandleDateChanged"/>
+					<input type="date" value="StartDate" @onchange="HandleDateChanged"/>
 					<p>Vælg en tid</p>
-					<input @ref="_timeRef" type="time" value="StartTime" @onchange="HandleTimeChanged" />
+					<input type="time" value="StartTime" @onchange="HandleTimeChanged" />
 				}
 			</div>
 			@if (_timeIsAvailable != null) {
 				<div class="right-bottom">
-					@if (_timeIsAvailable.Value) { <p>Denne tid er ledig</p> }
-					else { <p>Denne tid er allerede booket</p> }
-					<button @onclick="HandleCreateBookingClick">Book denne tid</button>
+					<p>@(_timeIsAvailable.Value ? "Denne tid er ledig" : "Denne tid er allerede booket")</p>
+
+					<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
+					@if (_discount != null)
+					{
+						<p>Rabat: @_discount.Name</p>
+						<p>@_discount.Amount</p>						
+					}
+					<button class="btn-create @(_timeIsAvailable.Value ? "" : "inactive")" @onclick="HandleCreateBookingClick">Book denne tid</button>
 				</div>
 			}
 		</div>
@@ -138,8 +147,7 @@
 	public TimeOnly? StartTime { get; set; }
 	private bool? _timeIsAvailable;
 
-	private ElementReference _dateRef;
-	private ElementReference _timeRef;
+	private BookingDiscountViewModel? _discount;
 
 	private List<PrivateCustomerViewModel> _customers = [];
 	private List<TreatmentViewModel> _treatments = [];
@@ -247,7 +255,18 @@
 
 	private async Task HandleCreateBookingClick()
 	{
-		
+		if (!_timeIsAvailable!.Value) return;
+
+		var dateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
+		var command = new CreateBookingCommand(dateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
+
+		try
+		{
+			await BookingCommand.CreateBooking(command);
+			Snackbar.Add("Booking blev oprettet.", Severity.Success);
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private void HandleChangeCustomerClick()
@@ -258,6 +277,7 @@
 		StartDate = null;
 		StartTime = null;
 		_timeIsAvailable = null;
+		_discount = null;
 
 		_activePicker = Picker.Customers;
 	}
@@ -269,6 +289,7 @@
 		StartDate = null;
 		StartTime = null;
 		_timeIsAvailable = null;
+		_discount = null;
 
 		_activePicker = Picker.Treatments;
 	}
@@ -279,6 +300,7 @@
 		StartDate = null;
 		StartTime = null;
 		_timeIsAvailable = null;
+		_discount = null;
 
 		_activePicker = Picker.Employee;
 	}
@@ -288,8 +310,14 @@
 		StartDate = null;
 		StartDate = null;
 		_timeIsAvailable = null;
+		_discount = null;
 
 		_activePicker = Picker.Time;
+	}
+
+	private async Task HandleGetDiscountClick(MouseEventArgs args)
+	{
+		
 	}
 }
 
@@ -419,5 +447,13 @@
 
 		.picker-btn:active {
 			background: #dbeafe;
+		}
+
+	.btn-create {
+
+	}
+
+		.btn-create.inactive {
+
 		}
 </style>
