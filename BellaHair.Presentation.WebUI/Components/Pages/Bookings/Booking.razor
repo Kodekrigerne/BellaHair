@@ -6,6 +6,7 @@
 
 @rendermode InteractiveServer
 
+@using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
@@ -16,7 +17,9 @@
 @inject IPrivateCustomerQuery CustomerQuery;
 @inject ITreatmentQuery TreatmentQuery;
 @inject IEmployeeQuery EmployeeQuery;
+@inject IBookingQuery BookingQuery;
 
+<p>@_timeIsAvailable</p>
 <div class="kk-container body-container">
 	<div class="body-left">
 		<div class="left-container">
@@ -27,7 +30,10 @@
 				}
 				else
 				{
-					<button @onclick="HandleChangeCustomerClick">@Customer.FullName</button>
+					<button class="btn-picked" @onclick="HandleChangeCustomerClick">
+						<p class="picked-label">Kunde</p>
+						<p class="picked-text">@Customer.FullName</p>
+					</button>
 				}
 			</div>
 			<div class="pick-container">
@@ -37,7 +43,10 @@
 				}
 				else
 				{
-					<button @onclick="HandleChangeTreatmentClick">@Treatment.Name</button>
+					<button class="btn-picked" @onclick="HandleChangeTreatmentClick">
+						<p class="picked-label">Behandling</p>
+						<p class="picked-text">@Treatment.Name</p>
+					</button>
 				}
 			</div>
 		</div>
@@ -49,17 +58,23 @@
 				}
 				else
 				{
-					<button @onclick="HandleChangeEmployeeClick">@Employee.Name</button>
+					<button class="btn-picked" @onclick="HandleChangeEmployeeClick">
+						<p class="picked-label">Medarbejder</p>
+						<p class="picked-text">@Employee.Name</p>
+					</button>
 				}
 			</div>
 			<div class="pick-container">
-				@if (StartDateTime == null)
+				@if (StartDate == null && StartTime == null)
 				{
 					<button class="btn-pick @(Employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
 				}
 				else
 				{
-					<p @onclick="HandleChangeTimeClick">@StartDateTime</p>
+					<button class="btn-picked" @onclick="HandleChangeTimeClick">
+						<p class="picked-label">Dato og tid</p>
+						<p class="picked-text">@StartDate @StartTime</p>
+					</button>
 				}
 			</div>
 		</div>
@@ -82,14 +97,21 @@
 			}
 			else if (_activePicker == Picker.Employee)
 			{
-				@foreach (var employee in _employees)
+				if (Employee == null)
 				{
-					<button @onclick="() => HandleEmployeePickerClick(employee.Id)">@employee.Name</button>
+					@foreach (var employee in _employees)
+					{
+						<button @onclick="() => HandleEmployeePickerClick(employee.Id)">@employee.Name</button>
+					}
 				}
 			}
-			else if (_activePicker == Picker.Time)
+			else if (_activePicker == Picker.Time && Employee != null)
 			{
+				<p>@Employee.Name</p>
 				<p>Pick a time</p>
+				<input @ref="_dateRef" type="date" value="StartDate" @onchange="HandleDateChanged"/>
+				<input @ref="_timeRef" type="time" value="StartTime" @onchange="HandleTimeChanged" />
+				@if (StartDate != null) { <p>@StartDate @StartTime</p> }
 			}
 		</div>
 		<div class="right-buttons"></div>
@@ -106,11 +128,23 @@
 	public PrivateCustomerViewModel? Customer { get; set; }
 	public TreatmentViewModel? Treatment { get; set; }
 	public EmployeeNameWithBookingsViewModel? Employee { get; set; }
-	public DateTime? StartDateTime { get; set; }
+	public DateOnly? StartDate { get; set; }
+	public TimeOnly? StartTime { get; set; }
+	private bool? _timeIsAvailable;
+
+	private ElementReference _dateRef;
+	private ElementReference _timeRef;
 
 	private List<PrivateCustomerViewModel> _customers = [];
 	private List<TreatmentViewModel> _treatments = [];
 	private List<EmployeeNameWithBookingsViewModel> _employees = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await HandlePickCustomerClick();
+	}
 
 	private async Task HandlePickCustomerClick()
 	{
@@ -152,11 +186,10 @@
 		_activePicker = Picker.Employee;
 	}
 
-	private async Task HandlePickStartDateTimeClick()
+	private void HandlePickStartDateTimeClick()
 	{
 		if (Employee == null) return;
 
-		await Task.Delay(1);
 		_activePicker = Picker.Time;
 	}
 
@@ -172,10 +205,38 @@
 		await HandlePickEmployeeClick();
 	}
 
-	private async Task HandleEmployeePickerClick(Guid employeeId)
+	private void HandleEmployeePickerClick(Guid employeeId)
 	{
 		Employee = _employees.Find(t => t.Id == employeeId);
-		await HandlePickStartDateTimeClick();
+		HandlePickStartDateTimeClick();
+	}
+
+	private async Task HandleDateChanged(ChangeEventArgs cea)
+	{
+		StartDate = DateOnly.Parse((string)cea.Value!);
+
+		if (StartTime != null)
+		{
+			await HandleDateTimeChanged();
+		}
+	}
+
+	private async Task HandleTimeChanged(ChangeEventArgs cea)
+	{
+		StartTime = TimeOnly.Parse((string)cea.Value!);
+
+		if (StartDate != null)
+		{
+			await HandleDateTimeChanged();
+		}
+	}
+
+	private async Task HandleDateTimeChanged()
+	{
+		var dateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
+		var query = new BookingIsAvailableQuery(dateTime, Treatment!.DurationMinutes, Employee!.Id, Customer!.Id);
+
+		_timeIsAvailable = !(await BookingQuery.BookingIsAvailable(query));
 	}
 
 	private void HandleChangeCustomerClick()
@@ -183,7 +244,9 @@
 		Customer = null;
 		Treatment = null;
 		Employee = null;
-		StartDateTime = null;
+		StartDate = null;
+		StartTime = null;
+		_timeIsAvailable = null;
 
 		_activePicker = Picker.Customers;
 	}
@@ -192,7 +255,9 @@
 	{
 		Treatment = null;
 		Employee = null;
-		StartDateTime = null;
+		StartDate = null;
+		StartTime = null;
+		_timeIsAvailable = null;
 
 		_activePicker = Picker.Treatments;
 	}
@@ -200,14 +265,18 @@
 	private void HandleChangeEmployeeClick()
 	{
 		Employee = null;
-		StartDateTime = null;
+		StartDate = null;
+		StartTime = null;
+		_timeIsAvailable = null;
 
 		_activePicker = Picker.Employee;
 	}
 
 	private void HandleChangeTimeClick()
 	{
-		StartDateTime = null;
+		StartDate = null;
+		StartDate = null;
+		_timeIsAvailable = null;
 
 		_activePicker = Picker.Time;
 	}
@@ -239,6 +308,7 @@
 		border-width: 1px;
 		border-radius: 6px;
 		display: flex;
+		height: 4rem;
 	}
 
 	.btn-pick {
@@ -247,11 +317,51 @@
 		flex: 1;
 		border-radius: 6px;
 		background-color: white;
+		font-size: 1.05rem;
+		font-weight: 600;
 	}
+
+		.btn-pick:hover {
+			background-color: #f0f4fa;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+			cursor: pointer;
+			transition: background 0.2s, box-shadow 0.2s;
+		}
 
 		.btn-pick.inactive {
 			background-color: lightgrey;
 		}
+
+	.btn-picked {
+		border: none;
+		background: none;
+		flex: 1;
+		border-radius: 6px;
+		background-color: white;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+		.btn-picked:hover {
+			background-color: #f0f4fa;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+			cursor: pointer;
+			transition: background 0.1s, box-shadow 0.1s;
+		}
+
+	.picked-label {
+		margin: 0;
+		font-size: 1.05rem;
+		font-weight: 600;
+	}
+
+	.picked-text {
+		margin: 0;
+		font-size: 1.10rem;
+		font-weight: 700;
+	}
 
 	.body-right {
 		flex: 1;
