@@ -1,4 +1,5 @@
 ﻿@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
@@ -9,7 +10,9 @@
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
 <!-- TODO Bedre styling -->
 
-<Modal @bind-IsVisible="@_showNewModal">
+
+<!-- Modal til sletning -->
+<Modal @bind-IsVisible="@showDeleteModal">
 	@if (_futureBookings)
 	{
 		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
@@ -21,6 +24,13 @@
 		<button class="btn-add" @onclick="@CloseModal">Annuller</button>
 	}
 </Modal>
+
+
+<!-- Modal til redigering -->
+<Modal IsVisible="@showEditModal">
+	<UpdatePrivateCustomerForm OnCreate="@HandleUpdate" OnCancel="@CloseModal" CustomerToUpdate="@PrivateCustomer"></UpdatePrivateCustomerForm>
+</Modal>
+
 
 <div class="privatecustomer-card">
 	
@@ -61,25 +71,30 @@
 		</div>
 
 	</div>
+	
+	<div class="action-button-group">
+		<EditButton onclick="@(() => showEditModal = true)" />
+		<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+	</div>
 
-	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 </div>
 
 	@code {
 
 	[Parameter, EditorRequired]
-	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
+	public required PrivateCustomerDTO PrivateCustomer { get; set; }
 
 	[Parameter, EditorRequired]
-	public required EventCallback OnDelete { get; set; }
+	public required EventCallback OnChange { get; set; }
 
-	private bool _showNewModal = false;
+	private bool showEditModal = false;
+	private bool showDeleteModal = false;
 	private bool _futureBookings = false;
 
 	// Viser modal, og tjekker for future-bookings.
 	private async Task HandleOnDeleteClick()
 	{
-		_showNewModal = true;
+		showDeleteModal = true;
 		_futureBookings = await PrivateCustomerQuery.PCFutureBookingsCheck(PrivateCustomer.Id);
 	}
 
@@ -87,12 +102,22 @@
 	{
 		var command = new DeletePrivateCustomerCommand(PrivateCustomer.Id);
 		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
-		_showNewModal = false;
-		await OnDelete.InvokeAsync();
+		showDeleteModal = false;
+		await OnChange.InvokeAsync();
 		Snackbar.Add("Kundeprofilen blev slettet.", Severity.Success);
 	}
 
-	private void CloseModal() => _showNewModal = false;
+	private async Task HandleUpdate()
+	{
+		showEditModal = false;
+		await OnChange.InvokeAsync();
+	}
+
+	private void CloseModal()
+	{
+		showDeleteModal = false;
+		showEditModal = false;
+	}
 
 	private string GetCustomerInitials(string name)
 	{

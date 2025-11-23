@@ -1,0 +1,118 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using System.Linq;
+@using BellaHair.Ports.Employees
+@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Ports.Treatments
+@inject IPrivateCustomerCommand PrivateCustomerCommand
+@inject IPrivateCustomerQuery PrivateCustomerQuery
+@inject ISnackbar Snackbar
+
+<!-- Mikkel Dahlmann -->
+
+<h3 style="text-align: center; font-weight: bold">Rediger kunde</h3>
+<br />
+<p style="text-align: center">Rediger kundens oplysninger.</p>
+
+<!-- Editform container -->
+<EditForm Model="@PrivateCustomer" OnValidSubmit="@UpdatePCustomer">
+	<DataAnnotationsValidator />
+
+	<div class="inputs-container">
+
+		<div class="inputs-items-container">
+
+			<!-- Indeholdte inputs til formen -->
+			<div>
+				<CreatePrivateCustomerInputs PrivateCustomerModel="PrivateCustomer" />
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="btn-wrapper">
+		<button class="btn-add" type="submit">Opdater</button>
+		<button class="btn-remove" type="button" @onclick="@MapDtoToModel">Nulstil ændringer</button>
+		<button class="btn-remove" type="button" onclick="@OnCancel">Annuller</button>
+	</div>
+
+</EditForm>
+
+@code {
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCancel { get; set; }
+
+	[Parameter, EditorRequired]
+	public PrivateCustomerDTO? CustomerToUpdate { get; set; }
+
+	public NewPrivateCustomerModel? PrivateCustomer { get; set; } = new NewPrivateCustomerModel();
+
+	protected override void OnInitialized()
+	{
+		if (CustomerToUpdate != null)
+		{
+			MapDtoToModel();
+		}
+
+		else
+		{
+			throw new Exception("CustomerToUpdate parameter is required for updating a private customer.");
+		}
+	}
+
+	private async Task UpdatePCustomer()
+	{
+		try
+		{
+			if (PrivateCustomer!.MiddleName == string.Empty) PrivateCustomer.MiddleName = null;
+
+			var command = new UpdatePrivateCustomerCommand(
+				PrivateCustomer.Id,
+				PrivateCustomer.FirstName,
+				PrivateCustomer.MiddleName,
+				PrivateCustomer.LastName,
+				PrivateCustomer.StreetName,
+				PrivateCustomer.City,
+				PrivateCustomer.StreetNumber,
+				PrivateCustomer.ZipCode!.Value,
+				PrivateCustomer.Floor,
+				PrivateCustomer.PhoneNumber,
+				PrivateCustomer.Email,
+				PrivateCustomer.Birthday!.Value
+			);
+
+			await PrivateCustomerCommand.UpdatePrivateCustomerAsync(command);
+
+			Snackbar.Add($"Kundeprofilen '{command.FirstName} {command.LastName}' blev opdateret", Severity.Success);
+
+			await OnCreate.InvokeAsync();
+
+		}
+		catch (Exception e)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+		}
+	}
+
+	private void MapDtoToModel()
+	{
+		PrivateCustomer!.Id = CustomerToUpdate!.Id;
+		PrivateCustomer.FirstName = CustomerToUpdate.FirstName;
+		PrivateCustomer.MiddleName = CustomerToUpdate.MiddleName;
+		PrivateCustomer.LastName = CustomerToUpdate.LastName;
+		PrivateCustomer.StreetName = CustomerToUpdate.StreetName;	
+		PrivateCustomer.City = CustomerToUpdate.City;
+		PrivateCustomer.StreetNumber = CustomerToUpdate.StreetNumber;
+		PrivateCustomer.ZipCode = CustomerToUpdate.ZipCode;
+		PrivateCustomer.Floor = CustomerToUpdate.Floor;
+		PrivateCustomer.PhoneNumber = CustomerToUpdate.PhoneNumber;
+		PrivateCustomer.Email = CustomerToUpdate.Email;
+		PrivateCustomer.Birthday = CustomerToUpdate.Birthday;
+
+		StateHasChanged();
+	}
+}
