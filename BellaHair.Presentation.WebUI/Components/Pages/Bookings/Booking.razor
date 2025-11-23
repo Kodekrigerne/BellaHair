@@ -50,7 +50,10 @@
 					{
 						<button class="btn-picked" @onclick="HandleChangeTreatmentClick">
 							<p class="picked-label">Behandling</p>
-							<p class="picked-text">@Treatment.Name</p>
+							<p class="picked-text">
+								<span class="picked-name">@Treatment.Name</span>
+								<span class="picked-duration">@Treatment.DurationMinutes min</span>
+							</p>
 						</button>
 					}
 				</div>
@@ -97,7 +100,10 @@
 				{
 					@foreach (var treatment in _treatments)
 					{
-						<button class="picker-btn" @onclick="() => HandleTreatmentPickerClick(treatment.Id)">@treatment.Name</button>
+						<button class="picker-btn" @onclick="() => HandleTreatmentPickerClick(treatment.Id)">
+							<span class="treatment-name">@treatment.Name</span>
+							<span class="treatment-duration">@treatment.DurationMinutes min</span>
+						</button>
 					}
 				}
 				else if (_activePicker == Picker.Employee)
@@ -456,6 +462,15 @@
 		font-weight: 700;
 	}
 
+	.picked-duration {
+		position: absolute;
+		right: 0.8rem;
+		font-size: 0.97em;
+		opacity: 0.76;
+		pointer-events: none;
+		padding-left: 6px;
+	}
+
 	.body-right {
 		flex: 1;
 	}
@@ -473,6 +488,7 @@
 	}
 
 	.picker-btn {
+		position: relative;
 		display: block;
 		width: 100%;
 		padding: 12px 20px;
@@ -484,6 +500,16 @@
 		font-size: 1rem;
 		color: #222;
 		transition: background 0.1s, color 0.1s;
+	}
+
+	.treatment-duration {
+		position: absolute;
+		right: 20px;
+		top: 50%;
+		transform: translateY(-50%);
+		opacity: 0.7;
+		font-size: 0.95em;
+		pointer-events: none;
 	}
 
 		.picker-btn:last-child {
