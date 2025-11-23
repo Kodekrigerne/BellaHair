@@ -84,7 +84,7 @@
 					{
 						<button class="btn-picked" @onclick="HandleChangeTimeClick">
 							<p class="picked-label">Dato og tid</p>
-							<p class="picked-text">@StartDate @StartTime</p>
+							<p class="picked-text">@StartDate!.Value.Date @StartTime</p>
 						</button>
 					}
 				</div>
@@ -124,12 +124,17 @@
 					<p>Vælg en dato</p>
 					<MudDatePicker
 						@ref="_datePickerRef"
-						Date="StartDateTime"
+						Date="StartDate"
 						DateChanged="HandleDateChanged"
 						PickerVariant="PickerVariant.Dialog"
 						IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
 					<p>Vælg en tid</p>
-					<input type="time" value="StartTime" @onchange="HandleTimeChanged" />
+					<MudTimePicker
+						@ref="_timePickerRef"
+						Time="StartTime"
+						MinuteSelectionStep="5"
+						TimeChanged="HandleTimeChanged"
+						PickerVariant = "PickerVariant.Dialog"/>
 				}
 			</div>
 			@if (_timeIsAvailable != null)
@@ -137,6 +142,7 @@
 				<div class="right-bottom">
 					<p class="availability-status">@_availabilityMessage</p>
 
+					@if (_timeIsAvailable != null && _timeIsAvailable == true) {
 					<div class="discount-section">
 						<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
 						@if (_discount != null)
@@ -154,7 +160,8 @@
 						}
 					</div>
 
-					<button class="btn-create @(_timeIsAvailable.Value ? "" : "inactive")" @onclick="HandleCreateBookingClick">Book denne tid</button>
+					<button class="btn-create" @onclick="HandleCreateBookingClick">Book denne tid</button>
+					}
 				</div>
 			}
 		</div>
@@ -167,6 +174,7 @@
 
 	private DateTime _now;
 	private MudDatePicker? _datePickerRef;
+	private MudTimePicker? _timePickerRef;
 
 	[Parameter]
 	public Guid Id { get; set; }
@@ -175,10 +183,9 @@
 	public TreatmentViewModel? Treatment { get; set; }
 	public EmployeeNameWithBookingsViewModel? Employee { get; set; }
 
-	public DateTime? StartDateTime { get; set; }
+	public DateTime? StartDate { get; set; }
 
-	public DateOnly? StartDate { get; set; }
-	public TimeOnly? StartTime { get; set; }
+	public TimeSpan? StartTime { get; set; }
 
 	private bool? _timeIsAvailable;
 	private string? _availabilityMessage;
@@ -241,9 +248,9 @@
 	{
 		if (Employee == null) return;
 
-		if (_now.DayOfWeek == DayOfWeek.Saturday) StartDateTime = _now.Date.AddDays(2);
-		else if (_now.DayOfWeek == DayOfWeek.Sunday) StartDateTime = _now.Date.AddDays(1);
-		else StartDateTime = _now;
+		if (_now.DayOfWeek == DayOfWeek.Saturday) StartDate = _now.Date.AddDays(2);
+		else if (_now.DayOfWeek == DayOfWeek.Sunday) StartDate = _now.Date.AddDays(1);
+		else StartDate = _now;
 
 		_activePicker = Picker.Time;
 		StateHasChanged();
@@ -276,18 +283,23 @@
 	{
 		if (newDate == null) return;
 
-		StartDateTime = newDate;
-		StartDate = DateOnly.FromDateTime(newDate.Value);
+		StartDate = newDate;
 
 		if (StartTime != null)
 		{
 			await HandleDateTimeChanged();
 		}
+		else
+		{
+			if (_timePickerRef != null) await _timePickerRef.OpenAsync();
+		}
 	}
 
-	private async Task HandleTimeChanged(ChangeEventArgs cea)
+	private async Task HandleTimeChanged(TimeSpan? newTime)
 	{
-		StartTime = TimeOnly.Parse((string)cea.Value!);
+		if (newTime == null) return;
+
+		StartTime = newTime;
 
 		if (StartDate != null)
 		{
@@ -297,21 +309,23 @@
 
 	private async Task HandleDateTimeChanged()
 	{
-		var startDateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
-		var treatmentEnd = StartTime.Value.AddMinutes(Treatment!.DurationMinutes);
+		if (StartDate == null || StartTime == null) return;
 
-		var earliest = new TimeOnly(10, 0, 0);
-		var latest = new TimeOnly(18, 0, 0);
+		var startDateTime = StartDate.Value.Add(StartTime!.Value);
+		var treatmentEnd = startDateTime.AddMinutes(Treatment!.DurationMinutes);
 
-		//TODO: Burde rykkes til domænet
-		if (StartTime.Value < earliest)
+		var date = StartDate.Value.Date;
+		var earliest = date.AddHours(10);
+		var latest = date.AddHours(18);
+
+		if (startDateTime < earliest)
 		{
 			_timeIsAvailable = false;
 			_availabilityMessage = "Kan ikke starte booking før åbningstid";
 			return;
 		}
 
-		if (StartTime > latest || treatmentEnd > latest)
+		if (treatmentEnd > latest)
 		{
 			_timeIsAvailable = false;
 			_availabilityMessage = "Booking skal slutte før lukketid";
@@ -326,10 +340,10 @@
 
 	private async Task HandleCreateBookingClick()
 	{
-		if (!_timeIsAvailable!.Value) return;
+		if (!_timeIsAvailable!.Value || StartDate == null || StartTime == null) return;
 
-		var dateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
-		var command = new CreateBookingCommand(dateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
+		var startDateTime = StartDate.Value.Add(StartTime.Value);
+		var command = new CreateBookingCommand(startDateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
 
 		try
 		{
@@ -393,10 +407,12 @@
 
 	private async Task HandleGetDiscountClick(MouseEventArgs args)
 	{
+		if (StartDate == null || StartTime == null) return;
+
 		try
 		{
-			var dateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
-			var query = new FindBestDiscountQuery(dateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
+			var startDateTime = StartDate.Value.Add(StartTime.Value);
+			var query = new FindBestDiscountQuery(startDateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
@@ -638,11 +654,5 @@
 
 		.btn-create:hover {
 			background-color: #0b7dda;
-		}
-
-		.btn-create.inactive {
-			background-color: #ccc;
-			cursor: not-allowed;
-			opacity: 0.6;
 		}
 </style>
