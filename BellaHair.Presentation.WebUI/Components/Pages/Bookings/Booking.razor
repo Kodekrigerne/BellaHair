@@ -23,6 +23,7 @@
 @inject IBookingQuery BookingQuery;
 @inject IBookingCommand BookingCommand;
 @inject IDiscountQuery DiscountQuery;
+@inject NavigationManager NavigationManager;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -306,6 +307,7 @@
 		{
 			await BookingCommand.CreateBooking(command);
 			Snackbar.Add("Booking blev oprettet.", Severity.Success);
+			NavigationManager.NavigateTo("/bookings");
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
