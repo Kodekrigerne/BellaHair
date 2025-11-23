@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Employees;
+﻿using BellaHair.Domain.Employees;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Employees
 
-{ 
+{
     // Linnea
 
     /// <summary>
@@ -32,6 +28,14 @@ namespace BellaHair.Infrastructure.Employees
         async Task<Employee> IEmployeeRepository.GetAsync(Guid id)
         {
             var employee = await _db.Employees.FindAsync(id)
+                ?? throw new KeyNotFoundException($"No employee exists with ID {id}");
+
+            return employee;
+        }
+
+        async Task<Employee> IEmployeeRepository.GetWithTreatmentsAsync(Guid id)
+        {
+            var employee = await _db.Employees.Include(e => e.Treatments).SingleOrDefaultAsync(e => e.Id == id)
                 ?? throw new KeyNotFoundException($"No employee exists with ID {id}");
 
             return employee;
