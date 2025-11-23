@@ -8,6 +8,7 @@
 
 @using BellaHair.Domain
 @using BellaHair.Ports.Bookings
+@using BellaHair.Ports.Discounts
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
@@ -21,6 +22,7 @@
 @inject IEmployeeQuery EmployeeQuery;
 @inject IBookingQuery BookingQuery;
 @inject IBookingCommand BookingCommand;
+@inject IDiscountQuery DiscountQuery;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -317,7 +319,19 @@
 
 	private async Task HandleGetDiscountClick(MouseEventArgs args)
 	{
-		
+		try
+		{
+			var dateTime = new DateTime(StartDate!.Value.Year, StartDate.Value.Month, StartDate.Value.Day, StartTime!.Value.Hour, StartTime.Value.Minute, StartTime.Value.Second);
+			var query = new FindBestDiscountQuery(dateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
+
+			var discountDTO = await DiscountQuery.FindBestDiscount(query);
+			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
+			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount);
+		}
+		catch
+		{
+			Snackbar.Add("Der opstod en fejl ved hentning af rabat", Severity.Error);
+		}
 	}
 }
 

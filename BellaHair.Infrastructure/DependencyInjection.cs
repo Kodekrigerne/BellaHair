@@ -22,6 +22,8 @@ namespace BellaHair.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceCollection)
         {
+            serviceCollection.AddScoped<IDiscountQuery, DiscountQueryHandler>();
+
             serviceCollection.AddScoped<IDiscountCalculatorService, DiscountCalculatorService>();
             serviceCollection.AddScoped<ILoyaltyDiscountRepository, LoyaltyDiscountRepository>();
             serviceCollection.AddScoped<ILoyaltyDiscountQuery, LoyaltyDiscountQueryHandler>();
@@ -29,7 +31,6 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
             serviceCollection.AddScoped<IEmployeeFutureBookingsChecker, EmployeeFutureBookingsChecker>();
-
 
             serviceCollection.AddScoped<ITreatmentRepository, TreatmentRepository>();
             serviceCollection.AddScoped<ITreatmentQuery, TreatmentQueryHandler>();
