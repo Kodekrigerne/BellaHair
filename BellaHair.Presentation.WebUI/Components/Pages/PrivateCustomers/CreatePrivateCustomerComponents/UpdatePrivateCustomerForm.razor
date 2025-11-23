@@ -32,7 +32,7 @@
 	</div>
 
 	<div class="btn-wrapper">
-		<button class="btn-add" type="submit">Opdater</button>
+		<button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
 		<button class="btn-remove" type="button" @onclick="@HandleReset">Nulstil ændringer</button>
 		<button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
 	</div>
@@ -53,6 +53,8 @@
 
 	private EditContext? editContext { get; set; }
 
+	private bool InputHasChanged;
+
 	protected override void OnInitialized()
 	{
 		if (CustomerToUpdate != null)
@@ -70,6 +72,8 @@
 	{
 		MapDtoToModel();
 		editContext = new EditContext(PrivateCustomer!);
+		editContext.OnFieldChanged += HandleFieldChanged!;
+		InputHasChanged = false;
 	}
 
 	private void HandleReset()
@@ -82,6 +86,13 @@
 	{
 		Snackbar.Add("Redigering blev afbrudt.", Severity.Warning);
 		await OnCancel.InvokeAsync();
+	}
+
+	private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+	{
+		InputHasChanged = editContext!.IsModified();
+
+		StateHasChanged();
 	}
 
 	private async Task UpdatePCustomer()
@@ -132,5 +143,13 @@
 		PrivateCustomer.PhoneNumber = CustomerToUpdate.PhoneNumber;
 		PrivateCustomer.Email = CustomerToUpdate.Email;
 		PrivateCustomer.Birthday = CustomerToUpdate.Birthday;
+	}
+
+	private void Dispose()
+	{
+		if (editContext != null)
+		{
+			editContext.OnFieldChanged -= HandleFieldChanged!;
+		}
 	}
 }
