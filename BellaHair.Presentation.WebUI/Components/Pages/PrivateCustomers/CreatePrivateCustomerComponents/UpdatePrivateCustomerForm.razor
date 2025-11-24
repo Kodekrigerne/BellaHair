@@ -1,4 +1,5 @@
-﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+﻿@using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Linq;
 @using BellaHair.Ports.Employees
@@ -15,6 +16,7 @@
 <p style="text-align: center">Rediger kundens oplysninger.</p>
 
 <!-- Editform container -->
+<!-- Editcontext specifikt sat, så den kan opdateres, når form resettes -->
 <EditForm EditContext="@editContext" OnValidSubmit="@UpdatePCustomer">
 	<DataAnnotationsValidator />
 
@@ -64,10 +66,13 @@
 
 		else
 		{
-			throw new Exception("CustomerToUpdate parameter is required for updating a private customer.");
+			Snackbar.Add("Noget gik galt.", Severity.Error);
 		}
 	}
 
+    // Sætter editcontext med modellen som reference.
+    // Der abonneres på feltændringer for at tracke input-ændringer.
+    // Feltændringer medfører kald af HandleFieldChanged-metoden.
 	private void InitializeViewModel()
 	{
 		MapDtoToModel();
@@ -123,12 +128,17 @@
 			await OnUpdate.InvokeAsync();
 
 		}
+		catch (DomainException e)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+		}
 		catch (Exception e)
 		{
 			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
 		}
 	}
 
+    // Mapper den givne DTO til Model der bruges til inputs.
 	private void MapDtoToModel()
 	{
 		PrivateCustomer!.Id = CustomerToUpdate!.Id;
