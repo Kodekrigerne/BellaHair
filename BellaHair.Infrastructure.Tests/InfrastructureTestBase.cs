@@ -28,7 +28,7 @@ namespace BellaHair.Infrastructure.Tests
             var services = new ServiceCollection();
             services.AddInfrastructureServices();
             ServiceProvider = services.BuildServiceProvider();
-            
+
             _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
             _db = new BellaHairContext(_options);
             _db.Database.EnsureCreated();
@@ -47,13 +47,13 @@ namespace BellaHair.Infrastructure.Tests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
+            _db.Database.CloseConnection();
+            _db.Dispose();
+
             if (ServiceProvider is IDisposable disposable)
             {
                 disposable.Dispose();
             }
-
-            _db.Database.CloseConnection();
-            _db.Dispose();
         }
     }
 }
