@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BellaHair.Domain.Discounts
+﻿namespace BellaHair.Domain.Discounts
 {
     public interface ICampaignDiscountRepository
     {
+        Task AddAsync(CampaignDiscount campaignDiscount);
+        Task Delete(CampaignDiscount campaignDiscount);
+        Task UpdateAsync(CampaignDiscount campaignDiscount);
+        Task<CampaignDiscount> GetAsync(Guid id);
+        Task SaveChangesAsync();
 
     }
 }
