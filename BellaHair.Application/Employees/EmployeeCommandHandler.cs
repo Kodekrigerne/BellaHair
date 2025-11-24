@@ -26,6 +26,37 @@ namespace BellaHair.Application.Employees
             _employeeFutureBookingsChecker = employeeFutureBookingsChecker;
         }
 
+        public async Task UpdateEmployeeAsync(UpdateEmployeeCommand command)
+        {
+            var employeeToUpdate = await _employeeRepo.GetAsync(command.Id);
+
+            var updatedName = Name.FromStrings(
+                command.FirstName,
+                command.LastName,
+                command.MiddleName);
+
+            var updatedAddress = Address.Create(
+                command.StreetName,
+                command.City,
+                command.StreetNumber,
+                command.ZipCode,
+                command.Floor);
+
+            var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
+            var updatedEmail = Email.FromString(command.Email);
+
+            var updatedTreatments = (List<Treatment>)await _treatmentRepo.GetAsync(command.TreatmentIds);
+
+            employeeToUpdate.Update(
+                updatedName,
+                updatedEmail,
+                updatedPhoneNumber,
+                updatedAddress,
+                updatedTreatments);
+
+            await _employeeRepo.SaveChangesAsync();
+        }
+
         async Task IEmployeeCommand.CreateEmployeeCommand(CreateEmployeeCommand command)
         {
             var name = Name.FromStrings(command.FirstName, command.LastName, command.MiddleName);

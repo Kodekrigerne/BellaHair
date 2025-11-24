@@ -31,6 +31,17 @@ public class Employee : PersonBase
     }
 
     public static Employee Create(Name name, Email email, PhoneNumber phoneNumber, Address address, List<Treatment> treatments) => new(name, email, phoneNumber, address, treatments);
+
+    public void Update(Name name, Email email, PhoneNumber phoneNumber, Address address, List<Treatment> treatments)
+    {
+        Name = name;
+        Address = address;
+        PhoneNumber = phoneNumber;
+        Email = email;
+        _treatments.Clear();
+        _treatments.AddRange(treatments);
+    }
+
 }
 
 public class EmployeeException(string message) : DomainException(message);
