@@ -48,7 +48,7 @@
                 
                 <div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item" style="@(itemStyle)">
                     
-						<div style="text-align: left;">@treatment.Name</div>
+						<div type="input" style="text-align: left;">@treatment.Name</div>
 							<div>
 								@if (isSelected)
 								{
@@ -82,7 +82,7 @@
 
 	<div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
 		 <button class="btn-add" type="submit">Opret</button>
-		<button class="btn-remove" type="reset">Ryd felter</button>
+		<button class="btn-remove" type="reset" @onclick="ClearTreatments" >Ryd felter</button>
 	</div>
 
 </EditForm>
@@ -125,6 +125,12 @@
 		}
 
 		// Genindlæser/opdaterer komponentet med det valgte
+		StateHasChanged();
+	}
+
+	private void ClearTreatments()
+	{
+		SelectedTreatmentIds.Clear();
 		StateHasChanged();
 	}
 
