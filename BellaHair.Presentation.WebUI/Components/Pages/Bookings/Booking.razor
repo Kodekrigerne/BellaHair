@@ -84,7 +84,7 @@
 					{
 						<button class="btn-picked" @onclick="HandleChangeTimeClick">
 							<p class="picked-label">Dato og tid</p>
-							<p class="picked-text">@StartDate!.Value.ToString("yyyy-MM-dd") @StartTime?.ToString(@"hh\:mm")</p>
+							<p class="picked-text">@StartDate?.ToString("yyyy-MM-dd") @StartTime?.ToString(@"hh\:mm")</p>
 						</button>
 					}
 				</div>
@@ -119,23 +119,30 @@
 						}
 					}
 				}
-				else if (_activePicker == Picker.Time && Employee != null)
-				{
-					<p>Vælg en dato</p>
-					<MudDatePicker
-						@ref="_datePickerRef"
-						Date="StartDate"
-						DateChanged="HandleDateChanged"
-						PickerVariant="PickerVariant.Dialog"
-						IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
-					<p>Vælg en tid</p>
-					<MudTimePicker
-						@ref="_timePickerRef"
-						Time="StartTime"
-						MinuteSelectionStep="5"
-						TimeChanged="HandleTimeChanged"
-						PickerVariant = "PickerVariant.Dialog"/>
-				}
+				<div class="date-picker-container">
+					@if (_activePicker == Picker.Time)
+					{
+						<div class="date-picker-section">
+							<p class="date-picker-label">Vælg en dato</p>
+							<MudDatePicker @ref="_datePickerRef"
+								Class="mud-picker-with-border"
+								Date="StartDate"
+								DateChanged="HandleDateChanged"
+								PickerVariant="PickerVariant.Dialog"
+								IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
+						</div>
+
+						<div class="date-picker-section">
+							<p class="date-picker-label">Vælg en tid</p>
+							<MudTimePicker @ref="_timePickerRef"
+								Class="mud-picker-with-border"
+								Time="StartTime"
+								MinuteSelectionStep="5"
+								TimeChanged="HandleTimeChanged"
+								PickerVariant="PickerVariant.Dialog" />
+						</div>
+					}
+				</div>
 			</div>
 			@if (_timeIsAvailable != null)
 			{
@@ -153,10 +160,10 @@
 					</div>
 
 					<div class="price-section">
-						<p class="price-without-discount">Pris uden rabat: @Treatment!.Price.ToString("F2") dkk</p>
-						@if (_discount != null)
+						<p class="price-without-discount">Pris uden rabat: @Treatment?.Price.ToString("F2") dkk</p>
+						@if (_discount != null && Treatment != null)
 						{
-							<p class="price-with-discount">Pris med rabat: @((Treatment!.Price - _discount.Amount).ToString("F2")) dkk</p>
+							<p class="price-with-discount">Pris med rabat: @((Treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
 						}
 					</div>
 
@@ -309,10 +316,10 @@
 
 	private async Task HandleDateTimeChanged()
 	{
-		if (StartDate == null || StartTime == null) return;
+		if (StartDate == null || StartTime == null || Treatment == null || Employee == null || Customer == null) return;
 
-		var startDateTime = StartDate.Value.Add(StartTime!.Value);
-		var treatmentEnd = startDateTime.AddMinutes(Treatment!.DurationMinutes);
+		var startDateTime = StartDate.Value.Add(StartTime.Value);
+		var treatmentEnd = startDateTime.AddMinutes(Treatment.DurationMinutes);
 
 		var date = StartDate.Value.Date;
 		var earliest = date.AddHours(10);
@@ -332,7 +339,7 @@
 			return;
 		}
 
-		var query = new BookingIsAvailableQuery(startDateTime, Treatment!.DurationMinutes, Employee!.Id, Customer!.Id);
+		var query = new BookingIsAvailableQuery(startDateTime, Treatment.DurationMinutes, Employee.Id, Customer.Id);
 
 		_timeIsAvailable = !(await BookingQuery.BookingIsAvailable(query));
 		_availabilityMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
@@ -340,10 +347,11 @@
 
 	private async Task HandleCreateBookingClick()
 	{
-		if (!_timeIsAvailable!.Value || StartDate == null || StartTime == null) return;
+		if (_timeIsAvailable == null || !_timeIsAvailable.Value || StartDate == null || 
+			StartTime == null || Treatment == null || Employee == null || Customer == null) return;
 
 		var startDateTime = StartDate.Value.Add(StartTime.Value);
-		var command = new CreateBookingCommand(startDateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
+		var command = new CreateBookingCommand(startDateTime, Employee.Id, Customer.Id, Treatment.Id);
 
 		try
 		{
@@ -407,12 +415,12 @@
 
 	private async Task HandleGetDiscountClick(MouseEventArgs args)
 	{
-		if (StartDate == null || StartTime == null) return;
+		if (StartDate == null || StartTime == null || Treatment == null || Employee == null || Customer == null) return;
 
 		try
 		{
 			var startDateTime = StartDate.Value.Add(StartTime.Value);
-			var query = new FindBestDiscountQuery(startDateTime, Employee!.Id, Customer!.Id, Treatment!.Id);
+			var query = new FindBestDiscountQuery(startDateTime, Employee.Id, Customer.Id, Treatment.Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
@@ -579,14 +587,12 @@
 		gap: 12px;
 	}
 
-	/* Line 1: Availability status */
 	.availability-status {
 		margin: 0;
 		font-weight: 600;
 		font-size: 1rem;
 	}
 
-	/* Line 2: Discount section */
 	.discount-section {
 		display: flex;
 		align-items: center;
@@ -620,7 +626,6 @@
 		font-weight: 600;
 	}
 
-	/* Line 3: Price section */
 	.price-section {
 		display: flex;
 		gap: 16px;
@@ -639,7 +644,6 @@
 		color: #4CAF50;
 	}
 
-	/* Line 4: Create booking button */
 	.btn-create {
 		padding: 12px 24px;
 		background-color: #2196F3;
@@ -655,4 +659,31 @@
 		.btn-create:hover {
 			background-color: #0b7dda;
 		}
+
+	.date-picker-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+		height: 100%;
+		gap: 1.75rem;
+		padding-top: 2.75rem;
+	}
+
+	.date-picker-section {
+		text-align: center;
+		width: 50%;
+	}
+
+	.date-picker-label {
+		margin-bottom: 1rem;
+		font-size: 1.25rem;
+	}
+
+	.mud-picker-with-border {
+		border: 1px solid black;
+		border-radius: 4px;
+		padding: 0.25rem 0 0.25rem 0;
+		padding-left: 1rem;
+	}
 </style>
