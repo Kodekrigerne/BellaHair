@@ -28,7 +28,10 @@ namespace BellaHair.Domain.Discounts
             if (endDate < startDate)
                 throw new CampaignDiscountException("Startdato skal være før slutdato.");
 
-            Id = Guid.NewGuid();
+            if (_treatments.Count == 0)
+                throw new CampaignDiscountException("Kampagnerabatten skal gælde for mindst én behandling.");
+
+                Id = Guid.NewGuid();
             Name = name;
             DiscountPercent = discountPercent;
             StartDate = startDate;
