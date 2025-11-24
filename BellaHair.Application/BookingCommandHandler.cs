@@ -7,6 +7,8 @@ using BellaHair.Ports.Bookings;
 
 namespace BellaHair.Application
 {
+    //Dennis
+    /// <inheritdoc cref="IBookingCommand" />
     public class BookingCommandHandler : IBookingCommand
     {
         private readonly IEmployeeRepository _employeeRepository;

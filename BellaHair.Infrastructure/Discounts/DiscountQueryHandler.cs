@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Discounts
 {
+    //Dennis
+    /// <inheritdoc cref="IDiscountQuery"/>
     public class DiscountQueryHandler : IDiscountQuery
     {
         private readonly BellaHairContext _db;
