@@ -12,7 +12,7 @@
 			@* Hvis medarbejderen har fremtidige bookinger, vises dette. *@
 			@if (_futureBookings)
 			{
-				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @employeeSimpleViewModel.Name har fremtidige bookinger.
+				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @employeeFullViewModel.Name har fremtidige bookinger.
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
 			<button class="btn-add" onclick="@CloseModal">Annuller</button>
@@ -22,7 +22,7 @@
 			else
 			{
 
-				<h4>Slet: @employeeSimpleViewModel.Name?</h4>
+				<h4>Slet: @employeeFullViewModel.Name?</h4>
 
 				<p style="max-width: 22rem; text-align: center;">	Er du sikker på, at du vil slette denne medarbejder?
 																	Denne handling kan ikke fortrydes.						</p>
@@ -39,27 +39,32 @@
 		<div class="employee-card">														@*Contains the entire singular employee card layout*@
 						
 				<div class="employee-avatar">											@*Contains the avatar with intials*@
-					@GetEmployeeInitials(@employeeSimpleViewModel.Name)
+					@GetEmployeeInitials(employeeFullViewModel.Name)
 				</div>
 					<div>																@*Positions other info to position next to avatar*@
-					<h3>@employeeSimpleViewModel.Name</h3>
+					<h3>@employeeFullViewModel.Name</h3>
 
 						<div class="employee-contact-details">
 							<div class="employee-single-contact-detail">
 								<MailIcon Class="employee-icons" />
-									@employeeSimpleViewModel.Email
+									@employeeFullViewModel.Email
 								</div>
 
 							<div class="employee-single-contact-detail">
 								<PhoneIcon Class="employee-icons"/>
-									@employeeSimpleViewModel.PhoneNumber
+									@employeeFullViewModel.PhoneNumber
+							</div>
+
+							<div class="employee-single-contact-detail"> 
+								<MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="employee-icons" />
+									@employeeFullViewModel.Address
 							</div>
 						</div>
 			<div class="delete-button">
 						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in employeeSimpleViewModel.TreatmentNames)
+						@foreach (var treatment in employeeFullViewModel.TreatmentNames)
 							{															
 								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
 							}
@@ -73,7 +78,7 @@
 	private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
-	public required EmployeeSimpleViewModel employeeSimpleViewModel { get; set; }
+	public required EmployeeFullViewModel employeeFullViewModel { get; set; }
 
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnDelete { get; set; }
@@ -95,19 +100,19 @@
 	private async Task HandleOnDeleteClick()
 	{
 		_showNewModal = true;
-		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeSimpleViewModel.Id);
+		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeFullViewModel.Id);
 	}
 
 	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.
 	private async Task HandleOnDeleteConfirm()
 	{
-		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
+		var command = new DeleteEmployeeCommand(employeeFullViewModel.Id);
 		try
 		{
 			await EmployeeCommand.DeleteEmployeeCommand(command);
 			CloseModal();
 			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
-			await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
+			await OnDelete.InvokeAsync(employeeFullViewModel.Id);
 		}
 
 		catch (Exception e)

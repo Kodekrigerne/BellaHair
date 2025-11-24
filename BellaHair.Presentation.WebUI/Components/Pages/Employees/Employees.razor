@@ -29,7 +29,7 @@
 
 			@foreach (var employee in _employees)
 			{
-				<EmployeeCard employeeSimpleViewModel="employee" OnDelete="@HandleDeleteClick"/>
+				<EmployeeCard employeeFullViewModel="employee" OnDelete="@HandleDeleteClick"/>
 			}
 		}
 </div>
@@ -41,7 +41,7 @@
 	/// <summary>
 	/// List of viewmodels used to store employee data
 	/// </summary>
-	private List<EmployeeSimpleViewModel>? _employees = null;
+	private List<EmployeeFullViewModel>? _employees = null;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -59,10 +59,11 @@
 		try
 		{
 			var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeSimpleViewModel(	e.Id,
+			_employees = employees.Select(e => new EmployeeFullViewModel(	e.Id,
 																			e.Name,
 																			e.Email,
 																			e.PhoneNumber,
+																			e.Address,
 																			e.TreatmentNames))
 																							.OrderBy(e => e.Name)
 																							.ToList();

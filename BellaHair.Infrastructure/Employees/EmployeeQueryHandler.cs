@@ -36,11 +36,11 @@ namespace BellaHair.Infrastructure.Employees
         }
 
         // Henter alle medarbejdere med færre detaljer til overblikket
-        async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
+        async Task<List<EmployeeDTO>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
         {
             var emp = await _db.Employees
                 .AsNoTracking()
-                .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Treatments.Select(x => x.Name).ToList()))
+                .Select(x => new EmployeeDTO(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Address.FullAddress, x.Treatments.Select(x => x.Name).ToList()))
                 .ToListAsync();
 
             return emp;
