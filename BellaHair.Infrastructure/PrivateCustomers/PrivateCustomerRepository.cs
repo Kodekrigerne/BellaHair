@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.PrivateCustomers;
+﻿using BellaHair.Domain;
+using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
@@ -10,7 +11,13 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PrivateCustomerRepository : IPrivateCustomerRepository
     {
         private readonly BellaHairContext _db;
-        public PrivateCustomerRepository(BellaHairContext db) => _db = db;
+        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+
+        public PrivateCustomerRepository(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            _db = db;
+            _currentDateTimeProvider = currentDateTimeProvider;
+        }
 
         async Task IPrivateCustomerRepository.AddAsync(PrivateCustomer privateCustomer)
         {
@@ -22,13 +29,16 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _db.PrivateCustomers.Remove(privateCustomer);
         }
 
-        // .Include sikrer, at det hentede PrivateCustomer-objekt inkluderer alle booking-relationer
         async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
             var privateCustomer = await _db.PrivateCustomers
-                .Include(p => p.Bookings) //TODO: Fix dette når vi har valgt en Visits strategi
                 .FirstOrDefaultAsync(p => p.Id == id)
                     ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
+
+            var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+            privateCustomer.SetVisits(visits);
 
             return privateCustomer;
         }
