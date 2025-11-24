@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 
 namespace BellaHair.Domain.PrivateCustomers
@@ -17,14 +16,14 @@ namespace BellaHair.Domain.PrivateCustomers
         private readonly List<Booking> _bookings = [];
 
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
-        public IReadOnlyCollection<Booking> Bookings => _bookings?.AsReadOnly();
+        public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
 
-        #pragma warning disable CS8618
+#pragma warning disable CS8618
         private PrivateCustomer() { }
-        #pragma warning restore CS8618
+#pragma warning restore CS8618
 
 
-        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber, 
+        private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber,
             Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             ValidateBirthday(birthday, currentDateTimeProvider);
@@ -38,13 +37,13 @@ namespace BellaHair.Domain.PrivateCustomers
             _bookings = [];
         }
 
-        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber, 
+        public static PrivateCustomer Create(Name name, Address address, PhoneNumber phoneNumber,
             Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             return new PrivateCustomer(name, address, phoneNumber, email, birthday, currentDateTimeProvider);
         }
 
-        public void Update(Name name, Address address, PhoneNumber phoneNumber, 
+        public void Update(Name name, Address address, PhoneNumber phoneNumber,
             Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             ValidateBirthday(birthday, currentDateTimeProvider);
