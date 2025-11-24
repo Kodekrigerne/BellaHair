@@ -92,7 +92,7 @@ namespace BellaHair.Application.Tests.Treatments
             var deleteCommand = new DeleteTreatmentCommand(treatment.Id);
 
             // Assert 
-          Assert.ThrowsAsync<TreatmentInUseException>( async () => await handler.DeleteTreatmentAsync(deleteCommand));
+          Assert.ThrowsAsync<DomainException>( async () => await handler.DeleteTreatmentAsync(deleteCommand));
         }
 
     }
