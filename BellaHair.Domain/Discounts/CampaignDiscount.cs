@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Treatments;
 
 namespace BellaHair.Domain.Discounts
@@ -20,7 +15,7 @@ namespace BellaHair.Domain.Discounts
 
 
 #pragma warning disable CS8618
-        private CampaignDiscount() {}
+        private CampaignDiscount() { }
 #pragma warning restore CS8618
 
         private CampaignDiscount(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Treatment> treatments)
@@ -28,18 +23,20 @@ namespace BellaHair.Domain.Discounts
             if (endDate < startDate)
                 throw new CampaignDiscountException("Startdato skal være før slutdato.");
 
-            if (_treatments.Count == 0)
+            var treatmentList = treatments.ToList();
+
+            if (treatmentList.Count == 0)
                 throw new CampaignDiscountException("Kampagnerabatten skal gælde for mindst én behandling.");
 
-                Id = Guid.NewGuid();
+            Id = Guid.NewGuid();
             Name = name;
             DiscountPercent = discountPercent;
             StartDate = startDate;
             EndDate = endDate;
-            _treatments = treatments.ToList();
+            _treatments = treatmentList;
         }
 
-        public static CampaignDiscount Create(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, List<Treatment> treatments) =>
+        public static CampaignDiscount Create(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Treatment> treatments) =>
             new(name, discountPercent, startDate, endDate, treatments);
 
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
@@ -50,7 +47,7 @@ namespace BellaHair.Domain.Discounts
             if (booking.StartDateTime < StartDate || booking.StartDateTime > EndDate)
                 return BookingDiscount.Inactive(Name);
 
-            if (_treatments.All(t => t.Id != booking.Treatment.Id)) 
+            if (_treatments.All(t => t.Id != booking.Treatment.Id))
                 return BookingDiscount.Inactive(Name);
 
             var discount = booking.Total * DiscountPercent.Value;

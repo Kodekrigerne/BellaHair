@@ -6,15 +6,15 @@
         Task DeleteCampaignDiscountAsync(DeleteCampaignDiscountCommand command);
     }
 
-    public class CreateCampaignDiscountCommand(
+    public record CreateCampaignDiscountCommand(
         string Name,
-        decimal Discount,
+        decimal DiscountPercent,
         DateTime StartDate,
         DateTime EndDate,
         IEnumerable<Guid> TreatmentIds);
 
 
-    public class DeleteCampaignDiscountCommand(Guid id);
+    public record DeleteCampaignDiscountCommand(Guid Id);
 
 
 }
