@@ -67,6 +67,24 @@ namespace BellaHair.Presentation.WebUI
             _db.SaveChanges();
         }
 
+        private void AddCampaignDiscounts()
+        {
+            _db.Add(CampaignDiscount.Create("Sommerklip", 
+                DiscountPercent.FromDecimal(0.20m),
+                new DateTime(2026, 6, 1, 12, 0, 0),
+                new DateTime(2026, 8, 1, 12, 0, 0), new List<Treatment> { _herreklip, _dameklip }));
+
+            _db.Add(CampaignDiscount.Create("Februar Farve Flash", 
+                DiscountPercent.FromDecimal(0.10m),
+                new DateTime(2026, 2, 1, 12, 0, 0),
+                new DateTime(2026, 3, 1, 0, 0, 0), new List<Treatment> { _farvning }));
+
+            _db.Add(CampaignDiscount.Create("Back-to-School Børneklip", 
+                DiscountPercent.FromDecimal(0.10m),
+                new DateTime(2026, 8, 1, 12, 0, 0),
+                new DateTime(2026, 9, 1, 0, 0, 0), new List<Treatment> { _børneklip }));
+        }
+
         private void AddLoyaltyDiscounts()
         {
             _db.Add(LoyaltyDiscount.Create("Stamkunde Nikkel", 1, DiscountPercent.FromDecimal(0.01m)));
