@@ -67,9 +67,10 @@
 
 			_bookings = bookings.Select(b => new BookingSimpleViewModel(
 				b.StartDateTime,
+				b.EndDateTime,
 				DateOnly.FromDateTime(b.StartDateTime),
 				TimeOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.StartDateTime.AddMinutes(b.DurationMinutes)),
+				TimeOnly.FromDateTime(b.EndDateTime),
 				b.Total,
 				b.EmployeeFullName,
 				b.CustomerFullName,
