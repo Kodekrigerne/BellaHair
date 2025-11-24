@@ -8,7 +8,7 @@
             @ref="_modalDiv"
             @onkeydown="HandleKeyDown"
             @onclick:stopPropagation>
-            @ChildContent
+            @if (IsVisible && _isMounted) @ChildContent
         </div>
     </div>
 }

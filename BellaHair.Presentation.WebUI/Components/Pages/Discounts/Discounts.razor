@@ -11,6 +11,7 @@
 @rendermode InteractiveServer
 
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
+@inject ISnackbar Snackbar;
 
 <Modal @bind-IsVisible="@_showNewModal">
 	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
@@ -25,7 +26,6 @@
 </div>
 
 <div class="kk-container">
-	@if (_errorMessage != null) { <p>@_errorMessage</p> }
 	@if (_discounts == null) { <p>Loading</p> }
 	else if (_activeTab == DiscountTab.Loyalty)
 	{
@@ -55,7 +55,6 @@
 	};
 
 	private bool _showNewModal = false;
-	private string? _errorMessage;
 
 	private List<IDiscountViewModel>? _discounts = null;
 	private int LoyaltyCount;
@@ -82,9 +81,8 @@
 
 			_activeTab = DiscountTab.Loyalty;
 		}
-		catch (DomainException ex) { _errorMessage = ex.Message; }
-		catch (Exception ex) { _errorMessage = ex.Message; }  
-	@*TODO: "Noget gik galt. "*@
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private void HandleCampaignSelectorClick()

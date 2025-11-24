@@ -1,9 +1,11 @@
 ﻿<!-- Dennis -->
 
+@using BellaHair.Domain
 @using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Shared;
 
 @inject ILoyaltyDiscountCommand _loyaltyDiscountCommand
+@inject ISnackbar Snackbar;
 
 <div class="ldc-card">
 	<p>@LoyaltyDiscount.Name</p>
@@ -22,9 +24,15 @@
 
 	private async Task HandleOnDeleteClick()
 	{
-		var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
-		await _loyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
-		await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
+		try
+		{
+			var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
+			await _loyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
+			await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
+			Snackbar.Add("Stamkunderabat slettet.", Severity.Success);
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 }
 
