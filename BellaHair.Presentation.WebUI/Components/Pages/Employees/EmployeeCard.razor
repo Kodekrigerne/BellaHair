@@ -4,8 +4,7 @@
 @inject IEmployeeQuery EmployeeQuery
 @inject ISnackbar SnackBar
 
-
-	<Modal @bind-IsVisible="@_showNewModal">
+	<Modal @bind-IsVisible="@_showDeleteModal">
 		<div class="modal-centered-content">
 				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
 
@@ -35,6 +34,10 @@
 		</div>
 	</Modal>
 
+	<Modal @bind-IsVisible="@showEditModal">
+
+	</Modal>
+
 
 		<div class="employee-card">														@*Contains the entire singular employee card layout*@
 						
@@ -61,6 +64,8 @@
 							</div>
 						</div>
 			<div class="delete-button">
+						<EditButton onclick="@(() => showEditModal = true)" />
+
 						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
@@ -73,9 +78,10 @@
 				</div>
 
 @code
-{
-	private bool _showNewModal = false;
-	private bool _futureBookings = false;
+	{
+		private bool _showDeleteModal = false;
+		public bool showEditModal = false;
+		private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
 	public required EmployeeFullViewModel employeeFullViewModel { get; set; }
@@ -99,7 +105,7 @@
 	// Viser modalen og tjekker, om der er fremtidige bookinger.
 	private async Task HandleOnDeleteClick()
 	{
-		_showNewModal = true;
+		_showDeleteModal = true;
 		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeFullViewModel.Id);
 	}
 
@@ -122,6 +128,6 @@
 	}
 
 	// Lukker modalen
-	private void CloseModal() => _showNewModal = false;
+	private void CloseModal() => _showDeleteModal = false;
 
 }
