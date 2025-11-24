@@ -70,13 +70,15 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.PhoneNumber);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Address);
             modelBuilder.Entity<Employee>()
-                                            .HasMany(e => e.Treatments) 
-                                            .WithMany(t => t.Employees); 
+                                            .HasMany(e => e.Treatments)
+                                            .WithMany(t => t.Employees);
 
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.PhoneNumber);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Address);
+
+            modelBuilder.Entity<PrivateCustomer>().Ignore(p => p.Visits);
 
             modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
         }

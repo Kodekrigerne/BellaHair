@@ -6,6 +6,10 @@
 
 @rendermode InteractiveServer
 
+@using BellaHair.Domain
+@using BellaHair.Infrastructure
+@using BellaHair.Ports.Bookings
+@using BellaHair.Ports.Discounts
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
@@ -13,86 +17,164 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 
+@inject ISnackbar Snackbar;
 @inject IPrivateCustomerQuery CustomerQuery;
 @inject ITreatmentQuery TreatmentQuery;
 @inject IEmployeeQuery EmployeeQuery;
+@inject IBookingQuery BookingQuery;
+@inject IBookingCommand BookingCommand;
+@inject IDiscountQuery DiscountQuery;
+@inject NavigationManager NavigationManager;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 
-<div class="kk-container body-container">
-	<div class="body-left">
-		<div class="left-container">
-			<div class="pick-container">
-				@if (Customer == null)
-				{
-					<button class="btn-pick" @onclick="HandlePickCustomerClick">Vælg en kunde</button>
-				}
-				else
-				{
-					<button @onclick="HandleChangeCustomerClick">@Customer.FullName</button>
-				}
+<div class="kk-container">
+	<div class="body-container">
+		<div class="body-left">
+			<div class="left-container">
+				<div class="pick-container">
+					@if (Customer == null)
+					{
+						<button class="btn-pick" @onclick="HandlePickCustomerClick">Vælg en kunde</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeCustomerClick">
+							<p class="picked-label">Kunde</p>
+							<p class="picked-text">@Customer.FullName</p>
+						</button>
+					}
+				</div>
+				<div class="pick-container">
+					@if (Treatment == null)
+					{
+						@* Hvis Customer er null: btn-pick.inactive, ellers btn-pick *@
+						<button class="btn-pick @(Customer == null ? "inactive" : "")" @onclick="HandlePickTreatmentClick">Vælg en behandling</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeTreatmentClick">
+							<p class="picked-label">Behandling</p>
+							<p class="picked-text">
+								<span class="picked-name">@Treatment.Name</span>
+								<span class="picked-duration">@Treatment.DurationMinutes min</span>
+							</p>
+						</button>
+					}
+				</div>
 			</div>
-			<div class="pick-container">
-				@if (Treatment == null)
-				{
-					<button class="btn-pick" @onclick="HandlePickTreatmentClick">Vælg en behandling</button>
-				}
-				else
-				{
-					<button @onclick="HandleChangeTreatmentClick">@Treatment.Name</button>
-				}
+			<div class="left-container">
+				<div class="pick-container">
+					@if (Employee == null)
+					{
+						@* Hvis Treatment er null: btn-pick.inactive, ellers btn-pick *@
+						<button class="btn-pick @(Treatment == null ? "inactive" : "")" @onclick="HandlePickEmployeeClick">Vælg en Medarbejder</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeEmployeeClick">
+							<p class="picked-label">Medarbejder</p>
+							<p class="picked-text">@Employee.Name</p>
+						</button>
+					}
+				</div>
+				<div class="pick-container">
+					@if (StartDate == null && StartTime == null)
+					{
+						@* Hvis Employee er null: btn-pick.inactive, ellers btn-pick *@
+						<button class="btn-pick @(Employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
+					}
+					else
+					{
+						<button class="btn-picked" @onclick="HandleChangeTimeClick">
+							<p class="picked-label">Dato og tid</p>
+							<p class="picked-text">@StartDate?.ToString("yyyy-MM-dd") @StartTime?.ToString(@"hh\:mm")</p>
+						</button>
+					}
+				</div>
 			</div>
 		</div>
-		<div class="left-container">
-			<div class="pick-container">
-				@if (Employee == null)
+		<div class="body-right">
+			<div class="right-picker">
+				@if (_activePicker == Picker.Customers)
 				{
-					<button class="btn-pick" @onclick="HandlePickEmployeeClick">Vælg en Medarbejder</button>
+					@foreach (var customer in _customers)
+					{
+						<button class="picker-btn" @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
+					}
 				}
-				else
+				else if (_activePicker == Picker.Treatments)
 				{
-					<button @onclick="HandleChangeEmployeeClick">@Employee.Name</button>
+					@foreach (var treatment in _treatments)
+					{
+						<button class="picker-btn" @onclick="() => HandleTreatmentPickerClick(treatment.Id)">
+							<span class="treatment-name">@treatment.Name</span>
+							<span class="treatment-duration">@treatment.DurationMinutes min</span>
+						</button>
+					}
 				}
+				else if (_activePicker == Picker.Employee)
+				{
+					if (Employee == null)
+					{
+						@foreach (var employee in _employees)
+						{
+							<button class="picker-btn" @onclick ="() => HandleEmployeePickerClick(employee.Id)">@employee.Name</button>
+						}
+					}
+				}
+				<div class="date-picker-container">
+					@if (_activePicker == Picker.Time)
+					{
+						<div class="date-picker-section">
+							<p class="date-picker-label">Vælg en dato</p>
+							<MudDatePicker @ref="_datePickerRef"
+								Class="mud-picker-with-border"
+								Date="StartDate"
+								DateChanged="HandleDateChanged"
+								PickerVariant="PickerVariant.Dialog"
+								IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
+						</div>
+
+						<div class="date-picker-section">
+							<p class="date-picker-label">Vælg en tid</p>
+							<MudTimePicker @ref="_timePickerRef"
+								Class="mud-picker-with-border"
+								Time="StartTime"
+								MinuteSelectionStep="5"
+								TimeChanged="HandleTimeChanged"
+								PickerVariant="PickerVariant.Dialog" />
+						</div>
+					}
+				</div>
 			</div>
-			<div class="pick-container">
-				@if (StartDateTime == null)
-				{
-					<button class="btn-pick" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
-				}
-				else
-				{
-					<p @onclick="HandleChangeTimeClick">@StartDateTime</p>
-				}
-			</div>
-		</div>
-	</div>
-	<div class="body-right">
-		<div class="right-picker">
-			@if (_activePicker == Picker.Customers)
+			@if (_timeIsAvailable != null)
 			{
-				@foreach (var customer in _customers)
-				{
-					<button @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
-				}
-			}
-			else if (_activePicker == Picker.Treatments)
-			{
-				@foreach (var treatment in _treatments)
-				{
-					<button @onclick="() => HandleTreatmentPickerClick(treatment.Id)">@treatment.Name</button>
-				}
-			}
-			else if (_activePicker == Picker.Employee)
-			{
-				@foreach (var employee in _employees)
-				{
-					<button @onclick="() => HandleEmployeePickerClick(employee.Id)">@employee.Name</button>
-				}
-			}
-			else if (_activePicker == Picker.Time)
-			{
-				<p>Pick a time</p>
+				<div class="right-bottom">
+					<p class="availability-status">@_availabilityMessage</p>
+
+					@if (_timeIsAvailable != null && _timeIsAvailable == true) {
+					<div class="discount-section">
+						<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
+						@if (_discount != null)
+						{
+							<p class="discount-name">Rabat: @_discount.Name</p>
+							<p class="discount-amount">Beløb: @_discount.Amount.ToString("F2") dkk</p>
+						}
+					</div>
+
+					<div class="price-section">
+						<p class="price-without-discount">Pris uden rabat: @Treatment?.Price.ToString("F2") dkk</p>
+						@if (_discount != null && Treatment != null)
+						{
+							<p class="price-with-discount">Pris med rabat: @((Treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
+						}
+					</div>
+
+					<button class="btn-create" @onclick="HandleCreateBookingClick">Book denne tid</button>
+					}
+				</div>
 			}
 		</div>
-		<div class="right-buttons"></div>
 	</div>
 </div>
 
@@ -100,22 +182,44 @@
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
 
+	private DateTime _now;
+	private MudDatePicker? _datePickerRef;
+	private MudTimePicker? _timePickerRef;
+
 	[Parameter]
 	public Guid Id { get; set; }
 
 	public PrivateCustomerViewModel? Customer { get; set; }
 	public TreatmentViewModel? Treatment { get; set; }
 	public EmployeeNameWithBookingsViewModel? Employee { get; set; }
-	public DateTime? StartDateTime { get; set; }
+
+	public DateTime? StartDate { get; set; }
+
+	public TimeSpan? StartTime { get; set; }
+
+	private bool? _timeIsAvailable;
+	private string? _availabilityMessage;
+
+	private BookingDiscountViewModel? _discount;
 
 	private List<PrivateCustomerViewModel> _customers = [];
 	private List<TreatmentViewModel> _treatments = [];
 	private List<EmployeeNameWithBookingsViewModel> _employees = [];
 
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		await HandlePickCustomerClick();
+	}
+
 	private async Task HandlePickCustomerClick()
 	{
 		_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visits)).ToList();
+		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visits))
+		.OrderBy(e => e.FullName)
+		.ToList();
 
 		_activePicker = Picker.Customers;
 
@@ -126,7 +230,9 @@
 		if (Customer == null) return;
 
 		_treatments = (await TreatmentQuery.GetAllAsync())
-		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount)).ToList();
+		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+		.OrderBy(t => t.Name)
+		.ToList();
 
 		_activePicker = Picker.Treatments;
 	}
@@ -142,6 +248,7 @@
 				e.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.StartDateTime.AddMinutes(b.DurationMinutes)))
 					.ToList()))
+			.OrderBy(e => e.Name)
 			.ToList();
 
 		_activePicker = Picker.Employee;
@@ -151,8 +258,17 @@
 	{
 		if (Employee == null) return;
 
-		await Task.Delay(1);
+		if (_now.DayOfWeek == DayOfWeek.Saturday) StartDate = _now.Date.AddDays(2);
+		else if (_now.DayOfWeek == DayOfWeek.Sunday) StartDate = _now.Date.AddDays(1);
+		else StartDate = _now;
+
 		_activePicker = Picker.Time;
+		StateHasChanged();
+		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
+		await Task.Delay(1);
+		if (_datePickerRef != null) {
+			await _datePickerRef.OpenAsync();
+		}
 	}
 
 	private async Task HandleCustomerPickerClick(Guid customerId)
@@ -173,12 +289,94 @@
 		await HandlePickStartDateTimeClick();
 	}
 
+	private async Task HandleDateChanged(DateTime? newDate)
+	{
+		if (newDate == null) return;
+
+		StartDate = newDate;
+
+		if (StartTime != null)
+		{
+			await HandleDateTimeChanged();
+		}
+		else
+		{
+			if (_timePickerRef != null) await _timePickerRef.OpenAsync();
+		}
+	}
+
+	private async Task HandleTimeChanged(TimeSpan? newTime)
+	{
+		if (newTime == null) return;
+
+		StartTime = newTime;
+
+		if (StartDate != null)
+		{
+			await HandleDateTimeChanged();
+		}
+	}
+
+	private async Task HandleDateTimeChanged()
+	{
+		if (StartDate == null || StartTime == null || Treatment == null || Employee == null || Customer == null) return;
+
+		var startDateTime = StartDate.Value.Add(StartTime.Value);
+		var treatmentEnd = startDateTime.AddMinutes(Treatment.DurationMinutes);
+
+		//TODO: Ryk til appsettings.json
+		var date = StartDate.Value.Date;
+		var earliest = date.AddHours(10);
+		var latest = date.AddHours(18);
+
+		if (startDateTime < earliest)
+		{
+			_timeIsAvailable = false;
+			_availabilityMessage = "Kan ikke starte booking før åbningstid";
+			return;
+		}
+
+		if (treatmentEnd > latest)
+		{
+			_timeIsAvailable = false;
+			_availabilityMessage = "Booking skal slutte før lukketid";
+			return;
+		}
+
+		var query = new BookingIsAvailableQuery(startDateTime, Treatment.DurationMinutes, Employee.Id, Customer.Id);
+
+		_timeIsAvailable = !(await BookingQuery.BookingHasOverlap(query));
+		_availabilityMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
+	}
+
+	private async Task HandleCreateBookingClick()
+	{
+		if (_timeIsAvailable == null || !_timeIsAvailable.Value || StartDate == null || 
+			StartTime == null || Treatment == null || Employee == null || Customer == null) return;
+
+		var startDateTime = StartDate.Value.Add(StartTime.Value);
+		var command = new CreateBookingCommand(startDateTime, Employee.Id, Customer.Id, Treatment.Id);
+
+		try
+		{
+			await BookingCommand.CreateBooking(command);
+			Snackbar.Add("Booking blev oprettet.", Severity.Success);
+			NavigationManager.NavigateTo("/bookings");
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
 	private void HandleChangeCustomerClick()
 	{
 		Customer = null;
 		Treatment = null;
 		Employee = null;
-		StartDateTime = null;
+		StartDate = null;
+		StartTime = null;
+		_timeIsAvailable = null;
+		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Customers;
 	}
@@ -187,7 +385,11 @@
 	{
 		Treatment = null;
 		Employee = null;
-		StartDateTime = null;
+		StartDate = null;
+		StartTime = null;
+		_timeIsAvailable = null;
+		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Treatments;
 	}
@@ -195,16 +397,43 @@
 	private void HandleChangeEmployeeClick()
 	{
 		Employee = null;
-		StartDateTime = null;
+		StartDate = null;
+		StartTime = null;
+		_timeIsAvailable = null;
+		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Employee;
 	}
 
 	private void HandleChangeTimeClick()
 	{
-		StartDateTime = null;
+		StartDate = null;
+		StartDate = null;
+		_timeIsAvailable = null;
+		_discount = null;
+		_availabilityMessage = null;
 
 		_activePicker = Picker.Time;
+	}
+
+	private async Task HandleGetDiscountClick(MouseEventArgs args)
+	{
+		if (StartDate == null || StartTime == null || Treatment == null || Employee == null || Customer == null) return;
+
+		try
+		{
+			var startDateTime = StartDate.Value.Add(StartTime.Value);
+			var query = new FindBestDiscountQuery(startDateTime, Employee.Id, Customer.Id, Treatment.Id);
+
+			var discountDTO = await DiscountQuery.FindBestDiscount(query);
+			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
+			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount);
+		}
+		catch
+		{
+			Snackbar.Add("Der opstod en fejl ved hentning af rabat", Severity.Error);
+		}
 	}
 }
 
@@ -212,7 +441,9 @@
 	.body-container {
 		display: flex;
 		flex-direction: row;
-		padding: 1rem;
+		padding: 0rem;
+		flex: 1;
+		gap: 1rem;
 	}
 
 	.body-left {
@@ -234,12 +465,68 @@
 		border-width: 1px;
 		border-radius: 6px;
 		display: flex;
+		height: 4rem;
 	}
 
 	.btn-pick {
 		border: none;
 		background:none;
 		flex: 1;
+		border-radius: 6px;
+		background-color: white;
+		font-size: 1.05rem;
+		font-weight: 600;
+	}
+
+		.btn-pick:hover {
+			background-color: #f0f4fa;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+			cursor: pointer;
+			transition: background 0.2s, box-shadow 0.2s;
+		}
+
+		.btn-pick.inactive {
+			background-color: lightgrey;
+		}
+
+	.btn-picked {
+		border: none;
+		background: none;
+		flex: 1;
+		border-radius: 6px;
+		background-color: white;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+		.btn-picked:hover {
+			background-color: #f0f4fa;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+			cursor: pointer;
+			transition: background 0.1s, box-shadow 0.1s;
+		}
+
+	.picked-label {
+		margin: 0;
+		font-size: 1.05rem;
+		font-weight: 600;
+	}
+
+	.picked-text {
+		margin: 0;
+		font-size: 1.10rem;
+		font-weight: 700;
+	}
+
+	.picked-duration {
+		position: absolute;
+		right: 0.8rem;
+		font-size: 0.97em;
+		opacity: 0.76;
+		pointer-events: none;
+		padding-left: 6px;
 	}
 
 	.body-right {
@@ -249,5 +536,158 @@
 	.right-picker {
 		display: flex;
 		flex-direction: column;
+		height: 20rem;
+		border-style: solid;
+		border-width: 1px;
+		border-color: black;
+		border-radius: 6px;
+		overflow-x: auto;
+		overflow-y: scroll;
+	}
+
+	.picker-btn {
+		position: relative;
+		display: block;
+		width: 100%;
+		padding: 12px 20px;
+		margin: 0;
+		border: none;
+		border-bottom: 1px solid #eee;
+		background: none;
+		text-align: center;
+		font-size: 1rem;
+		color: #222;
+		transition: background 0.1s, color 0.1s;
+	}
+
+	.treatment-duration {
+		position: absolute;
+		right: 20px;
+		top: 50%;
+		transform: translateY(-50%);
+		opacity: 0.7;
+		font-size: 0.95em;
+		pointer-events: none;
+	}
+
+		.picker-btn:last-child {
+			border-bottom: none;
+		}
+
+		.picker-btn:hover,
+		.picker-btn:focus {
+			background: #e3eafb;
+			color: #1d4ed8;
+			outline: none;
+		}
+
+		.picker-btn:active {
+			background: #dbeafe;
+		}
+
+	.right-bottom {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.availability-status {
+		margin: 0;
+		font-weight: 600;
+		font-size: 1rem;
+	}
+
+	.discount-section {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.btn-discount {
+		padding: 8px 16px;
+		background-color: #4CAF50;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+		.btn-discount:hover {
+			background-color: #45a049;
+		}
+
+	.discount-name {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.discount-amount {
+		margin: 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+
+	.price-section {
+		display: flex;
+		gap: 16px;
+		flex-wrap: wrap;
+	}
+
+	.price-without-discount {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.price-with-discount {
+		margin: 0;
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: #4CAF50;
+	}
+
+	.btn-create {
+		padding: 12px 24px;
+		background-color: #2196F3;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+		font-weight: 600;
+		transition: background-color 0.3s ease;
+	}
+
+		.btn-create:hover {
+			background-color: #0b7dda;
+		}
+
+	.date-picker-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+		height: 100%;
+		gap: 1.75rem;
+		padding-top: 2.75rem;
+	}
+
+	.date-picker-section {
+		text-align: center;
+		width: 50%;
+	}
+
+	.date-picker-label {
+		margin-bottom: 1rem;
+		font-size: 1.25rem;
+	}
+
+	.mud-picker-with-border {
+		border: 1px solid black;
+		border-radius: 4px;
+		padding: 0.25rem 0 0.25rem 0;
+		padding-left: 1rem;
 	}
 </style>

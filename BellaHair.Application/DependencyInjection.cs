@@ -2,6 +2,7 @@
 using BellaHair.Application.Employees;
 using BellaHair.Application.PrivateCustomers;
 using BellaHair.Application.Treatments;
+using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
@@ -17,7 +18,8 @@ namespace BellaHair.Application
             serviceCollection.AddScoped<ILoyaltyDiscountCommand, LoyaltyDiscountCommandHandler>();
             serviceCollection.AddScoped<ITreatmentCommand, TreatmentCommandHandler>();
             serviceCollection.AddScoped<IEmployeeCommand, EmployeeCommandHandler>();
-            
+            serviceCollection.AddScoped<IBookingCommand, BookingCommandHandler>();
+
             serviceCollection.AddScoped<IPrivateCustomerCommand, PrivateCustomerCommandHandler>();
 
             return serviceCollection;
