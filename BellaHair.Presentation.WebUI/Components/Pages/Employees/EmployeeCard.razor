@@ -36,6 +36,8 @@
 
 	<Modal @bind-IsVisible="@showEditModal">
 
+		<BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents.UpdateEmployeeForm EmployeeToUpdate="@employeeFullViewModel"/>
+	
 	</Modal>
 
 
@@ -79,12 +81,17 @@
 
 @code
 	{
-		private bool _showDeleteModal = false;
-		public bool showEditModal = false;
-		private bool _futureBookings = false;
+
+	private bool _showDeleteModal = false;
+	public bool showEditModal = false;
+	private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
-	public required EmployeeFullViewModel employeeFullViewModel { get; set; }
+	 public required EventCallback OnChange { get; set; }
+
+
+	[Parameter, EditorRequired]
+	public required EmployeellViewModel employeeFullViewModel { get; set; }
 
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnDelete { get; set; }
@@ -101,6 +108,13 @@
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
 
 	}
+
+	private async Task HandleUpdate()
+	{
+		showEditModal = false;
+		await OnChange.InvokeAsync();
+	}
+
 
 	// Viser modalen og tjekker, om der er fremtidige bookinger.
 	private async Task HandleOnDeleteClick()

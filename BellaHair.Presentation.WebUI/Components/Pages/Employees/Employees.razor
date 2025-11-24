@@ -29,7 +29,7 @@
 
 			@foreach (var employee in _employees)
 			{
-				<EmployeeCard employeeFullViewModel="employee" OnDelete="@HandleDeleteClick"/>
+				<EmployeeCard employeeFullViewModel="employee" OnDelete="@HandleDeleteClick" OnChange="LoadEmployees"/>
 			}
 		}
 </div>
