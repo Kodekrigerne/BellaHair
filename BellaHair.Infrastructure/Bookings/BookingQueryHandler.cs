@@ -51,7 +51,7 @@ namespace BellaHair.Infrastructure.Bookings
             return MapToBookingSimpleDTOs(bookings);
         }
 
-        async Task<bool> IBookingQuery.BookingIsAvailable(BookingIsAvailableQuery query)
+        async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
         {
             return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId);
         }

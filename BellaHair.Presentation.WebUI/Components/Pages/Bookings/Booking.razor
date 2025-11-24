@@ -324,6 +324,7 @@
 		var startDateTime = StartDate.Value.Add(StartTime.Value);
 		var treatmentEnd = startDateTime.AddMinutes(Treatment.DurationMinutes);
 
+		//TODO: Ryk til appsettings.json
 		var date = StartDate.Value.Date;
 		var earliest = date.AddHours(10);
 		var latest = date.AddHours(18);
@@ -344,7 +345,7 @@
 
 		var query = new BookingIsAvailableQuery(startDateTime, Treatment.DurationMinutes, Employee.Id, Customer.Id);
 
-		_timeIsAvailable = !(await BookingQuery.BookingIsAvailable(query));
+		_timeIsAvailable = !(await BookingQuery.BookingHasOverlap(query));
 		_availabilityMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
 	}
 

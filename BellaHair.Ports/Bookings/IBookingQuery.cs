@@ -8,7 +8,7 @@
     {
         Task<IEnumerable<BookingSimpleDTO>> GetAllNewAsync();
         Task<IEnumerable<BookingSimpleDTO>> GetAllOldAsync();
-        Task<bool> BookingIsAvailable(BookingIsAvailableQuery query);
+        Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
 
     public record DiscountDTO(string Name, decimal DiscountAmount);
