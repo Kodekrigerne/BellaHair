@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
@@ -38,11 +39,11 @@ namespace BellaHair.Application.Treatments
 
         async Task ITreatmentCommand.DeleteTreatmentAsync(DeleteTreatmentCommand command)
         {
-            bool isBooked = await _bookingChecker.CheckFutureBookingsWithTreatmentAsync(command.Id);
+            bool isBooked = await _bookingChecker.HasFutureBookingsWithTreatmentAsync(command.Id);
 
             if (isBooked)
             {
-                throw new TreatmentInUseException($"Can't delete treatment with id {command.Id}: Treatment is used in a booking.");
+                throw new DomainException($"Kan ikke slette behandlingen: Behandling bruges i en booking");
             }
 
             var treatment = await _treatmentRepository.GetAsync(command.Id);

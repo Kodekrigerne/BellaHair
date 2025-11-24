@@ -1,0 +1,83 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using System.Linq;
+@using BellaHair.Ports.Employees
+@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Ports.Treatments
+@inject IPrivateCustomerCommand PrivateCustomerCommand
+@inject IPrivateCustomerQuery PrivateCustomerQuery
+@inject ISnackbar Snackbar
+
+<!-- Mikkel Dahlmann -->
+
+<h3 style="text-align: center; font-weight: bold">Opret ny kunde</h3>
+<br />
+<p style="text-align: center">Indtast oplysningerne på den kunde, du vil oprette.</p>
+
+<!-- Editform container -->
+<EditForm Model="@PrivateCustomer" OnValidSubmit="@HandleCreatePCustomer">
+        <DataAnnotationsValidator />
+
+        <div class="inputs-container">
+			
+	        <div class="inputs-items-container">
+
+		        <!-- Indeholdte inputs til formen -->
+		        <div>
+			        <CreatePrivateCustomerInputs PrivateCustomerModel="PrivateCustomer"/>
+		        </div>
+
+	        </div>
+
+        </div>
+
+        <div class="btn-wrapper">
+	        <button class="btn-add" type="submit">Opret</button>
+			<button class="btn-remove" type="reset" >Ryd indhold</button>				
+			<button class="btn-remove" type="button" onclick="@OnCancel">Annuller</button>
+        </div>
+
+</EditForm>
+
+@code {
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCancel { get; set; }
+
+	public NewPrivateCustomerModel PrivateCustomer { get; set; } = new NewPrivateCustomerModel();
+
+	private async Task HandleCreatePCustomer()
+	{
+		try
+		{
+			if (PrivateCustomer.MiddleName == string.Empty) PrivateCustomer.MiddleName = null;
+
+			var command = new CreatePrivateCustomerCommand(
+				PrivateCustomer.FirstName,
+				PrivateCustomer.MiddleName,
+				PrivateCustomer.LastName,
+				PrivateCustomer.StreetName,
+				PrivateCustomer.City,
+				PrivateCustomer.StreetNumber,
+				PrivateCustomer.ZipCode!.Value,
+				PrivateCustomer.Floor,
+				PrivateCustomer.PhoneNumber,
+				PrivateCustomer.Email,
+				PrivateCustomer.Birthday!.Value
+			);
+
+			await PrivateCustomerCommand.CreatePrivateCustomerAsync(command);
+
+			Snackbar.Add($"Kundeprofilen '{command.FirstName} {command.LastName}' blev oprettet", Severity.Success);
+
+			await OnCreate.InvokeAsync();
+
+		}
+		catch (Exception e)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+		}
+	}
+}

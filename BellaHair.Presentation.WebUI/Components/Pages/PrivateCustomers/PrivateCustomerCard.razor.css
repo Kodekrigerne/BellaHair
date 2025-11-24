@@ -66,3 +66,17 @@
     height: 16px;
     display: inline-block;
 }
+
+.action-button-group {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-button-group ::deep .bin-delete-button {
+    position: static !important;
+    top: unset !important;
+    right: unset !important;
+}

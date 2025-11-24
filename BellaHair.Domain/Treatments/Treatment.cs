@@ -17,7 +17,7 @@ namespace BellaHair.Domain.Treatments
         public string Name { get; private set; }
         public Price Price { get; private set; }
         public DurationMinutes DurationMinutes { get; private set; }
-        public List<Employee> Employees { get; private set; } = [];
+        public IReadOnlyList<Employee> Employees;
 
 #pragma warning disable CS8618
         public Treatment() { }
@@ -38,6 +38,4 @@ namespace BellaHair.Domain.Treatments
             => new(treatmentName, price, durationMinutes);
     }
     public class TreatmentException(string message) : DomainException(message);
-
-    public class TreatmentInUseException(string message) : DomainException(message);
 }

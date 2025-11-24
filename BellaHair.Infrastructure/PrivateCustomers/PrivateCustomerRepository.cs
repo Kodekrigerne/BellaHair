@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.PrivateCustomers;
+﻿using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
@@ -11,18 +6,17 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     // Mikkel Dahlmann
 
     /// <summary><inheritdoc cref="IPrivateCustomerRepository"/> on the DbContext.</summary>
-    
+
     public class PrivateCustomerRepository : IPrivateCustomerRepository
     {
         private readonly BellaHairContext _db;
-
         public PrivateCustomerRepository(BellaHairContext db) => _db = db;
 
         async Task IPrivateCustomerRepository.AddAsync(PrivateCustomer privateCustomer)
         {
             await _db.PrivateCustomers.AddAsync(privateCustomer);
         }
-        
+
         void IPrivateCustomerRepository.Delete(PrivateCustomer privateCustomer)
         {
             _db.PrivateCustomers.Remove(privateCustomer);
@@ -32,9 +26,9 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
             var privateCustomer = await _db.PrivateCustomers
-                                      .Include(p => p.Bookings)
-                                      .SingleOrDefaultAsync(p => p.Id == id)
-                                  ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
+                .Include(p => p.Bookings) //TODO: Fix dette når vi har valgt en Visits strategi
+                .FirstOrDefaultAsync(p => p.Id == id)
+                    ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
 
             return privateCustomer;
         }

@@ -1,0 +1,41 @@
+﻿<!-- Mikkel Dahlmann -->
+
+<button class="edit-button" @onclick="@OnClick">
+	<EditIcon Class="edit-icon" />
+</button>
+
+@code {
+	[Parameter]
+	public EventCallback OnClick { get; set; }
+}
+
+<style>
+	.edit-button {
+		width: 2.75rem;
+		height: 2.75rem;
+		border: none;
+		background-color: none;
+		background: none;
+		border-radius: 8px;
+		padding: 0px;
+		color: lavender;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+		.edit-button:hover {
+			background-color: lavender;
+			transition: background-color 0.2s;
+		}
+
+		.edit-button:active {
+			transform: translate(1px, 1px);
+		}
+
+	.edit-icon {
+		height: 1.5rem;
+		width: 1.5rem;
+		fill: dimgrey !important;
+	}
+</style>

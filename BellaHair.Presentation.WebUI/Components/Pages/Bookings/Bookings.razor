@@ -9,8 +9,10 @@
 
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider
 @inject IBookingQuery BookingQuery
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar;
 
-<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => {})" />
+<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/new"); })" />
 
 <div>
 	<button @onclick="HandleNewSelectorClick" class="@(_activeTab == BookingTab.New? "btn-select-active" : "btn-select")">Kommende bookinger</button>
@@ -18,7 +20,6 @@
 </div>
 
 <div class="kk-container">
-	@if (_errorMessage != null) { <p>@_errorMessage</p> }
 	@if (_bookings == null) { <p>Loading</p>
 	}
 	else
@@ -33,8 +34,6 @@
 @code {
 	private enum BookingTab { New, Old }
 	private BookingTab _activeTab;
-
-	private string? _errorMessage;
 
 	private DateTime _now;
 	private List<BookingSimpleViewModel> _bookings = [];
@@ -80,13 +79,7 @@
 				b.Discount?.DiscountAmount
 			)).OrderBy(b => b.StartDateTime).ToList();
 		}
-		catch (DomainException ex)
-		{
-			_errorMessage = ex.Message;
-		}
-		catch (Exception ex)
-		{
-			_errorMessage = ex.Message; /* Noget gik galt */
-		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 }

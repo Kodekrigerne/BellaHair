@@ -1,6 +1,5 @@
-﻿@using BellaHair.Application.PrivateCustomers
-@using BellaHair.Domain.PrivateCustomers
-@using BellaHair.Ports.PrivateCustomers
+﻿@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
@@ -10,7 +9,10 @@
 <!-- Mikkel Dahlmann -->
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
 <!-- TODO Bedre styling -->
-<Modal @bind-IsVisible="@_showNewModal">
+
+
+<!-- Modal til sletning -->
+<Modal @bind-IsVisible="@showDeleteModal">
 	@if (_futureBookings)
 	{
 		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
@@ -18,58 +20,81 @@
 	else
 	{
 		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-		<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Slet</button>
-		<button class="btn-add" onclick="@CloseModal">Annuller</button>
+		<button class="btn-remove" @onclick="@HandleOnDeleteConfirm">Slet</button>
+		<button class="btn-add" @onclick="@HandleCancel">Annuller</button>
 	}
 </Modal>
 
+
+<!-- Modal til redigering -->
+<Modal IsVisible="@showEditModal">
+	<UpdatePrivateCustomerForm OnUpdate="@HandleUpdate" OnCancel="@CloseModal" CustomerToUpdate="@PrivateCustomer"></UpdatePrivateCustomerForm>
+</Modal>
+
+
 <div class="privatecustomer-card">
+	
 	<div class="privatecustomer-avatar">
 		@GetCustomerInitials(PrivateCustomer.FullName)
 	</div>
+
 	<div class="privatecustomer-details">
 		<h3>@PrivateCustomer.FullName</h3>
+		
 		<div class="privatecustomer-contact-body">
+			
 			<div class="privatecustomer-contact-details">
 				<PhoneIcon Class="privatecustomer-icons" />
 				@PrivateCustomer.PhoneNumber
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<HomeIcon Class="privatecustomer-icons" />
 				@PrivateCustomer.FullAddress
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<BirthdayIcon Class="privatecustomer-icons-birthday" />
-				@PrivateCustomer.Birthday.ToString("d. MMMM yyyy")
+				@PrivateCustomer.Birthday.ToString("d. MMMM yyyy") (@CalculateAge() år)
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<MailIcon Class="privatecustomer-icons" />
 				@PrivateCustomer.Email
 			</div>
+
 			<div class="privatecustomer-contact-details">
 				<VisitsIcon Class="privatecustomer-icons" />
-				Antal besøg: @PrivateCustomer.Visits
+				Antal bookinger: @PrivateCustomer.Visits
 			</div>
+
 		</div>
+
 	</div>
-	<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+	
+	<div class="action-button-group">
+		<EditButton onclick="@(() => showEditModal = true)" />
+		<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+	</div>
+
 </div>
 
 	@code {
 
 	[Parameter, EditorRequired]
-	public required PrivateCustomerViewModel PrivateCustomer { get; set; }
+	public required PrivateCustomerDTO PrivateCustomer { get; set; }
 
 	[Parameter, EditorRequired]
-	public required EventCallback OnDelete { get; set; }
+	public required EventCallback OnChange { get; set; }
 
-	private bool _showNewModal = false;
+	private bool showEditModal = false;
+	private bool showDeleteModal = false;
 	private bool _futureBookings = false;
 
 	// Viser modal, og tjekker for future-bookings.
 	private async Task HandleOnDeleteClick()
 	{
-		_showNewModal = true;
+		showDeleteModal = true;
 		_futureBookings = await PrivateCustomerQuery.PCFutureBookingsCheck(PrivateCustomer.Id);
 	}
 
@@ -77,16 +102,51 @@
 	{
 		var command = new DeletePrivateCustomerCommand(PrivateCustomer.Id);
 		await PrivateCustomerCommand.DeletePrivateCustomerAsync(command);
-		_showNewModal = false;
-		await OnDelete.InvokeAsync();
+		showDeleteModal = false;
+		await OnChange.InvokeAsync();
 		Snackbar.Add("Kundeprofilen blev slettet.", Severity.Success);
 	}
 
-	private void CloseModal() => _showNewModal = false;
+	private async Task HandleUpdate()
+	{
+		showEditModal = false;
+		await OnChange.InvokeAsync();
+	}
+
+	private void HandleCancel()
+	{
+		CloseModal();
+		Snackbar.Add("Handlingen blev afbrudt.", Severity.Warning);
+	}
+
+	private void CloseModal()
+	{
+		showDeleteModal = false;
+		showEditModal = false;
+	}
 
 	private string GetCustomerInitials(string name)
 	{
 		var parts = name.Split(' ');
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
+	}
+
+	// Beregner kundens alder
+	private int CalculateAge()
+	{
+
+// TODO: Brug GetCurrentDate metode når den er CrossCut 
+		DateTime today = DateTime.Today;
+
+		// År udregnet fra nuværende år minus fødselsår.
+		int age = today.Year - PrivateCustomer.Birthday.Year;
+
+		// Hvis fødselsdag endnu ikke er sket i år, så træk ét år fra alder.
+		if (PrivateCustomer.Birthday.Date > today.AddYears(-age).Date)
+		{
+			age--;
+		}
+
+		return age;
 	}
 }

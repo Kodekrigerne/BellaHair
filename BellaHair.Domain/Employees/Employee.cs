@@ -1,16 +1,19 @@
-﻿    namespace BellaHair.Domain.Employees;
-using System.Collections.ObjectModel;
+﻿namespace BellaHair.Domain.Employees;
 using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 
 // Linnea
 
 public class Employee : PersonBase
-    {
+{
 
     private readonly List<Treatment> _treatments; //Inde i
     public IReadOnlyList<Treatment> Treatments => _treatments.AsReadOnly(); //Udad
+
+    private readonly List<Booking> _bookings;
+    public IReadOnlyList<Booking> Bookings => _bookings.AsReadOnly();
 
 #pragma warning disable CS8618
     private Employee() { }
@@ -24,9 +27,10 @@ public class Employee : PersonBase
         PhoneNumber = phoneNumber;
         Address = address;
         _treatments = treatments.ToList();
+        _bookings = [];
     }
 
     public static Employee Create(Name name, Email email, PhoneNumber phoneNumber, Address address, List<Treatment> treatments) => new(name, email, phoneNumber, address, treatments);
-    }
+}
 
 public class EmployeeException(string message) : DomainException(message);

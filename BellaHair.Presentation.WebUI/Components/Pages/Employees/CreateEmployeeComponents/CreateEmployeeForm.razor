@@ -5,8 +5,9 @@
 @using System.Linq;
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.Treatments
-@inject IEmployeeCommand _employeeCommand
-@inject ITreatmentQuery _treatmentQuery
+@inject IEmployeeCommand EmployeeCommand
+@inject ITreatmentQuery TreatmentQuery
+@inject ISnackbar Snackbar
 
 <h3 style="text-align: center; font-weight: bold">Opret ny medarbejder</h3>
 <br />
@@ -21,7 +22,6 @@
 			{
 				<p>@_errorMessage</p>
 			}
-
 			<div>
 				@* EmployeeInput komponentet indeholder alle inputfelter til medarbejderoplysninger og som tager imod vores NewEmployeeModel
 					for at modtage de indtastede inputs *@
@@ -48,7 +48,7 @@
                 
                 <div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item" style="@(itemStyle)">
                     
-						<div style="text-align: left;">@treatment.Name</div>
+						<div type="input" style="text-align: left;">@treatment.Name</div>
 							<div>
 								@if (isSelected)
 								{
@@ -80,9 +80,10 @@
 		</div>
 	</div>
 
-	 <div class="btn-wrapper">
-            <button class="btn-add" type="submit">Opret</button>
-	 </div>
+	<div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
+		 <button class="btn-add" type="submit">Opret</button>
+		<button class="btn-remove" type="reset" @onclick="ClearTreatments" >Ryd felter</button>
+	</div>
 
 </EditForm>
 
@@ -127,6 +128,12 @@
 		StateHasChanged();
 	}
 
+	private void ClearTreatments()
+	{
+		SelectedTreatmentIds.Clear();
+		StateHasChanged();
+	}
+
 	private async Task HandleCreateEmployee()
 	{
 		try
@@ -149,22 +156,25 @@
 				_newEmployeeModel.Floor
 			);
 
-            await _employeeCommand.CreateEmployeeCommand(command);
+            await EmployeeCommand.CreateEmployeeCommand(command);
 
 			await OnCreate.InvokeAsync();
 
+			Snackbar.Add($"Medarbejder oprettet", Severity.Success);
 		}
+
 		catch (Exception e)
 		{
-			_errorMessage = $"Oprettelse mislykkedes: {e.Message}";
+			Snackbar.Add($"Oprettelsen mislykkedes: {e.Message}", Severity.Error);
 		}
+
 	}
 
 	private async Task LoadTreatments()
 	{
 		try
 		{
-			var treatments = await _treatmentQuery.GetAllAsync();
+			var treatments = await TreatmentQuery.GetAllAsync();
 			_treatments = treatments
 				.OrderBy(t => t.Name)
 				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))

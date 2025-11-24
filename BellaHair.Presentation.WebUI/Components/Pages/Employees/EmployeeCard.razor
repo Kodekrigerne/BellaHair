@@ -1,28 +1,65 @@
-﻿@using BellaHair.Ports.Discounts
+﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
+@inject IEmployeeCommand EmployeeCommand
+@inject IEmployeeQuery EmployeeQuery
+@inject ISnackbar SnackBar
 
-		<div class="employee-card">												@*Contains the entire singular employee card layout*@
+
+	<Modal @bind-IsVisible="@_showNewModal">
+		<div class="modal-centered-content">
+				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
+
+			@* Hvis medarbejderen har fremtidige bookinger, vises dette. *@
+			@if (_futureBookings)
+			{
+				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @employeeSimpleViewModel.Name har fremtidige bookinger.
+					Disse skal slettes før medarbejderen kan slettes.
+				</p>
+			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+			}
+
+			@* Hvis medarbejderen ikke har fremtidige bookinger, vises dette. *@
+			else
+			{
+
+				<h4>Slet: @employeeSimpleViewModel.Name?</h4>
+
+				<p style="max-width: 22rem; text-align: center;">	Er du sikker på, at du vil slette denne medarbejder?
+																	Denne handling kan ikke fortrydes.						</p>
+
+				<div class="remove-confirmation-buttons">
+					<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
+					<button class="btn-add" onclick="@CloseModal">Annuller</button>
+				</div>
+			}
+		</div>
+	</Modal>
+
+
+		<div class="employee-card">														@*Contains the entire singular employee card layout*@
 						
 				<div class="employee-avatar">											@*Contains the avatar with intials*@
-					@GetEmployeeInitials(@employeeSimpleViewModel.name)
+					@GetEmployeeInitials(@employeeSimpleViewModel.Name)
 				</div>
 					<div>																@*Positions other info to position next to avatar*@
-					<h3>@employeeSimpleViewModel.name</h3>
+					<h3>@employeeSimpleViewModel.Name</h3>
 
 						<div class="employee-contact-details">
 							<div class="employee-single-contact-detail">
 								<MailIcon Class="employee-icons" />
-									@employeeSimpleViewModel.email
+									@employeeSimpleViewModel.Email
 								</div>
 
 							<div class="employee-single-contact-detail">
 								<PhoneIcon Class="employee-icons"/>
-									@employeeSimpleViewModel.phoneNumber
+									@employeeSimpleViewModel.PhoneNumber
 							</div>
 						</div>
-
+			<div class="delete-button">
+						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
+			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in employeeSimpleViewModel.treatmentNames)
+						@foreach (var treatment in employeeSimpleViewModel.TreatmentNames)
 							{															
 								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
 							}
@@ -32,8 +69,14 @@
 
 @code
 {
+	private bool _showNewModal = false;
+	private bool _futureBookings = false;
+
 	[Parameter, EditorRequired]
 	public required EmployeeSimpleViewModel employeeSimpleViewModel { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnDelete { get; set; }
 
 	/// <summary>
 	/// Provides initials needed to make employee avatar by taking a full name as a single string,
@@ -47,5 +90,33 @@
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
 
 	}
+
+	// Viser modalen og tjekker, om der er fremtidige bookinger.
+	private async Task HandleOnDeleteClick()
+	{
+		_showNewModal = true;
+		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeSimpleViewModel.Id);
+	}
+
+	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.
+	private async Task HandleOnDeleteConfirm()
+	{
+		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
+		try
+		{
+			await EmployeeCommand.DeleteEmployeeCommand(command);
+			CloseModal();
+			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
+			await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
+		}
+
+		catch (Exception e)
+		{
+			SnackBar.Add(e.Message, Severity.Warning);
+		}
+	}
+
+	// Lukker modalen
+	private void CloseModal() => _showNewModal = false;
 
 }
