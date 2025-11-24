@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BellaHair.Ports.PrivateCustomers
+﻿namespace BellaHair.Ports.PrivateCustomers
 {
     // Mikkel Dahlmann
 
     /// <summary>
     /// Defines a query interface for retrieving private customer records asynchronously.
     /// </summary>
-    
+
     public interface IPrivateCustomerQuery
     {
         Task<List<PrivateCustomerDTO>> GetPrivateCustomersAsync();
@@ -33,5 +27,5 @@ namespace BellaHair.Ports.PrivateCustomers
         string PhoneNumber,
         string Email,
         DateTime Birthday,
-        int Visists);
+        int Visits);
 }

@@ -1,0 +1,14 @@
+﻿.btn-add:disabled {
+    /* 1. Visuel deaktivering: Gør baggrunden lysere/grå */
+    background-color: #cccccc; /* Lys grå */
+    /* 2. Tekstfarve: Gør teksten lysere/svagere */
+    color: #666666; /* Mørkere grå */
+    /* 3. Fjern skygger/borders, der får den til at se aktiv ud */
+    border-color: #999999;
+    /* 4. Vigtigt: Skift musens markør til "ikke tilladt" */
+    cursor: not-allowed;
+    /* 5. Gør den lidt gennemsigtig (valgfrit, men tydeligt) */
+    opacity: 0.65;
+    /* Sæt transitioner til 0, så der ikke er nogen hover-effekt */
+    transition: none;
+}

@@ -217,7 +217,7 @@
 	private async Task HandlePickCustomerClick()
 	{
 		_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visists))
+		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visits))
 		.OrderBy(e => e.FullName)
 		.ToList();
 

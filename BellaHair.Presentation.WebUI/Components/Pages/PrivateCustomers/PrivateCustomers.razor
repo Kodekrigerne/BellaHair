@@ -12,11 +12,11 @@
 @inject ISnackbar Snackbar
 
 
-<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => {_showNewModal = true;})" />
+<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
 	
 
 <!-- Modal overlay der viser 'Opret ny kunde'-formular -->
-<Modal IsVisible="@_showNewModal">
+<Modal IsVisible="@showCreateModal">
 	<CreatePrivateCustomerForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreatePrivateCustomerForm>
 </Modal>
 
@@ -32,15 +32,15 @@
 		foreach (var customer in _customers)
 		{
 			<!-- Card komponent der tager imod en customer. OnDelete er komponentens EventCallBack. -->
-			<PrivateCustomerCard PrivateCustomer="@customer" OnDelete="@LoadCustomers"></PrivateCustomerCard>
+			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers"></PrivateCustomerCard>
 		}
 	}
 </div>
 
 @code {
-	private bool _showNewModal = false;
+	private bool showCreateModal = false;
 
-	private List<PrivateCustomerViewModel>? _customers = null;
+	private List<PrivateCustomerDTO>? _customers;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -54,17 +54,7 @@
 		// Forsøger at populate _customers-listen med alle privatkunder.
 		try
 		{
-			var customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			
-			_customers = customers.Select(e => new PrivateCustomerViewModel(
-					e.Id, 
-					e.FullName, 
-					e.Birthday, 
-					e.Email, 
-					e.PhoneNumber, 
-					e.FullAddress, 
-					e.Visists))
-				.ToList();
+			_customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
 		}
 
 		catch (DomainException ex)
@@ -80,12 +70,13 @@
 
 	private async Task HandleCreate()
 	{
-		_showNewModal = false;
+		showCreateModal = false;
 		await LoadCustomers();
 	}
 
 	private void HandleCancel()
 	{
-		_showNewModal = false;
+		showCreateModal = false;
+		Snackbar.Add("Handlingen blev afbrudt.", Severity.Info);
 	}
 }
