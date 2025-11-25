@@ -76,6 +76,9 @@ namespace BellaHair.Application
         {
             var booking = await _bookingRepository.GetAsync(command.Id);
 
+            var discount = await _discountCalculatorService.GetBestDiscount(booking);
+            if (discount != null) booking.SetDiscount(discount);
+
             booking.PayBooking(_currentDateTimeProvider);
             await _bookingRepository.SaveChangesAsync();
         }
@@ -86,6 +89,8 @@ namespace BellaHair.Application
 
             var employee = await _employeeRepository.GetWithTreatmentsAsync(command.EmployeeId);
             var treatment = await _treatmentRepository.GetAsync(command.TreatmentId);
+
+            //TODO: Overlap check
 
             booking.Update(command.StartDateTime, employee, treatment, _currentDateTimeProvider);
 

@@ -40,7 +40,9 @@ namespace BellaHair.Infrastructure.Bookings
 
             booking.Treatment?.Id ?? booking.TreatmentSnapshot?.TreatmentId
                 ?? throw new InvalidOperationException($"Booking {booking.Id} does not have a treatment attached."),
-            booking.Discount != null ? new DiscountDTO(booking.Discount.Name, booking.Discount.Amount) : null);
+
+            booking.Discount != null ? new DiscountDTO(booking.Discount.Name, booking.Discount.Amount) : null
+            );
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()
