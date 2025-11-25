@@ -1,9 +1,11 @@
 ﻿@using BellaHair.Domain
+@using BellaHair.Ports.Discounts
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject ITreatmentQuery TreatmentQuery
+@inject ICampaignDiscountCommand CampaignDiscountCommand
 @inject ISnackbar Snackbar
 
 <h3 class="header">Opret ny kampagnerabat</h3>
@@ -11,97 +13,99 @@
 <p class="header-description">Indtast oplysningerne på den kampagnerabat du vil oprette.</p>
 
 <EditForm Model="@_campaignDiscount" OnValidSubmit="@HandleCreateCampaignDiscount">
-<DataAnnotationsValidator />
-<div class="page-setup">
+	<DataAnnotationsValidator />
+	<div class="page-setup">
 
-<div class="kk-container">
-	<h5 class="subheader">Kampagnedetaljer</h5>
+		<div class="kk-container">
+			<h5 class="subheader">Kampagnedetaljer</h5>
 
-	<div class="campaign-input">
+			<div class="campaign-input">
 
-		<label for="name-input">Navn</label>
-		<input id="name-input" type="text" placeholder="Kampagnenavn" @bind="_campaignDiscount.Name" />
-		<ValidationMessage For="@(() => _campaignDiscount.Name)" />
+				<label for="name-input">Navn</label>
+				<input id="name-input" type="text" placeholder="Kampagnenavn" @bind="_campaignDiscount.Name" />
+				<ValidationMessage For="@(() => _campaignDiscount.Name)" />
 
-	</div>
-
-	<div class="campaign-input">
-
-		<label for="discount-input">Rabatprocent</label>
-		<input id="discount-input" type="number" @bind="_campaignDiscount.DiscountPercent" />
-		<ValidationMessage For="@(() => _campaignDiscount.DiscountPercent)" />
-
-	</div>
-	
-	<div class="campaign-input">
-
-		<label for="start-input">Startdato</label>
-		<input id="start-input" type="date" @bind="_campaignDiscount.StartDate" />
-		<ValidationMessage For="@(() => _campaignDiscount.StartDate)" />
-
-	</div>
-	
-	<div class="campaign-input">
-
-		<label for="end-input">Slutdato</label>
-		<input id="end-input" type="date" @bind="_campaignDiscount.EndDate" />
-		<ValidationMessage For="@(() => _campaignDiscount.EndDate)" />
-
-	</div>
-
-</div>
-
-<div class="kk-container">
-	<h5 class="subheader">Vælg behandlinger</h5>
-	
-	<div class="treatments-container">
-		@foreach (var treatment in Treatments)
-		{
-			var isSelected = SelectedTreatmentIds.Contains(treatment.Id);
-                
-			<div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item @(isSelected ? "treatment-selected" : "treatment-unselected")" >
-				<div class="t-name">  
-					@treatment.Name
-				</div> 
-				<div>
-					@if (isSelected)
-					{
-						<CheckedCirle/>
-					}
-					else
-					{
-						<UncheckedCircle/>
-					}
-				</div>
-				
 			</div>
-		}
 
-	</div>
-	<div class="count-div">
-			Valgt: @SelectedTreatmentIds.Count() behandlinger
-	</div>
-</div>
+			<div class="campaign-input">
+
+				<label for="discount-input">Rabatprocent</label>
+				<input id="discount-input" type="number" @bind="_campaignDiscount.DiscountPercentInput" />
+				<ValidationMessage For="@(() => _campaignDiscount.DiscountPercentInput)" />
+
+			</div>
+
+			<div class="campaign-input">
+
+				<label for="start-input">Startdato</label>
+				<input id="start-input" type="date" @bind="_campaignDiscount.StartDate" />
+				<ValidationMessage For="@(() => _campaignDiscount.StartDate)" />
+
+			</div>
+
+			<div class="campaign-input">
+
+				<label for="end-input">Slutdato</label>
+				<input id="end-input" type="date" @bind="_campaignDiscount.EndDate" />
+				<ValidationMessage For="@(() => _campaignDiscount.EndDate)" />
+
+			</div>
+
+		</div>
+
+		<div class="kk-container">
+			<h5 class="subheader">Vælg behandlinger</h5>
+
+			<div class="treatments-container">
+				@foreach (var treatment in Treatments)
+				{
+					var isSelected = SelectedTreatmentIds.Contains(treatment.Id);
+
+					<div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item @(isSelected ? "treatment-selected" : "treatment-unselected")" >
+						<div class="t-name">  
+							@treatment.Name
+						</div> 
+						<div>
+							@if (isSelected)
+							{
+								<CheckedCirle/>
+							}
+							else
+							{
+								<UncheckedCircle/>
+							}
+						</div>
+
+					</div>
+				}
+
+			</div>
+			<div class="count-div">
+				Valgt: @SelectedTreatmentIds.Count() behandlinger
+			</div>
+		</div>
 	</div>
 
-<div class="btn-wrapper">
-	<button class="btn-add" type="submit" >Opret</button>
-	<button class="btn-remove" type="button">Annuller</button>
-</div>
+	<div class="btn-wrapper">
+		<button class="btn-add" type="submit" >Opret</button>
+		<button class="btn-remove" type="button">Annuller</button>
+	</div>
 
 </EditForm>
 
 @code {
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	private List<TreatmentViewModel> Treatments { get; set; } = [];
+	private List<Guid> SelectedTreatmentIds { get; set; } = [];
+
 	private NewCampaignDiscountModel _campaignDiscount = new NewCampaignDiscountModel
 	{
 		StartDate = DateTime.Now,
 		EndDate = DateTime.Now.AddDays(7)
 	};
-
-	private List<TreatmentViewModel> Treatments { get; set; } = [];
-
-	private List<Guid> SelectedTreatmentIds { get; set; } = [];
-
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -111,9 +115,32 @@
 	}
 
 
-	private Task HandleCreateCampaignDiscount()
+	private async Task HandleCreateCampaignDiscount()
 	{
-		throw new NotImplementedException();
+		try
+		{
+			_campaignDiscount.TreatmentIds = SelectedTreatmentIds;
+
+			var command = new CreateCampaignDiscountCommand(
+				_campaignDiscount.Name,
+				_campaignDiscount.DiscountPercent,
+				_campaignDiscount.StartDate,
+				_campaignDiscount.EndDate,
+				_campaignDiscount.TreatmentIds);
+
+			await CampaignDiscountCommand.CreateCampaignDiscountAsync(command);
+			Snackbar.Add("Behandlingen blev oprettet", Severity.Success);
+
+			await OnCreate.InvokeAsync();
+		}
+		catch (DomainException dex)
+		{
+			Snackbar.Add(dex.Message, Severity.Error);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Der skete en fejl under oprettelse af behandling: {ex.Message}", Severity.Error);
+		}
 	}
 
 	private async Task LoadTreatments()
