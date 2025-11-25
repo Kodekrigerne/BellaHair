@@ -24,10 +24,7 @@ namespace BellaHair.Infrastructure.Bookings
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.Treatment != null)
-                //Hvor sluttiden er større end nutid, fanger også igangværende bookinger
-                .Where(b => b.StartDateTime.AddMinutes(
-                    b.Treatment!.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -41,8 +38,7 @@ namespace BellaHair.Infrastructure.Bookings
             var bookings = await _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.TreatmentSnapshot != null)
-                .Where(b => b.StartDateTime.AddMinutes(
-                    b.TreatmentSnapshot!.DurationMinutes) < _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -62,6 +58,7 @@ namespace BellaHair.Infrastructure.Bookings
             // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
             return bookings.Select(b => new BookingSimpleDTO(
                 b.StartDateTime,
+                b.EndDateTime,
                 b.Total,
                 b.Employee?.Name.FullName ?? b.EmployeeSnapshot?.FullName
                     ?? throw new InvalidOperationException($"Booking {b.Id} does not have an employee attached."),

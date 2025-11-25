@@ -26,6 +26,7 @@ namespace BellaHair.Domain.Bookings
         public BookingDiscount? Discount { get; private set; }
         public DateTime CreatedDateTime { get; private init; }
         public DateTime StartDateTime { get; private set; }
+        public DateTime EndDateTime { get; private set; }
         public DateTime? PaidDateTime { get; private set; }
 
         public bool IsPaid { get; private set; }
@@ -46,6 +47,7 @@ namespace BellaHair.Domain.Bookings
             StartDateTime = startDateTime;
             CreatedDateTime = currentDateTime;
             IsPaid = false;
+            UpdateEndDateTime();
         }
 
         public static Booking Create(
@@ -60,8 +62,7 @@ namespace BellaHair.Domain.Bookings
             if (startDateTime < currentDateTime)
                 throw new BookingException($"Cannot create past bookings {startDateTime}.");
 
-            //TODO: Fjern kommentar når treatments er implementeret på medarbejdere
-            if (employee.Treatments == null || employee.Treatments.Count == 0)
+            if (employee.Treatments == null)
                 throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
 
             if (!employee.Treatments.Any(t => t.Id == treatment.Id))
@@ -86,10 +87,21 @@ namespace BellaHair.Domain.Bookings
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
-        //TODO: Repo og query metode til booking GetAsync skal .Include Treatment, Employee, Customer
         private decimal CalculateTotal()
         {
-            return Treatment?.Price.Value ?? throw new BookingException($"Booking must be loaded with all relations included {Id}");
+            if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
+            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
+
+            return Treatment.Price.Value;
+        }
+
+        //Kald altid denne metode når bookingen ændres
+        private void UpdateEndDateTime()
+        {
+            if (IsPaid) throw new InvalidOperationException("Cannot update EndDateTime on a paid booking.");
+            if (Treatment == null) throw new InvalidOperationException("Cannot update EndDateTime without Treatments loaded.");
+
+            EndDateTime = StartDateTime.AddMinutes(Treatment.DurationMinutes.Value);
         }
 
         public void SetDiscount(BookingDiscount discount)

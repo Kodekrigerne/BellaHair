@@ -37,5 +37,5 @@ namespace BellaHair.Ports.Employees
 
     public record EmployeeNameWithBookingsDTO(Guid Id, string Name, List<BookingTimesOnlyDTO> Bookings);
 
-    public record BookingTimesOnlyDTO(DateTime StartDateTime, int DurationMinutes);
+    public record BookingTimesOnlyDTO(DateTime StartDateTime, DateTime EndDateTime, int DurationMinutes);
 }

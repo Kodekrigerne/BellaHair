@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,7 +26,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         {
             return await _db.PrivateCustomers
                 .Where(p => p.Id == id)
-                .AnyAsync(p => p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
+                .AnyAsync(p => p.Bookings.Any(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
         }
     }
 }

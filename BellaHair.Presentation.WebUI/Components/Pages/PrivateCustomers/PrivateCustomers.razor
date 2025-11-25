@@ -12,7 +12,7 @@
 @inject ISnackbar Snackbar
 
 
-<PageHeader HeaderText="Kunder" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
+<PageHeader HeaderText="Kundekatalog" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
 	
 
 <!-- Modal overlay der viser 'Opret ny kunde'-formular -->
@@ -20,18 +20,26 @@
 	<CreatePrivateCustomerForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreatePrivateCustomerForm>
 </Modal>
 
-
 <!-- Container til privatecustomer 'cards' -->
 <div class="kk-container privatecustomer-container">
-	@if (_customers is null)
+
+    <!-- Search bar til at filtrere kunder samt vise antal kunder fundet -->
+	<div class="search-bar-container">
+		<h4>Kunder (@filteredCustomers!.Count)</h4>
+		<input type="text" class="form-control customer-search" placeholder="Søg efter kunde" 
+		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
+
+	</div>
+	
+	@if (filteredCustomers is null)
 	{
 		<h1>Der kunne ikke findes nogen kunder i databasen.</h1>
 	}
 	else
 	{
-		foreach (var customer in _customers)
+		foreach (var customer in filteredCustomers)
 		{
-			<!-- Card komponent der tager imod en customer. OnDelete er komponentens EventCallBack. -->
+			<!-- Card komponent der tager imod en customer. OnChange er komponentens EventCallBack. -->
 			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers"></PrivateCustomerCard>
 		}
 	}
@@ -40,7 +48,10 @@
 @code {
 	private bool showCreateModal = false;
 
-	private List<PrivateCustomerDTO>? _customers;
+	private List<PrivateCustomerDTO>? allCustomers;
+	private List<PrivateCustomerDTO>? filteredCustomers;
+
+	private string SearchTerm { get; set; } = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -51,10 +62,11 @@
 
 	private async Task LoadCustomers()
 	{
-		// Forsøger at populate _customers-listen med alle privatkunder.
+		// Forsøger at populate allCustomers-listen med alle privatkunder.
 		try
 		{
-			_customers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
+			allCustomers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
+			filteredCustomers = allCustomers;
 		}
 
 		catch (DomainException ex)
@@ -66,6 +78,27 @@
 		{
 			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
 		}
+	}
+
+    // Metode til at filtrere kunder baseret på søgetermen.
+	private void ApplyFilter()
+	{
+		if (string.IsNullOrWhiteSpace(SearchTerm))
+		{
+			filteredCustomers = allCustomers;
+		}
+		else
+		{
+			filteredCustomers = allCustomers!
+			.Where(c => c.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			c.FullAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			c.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			c.PhoneNumber.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			c.Birthday.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+			.ToList();
+		}
+
+		StateHasChanged();
 	}
 
 	private async Task HandleCreate()

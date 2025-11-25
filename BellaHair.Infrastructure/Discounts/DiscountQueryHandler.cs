@@ -22,12 +22,17 @@ namespace BellaHair.Infrastructure.Discounts
 
         async Task<BookingDiscountDTO?> IDiscountQuery.FindBestDiscount(FindBestDiscountQuery query)
         {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
             var employee = await _db.Employees.AsNoTracking().Include(e => e.Treatments).SingleOrDefaultAsync(e => e.Id == query.EmployeeId)
                 ?? throw new KeyNotFoundException($"Could not find employee with Id {query.EmployeeId}");
-            var customer = await _db.PrivateCustomers.AsNoTracking().Include(c => c.Bookings).SingleOrDefaultAsync(c => c.Id == query.CustomerId) //TODO: Fix dette når vi har valgt en Visits strategi
+            var customer = await _db.PrivateCustomers.AsNoTracking().SingleOrDefaultAsync(c => c.Id == query.CustomerId)
                 ?? throw new KeyNotFoundException($"Could not find customer with Id {query.CustomerId}");
             var treatment = await _db.Treatments.AsNoTracking().SingleOrDefaultAsync(t => t.Id == query.TreatmentId)
                 ?? throw new KeyNotFoundException($"Could not find treatment with Id {query.TreatmentId}");
+
+            var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == query.CustomerId).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+            customer.SetVisits(visits);
 
             //Det er nødvendigt at oprette en booking for at finde en rabat
             //Denne booking gemmes dog ikke
