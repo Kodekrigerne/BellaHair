@@ -58,13 +58,13 @@ namespace BellaHair.Domain.Bookings
             var currentDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
             if (startDateTime < currentDateTime)
-                throw new BookingException($"Cannot create past bookings {startDateTime}.");
+                throw new BookingException($"Kan ikke oprette booking med fortidig startdato og tidspunkt {startDateTime}.");
 
             if (employee.Treatments == null)
                 throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
 
             if (!employee.Treatments.Any(t => t.Id == treatment.Id))
-                throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
+                throw new BookingException($"Medarbejder {employee.Name.FullName} udbyder ikke behandling {treatment.Name}.");
 
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
@@ -74,7 +74,7 @@ namespace BellaHair.Domain.Bookings
             if (Employee == null || Customer == null || Treatment == null)
                 throw new InvalidOperationException("all booking relations must be populated when calling PayBooking.");
 
-            if (IsPaid == true) throw new BookingException("Cannot pay a booking that has already been paid");
+            if (IsPaid == true) throw new BookingException("Kan ikke betale en booking som allerede er betalt.");
 
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
@@ -102,9 +102,13 @@ namespace BellaHair.Domain.Bookings
             EndDateTime = StartDateTime.AddMinutes(Treatment.DurationMinutes.Value);
         }
 
-        public void SetDiscount(BookingDiscount discount)
+        public void SetDiscount(BookingDiscount discount, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            if (IsPaid) throw new BookingException("Cannot set the discount on a paid booking");
+            var now = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
+            if (StartDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
+
             Discount = discount;
         }
 
@@ -121,8 +125,8 @@ namespace BellaHair.Domain.Bookings
         {
             var now = currentDateTimeProvider.GetCurrentDateTime();
 
-            if (IsPaid) throw new BookingException("");
-            if (startDateTime < now) throw new BookingException("");
+            if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
+            if (startDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
 
             StartDateTime = startDateTime;
             Employee = employee;
