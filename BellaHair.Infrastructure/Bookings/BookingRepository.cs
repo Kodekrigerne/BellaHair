@@ -1,5 +1,5 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
+using BellaHair.Infrastructure.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
@@ -11,12 +11,12 @@ namespace BellaHair.Infrastructure.Bookings
     public class BookingRepository : IBookingRepository
     {
         private readonly BellaHairContext _db;
-        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public BookingRepository(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        public BookingRepository(BellaHairContext db, ICustomerVisitsService customerVisitsService)
         {
             _db = db;
-            _currentDateTimeProvider = currentDateTimeProvider;
+            _customerVisitsService = customerVisitsService;
         }
 
         public async Task AddAsync(Booking booking)
@@ -31,8 +31,6 @@ namespace BellaHair.Infrastructure.Bookings
 
         public async Task<Booking> GetAsync(Guid id)
         {
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-
             var booking = await _db.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -42,7 +40,7 @@ namespace BellaHair.Infrastructure.Bookings
 
             if (booking.Customer != null)
             {
-                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == booking.Customer.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+                var visits = await _customerVisitsService.GetCustomerVisitsAsync(booking.Customer.Id);
                 booking.Customer.SetVisits(visits);
             }
 

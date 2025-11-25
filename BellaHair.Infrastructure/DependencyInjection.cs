@@ -38,6 +38,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
             serviceCollection.AddScoped<IPCustomerFutureBookingChecker, PCustomerFutureBookingChecker>();
+            serviceCollection.AddScoped<ICustomerVisitsService, CustomerVisitsService>();
 
             serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 

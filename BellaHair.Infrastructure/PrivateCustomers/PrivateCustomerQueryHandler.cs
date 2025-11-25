@@ -14,17 +14,18 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     {
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public PrivateCustomerQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        public PrivateCustomerQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider, ICustomerVisitsService customerVisitsService)
         {
             _db = db;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _customerVisitsService = customerVisitsService;
         }
 
         async Task<PrivateCustomerDTO> IPrivateCustomerQuery.GetPrivateCustomerAsync(GetPrivateCustomerQuery query)
         {
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-            var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == query.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+            var visits = await _customerVisitsService.GetCustomerVisitsAsync(query.Id);
 
             return await _db.PrivateCustomers
                 .AsNoTracking()
@@ -50,8 +51,6 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-
             var customers = await _db.PrivateCustomers.AsNoTracking()
                 .ToListAsync();
 
@@ -59,7 +58,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
             foreach (var x in customers)
             {
-                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == x.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+                var visits = await _customerVisitsService.GetCustomerVisitsAsync(x.Id);
 
                 pclist.Add(new PrivateCustomerDTO(
                         x.Id,

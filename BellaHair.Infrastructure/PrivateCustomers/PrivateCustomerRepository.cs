@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.PrivateCustomers;
+﻿using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
@@ -11,12 +10,12 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     public class PrivateCustomerRepository : IPrivateCustomerRepository
     {
         private readonly BellaHairContext _db;
-        private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public PrivateCustomerRepository(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        public PrivateCustomerRepository(BellaHairContext db, ICustomerVisitsService customerVisitsService)
         {
             _db = db;
-            _currentDateTimeProvider = currentDateTimeProvider;
+            _customerVisitsService = customerVisitsService;
         }
 
         async Task IPrivateCustomerRepository.AddAsync(PrivateCustomer privateCustomer)
@@ -31,13 +30,11 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task<PrivateCustomer> IPrivateCustomerRepository.GetAsync(Guid id)
         {
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-
             var privateCustomer = await _db.PrivateCustomers
                 .FirstOrDefaultAsync(p => p.Id == id)
                     ?? throw new KeyNotFoundException($"No private customer exists with ID {id}");
 
-            var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+            var visits = await _customerVisitsService.GetCustomerVisitsAsync(privateCustomer.Id);
             privateCustomer.SetVisits(visits);
 
             return privateCustomer;
