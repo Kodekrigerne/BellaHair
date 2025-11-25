@@ -3,6 +3,15 @@ using BellaHair.Domain.Treatments;
 
 namespace BellaHair.Domain.Discounts
 {
+    // Mikkel Klitgaard
+    /// <summary>
+    /// Represents a discount campaign that applies a percentage-based discount to specified treatments within a defined
+    /// date range.
+    /// </summary>
+    /// <remarks>A campaign discount is associated with one or more treatments and is only active between the
+    /// specified start and end dates. The discount is applied to bookings that match the campaign's treatments and fall
+    /// within the campaign period. Use the <see cref="Create"/> method to instantiate a campaign discount with the
+    /// required parameters.</remarks>
     public class CampaignDiscount : DiscountBase
     {
         public string Name { get; private set; }

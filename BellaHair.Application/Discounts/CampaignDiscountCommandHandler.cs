@@ -4,6 +4,13 @@ using BellaHair.Ports.Discounts;
 
 namespace BellaHair.Application.Discounts
 {
+    // Mikkel Klitgaard
+    /// <summary>
+    /// Handles commands related to creating and deleting campaign discounts.
+    /// </summary>
+    /// <remarks>This class provides the implementation for the ICampaignDiscountCommand interface,
+    /// coordinating operations between campaign discount and treatment repositories. It is typically used in
+    /// application layers to manage campaign discount lifecycle actions.</remarks>
     public class CampaignDiscountCommandHandler : ICampaignDiscountCommand
     {
         private readonly ICampaignDiscountRepository _campaignDiscountRepo;
