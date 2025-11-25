@@ -23,6 +23,7 @@
 <!-- Container til privatecustomer 'cards' -->
 <div class="kk-container privatecustomer-container">
 
+    <!-- Search bar til at filtrere kunder samt vise antal kunder fundet -->
 	<div class="search-bar-container">
 		<h4>Kunder (@filteredCustomers!.Count)</h4>
 		<input type="text" class="form-control customer-search" placeholder="Søg efter kunde" 
@@ -38,7 +39,7 @@
 	{
 		foreach (var customer in filteredCustomers)
 		{
-			<!-- Card komponent der tager imod en customer. OnDelete er komponentens EventCallBack. -->
+			<!-- Card komponent der tager imod en customer. OnChange er komponentens EventCallBack. -->
 			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers"></PrivateCustomerCard>
 		}
 	}
@@ -57,16 +58,15 @@
 		await base.OnInitializedAsync();
 
 		await LoadCustomers();
-
-		filteredCustomers = allCustomers;
 	}
 
 	private async Task LoadCustomers()
 	{
-		// Forsøger at populate _customers-listen med alle privatkunder.
+		// Forsøger at populate allCustomers-listen med alle privatkunder.
 		try
 		{
 			allCustomers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
+			filteredCustomers = allCustomers;
 		}
 
 		catch (DomainException ex)
@@ -80,6 +80,7 @@
 		}
 	}
 
+    // Metode til at filtrere kunder baseret på søgetermen.
 	private void ApplyFilter()
 	{
 		if (string.IsNullOrWhiteSpace(SearchTerm))
@@ -88,7 +89,7 @@
 		}
 		else
 		{
-			filteredCustomers = allCustomers
+			filteredCustomers = allCustomers!
 			.Where(c => c.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			c.FullAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			c.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
