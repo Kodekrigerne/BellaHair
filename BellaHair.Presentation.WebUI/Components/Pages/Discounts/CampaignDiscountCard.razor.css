@@ -1,18 +1,20 @@
-﻿.ldc-card {
+﻿.cdc-card {
     padding: 1rem;
     margin-bottom: 1rem;
-    background: linear-gradient(to right, oklch(.97 .014 254.604), oklch(.977 .014 308.299)); /* blue-50, purple-50 */
+    background: linear-gradient(to right, #fbf5ff, #fdf2f8);
     border-style: solid;
     border-width: 1px;
     border-color: oklch(.882 .059 254.128); /* blue-200 */
     border-radius: 8px;
     position: relative;
-
-
-    .btn-offer {
-        padding: 8px;
-
-    }
+}
+.btn-offer {
+    padding: 8px;
+    background-color: #e9ecf1;
+    color: #1d294f;
+    font-weight:bold;
+    border-radius:10px;
+}
 
     .btn-offer:hover{
         cursor: default;
@@ -31,9 +33,8 @@
         margin-bottom:2px;
     }
 
-
     .p-txt{
-     margin:6px;
+     margin:8px;
     }
 
     .t-wrapper{
@@ -47,4 +48,28 @@
         margin-top:6px;
         margin-bottom:4px;
     }
+
+    .header-wrapper{
+        display: flex;
+        gap:10px;
+        vertical-align:middle;
+        
+    }
+
+.percent-wrapper {
+    vertical-align:middle;
+    background-color: #920dfc;
+    color: white;
+    padding: 2px 8px 3px 8px;
+    border-radius: 8px;
+    font-size:12px;
+    display:flex;
+    font-weight: bold;
+    margin-bottom:6px;
 }
+
+.icon-wrap{
+    margin-right:6px;
+    font-weight:normal;
+}
+
