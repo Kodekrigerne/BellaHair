@@ -7,20 +7,27 @@
 @inject ICampaignDiscountCommand CampaignDiscountCommand
 @inject ISnackbar Snackbar;
 
-<div class="ldc-card">
-	<p class="p-header">@CampaignDiscount.Name</p>
-	<p class="discount-duration">Varighed: @CampaignDiscount.StartDate.ToString("d/M/yy") - @CampaignDiscount.EndDate.ToString("d/M/yy")</p>
+<div class="cdc-card">
+	<div class="header-wrapper">
+		<p class="p-header">@CampaignDiscount.Name</p>
+		<div class="percent-wrapper">
+			<div class="icon-wrap">
+				<PercentIcon/> |
+			</div>
+			@((CampaignDiscount.DiscountPercent * 100).ToString("0"))%
+		</div>
+	</div>
+	<p class="discount-duration">Periode for kampagne: @CampaignDiscount.StartDate.ToString("d/M/yy") - @CampaignDiscount.EndDate.ToString("d/M/yy")</p>
 	<hr/>
 	<p class="p-txt">Gælder for behandlinger:</p>
 	<div class="t-wrapper">
-	@foreach(var id in CampaignDiscount.Treatments)
-	{
-		<button class="btn-offer">
-			@id.Name
-		</button>
-	}
+		@foreach (var id in CampaignDiscount.Treatments)
+		{
+			<button class="btn-offer">
+				@id.Name
+			</button>
+		}
 	</div>
-	<p>Rabat: @((CampaignDiscount.DiscountPercent * 100).ToString("0"))%</p>
 	<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 </div>
 
