@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Domain.Invoices
+﻿using BellaHair.Domain.Treatments;
+
+namespace BellaHair.Domain.Invoices
 {
     public class InvoiceModel
     {
@@ -6,10 +8,10 @@
         public DateTime IssueDate { get; set; }
         public DateTime DueDate { get; set; }
 
-        public InvoiceAddress SellerAddress { get; set; }
-        public InvoiceAddress CustomerAddress { get; set; }
+        public Address BellaHairAddress { get; set; }
+        public Address CustomerAddress { get; set; }
 
-        public List<OrderItem> Items { get; set; }
+        public Treatment Treatment { get; set; }
         public string Comments { get; set; }
     }
 }

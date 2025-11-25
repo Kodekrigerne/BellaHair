@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Invoices;
+﻿using BellaHair.Domain.Bookings;
+using BellaHair.Domain.Invoices;
 using QuestPDF.Helpers;
 
 // Mikkel Dahlmann
@@ -7,11 +8,16 @@ using QuestPDF.Helpers;
 /// Provides methods for generating sample invoice data for testing or demonstration purposes.
 /// </summary>
 
-public static class InvoiceDocumentDataSource
+public class InvoiceDocumentDataSource
 {
-    private static Random Random = new Random();
+    private readonly IBookingRepository _bookingRepository;
 
-    public static InvoiceModel GetInvoiceDetails()
+    public InvoiceDocumentDataSource(IBookingRepository bookingRepository)
+    {
+        _bookingRepository = bookingRepository;
+    }
+
+    public static InvoiceModel GetInvoiceDetails(Guid Id)
     {
         var items = Enumerable
             .Range(1, 8)

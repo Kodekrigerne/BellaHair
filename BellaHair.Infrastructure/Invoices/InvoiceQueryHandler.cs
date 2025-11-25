@@ -20,10 +20,11 @@ namespace BellaHair.Infrastructure.Invoices
             _jsRuntime = jsRuntime;
         }
 
-        public async Task CreateAndPrintInvoice()
+        public async Task CreateAndPrintInvoice(Guid bookingId)
         {
             QuestPDF.Settings.License = LicenseType.Community;
-            var model = InvoiceDocumentDataSource.GetInvoiceDetails();
+
+            var model = InvoiceDocumentDataSource.GetInvoiceDetails(bookingId);
             var document = new InvoiceDocument(model);
 
             byte[] pdfBytes = document.GeneratePdf();

@@ -50,6 +50,8 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IInvoiceQuery, InvoiceQueryHandler>();
 
+            serviceCollection.AddScoped<InvoiceDocumentDataSource>();
+
             return serviceCollection;
         }
     }

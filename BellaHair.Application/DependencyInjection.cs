@@ -19,7 +19,6 @@ namespace BellaHair.Application
             serviceCollection.AddScoped<ITreatmentCommand, TreatmentCommandHandler>();
             serviceCollection.AddScoped<IEmployeeCommand, EmployeeCommandHandler>();
             serviceCollection.AddScoped<IBookingCommand, BookingCommandHandler>();
-
             serviceCollection.AddScoped<IPrivateCustomerCommand, PrivateCustomerCommandHandler>();
 
             return serviceCollection;
