@@ -310,18 +310,23 @@
 
 	private async Task HandlePickCustomerClick()
 	{
-		_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-		.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
-		.OrderBy(e => e.FullName)
-		.ToList();
+		try
+		{
+			_customers = (await CustomerQuery.GetPrivateCustomersAsync())
+			.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
+			.OrderBy(e => e.FullName)
+			.ToList();
 
-		_activePicker = Picker.Customers;
-
+			_activePicker = Picker.Customers;
+		}
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private async Task HandlePickTreatmentClick()
 	{
 		if (_customer == null) return;
+		
+		try {
 
 		_treatments = (await TreatmentQuery.GetAllAsync())
 		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
@@ -329,12 +334,15 @@
 		.ToList();
 
 		_activePicker = Picker.Treatments;
+		}
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private async Task HandlePickEmployeeClick()
 	{
 		if (_treatment == null) return;
 
+		try {
 		_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
 			.Select(e => new EmployeeNameWithBookingsViewModel(
 				e.Id,
@@ -346,6 +354,8 @@
 			.ToList();
 
 		_activePicker = Picker.Employee;
+		}
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private async Task HandlePickStartDateTimeClick()
