@@ -425,7 +425,7 @@
 		_statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
 	}
 
-	private void HandleChangeCustomerClick()
+	private async Task HandleChangeCustomerClick()
 	{
 		if (Mode == BookingMode.Edit || Mode == BookingMode.View) return;
 
@@ -438,10 +438,11 @@
 		_discount = null;
 		_statusMessage = null;
 
-		_activePicker = Picker.Customers;
+		if (_customers.Count == 0) await HandlePickCustomerClick();
+		else _activePicker = Picker.Customers;
 	}
 
-	private void HandleChangeTreatmentClick()
+	private async Task HandleChangeTreatmentClick()
 	{
 		if (Mode == BookingMode.View) return;
 
@@ -453,10 +454,11 @@
 		_discount = null;
 		_statusMessage = null;
 
-		_activePicker = Picker.Treatments;
+		if (_treatments.Count == 0) await HandlePickTreatmentClick();
+		else _activePicker = Picker.Treatments;
 	}
 
-	private void HandleChangeEmployeeClick()
+	private async Task HandleChangeEmployeeClick()
 	{
 		if (Mode == BookingMode.View) return;
 
@@ -467,20 +469,21 @@
 		_discount = null;
 		_statusMessage = null;
 
-		_activePicker = Picker.Employee;
+		if (_employees.Count == 0) await HandlePickEmployeeClick();
+		else _activePicker = Picker.Employee;
 	}
 
-	private void HandleChangeTimeClick()
+	private async Task HandleChangeTimeClick()
 	{
 		if (Mode == BookingMode.View) return;
 
 		_startDate = null;
-		_startDate = null;
+		_startTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
 		_statusMessage = null;
 
-		_activePicker = Picker.Time;
+		await HandlePickStartDateTimeClick();
 	}
 
 	private async Task HandleGetDiscountClick(MouseEventArgs args)
