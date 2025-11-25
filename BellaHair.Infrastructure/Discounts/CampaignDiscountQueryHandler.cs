@@ -44,7 +44,7 @@ namespace BellaHair.Infrastructure.Discounts
 
         async Task<int> ICampaignDiscountQuery.GetCountAsync()
         {
-            return await _db.Discounts.AsNoTracking().CountAsync();
+            return await _db.Discounts.OfType<CampaignDiscount>().AsNoTracking().CountAsync();
         }
     }
 }
