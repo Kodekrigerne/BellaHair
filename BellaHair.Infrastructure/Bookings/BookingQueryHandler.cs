@@ -62,7 +62,6 @@ namespace BellaHair.Infrastructure.Bookings
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.TreatmentSnapshot != null)
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
