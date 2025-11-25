@@ -32,7 +32,7 @@
 					}
 					else
 					{
-						<button class="btn-picked" @onclick="HandleChangeCustomerClick">
+						<button class="btn-picked @(Mode == BookingMode.New ? "" : "inactive")" @onclick="HandleChangeCustomerClick">
 							<p class="picked-label">Kunde</p>
 							<p class="picked-text">@_customer.FullName</p>
 						</button>
@@ -46,7 +46,7 @@
 					}
 					else
 					{
-						<button class="btn-picked" @onclick="HandleChangeTreatmentClick">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "")" @onclick="HandleChangeTreatmentClick">
 							<p class="picked-label">Behandling</p>
 							<p class="picked-text">
 								<span class="picked-name">@_treatment.Name</span>
@@ -65,7 +65,7 @@
 					}
 					else
 					{
-						<button class="btn-picked" @onclick="HandleChangeEmployeeClick">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "")" @onclick="HandleChangeEmployeeClick">
 							<p class="picked-label">Medarbejder</p>
 							<p class="picked-text">@_employee.Name</p>
 						</button>
@@ -79,7 +79,7 @@
 					}
 					else
 					{
-						<button class="btn-picked" @onclick="HandleChangeTimeClick">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "")" @onclick="HandleChangeTimeClick">
 							<p class="picked-label">Dato og tid</p>
 							<p class="picked-text">@_startDate?.ToString("yyyy-MM-dd") @_startTime?.ToString(@"hh\:mm")</p>
 						</button>
@@ -546,9 +546,14 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		cursor: default !important;
 	}
 
-		.btn-picked:hover {
+	.btn-picked.inactive {
+		user-select: text;
+	}
+
+		.btn-picked:not(.inactive):hover {
 			background-color: #f0f4fa;
 			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 			cursor: pointer;
