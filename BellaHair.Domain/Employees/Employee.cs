@@ -9,7 +9,7 @@ using BellaHair.Domain.Treatments;
 public class Employee : PersonBase
 {
 
-    private readonly List<Treatment> _treatments; //Inde i
+    private readonly List<Treatment> _treatments = []; //Inde i
     public IReadOnlyList<Treatment> Treatments => _treatments.AsReadOnly(); //Udad
 
     private readonly List<Booking> _bookings;
@@ -38,7 +38,6 @@ public class Employee : PersonBase
         Address = address;
         PhoneNumber = phoneNumber;
         Email = email;
-        _treatments.Clear();
         _treatments.AddRange(treatments);
     }
 

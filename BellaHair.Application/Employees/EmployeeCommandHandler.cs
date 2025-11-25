@@ -29,6 +29,7 @@ namespace BellaHair.Application.Employees
         public async Task UpdateEmployeeAsync(UpdateEmployeeCommand command)
         {
             var employeeToUpdate = await _employeeRepo.GetAsync(command.Id);
+            var employeeToUpdateTreatments = await _treatmentRepo.GetAsync(employeeToUpdate.Treatments.Select(t => t.Id).ToList());
 
             var updatedName = Name.FromStrings(
                 command.FirstName,
@@ -45,7 +46,7 @@ namespace BellaHair.Application.Employees
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
 
-            var updatedTreatments = (List<Treatment>)await _treatmentRepo.GetAsync(command.TreatmentIds);
+            var updatedTreatments = await _treatmentRepo.GetAsync(command.TreatmentIds.ToList());
 
             employeeToUpdate.Update(
                 updatedName,
