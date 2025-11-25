@@ -12,29 +12,29 @@
 <br />
 <p>Rediger kundens oplysninger</p>
 
-<EditForm EditContext="@editContext" OnValidSubmit="UpdateEmployee">
+<EditForm EditContext="@editContext" OnValidSubmit="@UpdateEmployee">
 
     <DataAnnotationsValidator/>
 
     <div class="inputs-container">
 
 
-        <div class="inputs-items-container">
 
+            <div>
             <CreateEmployeeInputs EmployeeModel="EmployeeModel" />
+            </div>
+            <div class="inputs-items-container">
+            <CreateEmployeeTreatmentSelector SelectedTreatmentIds="SelectedTreatmentIds" _treatments="_treatments"/>
+            </div>
 
+            </div>
 
-        </div>
-
-
-    </div>
-
-    <div class="btn-wrapper">
+        <div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
         <button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
         <button class="btn-remove" type="reset">Nulstil ændringer</button>
         <button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
-    </div>
 
+        </div>
 
 </EditForm>
 
@@ -50,6 +50,8 @@
     [Parameter, EditorRequired]
     public EmployeeViewModel? EmployeeToUpdate { get; set; }
 
+    public List<Guid> SelectedTreatmentIds { get; set; } = []
+
     private EditContext? editContext { get; set; }
 
     public NewEmployeeModel EmployeeModel { get; set; } = new NewEmployeeModel();
@@ -58,11 +60,13 @@
 
     private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
 
-    protected override void OnInitialized()
+    protected async override void OnInitialized()
     {
         if (EmployeeToUpdate != null)
         {
+            await LoadTreatments();
             InitializeViewModel();
+            SelectedTreatmentIds = EmployeeModel.TreatmentIds.ToList();
         }        
         else
         {
@@ -143,6 +147,22 @@
         EmployeeModel.Email = EmployeeToUpdate.Email;
         EmployeeModel.Floor = EmployeeToUpdate.Floor;
         EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList();
+    }
+
+    private async Task LoadTreatments()
+    {
+        try
+        {
+            var treatments = await TreatmentQuery.GetAllAsync();
+            _treatments = treatments
+                .OrderBy(t => t.Name)
+                .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Der skete en fejl under indlæsning af behandlinger: {ex.Message}", Severity.Error);
+        }
     }
 
 }

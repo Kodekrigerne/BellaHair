@@ -37,7 +37,7 @@
 
 	<Modal @bind-IsVisible="@showEditModal">
 
-		<UpdateEmployeeForm EmployeeToUpdate="@Employee" OnCancel="HandleCancel" OnUpdate="HandleUpdate"/>
+		<UpdateEmployeeForm EmployeeToUpdate="@Employee" OnCancel="@HandleCancel" OnUpdate="@HandleUpdate"/>
 	
 	</Modal>
 
