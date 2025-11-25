@@ -32,7 +32,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
             foreach (var customer in customers)
             {
-                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == x.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == customer.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
 
                 pclist.Add(new PrivateCustomerDTO(
                         customer.Id,
