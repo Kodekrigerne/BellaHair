@@ -21,6 +21,33 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _currentDateTimeProvider = currentDateTimeProvider;
         }
 
+        async Task<PrivateCustomerDTO> IPrivateCustomerQuery.GetPrivateCustomerAsync(GetPrivateCustomerQuery query)
+        {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+            var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == query.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+
+            return await _db.PrivateCustomers
+                .AsNoTracking()
+                .Where(c => c.Id == query.Id)
+                .Select(c => new PrivateCustomerDTO(
+                        c.Id,
+                        c.Name.FirstName,
+                        c.Name.MiddleName,
+                        c.Name.LastName,
+                        c.Name.FullName,
+                        c.Address.StreetName,
+                        c.Address.City,
+                        c.Address.StreetNumber,
+                        c.Address.ZipCode,
+                        c.Address.Floor,
+                        c.Address.FullAddress,
+                        c.PhoneNumber.Value,
+                        c.Email.Value,
+                        c.Birthday,
+                        visits))
+                .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Customer {query.Id} not found.");
+        }
+
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
             var now = _currentDateTimeProvider.GetCurrentDateTime();
