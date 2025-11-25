@@ -23,14 +23,17 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
-            var customers = await _db.PrivateCustomers
-                .Include(p => p.Bookings)
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            var customers = await _db.PrivateCustomers.AsNoTracking()
                 .ToListAsync();
 
             List<PrivateCustomerDTO> pclist = new List<PrivateCustomerDTO>();
 
             foreach (var customer in customers)
             {
+                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == customer.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+
                 pclist.Add(new PrivateCustomerDTO(
                         customer.Id,
                         customer.Name.FirstName,
@@ -46,7 +49,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
                         customer.PhoneNumber.Value,
                         customer.Email.Value,
                         customer.Birthday,
-                        customer.Visits));
+                        visits));
             }
 
             return pclist;

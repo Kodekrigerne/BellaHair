@@ -33,7 +33,7 @@ namespace BellaHair.Application.Tests
 
             services.AddInfrastructureServices();
             services.AddApplicationServices();
-            
+
             ServiceProvider = services.BuildServiceProvider();
 
             _db = ServiceProvider.GetRequiredService<BellaHairContext>();
@@ -52,13 +52,13 @@ namespace BellaHair.Application.Tests
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
+            _db.Database.CloseConnection();
+            _db.Dispose();
+
             if (ServiceProvider is IDisposable disposable)
             {
                 disposable.Dispose();
             }
-
-            _db.Database.CloseConnection();
-            _db.Dispose();
         }
     }
 }

@@ -15,6 +15,7 @@
 
     public record BookingSimpleDTO(
         DateTime StartDateTime,
+        DateTime EndDateTime,
         decimal Total,
         string EmployeeFullName,
         string CustomerFullName,
