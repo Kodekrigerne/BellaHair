@@ -26,6 +26,7 @@
         Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
+        bool IsPaid,
         decimal Total,
         string EmployeeFullName,
         string CustomerFullName,

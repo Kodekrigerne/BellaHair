@@ -149,7 +149,7 @@
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
 						<div class="discount-section">
-							<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
+							@if(!_isPaid || IsEditable()) { <button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button> }
 							@if (_discount != null)
 							{
 								<p class="discount-name">Rabat: @_discount.Name</p>
@@ -172,16 +172,20 @@
 						else if (Mode == BookingMode.View)
 						{
 							<div class="btn-group">
-								<button class="btn-view btn-pay" @onclick="() => { }">Betal booking</button>
-								<button class="btn-view btn-edit" @onclick="() => { }">Rediger booking</button>
-								<button class="btn-view btn-delete" @onclick="() => { }">Slet booking</button>
+								@if (!_isPaid) { <button class="btn-view btn-pay" @onclick="HandlePayClick">Betal booking</button> }
+								
+								@if (IsEditable())
+								{
+									<button class="btn-view btn-edit" @onclick="HandleEditClick">Rediger booking</button>
+									<button class="btn-view btn-delete" @onclick="HandleDeleteClick">Slet booking</button>
+								}
 							</div>
 						}
 						else if (Mode == BookingMode.Edit)
 						{
 							<div class="btn-group">
-								<button class="btn-view btn-save" @onclick="() => {}">Gem ændringer</button>
-								<button class="btn-view btn-delete" @onclick="() => { }">Slet booking</button>
+								<button class="btn-view btn-save" @onclick="HandleSaveChangesClick">Gem ændringer</button>
+								<button class="btn-view btn-delete" @onclick="HandleDeleteClick">Slet booking</button>
 							</div>
 						}
 					}
@@ -199,6 +203,8 @@
 
 	[Parameter]
 	public Guid? Id { get; set; }
+
+	private bool _isPaid;
 
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
@@ -246,6 +252,7 @@
 			var booking = await BookingQuery.GetWithRelationsAsync(new GetWithRelationsQuery(Id!.Value));
 			_startDate = booking.StartDateTime.Date;
 			_startTime = booking.StartDateTime.TimeOfDay;
+			_isPaid = booking.IsPaid;
 
 			if (booking.Discount != null) {
 				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
@@ -273,6 +280,13 @@
 			Snackbar.Add("Noget gik galt.", Severity.Error);
 			NavigationManager.NavigateTo("/bookings");
 		}
+	}
+
+	private bool IsEditable()
+	{
+		if (_startDate == null || _startTime == null) return false;
+		if (_startDate.Value.Add(_startTime.Value) < _now) return false;
+		return true;
 	}
 
 	private async Task HandlePickCustomerClick()
@@ -410,24 +424,6 @@
 		_statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
 	}
 
-	private async Task HandleCreateBookingClick()
-	{
-		if (_timeIsAvailable == null || !_timeIsAvailable.Value || _startDate == null || 
-			_startTime == null || _treatment == null || _employee == null || _customer == null) return;
-
-		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
-
-		try
-		{
-			await BookingCommand.CreateBooking(command);
-			Snackbar.Add("Booking blev oprettet.", Severity.Success);
-			NavigationManager.NavigateTo("/bookings");
-		}
-		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
-		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
-	}
-
 	private void HandleChangeCustomerClick()
 	{
 		if (Mode == BookingMode.Edit || Mode == BookingMode.View) return;
@@ -503,6 +499,44 @@
 		{
 			Snackbar.Add("Der opstod en fejl ved hentning af rabat", Severity.Error);
 		}
+	}
+
+	private async Task HandleCreateBookingClick()
+	{
+		if (_timeIsAvailable == null || !_timeIsAvailable.Value || _startDate == null ||
+			_startTime == null || _treatment == null || _employee == null || _customer == null) return;
+
+		var startDateTime = _startDate.Value.Add(_startTime.Value);
+		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
+
+		try
+		{
+			await BookingCommand.CreateBooking(command);
+			Snackbar.Add("Booking blev oprettet.", Severity.Success);
+			NavigationManager.NavigateTo("/bookings");
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private Task HandlePayClick(MouseEventArgs args)
+	{
+		throw new NotImplementedException();
+	}
+
+	private Task HandleEditClick(MouseEventArgs args)
+	{
+		throw new NotImplementedException();
+	}
+	
+	private Task HandleDeleteClick(MouseEventArgs args)
+	{
+		throw new NotImplementedException();
+	}
+	
+	private Task HandleSaveChangesClick(MouseEventArgs args)
+	{
+		throw new NotImplementedException();
 	}
 }
 

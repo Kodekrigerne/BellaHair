@@ -36,7 +36,7 @@
 	private BookingTab _activeTab;
 
 	private DateTime _now;
-	private List<BookingSimpleViewModel> _bookings = [];
+	private List<BookingViewModel> _bookings = [];
 
 	protected async override Task OnInitializedAsync()
 	{
@@ -65,7 +65,7 @@
 		{
 			var bookings = bookingTab == BookingTab.New ? await BookingQuery.GetAllNewAsync() : await BookingQuery.GetAllOldAsync();
 
-			_bookings = bookings.Select(b => new BookingSimpleViewModel(
+			_bookings = bookings.Select(b => new BookingViewModel(
 				b.Id,
 				b.StartDateTime,
 				b.EndDateTime,

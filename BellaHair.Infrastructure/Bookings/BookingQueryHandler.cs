@@ -83,6 +83,7 @@ namespace BellaHair.Infrastructure.Bookings
                 b.Id,
                 b.StartDateTime,
                 b.EndDateTime,
+                b.IsPaid,
                 b.Total,
                 b.Employee?.Name.FullName ?? b.EmployeeSnapshot?.FullName
                     ?? throw new InvalidOperationException($"Booking {b.Id} does not have an employee attached."),

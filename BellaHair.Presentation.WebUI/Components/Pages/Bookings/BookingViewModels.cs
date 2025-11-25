@@ -1,6 +1,6 @@
 ﻿namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
 {
-    public record BookingSimpleViewModel(
+    public record BookingViewModel(
         Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
