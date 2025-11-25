@@ -7,10 +7,12 @@ public class CustomerComponent : IComponent
     private string Name { get; }
     private string Email { get; }
     private string PhoneNumber { get; }
+    private string Title { get; }
 
 
-    public CustomerComponent(string address, string name, string email, string phoneNumber)
+    public CustomerComponent(string title, string address, string name, string email, string phoneNumber)
     {
+        Title = title;
         Address = address;
         Name = name;
         Email = email;
@@ -22,6 +24,8 @@ public class CustomerComponent : IComponent
         container.Column(column =>
         {
             column.Spacing(2);
+
+            column.Item().BorderBottom(1).PaddingBottom(5).Text(Title).SemiBold();
 
             column.Item().Text(Name);
             column.Item().Text(Address);

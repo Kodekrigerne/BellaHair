@@ -2,6 +2,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System.Reflection;
 
 // Mikkel Dahlmann
 
@@ -12,10 +13,24 @@ using QuestPDF.Infrastructure;
 public class InvoiceDocument : IDocument
 {
     public InvoiceModel Model { get; }
+    public Byte[] LogoContent { get; }
 
     public InvoiceDocument(InvoiceModel model)
     {
         Model = model;
+
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = "BellaHair.Infrastructure.Invoices.BellaHairLogo.png";
+
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+        {
+            throw new FileNotFoundException($"Could not find the embedded resource: {resourceName}");
+        }
+
+        using var ms = new MemoryStream();
+        stream.CopyTo(ms);
+        LogoContent = ms.ToArray();
     }
 
     public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
@@ -47,17 +62,23 @@ public class InvoiceDocument : IDocument
             row.RelativeItem().Column(column =>
             {
                 column.Item()
-                    .Text($"Faktura #{Model.InvoiceNumber}")
-                    .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
+                    .Text($"Faktura #1(PH!)")
+                    .FontSize(24).Bold().FontColor(Colors.Black);
 
                 column.Item().Text(text =>
                 {
-                    text.Span("Betalingsdato: ").SemiBold();
+                    text.Span("Fakturadato: ").SemiBold();
+                    text.Span($"{Model.IssueDate:d}");
+                });
+
+                column.Item().Text(text =>
+                {
+                    text.Span("Betalt: ").SemiBold();
                     text.Span($"{Model.IssueDate:d}");
                 });
             });
 
-            row.ConstantItem(100).Height(50).Placeholder();
+            row.ConstantItem(150).Height(90).Image(LogoContent);
         });
     }
 
@@ -69,18 +90,23 @@ public class InvoiceDocument : IDocument
 
             column.Item().Row(row =>
             {
-                row.RelativeItem().Component(new CustomerComponent(Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
+                row.RelativeItem().Component(new CustomerComponent("Afsender:", "Nygade 1, 7100 Vejle", "BellaHair - CVR-nr: 12345678", "kontakt@bellahair.dk", "40284846"));
                 row.ConstantItem(50);
-                row.RelativeItem().Component(new CustomerComponent(Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
+                row.RelativeItem().Component(new CustomerComponent("Modtager:", Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
             });
 
-            column.Item().Element(ComposeTable);
+            column.Item().PaddingTop(30).Element(ComposeTable);
 
-            var totalPrice = Model.Treatments.Sum(x => x.Price * 1);
-            column.Item().AlignRight().Text($"Slut total: {totalPrice:C2}").FontSize(14);
+            var totalPriceWithTax = Model.Treatments.Sum(x => x.Price * 1);
+            var totalPriceWithoutTax = totalPriceWithTax * 0.8m;
+            var tax = totalPriceWithTax - totalPriceWithoutTax;
 
-            if (!string.IsNullOrWhiteSpace(Model.Comments))
-                column.Item().PaddingTop(25).Element(ComposeComments);
+            column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalPriceWithoutTax:N2}").FontSize(12);
+            column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
+            column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalPriceWithTax:N2}").FontSize(15).SemiBold();
+
+            //if (!string.IsNullOrWhiteSpace(Model.Comments))
+            //    column.Item().PaddingTop(25).Element(ComposeComments);
         });
     }
 
@@ -101,9 +127,9 @@ public class InvoiceDocument : IDocument
             {
                 header.Cell().Element(CellStyle).Text("#");
                 header.Cell().Element(CellStyle).Text("Service");
-                header.Cell().Element(CellStyle).AlignRight().Text("Pris");
+                header.Cell().Element(CellStyle).AlignRight().Text("Enhedspris");
                 header.Cell().Element(CellStyle).AlignRight().Text("Antal");
-                header.Cell().Element(CellStyle).AlignRight().Text("Total");
+                header.Cell().Element(CellStyle).AlignRight().Text("Pris");
 
                 static IContainer CellStyle(IContainer container)
                 {
@@ -115,9 +141,9 @@ public class InvoiceDocument : IDocument
             {
                 table.Cell().Element(CellStyle).Text((Model.Treatments.IndexOf(treatment) + 1).ToString());
                 table.Cell().Element(CellStyle).Text(treatment.Name);
-                table.Cell().Element(CellStyle).AlignRight().Text($"{treatment.Price}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price:N2}");
                 table.Cell().Element(CellStyle).AlignRight().Text("1");
-                table.Cell().Element(CellStyle).AlignRight().Text($"{treatment.Price * 1:C2}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 1:N2}");
 
                 static IContainer CellStyle(IContainer container)
                 {
@@ -127,13 +153,13 @@ public class InvoiceDocument : IDocument
         });
     }
 
-    public void ComposeComments(IContainer container)
-    {
-        container.Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
-        {
-            column.Spacing(5);
-            column.Item().Text("Kommentarer").FontSize(14);
-            column.Item().Text(Model.Comments);
-        });
-    }
+    //public void ComposeComments(IContainer container)
+    //{
+    //    container.Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
+    //    {
+    //        column.Spacing(5);
+    //        column.Item().Text("Kommentarer").FontSize(14);
+    //        column.Item().Text(Model.Comments);
+    //    });
+    //}
 }
