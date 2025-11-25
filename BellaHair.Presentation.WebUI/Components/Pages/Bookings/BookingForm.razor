@@ -519,24 +519,54 @@
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
-	private Task HandlePayClick(MouseEventArgs args)
+	private async Task HandlePayClick()
 	{
-		throw new NotImplementedException();
+		try
+		{
+			var command = new PayBookingCommand(Id);
+			await BookingCommand.PayBooking(command);
+			Snackbar.Add("Bookingen er betalt", Severity.Success);
+			await LoadBooking();
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
 	}
 
-	private Task HandleEditClick(MouseEventArgs args)
+	private void HandleEditClick()
 	{
-		throw new NotImplementedException();
+		Mode = BookingMode.Edit;
 	}
-	
-	private Task HandleDeleteClick(MouseEventArgs args)
+
+	private async Task HandleDeleteClick()
 	{
-		throw new NotImplementedException();
+		try
+		{
+			var command = new DeleteBookingCommand(Id)
+			await BookingCommand.DeleteBooking(command);
+			Snackbar.Add("Bookingen er slettet", Severity.Success);
+			NavigationManager.NavigateTo("/bookings");
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
 	}
-	
-	private Task HandleSaveChangesClick(MouseEventArgs args)
+
+	private async Task HandleSaveChangesClick()
 	{
-		throw new NotImplementedException();
+		if (_timeIsAvailable == null || !_timeIsAvailable.Value || _startDate == null ||
+			_startTime == null || _treatment == null || _employee == null || _customer == null) return;
+
+		var startDateTime = _startDate.Value.Add(_startTime.Value);
+		var command = new UpdateBookingCommand(Id, startDateTime, _employee.Id, _treatment.Id);
+
+		try
+		{
+			await BookingCommand.UpdateBooking(command);
+			Snackbar.Add("Bookingen er opdateret", Severity.Success);
+			await LoadBooking();
+			Mode = BookingMode.View;
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
 	}
 }
 
