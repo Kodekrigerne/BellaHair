@@ -20,6 +20,7 @@ namespace BellaHair.Ports.Discounts
     }
 
     public record CampaignDiscountDTO(
+        Guid Id,
         string Name,
         decimal DiscountPercent,
         DateTime StartDate,

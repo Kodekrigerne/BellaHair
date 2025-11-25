@@ -31,13 +31,14 @@ namespace BellaHair.Infrastructure.Discounts
             // Jeg bruger en CampaignTreatmentDTO for at hente id ud på alle behandlinger
             // og finder det dertilhørende behandlingsnavn
             return campaigns.Select(c => new CampaignDiscountDTO(
+                c.Id,
                 c.Name,
                 c.DiscountPercent.Value,
                 c.StartDate,
                 c.EndDate,
                 c.TreatmentIds.Select(id => new CampaignTreatmentDTO(
                     id, 
-                    _db.Treatments.Find(id)!.Name))
+                    _db.Treatments.Find(id)?.Name ?? "Ukendt behandling"))
                 )).ToList();
         }
 
