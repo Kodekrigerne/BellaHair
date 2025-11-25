@@ -73,17 +73,27 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(CampaignDiscount.Create("Sommerklip",
                 DiscountPercent.FromDecimal(0.20m),
                 new DateTime(2026, 6, 1, 12, 0, 0),
-                new DateTime(2026, 8, 1, 12, 0, 0), new List<Guid> { _herreklip.Id, _dameklip.Id }));
+                new DateTime(2026, 8, 1, 12, 0, 0),
+                new List<Guid> { _herreklip.Id, _dameklip.Id }));
 
             _db.Add(CampaignDiscount.Create("Februar Farve Flash",
                 DiscountPercent.FromDecimal(0.10m),
                 new DateTime(2026, 2, 1, 12, 0, 0),
-                new DateTime(2026, 3, 1, 0, 0, 0), new List<Guid> { _farvning.Id }));
+                new DateTime(2026, 3, 1, 0, 0, 0),
+                new List<Guid> { _farvning.Id }));
 
             _db.Add(CampaignDiscount.Create("Back-to-School Børneklip",
                 DiscountPercent.FromDecimal(0.10m),
                 new DateTime(2026, 8, 1, 12, 0, 0),
-                new DateTime(2026, 9, 1, 0, 0, 0), new List<Guid> { _børneklip.Id }));
+                new DateTime(2026, 9, 1, 0, 0, 0),
+                new List<Guid> { _børneklip.Id }));
+
+            _db.Add(CampaignDiscount.Create("Juletilbud",
+                DiscountPercent.FromDecimal(0.12m),
+                new DateTime(2025, 12, 1),
+                new DateTime(2025, 12, 24),
+                new List<Guid>
+                    { _herreklip.Id, _dameklip.Id, _barbering.Id, _farvning.Id, _børneklip.Id, _permanent.Id }));
         }
 
         private void AddLoyaltyDiscounts()
