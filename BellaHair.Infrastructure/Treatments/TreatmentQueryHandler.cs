@@ -25,8 +25,22 @@ namespace BellaHair.Infrastructure.Treatments
                     t.Name,
                     t.Price.Value,
                     t.DurationMinutes.Value,
-                    t.Employees.Count()))
+                    t.Employees.Count))
                 .ToListAsync();
+        }
+
+        async Task<TreatmentDTO> ITreatmentQuery.GetAsync(GetQuery query)
+        {
+            return await _db.Treatments
+                .AsNoTracking()
+                .Where(t => t.Id == query.Id)
+                .Select(t => new TreatmentDTO(
+                    t.Id,
+                    t.Name,
+                    t.Price.Value,
+                    t.DurationMinutes.Value,
+                    t.Employees.Count))
+                .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Treatment {query.Id} not found.");
         }
     }
 }
