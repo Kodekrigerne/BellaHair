@@ -32,7 +32,7 @@
 					}
 					else
 					{
-						<button class="btn-picked @(Mode == BookingMode.New ? "" : "inactive")" @onclick="HandleChangeCustomerClick">
+						<button class="btn-picked @(Mode == BookingMode.New ? "" : "inactive") @(Mode == BookingMode.Edit ? "greyed" : "")" @onclick="HandleChangeCustomerClick">
 							<p class="picked-label">Kunde</p>
 							<p class="picked-text">@_customer.FullName</p>
 						</button>
@@ -637,18 +637,25 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		cursor: default !important;
+	}
+
+	.btn-picked.greyed {
+		background-color: lightgrey;
 	}
 
 	.btn-picked.inactive {
 		user-select: text;
 	}
 
+			.btn-picked.inactive:hover {
+			cursor: default;
+		}
+
 		.btn-picked:not(.inactive):hover {
 			background-color: #f0f4fa;
 			box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-			cursor: pointer;
 			transition: background 0.1s, box-shadow 0.1s;
+			cursor: pointer;
 		}
 
 	.picked-label {
