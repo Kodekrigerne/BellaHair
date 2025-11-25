@@ -217,12 +217,45 @@
 		}
 
 		if (Mode == BookingMode.New) await HandlePickCustomerClick();
+		else if (Mode == BookingMode.View) await LoadBooking();
+	}
+
+	private async Task LoadBooking()
+	{
+		try
+		{
+			var booking = await BookingQuery.GetWithRelationsAsync(new GetWithRelationsQuery(Id!.Value));
+			_startDate = booking.StartDateTime.Date;
+
+			if (booking.Discount != null) {
+			_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
+			}
+
+			var c = await CustomerQuery.GetPrivateCustomerAsync(new GetPrivateCustomerQuery(booking.CustomerId));
+			_customer = new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits);
+
+			var t = await TreatmentQuery.GetAsync(new GetQuery(booking.TreatmentId));
+			_treatment = new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount);
+
+			var e = await EmployeeQuery.GetWithFutureBookingsAsync(new GetWithFutureBookingsQuery(booking.EmployeeId));
+			_employee = new EmployeeNameWithBookingsViewModel(
+				e.Id,
+				e.Name,
+				e.Bookings
+					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime)).ToList());
+		}
+		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
+		catch
+		{
+			Snackbar.Add("Noget gik galt.", Severity.Error);
+			NavigationManager.NavigateTo("/bookings");
+		}
 	}
 
 	private async Task HandlePickCustomerClick()
 	{
 		_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-		.Select(e => new PrivateCustomerViewModel(e.Id, e.FullName, e.Birthday, e.Email, e.PhoneNumber, e.FullAddress, e.Visits))
+		.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
 		.OrderBy(e => e.FullName)
 		.ToList();
 

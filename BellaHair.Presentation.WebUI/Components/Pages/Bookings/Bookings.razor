@@ -77,7 +77,7 @@
 				b.TreatmentName,
 				b.DurationMinutes,
 				b.Discount?.Name,
-				b.Discount?.DiscountAmount
+				b.Discount?.Amount
 			)).OrderBy(b => b.StartDateTime).ToList();
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
