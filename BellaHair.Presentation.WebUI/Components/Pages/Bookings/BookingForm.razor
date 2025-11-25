@@ -46,9 +46,9 @@
 					}
 					else
 					{
-						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "")" @onclick="HandleChangeTreatmentClick">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double" @onclick="HandleChangeTreatmentClick">
 							<p class="picked-label">Behandling</p>
-							<p class="picked-text">
+							<p class="picked-text ">
 								<span class="picked-name">@_treatment.Name</span>
 								<span class="picked-duration">@_treatment.DurationMinutes min</span>
 							</p>
@@ -79,9 +79,15 @@
 					}
 					else
 					{
-						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "")" @onclick="HandleChangeTimeClick">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double" @onclick="HandleChangeTimeClick">
 							<p class="picked-label">Dato og tid</p>
-							<p class="picked-text">@_startDate?.ToString("yyyy-MM-dd") @_startTime?.ToString(@"hh\:mm")</p>
+							<p class="picked-text">
+								<span>@_startDate?.ToString("yyyy-MM-dd")</span>
+								@if (_startTime != null && _endTime != null)
+								{
+									<span class="picked-to-from">@_startTime.Value.ToString(@"hh\:mm") - @( _endTime.Value.ToString(@"hh\:mm") )</span>
+								}
+							</p>
 						</button>
 					}
 				</div>
@@ -221,6 +227,7 @@
 
 	private DateTime? _startDate;
 	private TimeSpan? _startTime;
+	private TimeSpan? _endTime;
 
 	private bool? _timeIsAvailable;
 	private string? _statusMessage;
@@ -271,6 +278,7 @@
 				e.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime)).ToList());
 
+			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
 			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
 		}
@@ -288,6 +296,16 @@
 		if (_isPaid) return false;
 		if (_startDate.Value.Add(_startTime.Value) < _now) return false;
 		return true;
+	}
+
+	private void SetNulls()
+	{
+		_startDate = null;
+		_startTime = null;
+		_endTime = null;
+		_timeIsAvailable = null;
+		_discount = null;
+		_statusMessage = null;
 	}
 
 	private async Task HandlePickCustomerClick()
@@ -386,6 +404,7 @@
 		if (newTime == null) return;
 
 		_startTime = newTime;
+		_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment!.DurationMinutes));
 
 		if (_startDate != null)
 		{
@@ -432,11 +451,7 @@
 		_customer = null;
 		_treatment = null;
 		_employee = null;
-		_startDate = null;
-		_startTime = null;
-		_timeIsAvailable = null;
-		_discount = null;
-		_statusMessage = null;
+		SetNulls();
 
 		if (_customers.Count == 0) await HandlePickCustomerClick();
 		else _activePicker = Picker.Customers;
@@ -448,11 +463,7 @@
 
 		_treatment = null;
 		_employee = null;
-		_startDate = null;
-		_startTime = null;
-		_timeIsAvailable = null;
-		_discount = null;
-		_statusMessage = null;
+		SetNulls();
 
 		if (_treatments.Count == 0) await HandlePickTreatmentClick();
 		else _activePicker = Picker.Treatments;
@@ -463,11 +474,7 @@
 		if (Mode == BookingMode.View) return;
 
 		_employee = null;
-		_startDate = null;
-		_startTime = null;
-		_timeIsAvailable = null;
-		_discount = null;
-		_statusMessage = null;
+		SetNulls();
 
 		if (_employees.Count == 0) await HandlePickEmployeeClick();
 		else _activePicker = Picker.Employee;
@@ -477,11 +484,7 @@
 	{
 		if (Mode == BookingMode.View) return;
 
-		_startDate = null;
-		_startTime = null;
-		_timeIsAvailable = null;
-		_discount = null;
-		_statusMessage = null;
+		SetNulls();
 
 		await HandlePickStartDateTimeClick();
 	}
@@ -667,19 +670,32 @@
 		font-weight: 600;
 	}
 
+	.btn-picked-double .picked-text {
+		display: flex;
+		justify-content: flex-start;
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+		width: 100%;
+		text-align: left;
+	}
+
 	.picked-text {
 		margin: 0;
 		font-size: 1.10rem;
 		font-weight: 700;
+		display: flex;
+		align-items: center;
 	}
 
 	.picked-duration {
-		position: absolute;
-		right: 0.8rem;
 		font-size: 0.97em;
 		opacity: 0.76;
 		pointer-events: none;
-		padding-left: 6px;
+		margin-left: auto;
+	}
+
+	.picked-to-from {
+		margin-left: auto;
 	}
 
 	.body-right {
