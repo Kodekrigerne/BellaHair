@@ -3,6 +3,12 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
+// Mikkel Dahlmann
+
+/// <summary>
+/// Represents an invoice document that can be composed and rendered using the provided invoice model data.
+/// </summary>
+
 public class InvoiceDocument : IDocument
 {
     public InvoiceModel Model { get; }

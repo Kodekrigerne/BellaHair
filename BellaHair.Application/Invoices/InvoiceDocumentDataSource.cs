@@ -1,6 +1,12 @@
 ﻿using BellaHair.Domain.Invoices;
 using QuestPDF.Helpers;
 
+// Mikkel Dahlmann
+
+/// <summary>
+/// Provides methods for generating sample invoice data for testing or demonstration purposes.
+/// </summary>
+
 public static class InvoiceDocumentDataSource
 {
     private static Random Random = new Random();
