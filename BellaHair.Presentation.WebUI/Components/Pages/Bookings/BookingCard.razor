@@ -1,7 +1,14 @@
 ﻿@using System.Globalization
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
+@using BellaHair.Ports.Invoices
+@inject IInvoiceQuery InvoiceQuery
 
 <div class="bc-container">
+
+	<div>
+		<button class="btn-add" onclick="@InvoiceQuery.CreateAndPrintInvoice" />
+	</div>
+
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>

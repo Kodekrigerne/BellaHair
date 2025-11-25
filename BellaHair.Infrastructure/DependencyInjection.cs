@@ -7,11 +7,13 @@ using BellaHair.Domain.Treatments;
 using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
+using BellaHair.Infrastructure.Invoices;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
+using BellaHair.Ports.Invoices;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +48,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IBookingOverlapChecker, BookingOverlapChecker>();
             serviceCollection.AddScoped<IFutureBookingWithTreatmentChecker, FutureBookingWithTreatmentChecker>();
 
+            serviceCollection.AddScoped<IInvoiceQuery, InvoiceQueryHandler>();
 
             return serviceCollection;
         }
