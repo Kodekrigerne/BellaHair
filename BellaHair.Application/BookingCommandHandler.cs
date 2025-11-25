@@ -61,5 +61,35 @@ namespace BellaHair.Application
 
             await _bookingRepository.SaveChangesAsync();
         }
+
+        async Task IBookingCommand.DeleteBooking(DeleteBookingCommand command)
+        {
+            var booking = await _bookingRepository.GetAsync(command.Id);
+
+            booking.ValidateDelete(_currentDateTimeProvider);
+
+            _bookingRepository.Delete(booking);
+            await _bookingRepository.SaveChangesAsync();
+        }
+
+        async Task IBookingCommand.PayBooking(PayBookingCommand command)
+        {
+            var booking = await _bookingRepository.GetAsync(command.Id);
+
+            booking.PayBooking(_currentDateTimeProvider);
+            await _bookingRepository.SaveChangesAsync();
+        }
+
+        async Task IBookingCommand.UpdateBooking(UpdateBookingCommand command)
+        {
+            var booking = await _bookingRepository.GetAsync(command.Id);
+
+            var employee = await _employeeRepository.GetWithTreatmentsAsync(command.EmployeeId);
+            var treatment = await _treatmentRepository.GetAsync(command.TreatmentId);
+
+            booking.Update(command.StartDateTime, employee, treatment, _currentDateTimeProvider);
+
+            await _bookingRepository.SaveChangesAsync();
+        }
     }
 }

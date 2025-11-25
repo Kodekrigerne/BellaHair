@@ -285,6 +285,7 @@
 	private bool IsEditable()
 	{
 		if (_startDate == null || _startTime == null) return false;
+		if (_isPaid) return false;
 		if (_startDate.Value.Add(_startTime.Value) < _now) return false;
 		return true;
 	}
@@ -521,9 +522,11 @@
 
 	private async Task HandlePayClick()
 	{
+		if (Id == null) return;
+
 		try
 		{
-			var command = new PayBookingCommand(Id);
+			var command = new PayBookingCommand(Id.Value);
 			await BookingCommand.PayBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
 			await LoadBooking();
@@ -539,9 +542,11 @@
 
 	private async Task HandleDeleteClick()
 	{
+		if (Id == null) return;
+	
 		try
 		{
-			var command = new DeleteBookingCommand(Id)
+			var command = new DeleteBookingCommand(Id.Value);
 			await BookingCommand.DeleteBooking(command);
 			Snackbar.Add("Bookingen er slettet", Severity.Success);
 			NavigationManager.NavigateTo("/bookings");
@@ -553,10 +558,10 @@
 	private async Task HandleSaveChangesClick()
 	{
 		if (_timeIsAvailable == null || !_timeIsAvailable.Value || _startDate == null ||
-			_startTime == null || _treatment == null || _employee == null || _customer == null) return;
+			_startTime == null || _treatment == null || _employee == null || _customer == null || Id == null) return;
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var command = new UpdateBookingCommand(Id, startDateTime, _employee.Id, _treatment.Id);
+		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id);
 
 		try
 		{

@@ -35,9 +35,7 @@ namespace BellaHair.Domain.Bookings
         private decimal? _total;
         public decimal Total => IsPaid ? _total!.Value : CalculateTotal();
 
-#pragma warning disable CS8618
         private Booking() { }
-#pragma warning restore CS8618
 
         private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
         {
@@ -108,6 +106,29 @@ namespace BellaHair.Domain.Bookings
         {
             if (IsPaid) throw new BookingException("Cannot set the discount on a paid booking");
             Discount = discount;
+        }
+
+        public void ValidateDelete(ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            var now = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (IsPaid) throw new BookingException("Kan ikke slette en betalt ordre.");
+            if (StartDateTime < now && StartDateTime.Date == now.Date)
+                throw new BookingException("Afviklede bookinger kan først slettes dagen efter hvis ikke betalt.");
+        }
+
+        public void Update(DateTime startDateTime, Employee employee, Treatment treatment, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            var now = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (IsPaid) throw new BookingException("");
+            if (startDateTime < now) throw new BookingException("");
+
+            StartDateTime = startDateTime;
+            Employee = employee;
+            Treatment = treatment;
+
+            UpdateEndDateTime();
         }
     }
 
