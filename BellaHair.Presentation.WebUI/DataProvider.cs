@@ -63,7 +63,7 @@ namespace BellaHair.Presentation.WebUI
             AddPrivateCustomers();
             AddEmployees();
             AddBookings();
-            //AddCampaignDiscounts();
+            AddCampaignDiscounts();
 
             _db.SaveChanges();
         }
