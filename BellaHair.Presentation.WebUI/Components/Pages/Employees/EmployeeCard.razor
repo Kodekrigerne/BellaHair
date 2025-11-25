@@ -72,9 +72,9 @@
 						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in Employee.TreatmentNames)
+						@foreach (var treatment in Employee.Treatments)
 							{															
-								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
+								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
 							}
 						</div>
 					</div>

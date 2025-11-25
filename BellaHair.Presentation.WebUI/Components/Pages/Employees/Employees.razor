@@ -1,5 +1,6 @@
 ﻿@attribute [StreamRendering]
 @using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents
 @using BellaHair.Ports.Employees
@@ -71,7 +72,7 @@
 																	 e.StreetNumber,
 																	 e.ZipCode,
 																	 e.FullAddress,
-																	 e.Treatments.Select(t => t.Name).ToList(),
+																	 e.Treatments.Select(t => new EmployeeTreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).ToList(),
 																	 e.Floor))
 																	 .OrderBy(e => e.FirstName)
 																	 .ToList();

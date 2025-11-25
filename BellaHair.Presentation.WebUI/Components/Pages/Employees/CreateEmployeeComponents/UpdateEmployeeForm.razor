@@ -2,6 +2,7 @@
 @using BellaHair.Ports.Employees
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+
 @inject IEmployeeQuery EmployeeQuery
 @inject IEmployeeCommand EmployeeCommand
 @inject ITreatmentQuery TreatmentQuery
@@ -71,6 +72,7 @@
 
     private void InitializeViewModel()
     {
+        MapDtoToModel();
         editContext = new EditContext(EmployeeModel);
         editContext.OnFieldChanged += HandleFieldChanged!;
         InputHasChanged = false;
@@ -126,4 +128,21 @@
         }
 
     }
+
+    private void MapDtoToModel()
+    {
+        EmployeeModel!.Id = EmployeeToUpdate!.Id;
+        EmployeeModel.FirstName = EmployeeToUpdate.FirstName;
+        EmployeeModel.MiddleName = EmployeeToUpdate.MiddleName;
+        EmployeeModel.LastName = EmployeeToUpdate.LastName;
+        EmployeeModel.StreetName = EmployeeToUpdate.StreetName;
+        EmployeeModel.StreetNumber = EmployeeToUpdate.StreetNumber;
+        EmployeeModel.CityName = EmployeeToUpdate.City;
+        EmployeeModel.ZipCode = EmployeeToUpdate.ZipCode;
+        EmployeeModel.PhoneNumber = EmployeeToUpdate.PhoneNumber;
+        EmployeeModel.Email = EmployeeToUpdate.Email;
+        EmployeeModel.Floor = EmployeeToUpdate.Floor;
+        EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList();
+    }
+
 }
