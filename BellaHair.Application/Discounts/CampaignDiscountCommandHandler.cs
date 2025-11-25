@@ -22,14 +22,12 @@ namespace BellaHair.Application.Discounts
         {
             var discountPercent = DiscountPercent.FromDecimal(command.DiscountPercent);
 
-            var treatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
-
             var campaignDiscount = CampaignDiscount.Create(
                 command.Name,
                 discountPercent,
                 command.StartDate,
                 command.EndDate,
-                treatments);
+                command.TreatmentIds);
 
             await _campaignDiscountRepo.AddAsync(campaignDiscount);
 
