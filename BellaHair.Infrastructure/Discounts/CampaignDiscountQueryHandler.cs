@@ -1,3 +1,4 @@
+using System.Linq;
 using BellaHair.Domain.Discounts;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +14,20 @@ namespace BellaHair.Infrastructure.Discounts
 
         async Task<List<CampaignDiscountDTO>> ICampaignDiscountQuery.GetAllAsync()
         {
-            return await _db.Discounts
+            var campaigns = await _db.Discounts
                 .AsNoTracking()
                 .OfType<CampaignDiscount>()
-                .Select(x => new CampaignDiscountDTO(
-                    x.Name,
-                    x.DiscountPercent.Value,
-                    x.StartDate,
-                    x.EndDate,
-                    x.Treatments.Select(t => t.Id)))
                 .ToListAsync();
+
+            return campaigns.Select(c => new CampaignDiscountDTO(
+                c.Name,
+                c.DiscountPercent.Value,
+                c.StartDate,
+                c.EndDate,
+                c.TreatmentIds.Select(id => new CampaignTreatmentDTO(
+                    id, 
+                    _db.Treatments.Find(id)!.Name))
+                )).ToList();
         }
 
         async Task<int> ICampaignDiscountQuery.GetCountAsync()

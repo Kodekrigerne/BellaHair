@@ -17,5 +17,7 @@ namespace BellaHair.Ports.Discounts
         decimal DiscountPercent,
         DateTime StartDate,
         DateTime EndDate,
-        IEnumerable<Guid> TreatmentIds);
+        IEnumerable<CampaignTreatmentDTO> Treatments);
+
+    public record CampaignTreatmentDTO(Guid Id, string Name);
 }
