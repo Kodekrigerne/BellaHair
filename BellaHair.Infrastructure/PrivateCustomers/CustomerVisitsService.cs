@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
+    //Dennis
+    /// <inheritdoc cref="ICustomerVisitsService"/>
     public class CustomerVisitsService : ICustomerVisitsService
     {
         private readonly BellaHairContext _db;
