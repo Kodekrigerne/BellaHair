@@ -144,27 +144,46 @@
 			@if (_timeIsAvailable != null)
 			{
 				<div class="right-bottom">
-					<p class="availability-status">@_availabilityMessage</p>
+					<p class="availability-status">@_statusMessage</p>
 
-					@if (_timeIsAvailable != null && _timeIsAvailable == true) {
-					<div class="discount-section">
-						<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
-						@if (_discount != null)
+					@if (_timeIsAvailable != null && _timeIsAvailable == true)
+					{
+						<div class="discount-section">
+							<button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button>
+							@if (_discount != null)
+							{
+								<p class="discount-name">Rabat: @_discount.Name</p>
+								<p class="discount-amount">Beløb: @_discount.Amount.ToString("F2") dkk</p>
+							}
+						</div>
+
+						<div class="price-section">
+							<p class="price-without-discount">Pris uden rabat: @_treatment?.Price.ToString("F2") dkk</p>
+							@if (_discount != null && _treatment != null)
+							{
+								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
+							}
+						</div>
+
+						if (Mode == BookingMode.New)
 						{
-							<p class="discount-name">Rabat: @_discount.Name</p>
-							<p class="discount-amount">Beløb: @_discount.Amount.ToString("F2") dkk</p>
+							<button class="btn-view btn-save" @onclick="HandleCreateBookingClick">Book denne tid</button>
 						}
-					</div>
-
-					<div class="price-section">
-						<p class="price-without-discount">Pris uden rabat: @_treatment?.Price.ToString("F2") dkk</p>
-						@if (_discount != null && _treatment != null)
+						else if (Mode == BookingMode.View)
 						{
-							<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
+							<div class="btn-group">
+								<button class="btn-view btn-pay" @onclick="() => { }">Betal booking</button>
+								<button class="btn-view btn-edit" @onclick="() => { }">Rediger booking</button>
+								<button class="btn-view btn-delete" @onclick="() => { }">Slet booking</button>
+							</div>
 						}
-					</div>
-
-					<button class="btn-create" @onclick="HandleCreateBookingClick">Book denne tid</button>
+						else if (Mode == BookingMode.Edit)
+						{
+							<div class="btn-group">
+								<button class="btn-view btn-save" @onclick="() => {}">Gem ændringer</button>
+								<button class="btn-view btn-delete" @onclick="() => { }">Slet booking</button>
+							</div>
+						}
 					}
 				</div>
 			}
@@ -198,7 +217,7 @@
 	private TimeSpan? _startTime;
 
 	private bool? _timeIsAvailable;
-	private string? _availabilityMessage;
+	private string? _statusMessage;
 
 	private List<PrivateCustomerViewModel> _customers = [];
 	private List<TreatmentViewModel> _treatments = [];
@@ -229,7 +248,7 @@
 			_startTime = booking.StartDateTime.TimeOfDay;
 
 			if (booking.Discount != null) {
-			_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
+				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
 			}
 
 			var c = await CustomerQuery.GetPrivateCustomerAsync(new GetPrivateCustomerQuery(booking.CustomerId));
@@ -244,6 +263,9 @@
 				e.Name,
 				e.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime)).ToList());
+
+			_timeIsAvailable = true;
+			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
@@ -371,21 +393,21 @@
 		if (startDateTime < earliest)
 		{
 			_timeIsAvailable = false;
-			_availabilityMessage = "Kan ikke starte booking før åbningstid";
+			_statusMessage = "Kan ikke starte booking før åbningstid";
 			return;
 		}
 
 		if (treatmentEnd > latest)
 		{
 			_timeIsAvailable = false;
-			_availabilityMessage = "Booking skal slutte før lukketid";
+			_statusMessage = "Booking skal slutte før lukketid";
 			return;
 		}
 
 		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id);
 
 		_timeIsAvailable = !(await BookingQuery.BookingHasOverlap(query));
-		_availabilityMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
+		_statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
 	}
 
 	private async Task HandleCreateBookingClick()
@@ -417,7 +439,7 @@
 		_startTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
-		_availabilityMessage = null;
+		_statusMessage = null;
 
 		_activePicker = Picker.Customers;
 	}
@@ -432,7 +454,7 @@
 		_startTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
-		_availabilityMessage = null;
+		_statusMessage = null;
 
 		_activePicker = Picker.Treatments;
 	}
@@ -446,7 +468,7 @@
 		_startTime = null;
 		_timeIsAvailable = null;
 		_discount = null;
-		_availabilityMessage = null;
+		_statusMessage = null;
 
 		_activePicker = Picker.Employee;
 	}
@@ -459,7 +481,7 @@
 		_startDate = null;
 		_timeIsAvailable = null;
 		_discount = null;
-		_availabilityMessage = null;
+		_statusMessage = null;
 
 		_activePicker = Picker.Time;
 	}
@@ -700,9 +722,13 @@
 		color: #4CAF50;
 	}
 
-	.btn-create {
+	.btn-group {
+		display: flex;
+		gap: 12px;
+	}
+
+	.btn-view {
 		padding: 12px 24px;
-		background-color: #2196F3;
 		color: white;
 		border: none;
 		border-radius: 4px;
@@ -710,10 +736,39 @@
 		font-size: 1rem;
 		font-weight: 600;
 		transition: background-color 0.3s ease;
+		width: 100%;
 	}
 
-		.btn-create:hover {
+	.btn-save {
+		background-color: #2196F3;
+	}
+
+		.btn-save:hover {
 			background-color: #0b7dda;
+		}
+
+	.btn-pay {
+		background-color: #45a049;
+	}
+
+		.btn-pay:hover {
+			background-color: #3d8b40;
+		}
+
+	.btn-edit {
+		background-color: #1976D2;
+	}
+
+		.btn-edit:hover {
+			background-color: #1565C0;
+		}
+
+	.btn-delete {
+		background-color: #d32f2f;
+	}
+
+		.btn-delete:hover {
+			background-color: #c62828;
 		}
 
 	.date-picker-container {

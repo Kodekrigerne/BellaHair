@@ -12,7 +12,9 @@
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
 
-    public record BookingWithRelationsDTO(DateTime StartDateTime,
+    public record BookingWithRelationsDTO(
+        DateTime StartDateTime,
+        bool IsPaid,
         Guid EmployeeId,
         Guid CustomerId,
         Guid TreatmentId,

@@ -30,6 +30,7 @@ namespace BellaHair.Infrastructure.Bookings
 
             return new BookingWithRelationsDTO(
             booking.StartDateTime,
+            booking.IsPaid,
 
             booking.Employee?.Id ?? booking.EmployeeSnapshot?.EmployeeId
                 ?? throw new InvalidOperationException($"Booking {booking.Id} does not have an employee attached."),
