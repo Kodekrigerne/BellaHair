@@ -17,7 +17,7 @@
 
 <Modal @bind-IsVisible="@_showNewModal">
 	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
-	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm/> }
+	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign"/> }
 </Modal>
 
 <PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
@@ -69,6 +69,14 @@
 
 		await UpdateCounts();
 		await HandleLoyaltySelectorClick();
+	}
+
+	private async Task HandleOnCreateCampaign()
+	{
+		_showNewModal = false;
+
+		await UpdateCounts(DiscountTab.Campaign);
+		await HandleCampaignSelectorClick();
 	}
 
 	private async Task HandleLoyaltySelectorClick()
