@@ -12,7 +12,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar;
 
-<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/new"); })" />
+<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/ny"); })" />
 
 <div>
 	<button @onclick="HandleNewSelectorClick" class="@(_activeTab == BookingTab.New? "btn-select-active" : "btn-select")">Kommende bookinger</button>
