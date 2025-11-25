@@ -57,6 +57,7 @@ namespace BellaHair.Infrastructure.Bookings
             // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
             // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
             return bookings.Select(b => new BookingSimpleDTO(
+                b.Id,
                 b.StartDateTime,
                 b.EndDateTime,
                 b.Total,

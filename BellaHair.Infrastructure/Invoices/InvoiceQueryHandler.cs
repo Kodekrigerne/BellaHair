@@ -15,16 +15,18 @@ namespace BellaHair.Infrastructure.Invoices
     public class InvoiceQueryHandler : IInvoiceQuery
     {
         private readonly IJSRuntime _jsRuntime;
-        public InvoiceQueryHandler(IJSRuntime jsRuntime)
+        private readonly InvoiceDocumentDataSource _invoiceDocumentDataSource;
+        public InvoiceQueryHandler(IJSRuntime jsRuntime, InvoiceDocumentDataSource invoiceDocumentDataSource)
         {
             _jsRuntime = jsRuntime;
+            _invoiceDocumentDataSource = invoiceDocumentDataSource;
         }
 
         public async Task CreateAndPrintInvoice(Guid bookingId)
         {
             QuestPDF.Settings.License = LicenseType.Community;
 
-            var model = InvoiceDocumentDataSource.GetInvoiceDetails(bookingId);
+            var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(bookingId);
             var document = new InvoiceDocument(model);
 
             byte[] pdfBytes = document.GeneratePdf();

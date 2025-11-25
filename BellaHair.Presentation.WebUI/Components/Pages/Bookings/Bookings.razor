@@ -66,6 +66,7 @@
 			var bookings = bookingTab == BookingTab.New ? await BookingQuery.GetAllNewAsync() : await BookingQuery.GetAllOldAsync();
 
 			_bookings = bookings.Select(b => new BookingSimpleViewModel(
+				b.Id,
 				b.StartDateTime,
 				b.EndDateTime,
 				DateOnly.FromDateTime(b.StartDateTime),

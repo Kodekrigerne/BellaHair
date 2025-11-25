@@ -14,6 +14,7 @@
     public record DiscountDTO(string Name, decimal DiscountAmount);
 
     public record BookingSimpleDTO(
+        Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
         decimal Total,

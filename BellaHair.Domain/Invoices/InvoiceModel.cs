@@ -1,17 +1,22 @@
-﻿using BellaHair.Domain.Treatments;
+﻿using BellaHair.Domain.Bookings;
 
 namespace BellaHair.Domain.Invoices
 {
     public class InvoiceModel
     {
-        public int InvoiceNumber { get; set; }
+        public InvoiceModel(Guid invoiceNumber, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, string comments)
+        {
+            InvoiceNumber = invoiceNumber;
+            IssueDate = issueDate;
+            Customer = customer;
+            Comments = comments;
+            Treatments.Add(treatment);
+        }
+
+        public Guid InvoiceNumber { get; set; }
         public DateTime IssueDate { get; set; }
-        public DateTime DueDate { get; set; }
-
-        public Address BellaHairAddress { get; set; }
-        public Address CustomerAddress { get; set; }
-
-        public Treatment Treatment { get; set; }
+        public CustomerSnapshot Customer { get; set; }
         public string Comments { get; set; }
+        public List<TreatmentSnapshot> Treatments { get; set; } = [];
     }
 }

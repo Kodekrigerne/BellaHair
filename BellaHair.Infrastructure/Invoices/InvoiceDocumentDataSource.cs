@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Invoices;
-using QuestPDF.Helpers;
 
 // Mikkel Dahlmann
 
@@ -11,53 +11,25 @@ using QuestPDF.Helpers;
 public class InvoiceDocumentDataSource
 {
     private readonly IBookingRepository _bookingRepository;
+    private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
 
-    public InvoiceDocumentDataSource(IBookingRepository bookingRepository)
+    public InvoiceDocumentDataSource(IBookingRepository bookingRepository, ICurrentDateTimeProvider currentDateTimeProvider)
     {
         _bookingRepository = bookingRepository;
+        _currentDateTimeProvider = currentDateTimeProvider;
     }
 
-    public static InvoiceModel GetInvoiceDetails(Guid Id)
+    public async Task<InvoiceModel> GetInvoiceDetailsAsync(Guid Id)
     {
-        var items = Enumerable
-            .Range(1, 8)
-            .Select(i => GenerateRandomOrderItem())
-            .ToList();
+        var booking = await _bookingRepository.GetAsync(Id);
+        var currentDate = _currentDateTimeProvider.GetCurrentDateTime();
 
-        return new InvoiceModel
-        {
-            InvoiceNumber = Random.Next(1_000, 10_000),
-            IssueDate = DateTime.Now,
-            DueDate = DateTime.Now + TimeSpan.FromDays(14),
-
-            SellerAddress = GenerateRandomAddress(),
-            CustomerAddress = GenerateRandomAddress(),
-
-            Items = items,
-            Comments = Placeholders.Paragraph()
-        };
-    }
-
-    private static OrderItem GenerateRandomOrderItem()
-    {
-        return new OrderItem
-        {
-            Name = Placeholders.Label(),
-            Price = (decimal)Math.Round(Random.NextDouble() * 100, 2),
-            Quantity = Random.Next(1, 10)
-        };
-    }
-
-    private static InvoiceAddress GenerateRandomAddress()
-    {
-        return new InvoiceAddress
-        {
-            CompanyName = Placeholders.Name(),
-            Street = Placeholders.Label(),
-            City = Placeholders.Label(),
-            State = Placeholders.Label(),
-            Email = Placeholders.Email(),
-            Phone = Placeholders.PhoneNumber()
-        };
+        return new InvoiceModel(
+            booking.Id,
+            currentDate,
+            booking.CustomerSnapshot!,
+            booking.TreatmentSnapshot!,
+            "Test comment")
+        { };
     }
 }

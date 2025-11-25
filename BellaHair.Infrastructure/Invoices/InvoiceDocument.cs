@@ -40,26 +40,20 @@ public class InvoiceDocument : IDocument
             });
     }
 
-    void ComposeHeader(IContainer container)
+    public void ComposeHeader(IContainer container)
     {
         container.Row(row =>
         {
             row.RelativeItem().Column(column =>
             {
                 column.Item()
-                    .Text($"Invoice #{Model.InvoiceNumber}")
+                    .Text($"Faktura #{Model.InvoiceNumber}")
                     .FontSize(20).SemiBold().FontColor(Colors.Blue.Medium);
 
                 column.Item().Text(text =>
                 {
-                    text.Span("Issue date: ").SemiBold();
+                    text.Span("Betalingsdato: ").SemiBold();
                     text.Span($"{Model.IssueDate:d}");
-                });
-
-                column.Item().Text(text =>
-                {
-                    text.Span("Due date: ").SemiBold();
-                    text.Span($"{Model.DueDate:d}");
                 });
             });
 
@@ -67,7 +61,7 @@ public class InvoiceDocument : IDocument
         });
     }
 
-    void ComposeContent(IContainer container)
+    public void ComposeContent(IContainer container)
     {
         container.PaddingVertical(40).Column(column =>
         {
@@ -75,19 +69,22 @@ public class InvoiceDocument : IDocument
 
             column.Item().Row(row =>
             {
-                row.RelativeItem().Component(new AddressComponent("From", Model.SellerAddress));
+                row.RelativeItem().Component(new CustomerComponent(Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
                 row.ConstantItem(50);
-                row.RelativeItem().Component(new AddressComponent("For", Model.CustomerAddress));
+                row.RelativeItem().Component(new CustomerComponent(Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
             });
 
             column.Item().Element(ComposeTable);
+
+            var totalPrice = Model.Treatments.Sum(x => x.Price * 1);
+            column.Item().AlignRight().Text($"Slut total: {totalPrice:C2}").FontSize(14);
 
             if (!string.IsNullOrWhiteSpace(Model.Comments))
                 column.Item().PaddingTop(25).Element(ComposeComments);
         });
     }
 
-    void ComposeTable(IContainer container)
+    public void ComposeTable(IContainer container)
     {
         container.Table(table =>
         {
@@ -103,9 +100,9 @@ public class InvoiceDocument : IDocument
             table.Header(header =>
             {
                 header.Cell().Element(CellStyle).Text("#");
-                header.Cell().Element(CellStyle).Text("Product");
-                header.Cell().Element(CellStyle).AlignRight().Text("Unit price");
-                header.Cell().Element(CellStyle).AlignRight().Text("Quantity");
+                header.Cell().Element(CellStyle).Text("Service");
+                header.Cell().Element(CellStyle).AlignRight().Text("Pris");
+                header.Cell().Element(CellStyle).AlignRight().Text("Antal");
                 header.Cell().Element(CellStyle).AlignRight().Text("Total");
 
                 static IContainer CellStyle(IContainer container)
@@ -114,13 +111,13 @@ public class InvoiceDocument : IDocument
                 }
             });
 
-            foreach (var item in Model.Items)
+            foreach (var treatment in Model.Treatments)
             {
-                table.Cell().Element(CellStyle).Text(Model.Items.IndexOf(item) + 1);
-                table.Cell().Element(CellStyle).Text(item.Name);
-                table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price}$");
-                table.Cell().Element(CellStyle).AlignRight().Text(item.Quantity);
-                table.Cell().Element(CellStyle).AlignRight().Text($"{item.Price * item.Quantity}$");
+                table.Cell().Element(CellStyle).Text((Model.Treatments.IndexOf(treatment) + 1).ToString());
+                table.Cell().Element(CellStyle).Text(treatment.Name);
+                table.Cell().Element(CellStyle).AlignRight().Text($"{treatment.Price}");
+                table.Cell().Element(CellStyle).AlignRight().Text("1");
+                table.Cell().Element(CellStyle).AlignRight().Text($"{treatment.Price * 1:C2}");
 
                 static IContainer CellStyle(IContainer container)
                 {
@@ -130,12 +127,12 @@ public class InvoiceDocument : IDocument
         });
     }
 
-    void ComposeComments(IContainer container)
+    public void ComposeComments(IContainer container)
     {
         container.Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
         {
             column.Spacing(5);
-            column.Item().Text("Comments").FontSize(14);
+            column.Item().Text("Kommentarer").FontSize(14);
             column.Item().Text(Model.Comments);
         });
     }
