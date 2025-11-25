@@ -1,7 +1,9 @@
 ﻿@using System.Globalization
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
 
-<div class="bc-container">
+@inject NavigationManager NavigationManager;
+
+<button class="bc-container" @onclick="HandleBookingClick">
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>
@@ -44,11 +46,16 @@
 			</div>
 		}
 	</div>
-</div>
+</button>
 
 @code {
 	[Parameter, EditorRequired]
 	public required BookingSimpleViewModel Booking { get; set; }
+
+	private void HandleBookingClick()
+	{
+		NavigationManager.NavigateTo($"/booking/{Booking.Id}");
+	}
 }
 
 <style>
@@ -60,6 +67,8 @@
 		background: #fff;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 		transition: box-shadow 0.2s ease;
+		display: block;
+		width: 100%;
 	}
 
 		.bc-container:hover {

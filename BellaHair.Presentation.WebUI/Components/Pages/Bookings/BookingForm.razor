@@ -226,6 +226,7 @@
 		{
 			var booking = await BookingQuery.GetWithRelationsAsync(new GetWithRelationsQuery(Id!.Value));
 			_startDate = booking.StartDateTime.Date;
+			_startTime = booking.StartDateTime.TimeOfDay;
 
 			if (booking.Discount != null) {
 			_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
@@ -407,6 +408,8 @@
 
 	private void HandleChangeCustomerClick()
 	{
+		if (Mode == BookingMode.Edit || Mode == BookingMode.View) return;
+
 		_customer = null;
 		_treatment = null;
 		_employee = null;
@@ -421,6 +424,8 @@
 
 	private void HandleChangeTreatmentClick()
 	{
+		if (Mode == BookingMode.View) return;
+
 		_treatment = null;
 		_employee = null;
 		_startDate = null;
@@ -434,6 +439,8 @@
 
 	private void HandleChangeEmployeeClick()
 	{
+		if (Mode == BookingMode.View) return;
+
 		_employee = null;
 		_startDate = null;
 		_startTime = null;
@@ -446,6 +453,8 @@
 
 	private void HandleChangeTimeClick()
 	{
+		if (Mode == BookingMode.View) return;
+
 		_startDate = null;
 		_startDate = null;
 		_timeIsAvailable = null;
