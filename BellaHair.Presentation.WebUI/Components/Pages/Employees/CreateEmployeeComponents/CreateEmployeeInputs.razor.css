@@ -15,7 +15,7 @@
         margin-right: 10px;
     }
 
-    .employee-input input {
+    .employee-input ::deep input {
         border: 1px solid #ccc;
         border-radius: 4px;
         padding: 4px;

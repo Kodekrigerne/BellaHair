@@ -30,7 +30,7 @@
 
 		</div>
 		<div>
-		<CreateEmployeeTreatmentSelector SelectedTreatmentIds="SelectedTreatmentIds" _treatments="_treatments"/>
+			<CreateEmployeeTreatmentSelector @bind-Value="SelectedTreatmentIds" Treatments="_treatments" />
 
 			Valgt: @SelectedTreatmentIds.Count() behandlinger
 		</div>

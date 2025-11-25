@@ -111,3 +111,7 @@
     margin-bottom: 1rem;
 
 }
+
+::deep .edit-button-employee {
+    
+}
