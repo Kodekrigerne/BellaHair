@@ -10,7 +10,7 @@ namespace BellaHair.Ports.Employees
     // Linnea
     public interface IEmployeeQuery
     {
-        Task<List<EmployeeDTO>> GetAllEmployeesSimpleAsync();
+        Task<List<EmployeeDTOFull>> GetAllEmployeesAsync();
         Task<List<EmployeeNameWithBookingsDTO>> GetHasTreatmentAndWithFutureBookingsAsync(Guid treatmentId);
         Task<EmployeeDTOFull> GetEmployeeAsync(GetEmployeeByIdQuery query);
         Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query);
@@ -27,7 +27,7 @@ namespace BellaHair.Ports.Employees
     /// Represents a data transfer object containing all information about an employee, including personal
     /// details, contact information, address, and associated treatments.
     /// </summary>
-    public record EmployeeDTOFull(Guid Id, string FirstName, string MiddleName, string LastName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, List<TreatmentDTO> Treatments, int? Floor = null);
+    public record EmployeeDTOFull(Guid Id, string FirstName, string MiddleName, string LastName, string FullName, string Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, string FullAddress, List<TreatmentDTO> Treatments, int? Floor = null);
 
     public record GetEmployeeByIdQuery(Guid Id);
 

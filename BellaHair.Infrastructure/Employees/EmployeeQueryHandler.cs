@@ -1,4 +1,6 @@
 ﻿using BellaHair.Domain;
+using BellaHair.Domain.Employees;
+using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Employees;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
@@ -36,12 +38,31 @@ namespace BellaHair.Infrastructure.Employees
         }
 
         // Henter alle medarbejdere med færre detaljer til overblikket
-        async Task<List<EmployeeDTO>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
+        async Task<List<EmployeeDTOFull>> IEmployeeQuery.GetAllEmployeesAsync()
         {
             var emp = await _db.Employees
                 .AsNoTracking()
-                .Select(x => new EmployeeDTO(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Address.FullAddress, x.Treatments.Select(x => x.Name).ToList()))
-                .ToListAsync();
+                .Select(employee => new EmployeeDTOFull(employee.Id,
+                                                        employee.Name.FirstName,
+                                                        employee.Name.MiddleName ?? "",
+                                                        employee.Name.LastName,
+                                                        employee.Name.FullName,
+                                                        employee.Email.Value,
+                                                        employee.PhoneNumber.Value,
+                                                        employee.Address.StreetName,
+                                                        employee.Address.City,
+                                                        employee.Address.StreetNumber,
+                                                        employee.Address.ZipCode,
+                                                        employee.Address.FullAddress,
+                                                            employee.Treatments.Select(e => new TreatmentDTO(
+                                                                e.Id,
+                                                                e.Name,
+                                                                e.Price.Value,
+                                                                e.DurationMinutes.Value,
+                                                                e.Employees.Count)).ToList(),
+
+                                                        employee.Address.Floor))
+                                                        .ToListAsync();
 
             return emp;
         }
@@ -72,12 +93,14 @@ namespace BellaHair.Infrastructure.Employees
                 employee.Name.FirstName,
                 employee.Name.MiddleName ?? "",
                 employee.Name.LastName,
+                employee.Name.FullName,
                 employee.Email.Value,
                 employee.PhoneNumber.Value,
                 employee.Address.StreetName,
                 employee.Address.City,
                 employee.Address.StreetNumber,
                 employee.Address.ZipCode,
+                employee.Address.FullAddress,
                 treatments,
                 employee.Address.Floor);
         }

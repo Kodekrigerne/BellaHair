@@ -1,5 +1,6 @@
 ﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents;
 @inject IEmployeeCommand EmployeeCommand
 @inject IEmployeeQuery EmployeeQuery
 @inject ISnackbar SnackBar
@@ -11,7 +12,7 @@
 			@* Hvis medarbejderen har fremtidige bookinger, vises dette. *@
 			@if (_futureBookings)
 			{
-				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @employeeFullViewModel.Name har fremtidige bookinger.
+				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @Employee.FullName har fremtidige bookinger.
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
 			<button class="btn-add" onclick="@CloseModal">Annuller</button>
@@ -21,7 +22,7 @@
 			else
 			{
 
-				<h4>Slet: @employeeFullViewModel.Name?</h4>
+				<h4>Slet: @Employee.FullName?</h4>
 
 				<p style="max-width: 22rem; text-align: center;">	Er du sikker på, at du vil slette denne medarbejder?
 																	Denne handling kan ikke fortrydes.						</p>
@@ -36,7 +37,7 @@
 
 	<Modal @bind-IsVisible="@showEditModal">
 
-		<BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents.UpdateEmployeeForm EmployeeToUpdate="@employeeFullViewModel"/>
+		<UpdateEmployeeForm EmployeeToUpdate="@Employee" OnCancel="HandleCancel" OnUpdate="HandleUpdate"/>
 	
 	</Modal>
 
@@ -44,25 +45,25 @@
 		<div class="employee-card">														@*Contains the entire singular employee card layout*@
 						
 				<div class="employee-avatar">											@*Contains the avatar with intials*@
-					@GetEmployeeInitials(employeeFullViewModel.Name)
+					@GetEmployeeInitials(Employee.FullName)
 				</div>
 					<div>																@*Positions other info to position next to avatar*@
-					<h3>@employeeFullViewModel.Name</h3>
+					<h3>@Employee.FullName</h3>
 
 						<div class="employee-contact-details">
 							<div class="employee-single-contact-detail">
 								<MailIcon Class="employee-icons" />
-									@employeeFullViewModel.Email
+									@Employee.Email
 								</div>
 
 							<div class="employee-single-contact-detail">
 								<PhoneIcon Class="employee-icons"/>
-									@employeeFullViewModel.PhoneNumber
+									@Employee.PhoneNumber
 							</div>
 
 							<div class="employee-single-contact-detail"> 
 								<MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="employee-icons" />
-									@employeeFullViewModel.Address
+									@Employee.FullAddress
 							</div>
 						</div>
 			<div class="delete-button">
@@ -71,7 +72,7 @@
 						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
 			</div>
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in employeeFullViewModel.TreatmentNames)
+						@foreach (var treatment in Employee.TreatmentNames)
 							{															
 								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
 							}
@@ -91,7 +92,7 @@
 
 
 	[Parameter, EditorRequired]
-	public required EmployeellViewModel employeeFullViewModel { get; set; }
+	public required EmployeeViewModel Employee { get; set; }
 
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnDelete { get; set; }
@@ -115,24 +116,29 @@
 		await OnChange.InvokeAsync();
 	}
 
+	private void HandleCancel()
+	{
+		CloseModal();
+		SnackBar.Add("Handlingen blev afbrudt.", Severity.Warning);
+	}
 
 	// Viser modalen og tjekker, om der er fremtidige bookinger.
 	private async Task HandleOnDeleteClick()
 	{
 		_showDeleteModal = true;
-		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeFullViewModel.Id);
+		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(Employee.Id);
 	}
 
 	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.
 	private async Task HandleOnDeleteConfirm()
 	{
-		var command = new DeleteEmployeeCommand(employeeFullViewModel.Id);
+		var command = new DeleteEmployeeCommand(Employee.Id);
 		try
 		{
 			await EmployeeCommand.DeleteEmployeeCommand(command);
 			CloseModal();
 			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
-			await OnDelete.InvokeAsync(employeeFullViewModel.Id);
+			await OnDelete.InvokeAsync(Employee.Id);
 		}
 
 		catch (Exception e)
