@@ -30,8 +30,6 @@ namespace BellaHair.Application.Employees
         {
             var employeeToUpdate = await _employeeRepo.GetWithTreatmentsAsync(command.Id);
 
-            var selectedTreatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
-
             var updatedName = Name.FromStrings(
                 command.FirstName,
                 command.LastName,
@@ -44,28 +42,17 @@ namespace BellaHair.Application.Employees
                 command.ZipCode,
                 command.Floor);
 
+            var updatedTreatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
+
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
-
-            foreach (var treatment in selectedTreatments)
-            {
-                employeeToUpdate.AssignTreatment(treatment);
-            }
-
-            var toRemove = employeeToUpdate.Treatments
-                .Where(current => !selectedTreatments.Any(selected => selected.Id == current.Id))
-                .ToList();
-
-            foreach (var treatment in toRemove)
-            {
-                employeeToUpdate.RevokeTreatment(treatment);
-            }
 
             employeeToUpdate.Update(
                 updatedName,
                 updatedEmail,
                 updatedPhoneNumber,
-                updatedAddress);
+                updatedAddress,
+                updatedTreatments);
 
             await _employeeRepo.SaveChangesAsync();
         }
