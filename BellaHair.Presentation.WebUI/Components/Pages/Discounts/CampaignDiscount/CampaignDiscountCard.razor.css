@@ -14,8 +14,8 @@
     padding: 8px;
     background-color: #e9ecf1;
     color: #1d294f;
-    font-weight:bold;
-    border-radius:10px;
+    font-weight: bold;
+    border-radius: 10px;
 }
 
     .btn-offer:hover{
@@ -23,51 +23,51 @@
     }
 
     .discount-duration{
-        margin:0px;
-        font-size:12px;
-        color:grey;
+        margin: 0px;
+        font-size: 12px;
+        color: grey;
 
     }
 
     .p-header{
-        font-weight:bold;
-        font-size:16px;
-        margin-bottom:2px;
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 2px;
     }
 
     .p-txt{
-     margin:8px;
+     margin: 8px;
     }
 
     .t-wrapper{
-        margin:6px;
-        display:flex;
-        gap:10px;
-        margin-bottom:10px;
+        margin: 6px;
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
     }
 
     hr{
-        margin-top:6px;
-        margin-bottom:4px;
+        margin-top: 6px;
+        margin-bottom: 4px;
     }
 
     .header-wrapper{
         display: flex;
-        gap:10px;
-        vertical-align:middle;
+        gap: 10px;
+        vertical-align: middle;
         
     }
 
 .percent-wrapper {
-    vertical-align:middle;
+    vertical-align: middle;
     background-color: #920dfc;
     color: white;
     padding: 2px 8px 3px 8px;
     border-radius: 8px;
-    font-size:12px;
-    display:flex;
+    font-size: 12px;
+    display: flex;
     font-weight: bold;
-    margin-bottom:6px;
+    margin-bottom: 6px;
 }
 
 .icon-wrap{
@@ -81,16 +81,16 @@
 }
 
 .btn-wrapper{
-    display:flex;
-    gap:10px;
-    margin-top:20px;
-    justify-content:center;
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
 }
 
 .active-wrapper{
-    display:flex;
-    margin-left:auto;
-    margin-top:auto;
+    display: flex;
+    margin-left: auto;
+    margin-top: auto;
 
 }
 
@@ -100,9 +100,9 @@
     padding: 0px 10px 0px 10px;
     border-radius: 14px;
     font-size: 10px;
-    cursor:default;
-    height:20px;
-    width:50px;
+    cursor: default;
+    height: 20px;
+    width: 50px;
 }
 
 .btn-active {
@@ -111,4 +111,10 @@
 
 .btn-inactive{
     background-color: #fa4444
+}
+
+::deep .bin-delete-btn{
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
 }
