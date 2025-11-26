@@ -9,6 +9,7 @@
         Task<BookingWithRelationsDTO> GetWithRelationsAsync(GetWithRelationsQuery query);
         Task<IEnumerable<BookingDTO>> GetAllNewAsync();
         Task<IEnumerable<BookingDTO>> GetAllOldAsync();
+        Task<IEnumerable<BookingDTO>> GetAllWithinPeriodOnEmployee(DateTime startDateTime, DateTime endDateTime, Guid employeeId);
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
 

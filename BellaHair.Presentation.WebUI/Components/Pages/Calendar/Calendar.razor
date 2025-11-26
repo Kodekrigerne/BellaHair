@@ -1,24 +1,78 @@
 ﻿@page "/kalender"
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
+@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees
+@inject IBookingQuery BookingQuery
+@inject IEmployeeQuery EmployeeQuery
+@inject ISnackbar Snackbar
 
 <h3>Kalender</h3>
 
 <p>Vælg den medarbejder, du vil se kalenderen for.</p>
 
+<select @
+
 <Radzen.Blazor.RadzenScheduler @href="scheduler"
-								Data="@bookings"
-								>
+								Data="@_bookings"
+							   TItem="BookingCalendarViewModel"
+							   StartProperty="StartTime"
+							   EndProperty="EndTime">
 
 </Radzen.Blazor.RadzenScheduler>
 
-@code {
-	List<BookingSimpleViewModel> bookings {get; set; } 
+	@code {
+		public List<BookingCalendarViewModel> _bookings {get; set; } 
+		public List<EmployeeNameViewModel> _employees { get; set; }
 
-    protected override void OnInitialized()
-    {
-        // Get the current date to create test data relative to today
-        var today = DateTime.Today;
+		public EmployeeNameViewModel _pickedEmployee { get; set; }
+		public DateTime _pickedStartDateTime { get; set; }
+		public DateTime _pickedEndDateTime { get; set; }
 
 
-    }
+		protected async override Task OnInitializedAsync()
+		{
+			await LoadEmployees();
+			await PickEmployee();
+			await LoadBookings(_pickedStartDateTime, _pickedEndDateTime, _pickedEmployee.Id);
+		}
+
+		private async Task LoadEmployees()
+		{
+			var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
+			_employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.Name)).OrderBy(e => e.FullName).ToList();
+		}
+
+		private async Task InitialPickEmployeeAndDates()
+		{
+			_pickedEmployee = _employees.First();
+			_pickedStartDateTime = IDat½eTimeProvider.GetCurrentDateTime();
+			_pickedEndDateTime = IDat½eTimeProvider.GetCurrentDateTime();
+		}
+
+	private async Task LoadBookings(DateTime pickedStartDate, DateTime pickedEndDate, Guid pickedEmployeeId)
+	{
+		try
+		{
+			var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(pickedStartDate, pickedEndDate, pickedEmployeeId);
+
+			_bookings = bookings.Select(b => new BookingCalendarViewModel(
+				b.Id,
+				b.StartDateTime,
+				b.EndDateTime,
+				DateOnly.FromDateTime(b.StartDateTime),
+				TimeOnly.FromDateTime(b.StartDateTime),
+				TimeOnly.FromDateTime(b.EndDateTime),
+				b.EmployeeFullName,
+				b.CustomerFullName,
+				b.TreatmentName,
+				b.DurationMinutes
+			)).OrderBy(b => b.StartDateTime).ToList();
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+	}
+
 }

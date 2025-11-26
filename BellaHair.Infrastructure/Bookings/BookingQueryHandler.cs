@@ -106,5 +106,15 @@ namespace BellaHair.Infrastructure.Bookings
                 b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount) : null
                 ));
         }
+
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllWithinPeriodOnEmployee(DateTime startDate, DateTime endDate, Guid employeeId)
+        {
+            var bookings = await _db.Bookings.AsNoTracking().Where(b => b.StartDateTime.Date >= startDate.Date && b.EndDateTime.Date <= endDate.Date && b.Employee.Id == employeeId).Include(b => b.Treatment)
+                .Include(b => b.Customer)
+                .Include(b => b.Employee)
+                .ToListAsync();
+
+            return MapToBookingDTOs(bookings);
+        }
     }
 }

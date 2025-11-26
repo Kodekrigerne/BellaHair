@@ -15,6 +15,19 @@
         string? DiscountName,
         decimal? DiscountAmount);
 
+    public record BookingCalendarViewModel(
+        Guid Id,
+        DateTime StartDateTime,
+        DateTime EndDateTime,
+        DateOnly Date,
+        TimeOnly StartTime,
+        TimeOnly EndTime,
+        string EmployeeFullName,
+        string CustomerFullName,
+        string TreatmentName,
+        int DurationMinutes
+        );
+        
     public record BookingTimesOnlyViewModel(DateTime StartDateTime, DateTime EndDateTime);
 
     public record BookingDiscountViewModel(string Name, decimal Amount);
