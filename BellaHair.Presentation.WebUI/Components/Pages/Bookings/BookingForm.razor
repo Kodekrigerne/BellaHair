@@ -514,7 +514,7 @@
 		try
 		{
 			var startDateTime = _startDate.Value.Add(_startTime.Value);
-			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
+			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
