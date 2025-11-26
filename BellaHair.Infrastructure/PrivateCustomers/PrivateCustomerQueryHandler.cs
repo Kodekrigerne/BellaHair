@@ -14,17 +14,43 @@ namespace BellaHair.Infrastructure.PrivateCustomers
     {
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public PrivateCustomerQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider)
+        public PrivateCustomerQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider, ICustomerVisitsService customerVisitsService)
         {
             _db = db;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _customerVisitsService = customerVisitsService;
+        }
+
+        async Task<PrivateCustomerDTO> IPrivateCustomerQuery.GetPrivateCustomerAsync(GetPrivateCustomerQuery query)
+        {
+            var visits = await _customerVisitsService.GetCustomerVisitsAsync(query.Id);
+
+            return await _db.PrivateCustomers
+                .AsNoTracking()
+                .Where(c => c.Id == query.Id)
+                .Select(c => new PrivateCustomerDTO(
+                        c.Id,
+                        c.Name.FirstName,
+                        c.Name.MiddleName,
+                        c.Name.LastName,
+                        c.Name.FullName,
+                        c.Address.StreetName,
+                        c.Address.City,
+                        c.Address.StreetNumber,
+                        c.Address.ZipCode,
+                        c.Address.Floor,
+                        c.Address.FullAddress,
+                        c.PhoneNumber.Value,
+                        c.Email.Value,
+                        c.Birthday,
+                        visits))
+                .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Customer {query.Id} not found.");
         }
 
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-
             var customers = await _db.PrivateCustomers.AsNoTracking()
                 .ToListAsync();
 
@@ -32,7 +58,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
             foreach (var customer in customers)
             {
-                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == customer.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+                var visits = await _customerVisitsService.GetCustomerVisitsAsync(customer.Id);
 
                 pclist.Add(new PrivateCustomerDTO(
                         customer.Id,

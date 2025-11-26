@@ -1,14 +1,4 @@
-﻿using BellaHair.Domain.Employees;
-using BellaHair.Infrastructure.Employees;
-using BellaHair.Ports.Employees;
-using BellaHair.Application.Employees;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Treatments;
-using BellaHair.Infrastructure.Treatments;
+﻿using BellaHair.Ports.Employees;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -45,6 +35,4 @@ namespace BellaHair.Application.Tests.Employees
             });
         }
     }
-
 }
-

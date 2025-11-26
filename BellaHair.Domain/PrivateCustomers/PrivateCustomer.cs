@@ -54,7 +54,12 @@ namespace BellaHair.Domain.PrivateCustomers
 
         //Ville være mere clean hvis den tog list bookings og ICurrentDateTimeProvider
         //Men så skal vi loade alle bookings ud af DB "bare" for at få dette tal
-        public void SetVisits(int visits) => Visits = visits;
+        public void SetVisits(int visits)
+        {
+            if (visits < 0) throw new PrivateCustomerException("Antal besøg kan ikke være et negativt tal.");
+
+            Visits = visits;
+        }
 
         // Kunden skal minimum være 18 år gammel
         private static void ValidateBirthday(DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)

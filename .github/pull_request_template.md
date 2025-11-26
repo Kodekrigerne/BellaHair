@@ -1,24 +1,6 @@
 - [ ] Navngivning
-    - Klasser
-    - Records
-    - Interface
-    - Properties
-    - Fields
-    - Metodenavne
-    - Metodeparametre
-    - Primære constructors på klasser
-    - Primære constructors på records
 
 - [ ] Placering
-    - Entiteter
-    - Repository interfaces
-    - Repository implementeringer
-    - CommandHandler interfaces
-    - CommandHandler implementeringer
-    - QueryHandler interfaces
-    - QueryHandler implementeringer
-    - Commands
-    - Queries
 
 - [ ] Blazor
     - Er lokale (bruges kun i en enkelt komponent) css klasser i komponentens egen css fil?

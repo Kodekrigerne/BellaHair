@@ -9,8 +9,11 @@
     public interface IPrivateCustomerQuery
     {
         Task<List<PrivateCustomerDTO>> GetPrivateCustomersAsync();
+        Task<PrivateCustomerDTO> GetPrivateCustomerAsync(GetPrivateCustomerQuery query);
         Task<bool> PCFutureBookingsCheck(Guid id);
     }
+
+    public record GetPrivateCustomerQuery(Guid Id);
 
     public record PrivateCustomerDTO(
         Guid Id,

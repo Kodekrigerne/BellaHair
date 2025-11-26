@@ -19,7 +19,11 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            var booking = Fixture.New<Booking>().With(b => b.Employee, employee).With(b => b.Treatment, treatment).With(b => b.Customer, customer).With(b => b.IsPaid, false).Build();
+            var booking = Fixture.New<Booking>()
+                .With(b => b.Employee, employee)
+                .With(b => b.Treatment, treatment)
+                .With(b => b.Customer, customer)
+                .With(b => b.IsPaid, false).Build();
 
             //Act
             booking.PayBooking(dateTimeProvider.Object);
