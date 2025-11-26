@@ -38,7 +38,6 @@
 
 
 @code {
-
     [Parameter, EditorRequired]
     public required EventCallback OnUpdate { get; set; }
 
@@ -74,7 +73,7 @@
 
     private void InitializeViewModel()
     {
-        MapDtoToModel();
+        MapViewModeltoNewModel();
         editContext = new EditContext(EmployeeModel);
         editContext.OnFieldChanged += HandleFieldChanged!;
         InputHasChanged = false;
@@ -94,7 +93,7 @@
 
     private void HandleReset()
     {
-        SelectedTreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList();
+        SelectedTreatmentIds = EmployeeToUpdate!.Treatments.Select(t => t.Id).ToList();
         InitializeViewModel();
         StateHasChanged();
     }
@@ -138,7 +137,7 @@
 
     }
 
-    private void MapDtoToModel()
+    private void MapViewModeltoNewModel()
     {
         EmployeeModel!.Id = EmployeeToUpdate!.Id;
         EmployeeModel.FirstName = EmployeeToUpdate.FirstName;
