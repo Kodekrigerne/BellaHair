@@ -11,7 +11,7 @@
     flex-wrap: wrap;
     display: flex;
     gap: 1rem;
-    flex: 0 0 calc(50% - 1rem); /*  '0' (flex-grow): Må IKKE vokse. Forhindrer det sidste i
+    flex: 0 0 calc(50% - 0.5rem); /*  '0' (flex-grow): Må IKKE vokse. Forhindrer det sidste i
                                        at strække sig og fylde hele rækken, hvis antallet er ulige.
                                        '0' (flex-shrink): Må IKKE krympe. Beholder sin bredde.
                                         'calc(50% - 0.5rem)': Sætter bredden til PRÆCIS 50% af
@@ -19,11 +19,6 @@
     position: relative;
 }
 
-    /* Makes employee-card look clickable */
-    .employee-card:hover {
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.25);
-        cursor: pointer;
-    }
 
 /* Used to generate the round employee-avatar with purple gradient */
 .employee-avatar {
