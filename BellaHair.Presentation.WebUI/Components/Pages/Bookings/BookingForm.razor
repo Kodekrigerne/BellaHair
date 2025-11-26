@@ -256,7 +256,7 @@
 		}
 
 		if (Mode == BookingMode.New) await HandlePickCustomerClick();
-		else if (Mode == BookingMode.View) await LoadBooking();
+		else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
 	}
 
 	private async Task LoadBooking()
