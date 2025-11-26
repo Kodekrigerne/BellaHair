@@ -21,14 +21,23 @@
 	<hr/>
 	<p class="p-txt">Gælder for behandlinger:</p>
 	<div class="t-wrapper">
-		@foreach (var id in CampaignDiscount.Treatments)
+		@foreach (var campaign in CampaignDiscount.Treatments)
 		{
 			<button class="btn-offer">
-				@id.Name
+				@campaign.Name
 			</button>
 		}
+		<div class="active-wrapper">
+			
+			@if (CampaignDiscount.StartDate < DateTime.Now && CampaignDiscount.EndDate > DateTime.Now) _isActive = true;
+			else _isActive = false;
+			<button class="@(_isActive ? "btn-active" : "btn-inactive")">
+				@(_isActive ? "Aktiv" : "Inaktiv")
+			</button>
+		</div>
 	</div>
 	<BinDeleteButton OnClick="@(() => { _showConfirmDelete = true; })" />
+
 </div>
 
 <Modal @bind-IsVisible="@_showConfirmDelete">
@@ -57,6 +66,7 @@
 	public required EventCallback<Guid> OnDelete { get; set; }
 
 	private bool _showConfirmDelete = false;
+	private bool _isActive;
 
 	private async Task HandleOnDeleteClick()
 	{
