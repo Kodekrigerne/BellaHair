@@ -8,6 +8,9 @@ namespace BellaHair.Domain.Tests.Discounts
 {
     internal sealed class CampaignDiscountTests
     {
-        public void Given_
+        public void Given_ValidCampaignDiscount_Then_CreatesCampaignDiscount()
+        {
+
+        }
     }
 }
