@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
+using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
@@ -54,7 +55,6 @@ namespace BellaHair.Application
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
-
             if (discount != null) booking.SetDiscount(discount, _currentDateTimeProvider);
 
             await _bookingRepository.AddAsync(booking);
@@ -76,8 +76,11 @@ namespace BellaHair.Application
         {
             var booking = await _bookingRepository.GetAsync(command.Id);
 
-            var discount = await _discountCalculatorService.GetBestDiscount(booking);
-            if (discount != null) booking.SetDiscount(discount, _currentDateTimeProvider);
+            if (command.Discount != null)
+            {
+                var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount);
+                booking.SetDiscount(discount, _currentDateTimeProvider);
+            }
 
             booking.PayBooking(_currentDateTimeProvider);
             await _bookingRepository.SaveChangesAsync();
@@ -90,7 +93,16 @@ namespace BellaHair.Application
             var employee = await _employeeRepository.GetWithTreatmentsAsync(command.EmployeeId);
             var treatment = await _treatmentRepository.GetAsync(command.TreatmentId);
 
-            //TODO: Overlap check
+            if (await _bookingOverlapChecker.OverlapsWithBooking(
+                command.StartDateTime,
+                treatment.DurationMinutes.Value,
+                command.EmployeeId,
+                booking.Customer!.Id))
+                throw new DomainException("Kan ikke oprette booking som overlapper med eksisterende booking.");
+
+            //Den bedste rabat findes og tilføjes til bookingen
+            var discount = await _discountCalculatorService.GetBestDiscount(booking);
+            if (discount != null) booking.SetDiscount(discount, _currentDateTimeProvider);
 
             booking.Update(command.StartDateTime, employee, treatment, _currentDateTimeProvider);
 

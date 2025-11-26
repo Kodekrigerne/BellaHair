@@ -542,7 +542,7 @@
 
 		try
 		{
-			var command = new PayBookingCommand(Id.Value);
+			var command = new PayBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount));
 			await BookingCommand.PayBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
 			await LoadBooking();
