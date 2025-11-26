@@ -11,7 +11,7 @@
 	<p>@LoyaltyDiscount.Name</p>
 	<p class="ldc-visits">Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
 	<p>Rabat: @((LoyaltyDiscount.DiscountPercent * 100).ToString("0"))%</p>
-	<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
+	<BinDeleteButton Class="delete-btn" OnClick="@HandleOnDeleteClick"/>
 </div>
 
 @code {
@@ -50,5 +50,11 @@
 
 	.ldc-visits {
 		color: oklch(.446 .03 256.802); /* grey-600 */
+	}
+
+	.delete-btn {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
 	}
 </style>

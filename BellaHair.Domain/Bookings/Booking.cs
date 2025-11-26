@@ -37,9 +37,7 @@ namespace BellaHair.Domain.Bookings
         private decimal? _total;
         public decimal Total => IsPaid ? _total!.Value : CalculateTotal();
 
-#pragma warning disable CS8618
         private Booking() { }
-#pragma warning restore CS8618
 
         private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
         {
@@ -62,13 +60,9 @@ namespace BellaHair.Domain.Bookings
             var currentDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
             if (startDateTime < currentDateTime)
-                throw new BookingException($"Cannot create past bookings {startDateTime}.");
+                throw new BookingException($"Kan ikke oprette booking med fortidig startdato og tidspunkt {startDateTime}.");
 
-            if (employee.Treatments == null)
-                throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
-
-            if (!employee.Treatments.Any(t => t.Id == treatment.Id))
-                throw new BookingException($"Employee {employee.Name.FullName} does not offer treatment {treatment.Name}.");
+            ValidateEmployeeTreatment(employee, treatment);
 
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
@@ -78,7 +72,7 @@ namespace BellaHair.Domain.Bookings
             if (Employee == null || Customer == null || Treatment == null)
                 throw new InvalidOperationException("all booking relations must be populated when calling PayBooking.");
 
-            if (IsPaid == true) throw new BookingException("Cannot pay a booking that has already been paid");
+            if (IsPaid == true) throw new BookingException("Kan ikke betale en booking som allerede er betalt.");
 
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
@@ -106,10 +100,48 @@ namespace BellaHair.Domain.Bookings
             EndDateTime = StartDateTime.AddMinutes(Treatment.DurationMinutes.Value);
         }
 
-        public void SetDiscount(BookingDiscount discount)
+        public void SetDiscount(BookingDiscount discount, ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            if (IsPaid) throw new BookingException("Cannot set the discount on a paid booking");
+            var now = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
+
             Discount = discount;
+        }
+
+        public void ValidateDelete(ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            var now = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (IsPaid) throw new BookingException("Kan ikke slette en betalt ordre.");
+            if (StartDateTime < now && StartDateTime.Date == now.Date)
+                throw new BookingException("Afviklede bookinger kan først slettes dagen efter hvis ikke betalt.");
+        }
+
+        public void Update(DateTime startDateTime, Employee employee, Treatment treatment, ICurrentDateTimeProvider currentDateTimeProvider)
+        {
+            var now = currentDateTimeProvider.GetCurrentDateTime();
+
+            if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
+            if (StartDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
+            if (startDateTime < now) throw new BookingException("Kan ikke opdatere en booking med en starttid i fortiden");
+
+            ValidateEmployeeTreatment(employee, treatment);
+
+            StartDateTime = startDateTime;
+            Employee = employee;
+            Treatment = treatment;
+
+            UpdateEndDateTime();
+        }
+
+        private static void ValidateEmployeeTreatment(Employee employee, Treatment treatment)
+        {
+            if (employee.Treatments == null)
+                throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
+
+            if (!employee.Treatments.Any(t => t.Id == treatment.Id))
+                throw new BookingException($"Medarbejder {employee.Name.FullName} udbyder ikke behandling {treatment.Name}.");
         }
     }
 
