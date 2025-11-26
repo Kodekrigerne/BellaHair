@@ -62,9 +62,9 @@ namespace BellaHair.Infrastructure
                 .HasColumnName("Total")
                 .IsRequired(false);
 
-            modelBuilder.Entity<Employee>()
-                .Navigation(e => e.Treatments)
-                .UsePropertyAccessMode(PropertyAccessMode.Field);
+            //modelBuilder.Entity<Employee>()
+            //    .Navigation(e => e.Treatments)
+            //    .UsePropertyAccessMode(PropertyAccessMode.Field);
 
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
@@ -74,8 +74,8 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.PhoneNumber);
             modelBuilder.Entity<Employee>().ComplexProperty(e => e.Address);
             modelBuilder.Entity<Employee>()
-                            .HasMany(e => e.Treatments)
-                            .WithMany(t => t.Employees);
+                                           .HasMany(e => e.Treatments)
+                                           .WithMany(t => t.Employees);
 
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Name);
             modelBuilder.Entity<PrivateCustomer>().ComplexProperty(p => p.Email);
