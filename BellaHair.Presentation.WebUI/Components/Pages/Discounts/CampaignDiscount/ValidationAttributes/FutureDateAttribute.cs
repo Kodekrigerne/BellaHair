@@ -9,9 +9,9 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Discounts.CampaignDiscou
         {
             if (input is DateTime dateTimeValue)
             {
-                if (dateTimeValue < DateTime.Now)
+                if (dateTimeValue < DateTime.Now.AddDays(-1))
                 {
-                    return new ValidationResult("Datoen skal være i fremtiden.", [validationContext.MemberName!]);
+                    return new ValidationResult("Startdato kan tidligst være i dag.", [validationContext.MemberName!]);
                 }
             }
             return ValidationResult.Success;

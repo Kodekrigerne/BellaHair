@@ -17,7 +17,7 @@
 
 <Modal IsVisible="@_showNewModal">
 	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
-	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign"/> }
+	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign" OnCancel="HandleOnCancel"/> }
 </Modal>
 
 <PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>

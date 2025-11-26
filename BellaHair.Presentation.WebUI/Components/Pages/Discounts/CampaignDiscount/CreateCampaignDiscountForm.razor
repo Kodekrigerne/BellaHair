@@ -97,6 +97,8 @@
 
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
+
+	[Parameter, EditorRequired]
 	public required EventCallback OnCancel { get; set; }
 
 	private List<TreatmentViewModel> Treatments { get; set; } = [];
