@@ -27,10 +27,10 @@ namespace BellaHair.Domain.Discounts
 
         private CampaignDiscount(string discountName, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatments)
         {
+            var treatmentList = treatments.ToList();
+
             if (endDate < startDate)
                 throw new CampaignDiscountException("Startdato skal være før slutdato.");
-
-            var treatmentList = treatments.ToList();
 
             if (treatmentList.Count == 0)
                 throw new CampaignDiscountException("Kampagnerabatten skal gælde for mindst én behandling.");
