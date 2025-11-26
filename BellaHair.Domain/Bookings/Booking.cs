@@ -98,10 +98,8 @@ namespace BellaHair.Domain.Bookings
             EndDateTime = StartDateTime.AddMinutes(Treatment.DurationMinutes.Value);
         }
 
-        public void SetDiscount(BookingDiscount discount, ICurrentDateTimeProvider currentDateTimeProvider)
+        public void SetDiscount(BookingDiscount discount)
         {
-            var now = currentDateTimeProvider.GetCurrentDateTime();
-
             if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
 
             Discount = discount;

@@ -1,7 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using FixtureBuilder;
-using Moq;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {
@@ -12,13 +11,11 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         {
             //Arrange
             var discount = Fixture.New<BookingDiscount>().With(d => d.Name, "Test Discount").Build();
-            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
-            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
             var booking = Fixture.New<Booking>().With(b => b.IsPaid, false).Build();
 
             //Act
-            booking.SetDiscount(discount, dateTimeProvider.Object);
+            booking.SetDiscount(discount);
 
             //Assert
             Assert.Multiple(() =>
@@ -33,13 +30,11 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         {
             //Arrange
             var discount = Fixture.New<BookingDiscount>().Build();
-            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
-            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
             var booking = Fixture.New<Booking>().With(b => b.IsPaid, true).Build();
 
             //Act & Assert
-            Assert.Throws<BookingException>(() => booking.SetDiscount(discount, dateTimeProvider.Object));
+            Assert.Throws<BookingException>(() => booking.SetDiscount(discount));
         }
     }
 }

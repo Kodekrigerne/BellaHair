@@ -55,7 +55,7 @@ namespace BellaHair.Application
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
-            if (discount != null) booking.SetDiscount(discount, _currentDateTimeProvider);
+            if (discount != null) booking.SetDiscount(discount);
 
             await _bookingRepository.AddAsync(booking);
 
@@ -79,7 +79,7 @@ namespace BellaHair.Application
             if (command.Discount != null)
             {
                 var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount);
-                booking.SetDiscount(discount, _currentDateTimeProvider);
+                booking.SetDiscount(discount);
             }
 
             booking.PayBooking(_currentDateTimeProvider);
@@ -102,7 +102,7 @@ namespace BellaHair.Application
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
-            if (discount != null) booking.SetDiscount(discount, _currentDateTimeProvider);
+            if (discount != null) booking.SetDiscount(discount);
 
             booking.Update(command.StartDateTime, employee, treatment, _currentDateTimeProvider);
 
