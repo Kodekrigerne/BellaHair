@@ -125,7 +125,7 @@
 		{
 			Snackbar.Add("Noget gik galt.", Severity.Error);
 		}
-		
+
 	}
 
 	private async Task UpdateCounts(DiscountTab? discount = null)
@@ -145,7 +145,8 @@
 
 	private async Task HandleOnDeleteCampaignClick(Guid id)
 	{
-		throw new NotImplementedException();
+		_discounts = _discounts?.Where(d => d.Id != id).ToList();
+		await UpdateCounts(DiscountTab.Campaign);
 	}
 
 }
