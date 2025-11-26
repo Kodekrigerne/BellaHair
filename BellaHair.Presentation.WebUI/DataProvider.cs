@@ -94,6 +94,13 @@ namespace BellaHair.Presentation.WebUI
                 new DateTime(2025, 12, 24),
                 new List<Guid>
                     { _herreklip.Id, _dameklip.Id, _barbering.Id, _farvning.Id, _børneklip.Id, _permanent.Id }));
+
+            _db.Add(CampaignDiscount.Create("Movember shave",
+                DiscountPercent.FromDecimal(0.30m),
+                new DateTime(2025, 11, 1),
+                new DateTime(2025, 12, 1),
+                new List<Guid>
+                    { _barbering.Id }));
         }
 
         private void AddLoyaltyDiscounts()
