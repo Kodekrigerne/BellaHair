@@ -7,30 +7,21 @@
 
 	<Modal @bind-IsVisible="@_showDeleteModal">
 		<div class="modal-centered-content">
-				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
 
 			@* Hvis medarbejderen har fremtidige bookinger, vises dette. *@
 			@if (_futureBookings)
 			{
+				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
 				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @Employee.FullName har fremtidige bookinger.
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
-			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+			<button class="btn-add" onclick="@CloseDeleteModal">Annuller</button>
 			}
 
 			@* Hvis medarbejderen ikke har fremtidige bookinger, vises dette. *@
 			else
 			{
-
-				<h4>Slet: @Employee.FullName?</h4>
-
-				<p style="max-width: 22rem; text-align: center;">	Er du sikker på, at du vil slette denne medarbejder?
-																	Denne handling kan ikke fortrydes.						</p>
-
-				<div class="remove-confirmation-buttons">
-					<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
-					<button class="btn-add" onclick="@CloseModal">Annuller</button>
-				</div>
+			<DeleteComponent EntityName="@Employee.FullName" OnCancel="@CloseDeleteModal" OnDeleteConfirm="@HandleOnDeleteConfirm" EntityTypeName="medarbejder"/>
 			}
 		</div>
 	</Modal>
@@ -138,7 +129,7 @@
 		try
 		{
 			await EmployeeCommand.DeleteEmployeeCommand(command);
-			CloseModal();
+			CloseDeleteModal();
 			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
 			await OnDelete.InvokeAsync(Employee.Id);
 		}
@@ -150,6 +141,6 @@
 	}
 
 	// Lukker modalen
-	private void CloseModal() => _showDeleteModal = false;
+	private void CloseDeleteModal() => _showDeleteModal = false;
 
 }
