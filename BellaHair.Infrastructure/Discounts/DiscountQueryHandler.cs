@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
+using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,12 +13,14 @@ namespace BellaHair.Infrastructure.Discounts
         private readonly BellaHairContext _db;
         private readonly IDiscountCalculatorService _discountCalculatorService;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public DiscountQueryHandler(BellaHairContext db, IDiscountCalculatorService discountCalculatorService, ICurrentDateTimeProvider currentDateTimeProvider)
+        public DiscountQueryHandler(BellaHairContext db, IDiscountCalculatorService discountCalculatorService, ICurrentDateTimeProvider currentDateTimeProvider, ICustomerVisitsService customerVisitsService)
         {
             _db = db;
             _discountCalculatorService = discountCalculatorService;
             _currentDateTimeProvider = currentDateTimeProvider;
+            _customerVisitsService = customerVisitsService;
         }
 
         async Task<BookingDiscountDTO?> IDiscountQuery.FindBestDiscount(FindBestDiscountQuery query)
@@ -31,7 +34,7 @@ namespace BellaHair.Infrastructure.Discounts
             var treatment = await _db.Treatments.AsNoTracking().SingleOrDefaultAsync(t => t.Id == query.TreatmentId)
                 ?? throw new KeyNotFoundException($"Could not find treatment with Id {query.TreatmentId}");
 
-            var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == query.CustomerId).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+            var visits = await _customerVisitsService.GetCustomerVisitsAsync(customer.Id);
             customer.SetVisits(visits);
 
             //Det er nødvendigt at oprette en booking for at finde en rabat

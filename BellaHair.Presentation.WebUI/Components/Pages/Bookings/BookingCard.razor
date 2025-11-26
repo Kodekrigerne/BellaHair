@@ -1,7 +1,9 @@
 ﻿@using System.Globalization
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
 
-<div class="bc-container">
+@inject NavigationManager NavigationManager;
+
+<button class="bc-container" @onclick="HandleBookingClick">
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>
@@ -27,28 +29,29 @@
 			</div>
 		</div>
 
-		@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
-		{
-			<div class="bc-discount">
-				<DiscountIcon Class="bc-discount-icon" />
-				<span>
-					@if (Booking.DiscountName != null)
-					{
-						<span>@Booking.DiscountName</span>
-					}
-					@if (Booking.DiscountAmount != null)
-					{
-						<span class="bc-discount-amount">-@Booking.DiscountAmount dkk</span>
-					}
-				</span>
-			</div>
-		}
+		<div class="bc-body-right">
+			@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
+			{
+				<div class="bc-price">
+					<span>Total:</span>
+					<span style="margin-right: 2rem;">@Booking.Total.ToString("C2")</span>
+					<DiscountIcon Class="bc-discount-icon" />
+					<span>Rabat: @Booking.DiscountName</span>
+					<span>-@Booking.DiscountAmount!.Value.ToString("C2")</span>
+				</div>
+			}
+		</div>
 	</div>
-</div>
+</button>
 
 @code {
 	[Parameter, EditorRequired]
-	public required BookingSimpleViewModel Booking { get; set; }
+	public required BookingViewModel Booking { get; set; }
+
+	private void HandleBookingClick()
+	{
+		NavigationManager.NavigateTo($"/booking/{Booking.Id}");
+	}
 }
 
 <style>
@@ -58,12 +61,16 @@
 		padding: 1.25rem;
 		margin-bottom: 1rem;
 		background: #fff;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-		transition: box-shadow 0.2s ease;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0. 05);
+		transition: box-shadow 0.2s ease, border 0.2s ease;
+		display: block;
+		width: 100%;
 	}
 
+
 		.bc-container:hover {
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			background-color: #f5faff;
+			border: 1px solid #2563eb;
 		}
 
 	.bc-header {
@@ -108,6 +115,13 @@
 		gap: 0.75rem;
 	}
 
+	.bc-body-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.5rem;
+	}
+
 	.bc-treatment,
 	.bc-duration,
 	.bc-employee {
@@ -119,7 +133,7 @@
 		font-size: 1.10rem;
 	}
 
-	.bc-discount {
+	.bc-price {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -148,7 +162,12 @@
 		color: #177000;
 	}
 
-	.bc-discount-amount {
-		margin-left: 0.75rem;
+	.bc-total {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 1.10rem;
+		font-weight: 500;
+		color: black;
 	}
 </style>
