@@ -457,7 +457,7 @@
 			return;
 		}
 
-		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id);
+		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id, Id);
 
 		await GetBestDiscount();
 
