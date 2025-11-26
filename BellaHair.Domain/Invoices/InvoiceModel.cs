@@ -2,6 +2,12 @@
 
 namespace BellaHair.Domain.Invoices
 {
+    // Mikkel Dahlmann
+
+    /// <summary>
+    /// Represents an invoice, including customer information, issue date, treatments, and additional comments.
+    /// </summary>
+
     public class InvoiceModel
     {
         public InvoiceModel(Guid invoiceNumber, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, string comments)

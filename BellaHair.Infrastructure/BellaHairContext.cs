@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace BellaHair.Infrastructure
         public DbSet<PrivateCustomer> PrivateCustomers { get; set; }
         public DbSet<Treatment> Treatments { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -81,6 +83,12 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<PrivateCustomer>().Ignore(p => p.Visits);
 
             modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
+
+            modelBuilder.Entity<Invoice>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+                entity.Property(i => i.Id).ValueGeneratedNever();
+            };
         }
     }
 }

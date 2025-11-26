@@ -2,6 +2,7 @@
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using BellaHair.Infrastructure.Bookings;
@@ -51,6 +52,8 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IInvoiceQuery, InvoiceQueryHandler>();
 
             serviceCollection.AddScoped<InvoiceDocumentDataSource>();
+
+            serviceCollection.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
             return serviceCollection;
         }
