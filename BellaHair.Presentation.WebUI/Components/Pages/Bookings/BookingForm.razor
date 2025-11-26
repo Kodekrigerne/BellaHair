@@ -570,7 +570,8 @@
 							InvoiceQuery.GetInvoiceByBookingId(queryCommand);
 							return Task.CompletedTask;
 						};
-				});
+				}
+			);
 
 			await LoadBooking();
 		}
