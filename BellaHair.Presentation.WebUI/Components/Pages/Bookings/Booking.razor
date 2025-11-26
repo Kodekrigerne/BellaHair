@@ -246,7 +246,7 @@
 				e.Id,
 				e.Name,
 				e.Bookings
-					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.StartDateTime.AddMinutes(b.DurationMinutes)))
+					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
 					.ToList()))
 			.OrderBy(e => e.Name)
 			.ToList();

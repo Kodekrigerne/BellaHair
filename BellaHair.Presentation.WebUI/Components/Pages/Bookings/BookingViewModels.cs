@@ -2,6 +2,7 @@
 {
     public record BookingSimpleViewModel(
         DateTime StartDateTime,
+        DateTime EndDateTime,
         DateOnly Date,
         TimeOnly StartTime,
         TimeOnly EndTime,

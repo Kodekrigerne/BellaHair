@@ -73,7 +73,7 @@ namespace BellaHair.Application.Tests.Treatments
             var treatment = Treatment.Create("Voksbehandling", Price.FromDecimal(300), DurationMinutes.FromInt(30));
 
             var bookingFixture = Fixture.New<Booking>().UseConstructor()
-                                        .WithSetter(b => b.StartDateTime, DateTime.Now.AddDays(1))
+                                        .WithSetter(b => b.EndDateTime, DateTime.Now.AddDays(1))
                                         .WithSetter(b => b.Treatment, treatment)
                                         .Build();
 
@@ -84,7 +84,7 @@ namespace BellaHair.Application.Tests.Treatments
             var deleteCommand = new DeleteTreatmentCommand(treatment.Id);
 
             // Assert 
-          Assert.ThrowsAsync<DomainException>( async () => await handler.DeleteTreatmentAsync(deleteCommand));
+            Assert.ThrowsAsync<DomainException>(async () => await handler.DeleteTreatmentAsync(deleteCommand));
         }
 
     }

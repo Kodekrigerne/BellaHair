@@ -11,17 +11,14 @@ namespace BellaHair.Domain.PrivateCustomers
 
     public class PrivateCustomer : PersonBase
     {
-        public int Visits => _bookings.Count;
+        public int Visits { get; private set; }
         public DateTime Birthday { get; private set; }
         private readonly List<Booking> _bookings = [];
 
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
         public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
 
-#pragma warning disable CS8618
         private PrivateCustomer() { }
-#pragma warning restore CS8618
-
 
         private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber,
             Email email, DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
@@ -54,6 +51,10 @@ namespace BellaHair.Domain.PrivateCustomers
             Email = email;
             Birthday = birthday;
         }
+
+        //Ville være mere clean hvis den tog list bookings og ICurrentDateTimeProvider
+        //Men så skal vi loade alle bookings ud af DB "bare" for at få dette tal
+        public void SetVisits(int visits) => Visits = visits;
 
         // Kunden skal minimum være 18 år gammel
         private static void ValidateBirthday(DateTime birthday, ICurrentDateTimeProvider currentDateTimeProvider)
