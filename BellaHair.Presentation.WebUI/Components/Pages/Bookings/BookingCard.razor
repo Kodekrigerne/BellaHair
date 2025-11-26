@@ -9,6 +9,7 @@
 @inject NavigationManager NavigationManager;
 @inject ISnackbar Snackbar;
 @inject IBookingCommand BookingCommand;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 
 <div class="bc-container" @onclick="HandleBookingClick">
 	<div class="bc-header">
@@ -17,9 +18,9 @@
 			<p class="bc-date">@Booking.Date.ToString("dddd, MMMM dd, yyyy", new CultureInfo("da-DK"))</p>
 			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
 		</div>
-		<div style="display: flex; flex-direction: row;">
-			<EditButton OnClick="HandleEditClick" />
-			<BinDeleteButton OnClick="HandleDeleteClick" />
+		<div style="display: flex; flex-direction: row; gap: 2px;">
+			<EditButton Class="@(CanEdit() ? "edit-active" : "btn-inactive")" OnClick="HandleEditClick" />
+			<BinDeleteButton Class="@(CanDelete() ? "" : "btn-inactive")" OnClick="HandleDeleteClick" />
 		</div>
 	</div>
 	<div class="bc-body">
@@ -62,6 +63,15 @@
 	[Parameter]
 	public EventCallback<Guid> OnClickDelete { get; set; }
 
+	private DateTime _now;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+	}
+
 	private void HandleBookingClick()
 	{
 		NavigationManager.NavigateTo($"/booking/{Booking.Id}");
@@ -69,11 +79,15 @@
 
 	private void HandleEditClick()
 	{
+		if (!CanEdit()) return;
+
 		NavigationManager.NavigateTo($"/booking/{Booking.Id}/rediger");
 	}
 
 	private async Task HandleDeleteClick()
 	{
+		if (!CanDelete()) return;
+
 		try
 		{
 			await BookingCommand.DeleteBooking(new DeleteBookingCommand(Booking.Id));
@@ -82,6 +96,20 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private bool CanEdit()
+	{
+		if (Booking.IsPaid) return false;
+		if (Booking.StartDateTime < _now) return false;
+		return true;
+	}
+
+	private bool CanDelete()
+	{
+		if (Booking.IsPaid) return false;
+		if (Booking.StartDateTime < _now && Booking.StartDateTime.Date == _now.Date) return false;
+		return true;
 	}
 }
 
@@ -135,6 +163,31 @@
 		font-size: 1.10rem;
 		color: black;
 	}
+
+	.edit-active .edit-icon {
+		fill: #2196F3 !important;
+	}
+
+	.edit-active:hover {
+		background-color: #BBDEFB;
+	}
+
+	.btn-inactive {
+		color: grey;
+	}
+
+	.btn-inactive .edit-icon {
+		fill: grey !important;
+	}
+
+		.btn-inactive:hover {
+			background: none;
+			cursor: default;
+		}
+
+		.btn-inactive:active {
+			transform: none;
+		}
 
 	.bc-body {
 		display: flex;

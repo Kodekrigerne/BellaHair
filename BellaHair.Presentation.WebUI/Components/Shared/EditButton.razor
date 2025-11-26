@@ -1,10 +1,13 @@
 ﻿<!-- Mikkel Dahlmann -->
 
-<button class="edit-button" @onclick:stopPropagation @onclick="@OnClick">
+<button class="edit-button @Class" @onclick:stopPropagation @onclick="@OnClick">
 	<EditIcon Class="edit-icon" />
 </button>
 
 @code {
+	[Parameter]
+	public string? Class { get; set; }
+
 	[Parameter]
 	public EventCallback OnClick { get; set; }
 }
