@@ -3,6 +3,7 @@ using BellaHair.Presentation.WebUI.Components.Pages.Discounts.CampaignDiscount.V
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.Discounts.CampaignDiscount
 {
+    // Mikkel Klitgaard
     public class NewCampaignDiscountModel
     {
         [Required(ErrorMessage = "Kampagnenavn er påkrævet.")]
