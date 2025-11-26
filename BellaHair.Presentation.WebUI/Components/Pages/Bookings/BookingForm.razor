@@ -10,6 +10,7 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject ISnackbar Snackbar;
 @inject IPrivateCustomerQuery CustomerQuery;
@@ -97,36 +98,7 @@
 			<div class="right-picker">
 				@if (Mode == BookingMode.View && _customer != null)
 				{
-					<div class="customer-info">
-						<h3>@_customer.FullName</h3>
-
-						<div class="info-list">
-							<div class="info-item">
-								<span class="label">Email:</span>
-								<span class="value">@_customer.Email</span>
-							</div>
-
-							<div class="info-item">
-								<span class="label">Telefon:</span>
-								<span class="value">@_customer.PhoneNumber</span>
-							</div>
-
-							<div class="info-item">
-								<span class="label">Fødselsdag:</span>
-								<span class="value">@_customer.Birthday.ToString("MMMM dd, yyyy")</span>
-							</div>
-
-							<div class="info-item">
-								<span class="label">Adresse:</span>
-								<span class="value">@_customer.FullAddress</span>
-							</div>
-
-							<div class="info-item">
-								<span class="label">Antal bookinger:</span>
-								<span class="value">@_customer.Visits</span>
-							</div>
-						</div>
-					</div>
+					<CustomerDisplay Customer="_customer"/>
 				}
 				else
 				{
@@ -937,36 +909,5 @@
 		border-radius: 4px;
 		padding: 0.25rem 0 0.25rem 0;
 		padding-left: 1rem;
-	}
-
-	.customer-info {
-		padding: 1.5rem;
-	}
-
-		.customer-info h3 {
-			margin: 0 0 1.5rem 0;
-			font-size: 1.5rem;
-			color: #333;
-		}
-
-	.info-list {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.info-item {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.label {
-		font-weight: 600;
-		color: #666;
-		min-width: 120px;
-	}
-
-	.value {
-		color: #333;
 	}
 </style>
