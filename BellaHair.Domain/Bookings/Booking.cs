@@ -60,11 +60,7 @@ namespace BellaHair.Domain.Bookings
             if (startDateTime < currentDateTime)
                 throw new BookingException($"Kan ikke oprette booking med fortidig startdato og tidspunkt {startDateTime}.");
 
-            if (employee.Treatments == null)
-                throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
-
-            if (!employee.Treatments.Any(t => t.Id == treatment.Id))
-                throw new BookingException($"Medarbejder {employee.Name.FullName} udbyder ikke behandling {treatment.Name}.");
+            ValidateEmployeeTreatment(employee, treatment);
 
             return new(customer, employee, treatment, startDateTime, currentDateTime);
         }
@@ -107,7 +103,6 @@ namespace BellaHair.Domain.Bookings
             var now = currentDateTimeProvider.GetCurrentDateTime();
 
             if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
-            if (StartDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
 
             Discount = discount;
         }
@@ -126,13 +121,25 @@ namespace BellaHair.Domain.Bookings
             var now = currentDateTimeProvider.GetCurrentDateTime();
 
             if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
-            if (startDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
+            if (StartDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
+            if (startDateTime < now) throw new BookingException("Kan ikke opdatere en booking med en starttid i fortiden");
+
+            ValidateEmployeeTreatment(employee, treatment);
 
             StartDateTime = startDateTime;
             Employee = employee;
             Treatment = treatment;
 
             UpdateEndDateTime();
+        }
+
+        private static void ValidateEmployeeTreatment(Employee employee, Treatment treatment)
+        {
+            if (employee.Treatments == null)
+                throw new InvalidOperationException("Employees for Booking creation must have Treatments loaded eagerly.");
+
+            if (!employee.Treatments.Any(t => t.Id == treatment.Id))
+                throw new BookingException($"Medarbejder {employee.Name.FullName} udbyder ikke behandling {treatment.Name}.");
         }
     }
 
