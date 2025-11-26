@@ -25,7 +25,7 @@ namespace BellaHair.Domain.Discounts
         private CampaignDiscount() { }
 #pragma warning restore CS8618
 
-        private CampaignDiscount(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatments)
+        private CampaignDiscount(string discountName, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatments)
         {
             if (endDate < startDate)
                 throw new CampaignDiscountException("Startdato skal være før slutdato.");
@@ -36,15 +36,15 @@ namespace BellaHair.Domain.Discounts
                 throw new CampaignDiscountException("Kampagnerabatten skal gælde for mindst én behandling.");
 
             Id = Guid.NewGuid();
-            Name = name;
+            Name = discountName;
             DiscountPercent = discountPercent;
             StartDate = startDate;
             EndDate = endDate;
             TreatmentIds = treatmentList;
         }
 
-        public static CampaignDiscount Create(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatmentIds) =>
-            new(name, discountPercent, startDate, endDate, treatmentIds);
+        public static CampaignDiscount Create(string discountName, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatmentIds) =>
+            new(discountName, discountPercent, startDate, endDate, treatmentIds);
 
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
