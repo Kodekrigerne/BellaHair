@@ -97,8 +97,9 @@ namespace BellaHair.Application
                 command.StartDateTime,
                 treatment.DurationMinutes.Value,
                 command.EmployeeId,
-                booking.Customer!.Id))
-                throw new DomainException("Kan ikke oprette booking som overlapper med eksisterende booking.");
+                booking.Customer!.Id,
+                booking.Id))
+                throw new DomainException("Kan ikke ændre booking som overlapper med eksisterende booking.");
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
