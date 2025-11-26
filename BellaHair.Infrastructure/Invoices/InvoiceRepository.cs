@@ -1,9 +1,5 @@
 ﻿using BellaHair.Domain.Invoices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Invoices
 {
@@ -15,17 +11,21 @@ namespace BellaHair.Infrastructure.Invoices
 
         async Task IInvoiceRepository.AddAsync(Invoice invoice)
         {
-            await _db.Invoices
+            await _db.Invoices.AddAsync(invoice);
         }
 
-        Task<Invoice> IInvoiceRepository.GetAsync(Guid id)
+        async Task<Invoice> IInvoiceRepository.GetAsync(int id)
         {
-            throw new NotImplementedException();
+            var invoice = await _db.Invoices
+                .FirstOrDefaultAsync(p => p.Id == id)
+                    ?? throw new KeyNotFoundException($"No invoice exists with ID {id}");
+
+            return invoice;
         }
 
-        Task IInvoiceRepository.SaveChangesAsync()
+        async Task IInvoiceRepository.SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            await _db.SaveChangesAsync();
         }
     }
 }

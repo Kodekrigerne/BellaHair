@@ -84,6 +84,7 @@ namespace BellaHair.Infrastructure
 
             modelBuilder.Entity<LoyaltyDiscount>().ComplexProperty(l => l.DiscountPercent);
 
+            // Vi fortæller EF, at Id for Invoice ikke genereres af databasen
             modelBuilder.Entity<Invoice>(entity =>
             {
                 entity.HasKey(i => i.Id);

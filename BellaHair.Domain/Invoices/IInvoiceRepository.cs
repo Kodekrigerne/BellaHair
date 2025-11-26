@@ -9,7 +9,7 @@
     public interface IInvoiceRepository
     {
         Task AddAsync(Invoice invoice);
-        Task<Invoice> GetAsync(Guid id);
+        Task<Invoice> GetAsync(int id);
         Task SaveChangesAsync();
     }
 }

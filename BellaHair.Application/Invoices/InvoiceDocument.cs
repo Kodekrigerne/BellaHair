@@ -20,7 +20,7 @@ public class InvoiceDocument : IDocument
         Model = model;
 
         var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "BellaHair.Infrastructure.Invoices.BellaHairLogo.png";
+        var resourceName = "BellaHair.Application.Invoices.BellaHairLogo.png";
 
         using var stream = assembly.GetManifestResourceStream(resourceName);
         if (stream == null)

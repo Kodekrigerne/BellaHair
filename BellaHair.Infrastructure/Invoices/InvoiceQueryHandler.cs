@@ -1,4 +1,6 @@
-﻿using BellaHair.Ports.Invoices;
+﻿using BellaHair.Domain.Invoices;
+using BellaHair.Ports.Invoices;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
@@ -14,24 +16,28 @@ namespace BellaHair.Infrastructure.Invoices
 
     public class InvoiceQueryHandler : IInvoiceQuery
     {
+        private readonly BellaHairContext _db;
         private readonly IJSRuntime _jsRuntime;
         private readonly InvoiceDocumentDataSource _invoiceDocumentDataSource;
-        public InvoiceQueryHandler(IJSRuntime jsRuntime, InvoiceDocumentDataSource invoiceDocumentDataSource)
+
+        public InvoiceQueryHandler(BellaHairContext db, IJSRuntime jsRuntime, InvoiceDocumentDataSource invoiceDocumentDataSource)
         {
+            _db = db;
             _jsRuntime = jsRuntime;
             _invoiceDocumentDataSource = invoiceDocumentDataSource;
         }
 
-        public async Task CreateAndPrintInvoice(Guid bookingId)
+        async Task IInvoiceQuery.GetInvoiceByBookingId(Guid bookingId)
         {
-            QuestPDF.Settings.License = LicenseType.Community;
-
-            var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(bookingId);
-            var document = new InvoiceDocument(model);
-
+            var invoice = await _db.Invoices
             byte[] pdfBytes = document.GeneratePdf();
 
             await _jsRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(pdfBytes));
+        }
+
+        async Task<int> IInvoiceQuery.GetNextInvoiceIdAsync()
+        {
+            return await _db.Invoices.MaxAsync(i => (int?)i.Id) + 1 ?? 1;
         }
     }
 }

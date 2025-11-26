@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Invoices\BellaHairLogo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Invoices\BellaHairLogo.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.10" />
