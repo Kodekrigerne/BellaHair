@@ -28,8 +28,25 @@
 			</button>
 		}
 	</div>
-	<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
+	<BinDeleteButton OnClick="@(() => { _showConfirmDelete = true; })" />
 </div>
+
+<Modal @bind-IsVisible="@_showConfirmDelete">
+					
+	<h3>Slet kampagnerabat</h3>
+	<hr class="treatment-line" />
+	<p>Ønsker du at slette denne kampagne?</p>
+	Handlingen kan ikke fortrydes.
+
+	<div class="btn-wrapper">
+
+		<button class="btn-remove" @onclick="HandleOnDeleteClick">Slet</button>
+		<button class="btn-add" @onclick="@(() => { _showConfirmDelete = false; })">Annuller</button>
+
+	</div>
+
+</Modal>
+
 
 @code {
 	[Parameter, EditorRequired]
@@ -39,8 +56,12 @@
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnDelete { get; set; }
 
+	private bool _showConfirmDelete = false;
+
 	private async Task HandleOnDeleteClick()
 	{
+		_showConfirmDelete = false;
+
 		try
 		{
 			var command = new DeleteCampaignDiscountCommand(CampaignDiscount.Id);
