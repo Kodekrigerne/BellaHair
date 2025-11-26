@@ -88,7 +88,7 @@
 
 	<div class="btn-wrapper">
 		<button class="btn-add" type="submit" >Opret</button>
-		<button class="btn-remove" type="button">Annuller</button>
+		<button class="btn-remove" type="button" @onclick="HandleOnCancel">Annuller</button>
 	</div>
 
 </EditForm>
@@ -97,6 +97,7 @@
 
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
+	public required EventCallback OnCancel { get; set; }
 
 	private List<TreatmentViewModel> Treatments { get; set; } = [];
 	private List<Guid> SelectedTreatmentIds { get; set; } = [];
@@ -162,6 +163,12 @@
 			Snackbar.Add($"Der skete en fejl under oprettelse af kampagnerabat.", Severity.Error);
 		}
 	}
+
+	private void HandleOnCancel()
+	{
+		OnCancel.InvokeAsync();
+	}
+
 
 	private void ToggleTreatmentSelection(Guid treatmentId)
 	{

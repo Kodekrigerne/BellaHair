@@ -15,7 +15,7 @@
 @inject ISnackbar Snackbar;
 @inject ICampaignDiscountQuery CampaignDiscountQuery
 
-<Modal @bind-IsVisible="@_showNewModal">
+<Modal IsVisible="@_showNewModal">
 	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
 	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign"/> }
 </Modal>
@@ -78,6 +78,13 @@
 		await UpdateCounts(DiscountTab.Campaign);
 		await HandleCampaignSelectorClick();
 	}
+
+	private void HandleOnCancel()
+	{
+		_showNewModal = false;
+		Snackbar.Add("Handlingen blev afbrudt.", Severity.Info);
+	}
+
 
 	private async Task HandleLoyaltySelectorClick()
 	{
