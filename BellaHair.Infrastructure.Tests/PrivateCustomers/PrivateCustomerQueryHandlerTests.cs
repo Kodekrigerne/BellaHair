@@ -7,7 +7,7 @@ using BellaHair.Ports.PrivateCustomers;
 namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 {
     // Mikkel Dahlmann
-    
+
     internal sealed class PrivateCustomerQueryHandlerTests : InfrastructureTestBase
     {
         [Test]
@@ -15,7 +15,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         {
             // Arrange
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
-            var handler = (IPrivateCustomerQuery)new PrivateCustomerQueryHandler(_db, dateTimeProvider);
+            var handler = (IPrivateCustomerQuery)new PrivateCustomerQueryHandler(_db, dateTimeProvider, new CustomerVisitsService(_db, dateTimeProvider));
 
             var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),
                 Address.Create("Gade", "By", "1", 7100), PhoneNumber.FromString("12345678"),

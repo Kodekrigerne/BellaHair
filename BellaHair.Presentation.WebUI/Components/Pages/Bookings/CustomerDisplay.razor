@@ -1,0 +1,84 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
+@using BellaHair.Presentation.WebUI.Components.Shared
+<div class="customer-info">
+	<h3>@Customer.FullName</h3>
+	<div class="info-list">
+		<div class="info-item">
+			<span class="label">Email:</span>
+			<span class="value"><MailIcon Class="customer-icon" /> @Customer.Email</span>
+		</div>
+
+		<div class="info-item">
+			<span class="label">Telefon:</span>
+			<span class="value"><PhoneIcon Class="customer-icon" /> @Customer.PhoneNumber</span>
+		</div>
+
+		<div class="info-item">
+			<span class="label">Fødselsdag:</span>
+			<span class="value"><BirthdayIcon Class="customer-icon" /> @Customer.Birthday.ToString("MMMM dd, yyyy")</span>
+		</div>
+
+		<div class="info-item">
+			<span class="label">Adresse:</span>
+			<span class="value"><HomeIcon Class="customer-icon" /> @Customer.FullAddress</span>
+		</div>
+
+		<div class="info-item">
+			<span class="label">Antal bookinger:</span>
+			<span class="value"><VisitsIcon Class="customer-icon" /> @Customer.Visits</span>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required PrivateCustomerViewModel Customer { get; set; }
+}
+
+<style>
+	.customer-info {
+		padding: 1.5rem;
+	}
+
+		.customer-info h3 {
+			margin: 0 0 1.5rem 0;
+			font-size: 1.5rem;
+			color: #333;
+			background-color: lightblue;
+			border-radius: 6px;
+			padding: 0.25rem 1rem 0.25rem 1rem;
+			width: fit-content;
+		}
+
+	.info-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.info-item {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.label {
+		font-weight: 600;
+		color: #666;
+		min-width: 120px;
+	}
+
+	.customer-icon {
+		width: 16px;
+		height: 16px;
+		display: inline-block;
+		fill: dimgrey !important;
+	}
+
+	.value {
+		color: #333;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+</style>
