@@ -72,11 +72,14 @@ namespace BellaHair.Infrastructure.Tests.Employees
             _db.Add(employee);
             _db.SaveChanges();
 
+            var employeeToDelete = _db.Employees.First();
+
             // Act
-            repo.Delete(employee);
+            repo.Delete(employeeToDelete);
+            _db.SaveChanges();
 
             // Assert
-            Assert.That(_db.Employees.Find(employee.Id), Is.Null);
+            Assert.That(_db.Employees.Find(employeeToDelete.Id), Is.Null);
         }
 
         [Test]
