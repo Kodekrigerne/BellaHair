@@ -1,9 +1,7 @@
 ﻿using BellaHair.Domain;
-using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
-using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
 
 namespace BellaHair.Infrastructure.Tests.Employees
@@ -35,7 +33,7 @@ namespace BellaHair.Infrastructure.Tests.Employees
         }
 
         [Test]
-        public void Get_Given_ValidData_Then_GetsEmployee()
+        public void Get_Given_EmployeeExistsInDatabase_Then_GetsEmployee()
         {
             //Arrange
             var repo = (IEmployeeRepository)new EmployeeRepository(_db);
@@ -56,6 +54,40 @@ namespace BellaHair.Infrastructure.Tests.Employees
 
             //Assert
             Assert.That(employeeFromDb.Id, Is.EqualTo(employee.Id));
+        }
+
+        [Test]
+        public void Given_EmployeeExistsInDatabase_Then_DeletesEmployee()
+        {
+            // Arrange
+            var repo = (IEmployeeRepository)new EmployeeRepository(_db);
+            var name = Name.FromStrings("Jens", "Jensen", "Jensen");
+            var address = Address.Create("Vej", "By", "1", 7100, 2);
+            var phoneNumber = PhoneNumber.FromString("12345678");
+            var email = Email.FromString("email@email.com");
+            List<Treatment> treatments = [];
+
+            var employee = Employee.Create(name, email, phoneNumber, address, treatments);
+
+            _db.Add(employee);
+            _db.SaveChanges();
+
+            // Act
+            repo.Delete(employee);
+
+            // Assert
+            Assert.That(_db.Employees.Find(employee.Id), Is.Null);
+        }
+
+        [Test]
+        public void Given_EmployeeDoesNotExists_Then_ThrowsEmployeeException()
+        {
+            // Arrange
+            var repo = (IEmployeeRepository)new EmployeeRepository(_db);
+            var invalidId = Guid.NewGuid();
+
+            // Act & Assert
+            Assert.ThrowsAsync<KeyNotFoundException>(() => repo.GetAsync(invalidId));
         }
 
     }
