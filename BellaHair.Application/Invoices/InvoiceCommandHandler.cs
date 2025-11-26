@@ -27,6 +27,9 @@ namespace BellaHair.Application.Invoices
 
         async Task IInvoiceCommand.CreateInvoiceAsync(CreateInvoiceCommand command)
         {
+            bool exists = await _
+
+
             QuestPDF.Settings.License = LicenseType.Community;
 
             var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(command.Id);
