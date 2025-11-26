@@ -56,25 +56,25 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
             List<PrivateCustomerDTO> pclist = new List<PrivateCustomerDTO>();
 
-            foreach (var x in customers)
+            foreach (var customer in customers)
             {
-                var visits = await _customerVisitsService.GetCustomerVisitsAsync(x.Id);
+                var visits = await _customerVisitsService.GetCustomerVisitsAsync(customer.Id);
 
                 pclist.Add(new PrivateCustomerDTO(
-                        x.Id,
-                        x.Name.FirstName,
-                        x.Name.MiddleName,
-                        x.Name.LastName,
-                        x.Name.FullName,
-                        x.Address.StreetName,
-                        x.Address.City,
-                        x.Address.StreetNumber,
-                        x.Address.ZipCode,
-                        x.Address.Floor,
-                        x.Address.FullAddress,
-                        x.PhoneNumber.Value,
-                        x.Email.Value,
-                        x.Birthday,
+                        customer.Id,
+                        customer.Name.FirstName,
+                        customer.Name.MiddleName,
+                        customer.Name.LastName,
+                        customer.Name.FullName,
+                        customer.Address.StreetName,
+                        customer.Address.City,
+                        customer.Address.StreetNumber,
+                        customer.Address.ZipCode,
+                        customer.Address.Floor,
+                        customer.Address.FullAddress,
+                        customer.PhoneNumber.Value,
+                        customer.Email.Value,
+                        customer.Birthday,
                         visits));
             }
 
