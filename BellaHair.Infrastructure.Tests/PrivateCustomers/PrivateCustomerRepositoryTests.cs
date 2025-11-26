@@ -6,14 +6,14 @@ using BellaHair.Infrastructure.PrivateCustomers;
 namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 {
     // Mikkel Dahlmann
-    
+
     internal sealed class PrivateCustomerRepositoryTests : InfrastructureTestBase
     {
         [Test]
         public void Given_NewPrivateCustomer_Then_AddsPrivateCustomerToDatabase()
         {
             // Arrange
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db, new CurrentDateTimeProvider());
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
 
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
@@ -37,7 +37,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         public void Given_PrivateCustomerExistsInDatabase_Then_ReturnsPrivateCustomer()
         {
             // Arrange
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db, new CurrentDateTimeProvider());
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
 
 
@@ -49,8 +49,8 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 
             var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
-            _db.AddAsync(customer);
-            _db.SaveChangesAsync();
+            _db.Add(customer);
+            _db.SaveChanges();
 
             // Act
             var returnedCustomer = repo.GetAsync(customer.Id).GetAwaiter().GetResult();
@@ -63,7 +63,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         public void Given_PrivateCustomerExistsInDatabase_Then_DeletePrivateCustomerFromDatabase()
         {
             // Arrange
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db, new CurrentDateTimeProvider());
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
 
             var name = Name.FromStrings("Mikkel", "Dahlmann", "Frostholm");
@@ -74,8 +74,8 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 
             var customer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
-            _db.AddAsync(customer);
-            _db.SaveChangesAsync();
+            _db.Add(customer);
+            _db.SaveChanges();
 
             var customerToDelete = _db.PrivateCustomers.First();
 
@@ -91,7 +91,7 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
         public void Given_PrivateCustomerDoesNotExists_Then_ThrowsPrivateCustomerException()
         {
             // Arrange
-            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db);
+            var repo = (IPrivateCustomerRepository)new PrivateCustomerRepository(_db, new CurrentDateTimeProvider());
             var invalidId = Guid.NewGuid();
 
             // Act & Assert

@@ -23,30 +23,33 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
-            var customers = await _db.PrivateCustomers
-                .Include(p => p.Bookings)
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            var customers = await _db.PrivateCustomers.AsNoTracking()
                 .ToListAsync();
 
             List<PrivateCustomerDTO> pclist = new List<PrivateCustomerDTO>();
-            
-            foreach (var x in customers)
+
+            foreach (var customer in customers)
             {
+                var visits = await _db.PrivateCustomers.AsNoTracking().Where(c => c.Id == customer.Id).Select(c => c.Bookings.Count(b => b.EndDateTime < now)).SingleOrDefaultAsync();
+
                 pclist.Add(new PrivateCustomerDTO(
-                        x.Id,
-                        x.Name.FirstName,
-                        x.Name.MiddleName,
-                        x.Name.LastName,
-                        x.Name.FullName,
-                        x.Address.StreetName,
-                        x.Address.City,
-                        x.Address.StreetNumber,
-                        x.Address.ZipCode,
-                        x.Address.Floor,
-                        x.Address.FullAddress,
-                        x.PhoneNumber.Value,
-                        x.Email.Value,
-                        x.Birthday,
-                        x.Visits));
+                        customer.Id,
+                        customer.Name.FirstName,
+                        customer.Name.MiddleName,
+                        customer.Name.LastName,
+                        customer.Name.FullName,
+                        customer.Address.StreetName,
+                        customer.Address.City,
+                        customer.Address.StreetNumber,
+                        customer.Address.ZipCode,
+                        customer.Address.Floor,
+                        customer.Address.FullAddress,
+                        customer.PhoneNumber.Value,
+                        customer.Email.Value,
+                        customer.Birthday,
+                        visits));
             }
 
             return pclist;

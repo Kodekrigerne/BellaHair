@@ -111,17 +111,15 @@ namespace BellaHair.Infrastructure.Employees
 
             return await _db.Employees
                 .AsNoTracking()
-
                 .Where(e => e.Treatments.Any(t => t.Id == treatmentId))
-
                 .Select(e => new EmployeeNameWithBookingsDTO(
                     e.Id,
                     e.Name.FullName,
-
                     e.Bookings
-                        .Where(b => b.Treatment != null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > now)
+                        .Where(b => b.EndDateTime > now)
                         .Select(b => new BookingTimesOnlyDTO(
                             b.StartDateTime,
+                            b.EndDateTime,
                             b.Treatment!.DurationMinutes.Value)
                             )
                         .ToList()))
@@ -136,7 +134,7 @@ namespace BellaHair.Infrastructure.Employees
         /// employee has at least one future booking; otherwise, <see langword="false"/>.</returns>
         async Task<bool> IEmployeeQuery.EmployeeHasFutureBookings(Guid id)
         {
-            return (await _db.Employees.Include(e => e.Bookings.Where(b => b.Treatment != null && b.StartDateTime.AddMinutes(b.Treatment.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime()))
+            return (await _db.Employees.Include(e => e.Bookings.Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime()))
                             .FirstAsync(p => p.Id == id))
                             .Bookings.Any();
         }

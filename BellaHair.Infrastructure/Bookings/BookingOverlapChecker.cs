@@ -29,14 +29,16 @@ namespace BellaHair.Infrastructure.Bookings
         {
             var endDateTime = startDateTime.AddMinutes(durationMinutes);
 
+            //TODO: Hvis vi indfører multi-treatment bookings skal vi finde ud af hvordan vi håndterer dette
+
             var bookings = _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
                 .Where(b => b.Employee!.Id == employeeId);
 
             //ny starter < eksisterende slutter && eksisterende starter < ny slutter
             bool overlap = await bookings.AnyAsync(b =>
-                startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) &&
+                startDateTime < b.EndDateTime &&
                 b.StartDateTime < endDateTime
             );
 
@@ -49,12 +51,12 @@ namespace BellaHair.Infrastructure.Bookings
 
             var bookings = _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) > _currentDateTimeProvider.GetCurrentDateTime())
+                .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
                 .Where(b => b.Customer!.Id == customerId);
 
             //ny starter < eksisterende slutter && eksisterende starter < ny slutter
             bool overlap = await bookings.AnyAsync(b =>
-                startDateTime < b.StartDateTime.AddMinutes(b.Treatment!.DurationMinutes.Value) &&
+                startDateTime < b.EndDateTime &&
                 b.StartDateTime < endDateTime
             );
 
