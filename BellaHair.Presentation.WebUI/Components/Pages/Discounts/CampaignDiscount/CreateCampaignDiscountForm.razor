@@ -1,0 +1,190 @@
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Discounts
+@using BellaHair.Ports.Treatments
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@inject ITreatmentQuery TreatmentQuery
+@inject ICampaignDiscountCommand CampaignDiscountCommand
+@inject ISnackbar Snackbar
+
+<!-- Mikkel Klitgaard -->
+
+<h3 class="header">Opret ny kampagnerabat</h3>
+
+<p class="header-description">Indtast oplysningerne på den kampagnerabat du vil oprette.</p>
+
+<EditForm Model="@_campaignDiscount" OnValidSubmit="@HandleCreateCampaignDiscount">
+	<DataAnnotationsValidator />
+	<div class="page-setup">
+
+		<div class="kk-container">
+			<h5 class="subheader">Kampagnedetaljer</h5>
+
+			<div class="campaign-input">
+
+				<label for="name-input">Navn</label>
+				<input id="name-input" type="text" placeholder="Kampagnenavn" @bind="_campaignDiscount.Name" />
+				<ValidationMessage For="@(() => _campaignDiscount.Name)" />
+
+			</div>
+
+			<div class="campaign-input">
+
+				<label for="discount-input">Rabatprocent</label>
+				<input id="discount-input" type="number" @bind="_campaignDiscount.DiscountPercentInput" />
+				<ValidationMessage For="@(() => _campaignDiscount.DiscountPercentInput)" />
+
+			</div>
+
+			<div class="campaign-input">
+
+				<label for="start-input">Startdato</label>
+				<input id="start-input" type="date" @bind="_campaignDiscount.StartDate" />
+				<ValidationMessage For="@(() => _campaignDiscount.StartDate)" />
+
+			</div>
+
+			<div class="campaign-input">
+
+				<label for="end-input">Slutdato</label>
+				<input id="end-input" type="date" @bind="_campaignDiscount.EndDate" />
+				<ValidationMessage For="@(() => _campaignDiscount.EndDate)" />
+
+			</div>
+
+		</div>
+
+		<div class="kk-container">
+			<h5 class="subheader">Vælg behandlinger</h5>
+
+			<div class="treatments-container">
+				@foreach (var treatment in Treatments)
+				{
+					var isSelected = SelectedTreatmentIds.Contains(treatment.Id);
+
+					<div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item @(isSelected ? "treatment-selected" : "treatment-unselected")" >
+						<div class="t-name">  
+							@treatment.Name
+						</div> 
+						<div>
+							@if (isSelected)
+							{
+								<CheckedCirle/>
+							}
+							else
+							{
+								<UncheckedCircle/>
+							}
+						</div>
+
+					</div>
+				}
+
+			</div>
+			<div class="count-div">
+				Valgt: @SelectedTreatmentIds.Count() behandlinger
+			</div>
+		</div>
+	</div>
+
+	<div class="btn-wrapper">
+		<button class="btn-add" type="submit" >Opret</button>
+		<button class="btn-remove" type="button" @onclick="HandleOnCancel">Annuller</button>
+	</div>
+
+</EditForm>
+
+@code {
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCancel { get; set; }
+
+	private List<TreatmentViewModel> Treatments { get; set; } = [];
+	private List<Guid> SelectedTreatmentIds { get; set; } = [];
+
+	private NewCampaignDiscountModel _campaignDiscount = new NewCampaignDiscountModel
+	{
+		StartDate = DateTime.Now,
+		EndDate = DateTime.Now.AddDays(7)
+	};
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadTreatments();
+	}
+
+
+	private async Task HandleCreateCampaignDiscount()
+	{
+		try
+		{
+			_campaignDiscount.TreatmentIds = SelectedTreatmentIds;
+
+			var command = new CreateCampaignDiscountCommand(
+				_campaignDiscount.Name,
+				_campaignDiscount.DiscountPercent,
+				_campaignDiscount.StartDate,
+				_campaignDiscount.EndDate,
+				_campaignDiscount.TreatmentIds);
+
+			await CampaignDiscountCommand.CreateCampaignDiscountAsync(command);
+			Snackbar.Add("Behandlingen blev oprettet", Severity.Success);
+
+			await OnCreate.InvokeAsync();
+		}
+		catch (DomainException dex)
+		{
+			Snackbar.Add(dex.Message, Severity.Error);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Der skete en fejl under oprettelse af behandling: {ex.Message}", Severity.Error);
+		}
+	}
+
+	private async Task LoadTreatments()
+	{
+		try
+		{
+			var treatments = await TreatmentQuery.GetAllAsync();
+			Treatments = treatments
+				.OrderBy(t => t.Name)
+				.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+				.ToList();
+		}
+		catch (DomainException dex)
+		{
+			Snackbar.Add(dex.Message, Severity.Error);
+		}
+		catch (Exception)
+		{
+			Snackbar.Add($"Der skete en fejl under oprettelse af kampagnerabat.", Severity.Error);
+		}
+	}
+
+	private void HandleOnCancel()
+	{
+		OnCancel.InvokeAsync();
+	}
+
+
+	private void ToggleTreatmentSelection(Guid treatmentId)
+	{
+		if (SelectedTreatmentIds.Contains(treatmentId))
+		{
+			SelectedTreatmentIds.Remove(treatmentId);
+		}
+		else
+		{
+			SelectedTreatmentIds.Add(treatmentId);
+		}
+		StateHasChanged();
+	}
+
+}

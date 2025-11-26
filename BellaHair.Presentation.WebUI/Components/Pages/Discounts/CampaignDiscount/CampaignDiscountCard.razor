@@ -1,0 +1,91 @@
+﻿<!-- Mikkel Klitgaard -->
+
+@using BellaHair.Domain
+@using BellaHair.Ports.Discounts
+@using BellaHair.Presentation.WebUI.Components.Shared;
+
+@inject ICampaignDiscountCommand CampaignDiscountCommand
+@inject ISnackbar Snackbar;
+
+<div class="cdc-card">
+	<div class="header-wrapper">
+		<p class="p-header">@CampaignDiscount.Name</p>
+		<div class="percent-wrapper">
+			<div class="icon-wrap">
+				<PercentIcon/> |
+			</div>
+			@((CampaignDiscount.DiscountPercent * 100).ToString("0"))%
+		</div>
+	</div>
+	<p class="discount-duration">Periode for kampagne: @CampaignDiscount.StartDate.ToString("d/M/yy") - @CampaignDiscount.EndDate.ToString("d/M/yy")</p>
+	<hr/>
+	<p class="p-txt">Gælder for behandlinger:</p>
+	<div class="t-wrapper">
+		@foreach (var campaign in CampaignDiscount.Treatments)
+		{
+			<button class="btn-offer">
+				@campaign.Name
+			</button>
+		}
+		<div class="active-wrapper">
+			
+			@if (CampaignDiscount.StartDate < DateTime.Now && CampaignDiscount.EndDate > DateTime.Now) _isActive = true;
+			else _isActive = false;
+			<button class="@(_isActive ? "btn-active" : "btn-inactive")">
+				@(_isActive ? "Aktiv" : "Inaktiv")
+			</button>
+		</div>
+	</div>
+	<BinDeleteButton OnClick="@(() => { _showConfirmDelete = true; })" />
+
+</div>
+
+<Modal @bind-IsVisible="@_showConfirmDelete">
+					
+	<h3>Slet kampagnerabat</h3>
+	<hr class="treatment-line" />
+	<p>Ønsker du at slette denne kampagne?</p>
+	Handlingen kan ikke fortrydes.
+
+	<div class="btn-wrapper">
+
+		<button class="btn-remove" @onclick="HandleOnDeleteClick">Slet</button>
+		<button class="btn-add" @onclick="@(() => { _showConfirmDelete = false; })">Annuller</button>
+
+	</div>
+
+</Modal>
+
+
+@code {
+	[Parameter, EditorRequired]
+	public required CampaignDiscountViewModel CampaignDiscount { get; set; }
+
+	// Guid type så ID'et af den slettede rabat kan sendes tilbage til Discounts siden, så denne automatisk kan opdatere.
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnDelete { get; set; }
+
+	private bool _showConfirmDelete = false;
+	private bool _isActive;
+
+	private async Task HandleOnDeleteClick()
+	{
+		_showConfirmDelete = false;
+
+		try
+		{
+			var command = new DeleteCampaignDiscountCommand(CampaignDiscount.Id);
+			await CampaignDiscountCommand.DeleteCampaignDiscountAsync(command);
+			await OnDelete.InvokeAsync(CampaignDiscount.Id);
+			Snackbar.Add("Kampagnerabat slettet.", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+		catch (Exception)
+		{
+			Snackbar.Add("Noget gik galt.", Severity.Error);
+		}
+	}
+}
