@@ -62,7 +62,7 @@ public class InvoiceDocument : IDocument
             row.RelativeItem().Column(column =>
             {
                 column.Item()
-                    .Text($"Faktura #1(PH!)")
+                    .Text($"Faktura #{Model.Id}")
                     .FontSize(24).Bold().FontColor(Colors.Black);
 
                 column.Item().Text(text =>

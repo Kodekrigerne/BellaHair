@@ -31,6 +31,11 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>().OwnsOne(b => b.EmployeeSnapshot);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.CustomerSnapshot);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.TreatmentSnapshot);
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Invoice)
+                .WithOne(i => i.Booking)
+                .HasForeignKey<Invoice>(i => i.BookingId)
+                .IsRequired(false);
 
             //Selvom vores Booking relationer er nullable er det stadig nødvendigt at fortælle databasen at de må være null
             modelBuilder.Entity<Booking>().HasOne(b => b.Treatment).WithMany().OnDelete(DeleteBehavior.SetNull);
@@ -89,7 +94,7 @@ namespace BellaHair.Infrastructure
             {
                 entity.HasKey(i => i.Id);
                 entity.Property(i => i.Id).ValueGeneratedNever();
-            };
+            });
         }
     }
 }

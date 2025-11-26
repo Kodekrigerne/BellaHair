@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 
@@ -28,6 +29,7 @@ namespace BellaHair.Domain.Bookings
         public DateTime StartDateTime { get; private set; }
         public DateTime EndDateTime { get; private set; }
         public DateTime? PaidDateTime { get; private set; }
+        public Invoice? Invoice { get; private set; }
 
         public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored

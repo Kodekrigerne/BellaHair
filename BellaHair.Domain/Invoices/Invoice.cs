@@ -13,6 +13,7 @@ namespace BellaHair.Domain.Invoices
         public int Id { get; private set; }
         public Byte[] InvoicePdf { get; private set; }
         public Booking Booking { get; private set; }
+        public Guid BookingId { get; set; }
 
 #pragma warning disable CS8618
         private Invoice() { }

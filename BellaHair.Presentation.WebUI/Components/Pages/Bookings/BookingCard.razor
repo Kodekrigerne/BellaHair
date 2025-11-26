@@ -2,11 +2,13 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
 @using BellaHair.Ports.Invoices
 @inject IInvoiceQuery InvoiceQuery
+@inject IInvoiceCommand InvoiceCommand
 
 <div class="bc-container">
 
 	<div>
-		<button class="btn-add" @onclick="@HandleInvoiceClick">Se faktura</button>
+		<button class="btn-add" @onclick="@HandleCreateInvoiceClick">Lav faktura</button>
+		<button class="btn-add" @onclick="@HandleViewInvoiceClick">Se faktura</button>
 	</div>
 
 	<div class="bc-header">
@@ -57,9 +59,16 @@
 	[Parameter, EditorRequired]
 	public required BookingSimpleViewModel Booking { get; set; }
 
-	public async Task HandleInvoiceClick()
+	public async Task HandleViewInvoiceClick()
 	{
-		await InvoiceQuery.CreateAndPrintInvoice(Booking.Id);
+		await InvoiceQuery.GetInvoiceByBookingId(Booking.Id);
+	}
+	
+	public async Task HandleCreateInvoiceClick()
+	{
+        var command = new CreateInvoiceCommand(Booking.Id);
+		
+		await InvoiceCommand.CreateInvoiceAsync(command);
 	}
 }
 

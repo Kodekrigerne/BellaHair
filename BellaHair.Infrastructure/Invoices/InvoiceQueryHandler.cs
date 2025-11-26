@@ -1,9 +1,6 @@
-﻿using BellaHair.Domain.Invoices;
-using BellaHair.Ports.Invoices;
+﻿using BellaHair.Ports.Invoices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
-using QuestPDF.Fluent;
-using QuestPDF.Infrastructure;
 
 // Mikkel Dahlmann
 
@@ -18,19 +15,20 @@ namespace BellaHair.Infrastructure.Invoices
     {
         private readonly BellaHairContext _db;
         private readonly IJSRuntime _jsRuntime;
-        private readonly InvoiceDocumentDataSource _invoiceDocumentDataSource;
 
-        public InvoiceQueryHandler(BellaHairContext db, IJSRuntime jsRuntime, InvoiceDocumentDataSource invoiceDocumentDataSource)
+        public InvoiceQueryHandler(BellaHairContext db, IJSRuntime jsRuntime)
         {
             _db = db;
             _jsRuntime = jsRuntime;
-            _invoiceDocumentDataSource = invoiceDocumentDataSource;
         }
 
         async Task IInvoiceQuery.GetInvoiceByBookingId(Guid bookingId)
         {
             var invoice = await _db.Invoices
-            byte[] pdfBytes = document.GeneratePdf();
+                .FirstOrDefaultAsync(i => i.Booking.Id == bookingId)
+                ?? throw new InvalidOperationException($"Ingen faktura fundet for booking: {bookingId}");
+
+            byte[] pdfBytes = invoice.InvoicePdf;
 
             await _jsRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(pdfBytes));
         }
