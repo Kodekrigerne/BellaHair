@@ -22,11 +22,11 @@ namespace BellaHair.Infrastructure.Invoices
             _jsRuntime = jsRuntime;
         }
 
-        async Task IInvoiceQuery.GetInvoiceByBookingId(Guid bookingId)
+        async Task IInvoiceQuery.GetInvoiceByBookingId(GetInvoiceByBookingIdQuery query)
         {
             var invoice = await _db.Invoices
-                .FirstOrDefaultAsync(i => i.Booking.Id == bookingId)
-                ?? throw new InvalidOperationException($"Ingen faktura fundet for booking: {bookingId}");
+                .FirstOrDefaultAsync(i => i.Booking.Id == query.BookingId)
+                ?? throw new InvalidOperationException($"Ingen faktura fundet for booking: {query.BookingId}");
 
             byte[] pdfBytes = invoice.InvoicePdf;
 
