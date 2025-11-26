@@ -6,11 +6,6 @@
 
 <div class="bc-container">
 
-	<div>
-		<button class="btn-add" @onclick="@HandleCreateInvoiceClick">Lav faktura</button>
-		<button class="btn-add" @onclick="@HandleViewInvoiceClick">Se faktura</button>
-	</div>
-
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>
@@ -58,18 +53,6 @@
 @code {
 	[Parameter, EditorRequired]
 	public required BookingSimpleViewModel Booking { get; set; }
-
-	public async Task HandleViewInvoiceClick()
-	{
-		await InvoiceQuery.GetInvoiceByBookingId(Booking.Id);
-	}
-	
-	public async Task HandleCreateInvoiceClick()
-	{
-        var command = new CreateInvoiceCommand(Booking.Id);
-		
-		await InvoiceCommand.CreateInvoiceAsync(command);
-	}
 }
 
 <style>

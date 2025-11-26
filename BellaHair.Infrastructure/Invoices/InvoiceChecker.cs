@@ -1,4 +1,5 @@
 ﻿using BellaHair.Domain.Invoices;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Invoices
 {
@@ -13,12 +14,14 @@ namespace BellaHair.Infrastructure.Invoices
 
         async Task<bool> IInvoiceChecker.HasBeenPaid(Guid bookingId)
         {
-            throw new NotImplementedException();
+            return await _db.Invoices
+                .AnyAsync(i => i.BookingId == bookingId && i.Booking.IsPaid);
         }
 
-        Task<bool> IInvoiceChecker.HasInvoice(Guid bookingId)
+        async Task<bool> IInvoiceChecker.HasInvoice(Guid bookingId)
         {
-            throw new NotImplementedException();
+            return await _db.Invoices
+                .AnyAsync(i => i.BookingId == bookingId);
         }
     }
 }

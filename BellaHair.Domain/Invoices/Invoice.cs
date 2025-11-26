@@ -31,4 +31,6 @@ namespace BellaHair.Domain.Invoices
             return new Invoice(id, booking, invoicePdf);
         }
     }
+
+    public class InvoiceException(string message) : DomainException(message);
 }

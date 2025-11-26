@@ -17,18 +17,21 @@ namespace BellaHair.Application.Invoices
         private readonly IBookingRepository _bookingRepository;
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IInvoiceDocumentDataSource _invoiceDocumentDataSource;
+        private readonly IInvoiceChecker _invoiceChecker;
 
-        public InvoiceCommandHandler(IBookingRepository bookingRepository, IInvoiceRepository invoiceRepository, IInvoiceDocumentDataSource invoiceDocumentDataSource)
+        public InvoiceCommandHandler(IBookingRepository bookingRepository, IInvoiceRepository invoiceRepository, IInvoiceDocumentDataSource invoiceDocumentDataSource, IInvoiceChecker invoiceChecker)
         {
             _bookingRepository = bookingRepository;
             _invoiceRepository = invoiceRepository;
             _invoiceDocumentDataSource = invoiceDocumentDataSource;
+            _invoiceChecker = invoiceChecker;
         }
 
         async Task IInvoiceCommand.CreateInvoiceAsync(CreateInvoiceCommand command)
         {
-            bool exists = await _
+            if (await _invoiceChecker.HasBeenPaid(command.Id) == false) throw new InvoiceException("Bookingen skal være betalt, før der kan oprettes faktura.");
 
+            if (await _invoiceChecker.HasInvoice(command.Id) == true) throw new InvoiceException("Der er allerede oprettet en faktura for denne booking.");
 
             QuestPDF.Settings.License = LicenseType.Community;
 
