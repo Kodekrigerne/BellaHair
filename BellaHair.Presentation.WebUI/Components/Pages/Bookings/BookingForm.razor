@@ -163,7 +163,6 @@
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
 						<div class="discount-section">
-							@if(!_isPaid || IsEditable()) { <button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button> }
 							@if (_discount != null)
 							{
 								<p class="discount-name">Rabat: @_discount.Name</p>
@@ -289,6 +288,8 @@
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
 			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+
+			if (!_isPaid) await GetBestDiscount();
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
@@ -333,15 +334,15 @@
 	private async Task HandlePickTreatmentClick()
 	{
 		if (_customer == null) return;
-		
+
 		try {
 
-		_treatments = (await TreatmentQuery.GetAllAsync())
-		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
-		.OrderBy(t => t.Name)
-		.ToList();
+			_treatments = (await TreatmentQuery.GetAllAsync())
+			.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+			.OrderBy(t => t.Name)
+			.ToList();
 
-		_activePicker = Picker.Treatments;
+			_activePicker = Picker.Treatments;
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
@@ -351,17 +352,17 @@
 		if (_treatment == null) return;
 
 		try {
-		_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
-			.Select(e => new EmployeeNameWithBookingsViewModel(
-				e.Id,
-				e.Name,
-				e.Bookings
-					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
-					.ToList()))
-			.OrderBy(e => e.Name)
-			.ToList();
+			_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
+				.Select(e => new EmployeeNameWithBookingsViewModel(
+					e.Id,
+					e.Name,
+					e.Bookings
+						.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
+						.ToList()))
+				.OrderBy(e => e.Name)
+				.ToList();
 
-		_activePicker = Picker.Employee;
+			_activePicker = Picker.Employee;
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
@@ -458,6 +459,8 @@
 
 		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id);
 
+		await GetBestDiscount();
+
 		_timeIsAvailable = !(await BookingQuery.BookingHasOverlap(query));
 		_statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
 	}
@@ -507,7 +510,7 @@
 		await HandlePickStartDateTimeClick();
 	}
 
-	private async Task HandleGetDiscountClick(MouseEventArgs args)
+	private async Task GetBestDiscount()
 	{
 		if (_startDate == null || _startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
