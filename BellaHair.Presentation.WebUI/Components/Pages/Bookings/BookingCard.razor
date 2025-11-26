@@ -1,14 +1,25 @@
 ﻿@using System.Globalization
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+@inject IBookingCommand BookingCommand;
 
-<button class="bc-container" @onclick="HandleBookingClick">
+<div class="bc-container" @onclick="HandleBookingClick">
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>
 			<p class="bc-date">@Booking.Date.ToString("dddd, MMMM dd, yyyy", new CultureInfo("da-DK"))</p>
 			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
+		</div>
+		<div style="display: flex; flex-direction: row;">
+			<EditButton OnClick="HandleEditClick" />
+			<BinDeleteButton OnClick="HandleDeleteClick" />
 		</div>
 	</div>
 	<div class="bc-body">
@@ -19,7 +30,7 @@
 			</div>
 
 			<div class="bc-duration">
-				<DurationIcon Class="bc-duration-icon" />
+				<BookingDurationIcon Class="bc-duration-icon" />
 				<span>@Booking.DurationMinutes min</span>
 			</div>
 
@@ -42,15 +53,35 @@
 				</div>
 		</div>
 	</div>
-</button>
+</div>
 
 @code {
 	[Parameter, EditorRequired]
 	public required BookingViewModel Booking { get; set; }
 
+	[Parameter]
+	public EventCallback<Guid> OnClickDelete { get; set; }
+
 	private void HandleBookingClick()
 	{
 		NavigationManager.NavigateTo($"/booking/{Booking.Id}");
+	}
+
+	private void HandleEditClick()
+	{
+		NavigationManager.NavigateTo($"/booking/{Booking.Id}/rediger");
+	}
+
+	private async Task HandleDeleteClick()
+	{
+		try
+		{
+			await BookingCommand.DeleteBooking(new DeleteBookingCommand(Booking.Id));
+			if (OnClickDelete.HasDelegate) await OnClickDelete.InvokeAsync(Booking.Id);
+			Snackbar.Add("Bookingen blev slettet.", Severity.Success);
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 }
 
@@ -65,6 +96,8 @@
 		transition: box-shadow 0.2s ease, border 0.2s ease;
 		display: block;
 		width: 100%;
+		cursor: pointer;
+		user-select: none;
 	}
 
 
