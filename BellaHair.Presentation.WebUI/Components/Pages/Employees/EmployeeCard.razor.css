@@ -11,7 +11,7 @@
     flex-wrap: wrap;
     display: flex;
     gap: 1rem;
-    flex: 0 0 calc(50% - 0.5rem); /*  '0' (flex-grow): Må IKKE vokse. Forhindrer det sidste i
+    flex: 0 0 calc(50% - 1rem); /*  '0' (flex-grow): Må IKKE vokse. Forhindrer det sidste i
                                        at strække sig og fylde hele rækken, hvis antallet er ulige.
                                        '0' (flex-shrink): Må IKKE krympe. Beholder sin bredde.
                                         'calc(50% - 0.5rem)': Sætter bredden til PRÆCIS 50% af
@@ -39,6 +39,7 @@
 
 /* Used to contain all contact-details - not yet finished */
 .employee-contact-details {
+    padding-bottom: 0.5rem;
 }
 
 /* Contains singular contact-detail formatting like email or phonenumber */
@@ -112,6 +113,8 @@
 
 }
 
-::deep .edit-button-employee {
-    
+.delete-edit-buttons {
+    position: absolute;
+    top: 1rem;
+    right: 5rem;
 }

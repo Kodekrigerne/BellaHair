@@ -7,6 +7,7 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 5px;
+    max-width: 11rem;
 }
 
     .employee-input label {

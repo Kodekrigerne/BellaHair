@@ -29,7 +29,7 @@
 
         <div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
         <button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
-        <button class="btn-remove" type="reset">Nulstil ændringer</button>
+        <button class="btn-remove" type="reset" @onclick="@HandleReset">Nulstil ændringer</button>
         <button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
 
         </div>
@@ -90,6 +90,13 @@
     {
         Snackbar.Add("Redigering blev afbrudt.", Severity.Warning);
         await OnCancel.InvokeAsync();
+    }
+
+    private void HandleReset()
+    {
+        SelectedTreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList();
+        InitializeViewModel();
+        StateHasChanged();
     }
 
     private async Task UpdateEmployee()

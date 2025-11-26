@@ -43,29 +43,30 @@
 
 
 		<div class="employee-card">														@*Contains the entire singular employee card layout*@
-					<div>	
-				<div class="employee-avatar">											@*Contains the avatar with intials*@
-					@GetEmployeeInitials(Employee.FullName)
+	<div class="employee-avatar">
+		@*Contains the avatar with intials*@
+		@GetEmployeeInitials(@Employee.FullName)
+	</div>
+	<div>
+		@*Positions other info to position next to avatar*@
+		<h3>@Employee.FullName</h3>
+
+			<div class="employee-contact-details">
+				<div class="employee-single-contact-detail">
+					<MailIcon Class="employee-icons" />
+					@Employee.Email
 				</div>
-					<div>																@*Positions other info to position next to avatar*@
-					<h3>@Employee.FullName</h3>
 
-						<div class="employee-contact-details">
-							<div class="employee-single-contact-detail">
-								<MailIcon Class="employee-icons" />
-									@Employee.Email
-								</div>
+				<div class="employee-single-contact-detail">
+					<PhoneIcon Class="employee-icons" />
+					@Employee.PhoneNumber
+				</div>
 
-							<div class="employee-single-contact-detail">
-								<PhoneIcon Class="employee-icons"/>
-									@Employee.PhoneNumber
-							</div>
-
-							<div class="employee-single-contact-detail"> 
-								<MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="employee-icons" />
-									@Employee.FullAddress
-							</div>
-						</div>
+				<div class="employee-single-contact-detail">
+				<MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="employee-icons" />
+					@Employee.FullAddress
+				</div>
+			</div>
 						
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
 						@foreach (var treatment in Employee.Treatments)
@@ -74,24 +75,23 @@
 							}
 						</div>
 					</div>
-					</div>
 
-	<div class="delete-edit-buttons">
+	<div class="delete-edit-buttons d-flex gap-2" style="width: 0%;">
 		<EditButton onclick="@(() => showEditModal = true)" />
-		<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+			<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+	</div>
 	</div>
 
-	</div>
 
 @code
-	{
+{
 
 	private bool _showDeleteModal = false;
 	public bool showEditModal = false;
 	private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
-	 public required EventCallback OnChange { get; set; }
+	public required EventCallback OnChange { get; set; }
 
 
 	[Parameter, EditorRequired]
@@ -121,8 +121,7 @@
 
 	private void HandleCancel()
 	{
-		CloseModal();
-		SnackBar.Add("Handlingen blev afbrudt.", Severity.Warning);
+		showEditModal = false;
 	}
 
 	// Viser modalen og tjekker, om der er fremtidige bookinger.
