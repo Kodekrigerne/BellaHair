@@ -85,3 +85,28 @@
     justify-content:center;
 }
 
+.active-wrapper{
+    display:flex;
+    margin-left:auto;
+    margin-top:auto;
+
+}
+
+
+.btn-active, .btn-inactive {
+    color: white;
+    padding: 0px 10px 0px 10px;
+    border-radius: 14px;
+    font-size: 10px;
+    cursor:default;
+    height:20px;
+    width:50px;
+}
+
+.btn-active {
+    background-color: #2ddd22;
+}
+
+.btn-inactive{
+    background-color: #fa4444
+}
