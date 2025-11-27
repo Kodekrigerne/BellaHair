@@ -116,6 +116,7 @@ namespace BellaHair.Application
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
             }
+            // TODO : Catch mere specifik exception
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
