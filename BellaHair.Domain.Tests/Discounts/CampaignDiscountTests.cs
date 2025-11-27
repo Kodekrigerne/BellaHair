@@ -39,23 +39,39 @@ namespace BellaHair.Domain.Tests.Discounts
                 Assert.That(campaignDiscount.TreatmentIds, Is.EqualTo(treatmentIds));   
             });
 
-
         }
 
+        [Test]
         public void Given_StartDateIsAfterEndDate_Then_ThrowsException()
         {
-            var validDiscountPercent = DiscountPercent.FromDecimal(discountPercent);
+            // Arrange
+            var name = "Sommerkampagne";
+            var discountPercent = DiscountPercent.FromDecimal(0.30m);
+            var startDate = new DateTime(2025, 5, 10);
+            var invalidEndDate = new DateTime(2025, 5, 1);
 
-            Assert.Throws<CampaignDiscountException>(() =>
-                CampaignDiscount.Create(name, validDiscountPercent, startDate, endDate, treatmentIds));
+            var treatmentIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            // Act & Assert
+
+            Assert.Throws<CampaignDiscountException>(() => 
+                CampaignDiscount.Create(name, discountPercent, startDate, invalidEndDate, treatmentIds));
+
         }
 
-        public void Given_EmptyTreatmentList_Then_ThrowsException(string name, decimal discountPercent, DateTime startDate, DateTime endDate, List<Guid> treatmentIds)
+        [Test]
+        public void Given_EmptyTreatmentList_Then_ThrowsException()
         {
-            var validDiscountPercent = DiscountPercent.FromDecimal(discountPercent); 
+            // Arrange
+            var name = "Forårskampagne";
+            var discountPercent = DiscountPercent.FromDecimal(0.10m);
+            var startDate = new DateTime(2025, 3, 1);
+            var endDate = new DateTime(2025, 6, 1);
+
+            var treatmentIds = new List<Guid>([]);
             
             Assert.Throws<CampaignDiscountException>(() =>
-                CampaignDiscount.Create(name, validDiscountPercent, startDate, endDate, treatmentIds));
+                CampaignDiscount.Create(name, discountPercent, startDate, endDate, treatmentIds));
 
         }
     }

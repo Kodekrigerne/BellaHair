@@ -51,7 +51,7 @@ namespace BellaHair.Domain.Discounts
             if (booking.Treatment == null)
                 throw new InvalidOperationException("Treatment must be included in booking to calculate discount.");
 
-            if (booking.StartDateTime < StartDate || booking.StartDateTime > EndDate)
+            if (booking.StartDateTime < StartDate.Date || booking.StartDateTime > EndDate.Date)
                 return BookingDiscount.Inactive(Name);
 
             if (!TreatmentIds.Contains(booking.Treatment.Id))
