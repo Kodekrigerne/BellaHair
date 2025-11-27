@@ -5,6 +5,7 @@ namespace BellaHair.Domain.Discounts
     public class BirthdayDiscount : DiscountBase
     {
         public string Name { get; private set; }
+        public override DiscountType Type => DiscountType.BirthdayDiscount;
         public DiscountPercent DiscountPercent { get; private set; }
 
 
@@ -26,13 +27,13 @@ namespace BellaHair.Domain.Discounts
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
             if (booking.StartDateTime.Month != booking.Customer.Birthday.Month)
-                return BookingDiscount.Inactive(Name);
+                return BookingDiscount.Inactive(Name, Type);
 
             if (booking.Customer.HasUsedBirthdayDiscount(booking.StartDateTime.Year))
-                return BookingDiscount.Inactive(Name);
+                return BookingDiscount.Inactive(Name, Type);
 
             var discount = booking.Total * DiscountPercent.Value;
-            return BookingDiscount.Active(Name, discount);
+            return BookingDiscount.Active(Name, discount, Type);
         }
     }
     public class BirthdayDiscountException(string message) : DomainException(message);
