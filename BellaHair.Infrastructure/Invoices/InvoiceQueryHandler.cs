@@ -32,10 +32,5 @@ namespace BellaHair.Infrastructure.Invoices
 
             await _jsRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(pdfBytes));
         }
-
-        async Task<int> IInvoiceQuery.GetNextInvoiceIdAsync()
-        {
-            return await _db.Invoices.MaxAsync(i => (int?)i.Id) + 1 ?? 1;
-        }
     }
 }

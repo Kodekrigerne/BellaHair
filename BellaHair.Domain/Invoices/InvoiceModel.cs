@@ -1,4 +1,5 @@
 ﻿using BellaHair.Domain.Bookings;
+using BellaHair.Domain.Discounts;
 
 namespace BellaHair.Domain.Invoices
 {
@@ -10,17 +11,19 @@ namespace BellaHair.Domain.Invoices
 
     public class InvoiceModel
     {
-        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment)
+        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, BookingDiscount discount)
         {
             Id = id;
             IssueDate = issueDate;
             Customer = customer;
             Treatments.Add(treatment);
+            Discount = discount;
         }
 
         public int Id { get; set; }
         public DateTime IssueDate { get; set; }
         public CustomerSnapshot Customer { get; set; }
         public List<TreatmentSnapshot> Treatments { get; set; } = [];
+        public BookingDiscount Discount { get; set; }
     }
 }

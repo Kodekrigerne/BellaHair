@@ -63,6 +63,8 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<IEmailService, EmailService>();
 
+            serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
+
             return serviceCollection;
         }
     }

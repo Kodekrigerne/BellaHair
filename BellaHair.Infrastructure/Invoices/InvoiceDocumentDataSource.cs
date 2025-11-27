@@ -1,7 +1,7 @@
 ﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Invoices;
-using BellaHair.Ports.Invoices;
+using BellaHair.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 // Mikkel Dahlmann
 
@@ -11,34 +11,34 @@ using BellaHair.Ports.Invoices;
 
 public class InvoiceDocumentDataSource : IInvoiceDocumentDataSource
 {
-    private readonly IBookingRepository _bookingRepository;
+    private readonly BellaHairContext _db;
     private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
-    private readonly IInvoiceRepository _invoiceRepository;
-    private readonly IInvoiceQuery _invoiceQueryHandler;
 
     public InvoiceDocumentDataSource(
-        IBookingRepository bookingRepository,
-        ICurrentDateTimeProvider currentDateTimeProvider,
-        IInvoiceRepository invoiceRepository,
-        IInvoiceQuery invoiceQueryHandler)
+        BellaHairContext db,
+        ICurrentDateTimeProvider currentDateTimeProvider)
     {
-        _bookingRepository = bookingRepository;
+        _db = db;
         _currentDateTimeProvider = currentDateTimeProvider;
-        _invoiceRepository = invoiceRepository;
-        _invoiceQueryHandler = invoiceQueryHandler;
     }
 
     public async Task<InvoiceModel> GetInvoiceDetailsAsync(Guid Id)
     {
-        var booking = await _bookingRepository.GetAsync(Id);
+        var booking = await _db.Bookings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == Id)
+            ?? throw new DomainException("Booking not found");
+
         var currentDate = _currentDateTimeProvider.GetCurrentDateTime();
-        var id = await _invoiceQueryHandler.GetNextInvoiceIdAsync();
+        var id = await _db.Invoices.MaxAsync(i => (int?)i.Id) + 1 ?? 1;
+        var discount = booking.Discount;
 
         return new InvoiceModel(
             id,
             currentDate,
             booking.CustomerSnapshot!,
-            booking.TreatmentSnapshot!)
+            booking.TreatmentSnapshot!,
+            discount!)
         { };
     }
 }

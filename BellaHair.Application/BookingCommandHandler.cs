@@ -24,6 +24,7 @@ namespace BellaHair.Application
         private readonly IDiscountCalculatorService _discountCalculatorService;
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IInvoiceDocumentDataSource _invoiceDocumentDataSource;
+        private readonly IUnitOfWork _unitOfWork;
 
         public BookingCommandHandler(
             IEmployeeRepository employeeRepository,
@@ -34,7 +35,8 @@ namespace BellaHair.Application
             IBookingOverlapChecker bookingOverlapChecker,
             IDiscountCalculatorService discountCalculatorService,
             IInvoiceRepository invoiceRepository,
-            IInvoiceDocumentDataSource invoiceDocumentDataSource)
+            IInvoiceDocumentDataSource invoiceDocumentDataSource,
+            IUnitOfWork unitOfWork)
         {
             _employeeRepository = employeeRepository;
             _privateCustomerRepository = privateCustomerRepository;
@@ -45,6 +47,7 @@ namespace BellaHair.Application
             _discountCalculatorService = discountCalculatorService;
             _invoiceRepository = invoiceRepository;
             _invoiceDocumentDataSource = invoiceDocumentDataSource;
+            _unitOfWork = unitOfWork;
         }
 
         async Task IBookingCommand.CreateBooking(CreateBookingCommand command)
@@ -83,28 +86,40 @@ namespace BellaHair.Application
 
         async Task IBookingCommand.PayAndInvoiceBooking(PayAndInvoiceBookingCommand command)
         {
-            var booking = await _bookingRepository.GetAsync(command.Id);
+            await _unitOfWork.BeginTransactionAsync();
 
-            if (command.Discount != null)
+            try
             {
-                var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount);
-                booking.SetDiscount(discount);
+                var booking = await _bookingRepository.GetAsync(command.Id);
+
+                if (command.Discount != null)
+                {
+                    var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount);
+                    booking.SetDiscount(discount);
+                }
+
+                booking.PayBooking(_currentDateTimeProvider);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                QuestPDF.Settings.License = LicenseType.Community;
+
+                var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(command.Id);
+                var document = new InvoiceDocument(model);
+
+                byte[] pdfBytes = document.GeneratePdf();
+
+                var invoice = Invoice.Create(model.Id, booking, pdfBytes);
+
+                await _invoiceRepository.AddAsync(invoice);
+
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
             }
-
-            booking.PayBooking(_currentDateTimeProvider);
-            await _bookingRepository.SaveChangesAsync();
-
-            QuestPDF.Settings.License = LicenseType.Community;
-
-            var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(command.Id);
-            var document = new InvoiceDocument(model);
-
-            byte[] pdfBytes = document.GeneratePdf();
-
-            var invoice = Invoice.Create(model.Id, booking, pdfBytes);
-
-            await _invoiceRepository.AddAsync(invoice);
-            await _invoiceRepository.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+            }
         }
 
         async Task IBookingCommand.UpdateBooking(UpdateBookingCommand command)
