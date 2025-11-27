@@ -161,8 +161,9 @@
 			@if (_timeIsAvailable != null)
 			{
 				<div class="right-bottom">
+					
 					<p class="availability-status">@_statusMessage</p>
-
+			
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
 						<div class="discount-section">
@@ -178,6 +179,10 @@
 							@if (_discount != null && _treatment != null)
 							{
 								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
+							}
+							@if (_isPaid)
+							{
+								<button class="btn-view btn-pay" @onclick="HandleViewInvoiceClick">Se faktura</button>
 							}
 						</div>
 
@@ -557,7 +562,7 @@
 		try
 		{
 			var command = new PayAndInvoiceBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount));
-            await BookingCommand.PayAndInvoiceBooking(command);
+			await BookingCommand.PayAndInvoiceBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
 
 			var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
@@ -587,7 +592,7 @@
 	private async Task HandleDeleteClick()
 	{
 		if (Id == null) return;
-	
+
 		try
 		{
 			var command = new DeleteBookingCommand(Id.Value);
@@ -616,6 +621,23 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
+	}
+
+	private async Task HandleViewInvoiceClick()
+	{
+		try
+		{
+			var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
+			await InvoiceQuery.GetInvoiceByBookingIdAsync(queryCommand);
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error); 
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
 	}
 }
 
