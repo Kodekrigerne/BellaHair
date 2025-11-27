@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain;
+﻿using BellaHair.Application;
+using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
@@ -59,6 +60,8 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IInvoiceRepository, InvoiceRepository>();
             serviceCollection.AddScoped<IInvoiceDocumentDataSource, InvoiceDocumentDataSource>();
             serviceCollection.AddScoped<IInvoiceChecker, InvoiceChecker>();
+
+            serviceCollection.AddScoped<IEmailService, EmailService>();
 
             return serviceCollection;
         }

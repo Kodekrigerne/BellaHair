@@ -23,6 +23,13 @@ namespace BellaHair.Infrastructure.Invoices
             return invoice;
         }
 
+        async Task<Invoice> IInvoiceRepository.GetInvoiceByBookingIdAsync(Guid bookingId)
+        {
+            return await _db.Invoices
+                .FirstOrDefaultAsync(i => i.BookingId == bookingId)
+                    ?? throw new KeyNotFoundException($"No invoice exists for booking ID {bookingId}");
+        }
+
         async Task IInvoiceRepository.SaveChangesAsync()
         {
             await _db.SaveChangesAsync();

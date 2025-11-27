@@ -22,7 +22,6 @@ namespace BellaHair.Application
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
         private readonly IDiscountCalculatorService _discountCalculatorService;
-        private readonly IInvoiceChecker _invoiceChecker;
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IInvoiceDocumentDataSource _invoiceDocumentDataSource;
 
@@ -34,7 +33,6 @@ namespace BellaHair.Application
             ICurrentDateTimeProvider currentDateTimeProvider,
             IBookingOverlapChecker bookingOverlapChecker,
             IDiscountCalculatorService discountCalculatorService,
-            IInvoiceChecker invoiceChecker,
             IInvoiceRepository invoiceRepository,
             IInvoiceDocumentDataSource invoiceDocumentDataSource)
         {
@@ -45,7 +43,6 @@ namespace BellaHair.Application
             _currentDateTimeProvider = currentDateTimeProvider;
             _bookingOverlapChecker = bookingOverlapChecker;
             _discountCalculatorService = discountCalculatorService;
-            _invoiceChecker = invoiceChecker;
             _invoiceRepository = invoiceRepository;
             _invoiceDocumentDataSource = invoiceDocumentDataSource;
         }

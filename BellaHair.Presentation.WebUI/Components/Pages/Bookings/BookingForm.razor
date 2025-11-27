@@ -24,6 +24,7 @@
 @inject NavigationManager NavigationManager;
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 @inject IInvoiceQuery InvoiceQuery;
+@inject IInvoiceCommand InvoiceCommand;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -180,11 +181,15 @@
 							{
 								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
 							}
-							@if (_isPaid)
-							{
-								<button class="btn-view btn-pay" @onclick="HandleViewInvoiceClick">Se faktura</button>
-							}
 						</div>
+						
+						@if (_isPaid)
+						{
+							<div class="btn-group">
+								<button class="btn-view btn-pay" @onclick="HandleViewInvoiceClick" style="width: 50%">Se faktura</button>
+								<button class="btn-view btn-pay" @onclick="HandleEmailInvoice" style="width: 50%">Email faktura til kunde</button>
+							</div>
+						}
 
 						if (Mode == BookingMode.New)
 						{
@@ -627,12 +632,31 @@
 	{
 		try
 		{
-			var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
-			await InvoiceQuery.GetInvoiceByBookingIdAsync(queryCommand);
+			var command = new GetInvoiceByBookingIdQuery(Id!.Value);
+			await InvoiceQuery.GetInvoiceByBookingIdAsync(command);
 		}
 		catch (DomainException ex)
 		{
 			Snackbar.Add(ex.Message, Severity.Error); 
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+	}
+
+	private async Task HandleEmailInvoice()
+	{
+		try
+		{
+			var email = _customer!.Email;
+			var command = new EmailInvoiceToCustomerCommand(Id!.Value, email);
+			await InvoiceCommand.EmailInvoiceToCustomerAsync(command);
+			Snackbar.Add($"Faktura afsendt til {email}", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
 		}
 		catch (Exception ex)
 		{

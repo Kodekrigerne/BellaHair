@@ -10,6 +10,7 @@
     {
         Task AddAsync(Invoice invoice);
         Task<Invoice> GetAsync(int id);
+        Task<Invoice> GetInvoiceByBookingIdAsync(Guid bookingId);
         Task SaveChangesAsync();
     }
 }
