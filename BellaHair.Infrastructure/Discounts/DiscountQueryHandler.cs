@@ -47,7 +47,7 @@ namespace BellaHair.Infrastructure.Discounts
 
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
 
-            return discount == null ? null : new BookingDiscountDTO(discount.Name, discount.Amount);
+            return discount == null ? null : new BookingDiscountDTO(discount.Name, discount.Amount, discount.Type);
         }
     }
 }

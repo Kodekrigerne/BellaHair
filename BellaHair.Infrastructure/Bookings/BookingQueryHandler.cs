@@ -41,7 +41,7 @@ namespace BellaHair.Infrastructure.Bookings
             booking.Treatment?.Id ?? booking.TreatmentSnapshot?.TreatmentId
                 ?? throw new InvalidOperationException($"Booking {booking.Id} does not have a treatment attached."),
 
-            booking.Discount != null ? new DiscountDTO(booking.Discount.Name, booking.Discount.Amount) : null
+            booking.Discount != null ? new DiscountDTO(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type) : null
             );
         }
 
@@ -103,7 +103,7 @@ namespace BellaHair.Infrastructure.Bookings
                     : b.Treatment?.DurationMinutes.Value
                         ?? throw new InvalidOperationException($"Booking {b.Id} is unpaid but missing a treatment."),
 
-                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount) : null
+                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, b.Discount.Type) : null
                 ));
         }
     }
