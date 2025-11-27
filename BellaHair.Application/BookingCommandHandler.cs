@@ -78,8 +78,13 @@ namespace BellaHair.Application
 
             if (command.Discount != null)
             {
-                var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount);
+                var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount, command.Discount.Type);
                 booking.SetDiscount(discount);
+            }
+
+            if (booking.Discount.Type == DiscountType.BirthdayDiscount)
+            {
+                booking.Customer.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
             }
 
             booking.PayBooking(_currentDateTimeProvider);
