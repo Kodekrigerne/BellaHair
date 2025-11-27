@@ -12,7 +12,7 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar;
 
-<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/new"); })" />
+<PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/ny"); })" />
 
 <div>
 	<button @onclick="HandleNewSelectorClick" class="@(_activeTab == BookingTab.New? "btn-select-active" : "btn-select")">Kommende bookinger</button>
@@ -26,7 +26,7 @@
 	{
 		@foreach (var booking in _bookings)
 		{
-			<BookingCard Booking="@booking" />
+			<BookingCard Booking="@booking" OnClickDelete="HandleDeleteClick" />
 		}
 	}
 </div>
@@ -36,7 +36,7 @@
 	private BookingTab _activeTab;
 
 	private DateTime _now;
-	private List<BookingSimpleViewModel> _bookings = [];
+	private List<BookingViewModel> _bookings = [];
 
 	protected async override Task OnInitializedAsync()
 	{
@@ -65,22 +65,29 @@
 		{
 			var bookings = bookingTab == BookingTab.New ? await BookingQuery.GetAllNewAsync() : await BookingQuery.GetAllOldAsync();
 
-			_bookings = bookings.Select(b => new BookingSimpleViewModel(
+			_bookings = bookings.Select(b => new BookingViewModel(
+				b.Id,
 				b.StartDateTime,
 				b.EndDateTime,
 				DateOnly.FromDateTime(b.StartDateTime),
 				TimeOnly.FromDateTime(b.StartDateTime),
 				TimeOnly.FromDateTime(b.EndDateTime),
+				b.IsPaid,
 				b.Total,
 				b.EmployeeFullName,
 				b.CustomerFullName,
 				b.TreatmentName,
 				b.DurationMinutes,
 				b.Discount?.Name,
-				b.Discount?.DiscountAmount
+				b.Discount?.Amount
 			)).OrderBy(b => b.StartDateTime).ToList();
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private void HandleDeleteClick(Guid id)
+	{
+		_bookings = _bookings.Where(b => b.Id != id).ToList();
 	}
 }

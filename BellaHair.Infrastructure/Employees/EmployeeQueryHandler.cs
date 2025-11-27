@@ -105,6 +105,27 @@ namespace BellaHair.Infrastructure.Employees
                 employee.Address.Floor);
         }
 
+        async Task<EmployeeNameWithBookingsDTO> IEmployeeQuery.GetWithFutureBookingsAsync(GetWithFutureBookingsQuery query)
+        {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            return await _db.Employees
+                .AsNoTracking()
+                .Where(e => e.Id == query.Id)
+                .Select(e => new EmployeeNameWithBookingsDTO(
+                    e.Id,
+                    e.Name.FullName,
+                    e.Bookings
+                        .Where(b => b.EndDateTime > now)
+                        .Select(b => new BookingTimesOnlyDTO(
+                            b.StartDateTime,
+                            b.EndDateTime,
+                            b.Treatment!.DurationMinutes.Value)
+                            )
+                .ToList()))
+                .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Employee {query.Id} not found.");
+        }
+
         async Task<List<EmployeeNameWithBookingsDTO>> IEmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(Guid treatmentId)
         {
             var now = _currentDateTimeProvider.GetCurrentDateTime();

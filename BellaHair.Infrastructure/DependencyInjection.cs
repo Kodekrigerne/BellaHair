@@ -27,6 +27,8 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IDiscountCalculatorService, DiscountCalculatorService>();
             serviceCollection.AddScoped<ILoyaltyDiscountRepository, LoyaltyDiscountRepository>();
             serviceCollection.AddScoped<ILoyaltyDiscountQuery, LoyaltyDiscountQueryHandler>();
+            serviceCollection.AddScoped<ICampaignDiscountRepository, CampaignDiscountRepository>();
+            serviceCollection.AddScoped<ICampaignDiscountQuery, CampaignDiscountQueryHandler>();
 
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
@@ -38,6 +40,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
             serviceCollection.AddScoped<IPCustomerFutureBookingChecker, PCustomerFutureBookingChecker>();
+            serviceCollection.AddScoped<ICustomerVisitsService, CustomerVisitsService>();
 
             serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 

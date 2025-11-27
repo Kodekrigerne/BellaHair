@@ -20,7 +20,32 @@ namespace BellaHair.Infrastructure.Bookings
             _bookingOverlapChecker = bookingOverlapChecker;
         }
 
-        async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllNewAsync()
+        async Task<BookingWithRelationsDTO> IBookingQuery.GetWithRelationsAsync(GetWithRelationsQuery query)
+        {
+            var booking = await _db.Bookings
+                .Include(b => b.Employee)
+                .Include(b => b.Treatment)
+                .Include(b => b.Customer)
+                .FirstOrDefaultAsync(b => b.Id == query.Id) ?? throw new KeyNotFoundException($"Booking {query.Id} not found.");
+
+            return new BookingWithRelationsDTO(
+            booking.StartDateTime,
+            booking.IsPaid,
+
+            booking.Employee?.Id ?? booking.EmployeeSnapshot?.EmployeeId
+                ?? throw new InvalidOperationException($"Booking {booking.Id} does not have an employee attached."),
+
+            booking.Customer?.Id ?? booking.CustomerSnapshot?.CustomerId
+                ?? throw new InvalidOperationException($"Booking {booking.Id} does not have a customer attached."),
+
+            booking.Treatment?.Id ?? booking.TreatmentSnapshot?.TreatmentId
+                ?? throw new InvalidOperationException($"Booking {booking.Id} does not have a treatment attached."),
+
+            booking.Discount != null ? new DiscountDTO(booking.Discount.Name, booking.Discount.Amount) : null
+            );
+        }
+
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
@@ -30,35 +55,36 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Employee)
                 .ToListAsync();
 
-            return MapToBookingSimpleDTOs(bookings);
+            return MapToBookingDTOs(bookings);
         }
 
-        async Task<IEnumerable<BookingSimpleDTO>> IBookingQuery.GetAllOldAsync()
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync()
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.TreatmentSnapshot != null)
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
                 .ToListAsync();
 
-            return MapToBookingSimpleDTOs(bookings);
+            return MapToBookingDTOs(bookings);
         }
 
         async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
         {
-            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId);
+            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.bookingId);
         }
 
-        private static IEnumerable<BookingSimpleDTO> MapToBookingSimpleDTOs(IEnumerable<Booking> bookings)
+        private static IEnumerable<BookingDTO> MapToBookingDTOs(IEnumerable<Booking> bookings)
         {
             // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
             // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
-            return bookings.Select(b => new BookingSimpleDTO(
+            return bookings.Select(b => new BookingDTO(
+                b.Id,
                 b.StartDateTime,
                 b.EndDateTime,
+                b.IsPaid,
                 b.Total,
                 b.Employee?.Name.FullName ?? b.EmployeeSnapshot?.FullName
                     ?? throw new InvalidOperationException($"Booking {b.Id} does not have an employee attached."),

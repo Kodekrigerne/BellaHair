@@ -1,11 +1,12 @@
 ﻿using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure;
+using FixtureBuilder;
 
 namespace BellaHair.Domain.Tests.PrivateCustomers
 {
     // Mikkel Dahlmann
-    
+
     internal sealed class PrivateCustomerTests
     {
         [Test]
@@ -87,6 +88,32 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
 
             // Act & Assert
             Assert.Throws<PrivateCustomerException>(() => privateCustomer.Update(name, address, phoneNumber, email, newBirthday, dateTimeProvider));
+        }
+
+        [TestCase(0)]
+        [TestCase(1)]
+        [TestCase(5)]
+        public void SetVisits_Given_PositiveVisits_Then_SetsVisits(int visits)
+        {
+            //Arrange
+            var customer = Fixture.New<PrivateCustomer>().Build();
+
+            //Act
+            customer.SetVisits(visits);
+
+            //Assert
+            Assert.That(customer.Visits, Is.EqualTo(visits));
+        }
+
+        [TestCase(-1)]
+        [TestCase(-5)]
+        public void SetVisits_Given_NegativeVisits_Then_ThrowsException(int visits)
+        {
+            //Arrange
+            var customer = Fixture.New<PrivateCustomer>().Build();
+
+            //Act & Assert
+            Assert.Throws<PrivateCustomerException>(() => customer.SetVisits(visits));
         }
     }
 }

@@ -6,16 +6,27 @@
     /// </summary>
     public interface IBookingQuery
     {
-        Task<IEnumerable<BookingSimpleDTO>> GetAllNewAsync();
-        Task<IEnumerable<BookingSimpleDTO>> GetAllOldAsync();
+        Task<BookingWithRelationsDTO> GetWithRelationsAsync(GetWithRelationsQuery query);
+        Task<IEnumerable<BookingDTO>> GetAllNewAsync();
+        Task<IEnumerable<BookingDTO>> GetAllOldAsync();
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
 
-    public record DiscountDTO(string Name, decimal DiscountAmount);
+    public record BookingWithRelationsDTO(
+        DateTime StartDateTime,
+        bool IsPaid,
+        Guid EmployeeId,
+        Guid CustomerId,
+        Guid TreatmentId,
+        DiscountDTO? Discount);
 
-    public record BookingSimpleDTO(
+    public record DiscountDTO(string Name, decimal Amount);
+
+    public record BookingDTO(
+        Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
+        bool IsPaid,
         decimal Total,
         string EmployeeFullName,
         string CustomerFullName,
@@ -23,5 +34,7 @@
         int DurationMinutes,
         DiscountDTO? Discount);
 
-    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId);
+    public record GetWithRelationsQuery(Guid Id);
+
+    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId, Guid? bookingId = null);
 }

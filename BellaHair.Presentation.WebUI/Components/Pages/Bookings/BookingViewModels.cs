@@ -1,11 +1,13 @@
 ﻿namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
 {
-    public record BookingSimpleViewModel(
+    public record BookingViewModel(
+        Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
         DateOnly Date,
         TimeOnly StartTime,
         TimeOnly EndTime,
+        bool IsPaid,
         decimal Total,
         string EmployeeFullName,
         string CustomerFullName,

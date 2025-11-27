@@ -1,12 +1,26 @@
 ﻿@using System.Globalization
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
+@using BellaHair.Presentation.WebUI.Components.Shared
 
-<div class="bc-container">
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+@inject IBookingCommand BookingCommand;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider;
+
+<div class="bc-container" @onclick="HandleBookingClick">
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>
 			<p class="bc-date">@Booking.Date.ToString("dddd, MMMM dd, yyyy", new CultureInfo("da-DK"))</p>
 			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
+		</div>
+		<div style="display: flex; flex-direction: row; gap: 2px;">
+			<EditButton Class="@(CanEdit() ? "edit-active" : "btn-inactive")" OnClick="HandleEditClick" />
+			<BinDeleteButton Class="@(CanDelete() ? "" : "btn-inactive")" OnClick="HandleDeleteClick" />
 		</div>
 	</div>
 	<div class="bc-body">
@@ -17,7 +31,7 @@
 			</div>
 
 			<div class="bc-duration">
-				<DurationIcon Class="bc-duration-icon" />
+				<BookingDurationIcon Class="bc-duration-icon" />
 				<span>@Booking.DurationMinutes min</span>
 			</div>
 
@@ -27,28 +41,76 @@
 			</div>
 		</div>
 
-		@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
-		{
-			<div class="bc-discount">
-				<DiscountIcon Class="bc-discount-icon" />
-				<span>
-					@if (Booking.DiscountName != null)
+		<div class="bc-body-right">
+				<div class="bc-price">
+					<span>Total:</span>
+					<span>@Booking.Total.ToString("C2")</span>
+					@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
 					{
-						<span>@Booking.DiscountName</span>
+						<DiscountIcon Class="bc-discount-icon" />
+						<span>Rabat: @Booking.DiscountName</span>
+						<span>-@Booking.DiscountAmount!.Value.ToString("C2")</span>
 					}
-					@if (Booking.DiscountAmount != null)
-					{
-						<span class="bc-discount-amount">-@Booking.DiscountAmount dkk</span>
-					}
-				</span>
-			</div>
-		}
+				</div>
+		</div>
 	</div>
 </div>
 
 @code {
 	[Parameter, EditorRequired]
-	public required BookingSimpleViewModel Booking { get; set; }
+	public required BookingViewModel Booking { get; set; }
+
+	[Parameter]
+	public EventCallback<Guid> OnClickDelete { get; set; }
+
+	private DateTime _now;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+	}
+
+	private void HandleBookingClick()
+	{
+		NavigationManager.NavigateTo($"/booking/{Booking.Id}");
+	}
+
+	private void HandleEditClick()
+	{
+		if (!CanEdit()) return;
+
+		NavigationManager.NavigateTo($"/booking/{Booking.Id}/rediger");
+	}
+
+	private async Task HandleDeleteClick()
+	{
+		if (!CanDelete()) return;
+
+		try
+		{
+			await BookingCommand.DeleteBooking(new DeleteBookingCommand(Booking.Id));
+			if (OnClickDelete.HasDelegate) await OnClickDelete.InvokeAsync(Booking.Id);
+			Snackbar.Add("Bookingen blev slettet.", Severity.Success);
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private bool CanEdit()
+	{
+		if (Booking.IsPaid) return false;
+		if (Booking.StartDateTime < _now) return false;
+		return true;
+	}
+
+	private bool CanDelete()
+	{
+		if (Booking.IsPaid) return false;
+		if (Booking.StartDateTime < _now && Booking.StartDateTime.Date == _now.Date) return false;
+		return true;
+	}
 }
 
 <style>
@@ -58,20 +120,27 @@
 		padding: 1.25rem;
 		margin-bottom: 1rem;
 		background: #fff;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-		transition: box-shadow 0.2s ease;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0. 05);
+		transition: box-shadow 0.2s ease, border 0.2s ease;
+		display: block;
+		width: 100%;
+		cursor: pointer;
+		user-select: none;
 	}
 
+
 		.bc-container:hover {
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			background-color: #f5faff;
+			border: 1px solid #2563eb;
 		}
 
 	.bc-header {
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr auto auto;
 		align-items: flex-start;
 		margin-bottom: 1rem;
 		border-bottom: 1px solid #f0f0f0;
+		gap: 2rem;
 	}
 
 	.bc-customer {
@@ -96,6 +165,31 @@
 		color: black;
 	}
 
+	.edit-active .edit-icon {
+		fill: #2196F3 !important;
+	}
+
+	.edit-active:hover {
+		background-color: #BBDEFB;
+	}
+
+	.btn-inactive {
+		color: grey;
+	}
+
+	.btn-inactive .edit-icon {
+		fill: grey !important;
+	}
+
+		.btn-inactive:hover {
+			background: none;
+			cursor: default;
+		}
+
+		.btn-inactive:active {
+			transform: none;
+		}
+
 	.bc-body {
 		display: flex;
 		justify-content: space-between;
@@ -106,6 +200,13 @@
 		display: flex;
 		flex-direction: row;
 		gap: 0.75rem;
+	}
+
+	.bc-body-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0.5rem;
 	}
 
 	.bc-treatment,
@@ -119,7 +220,7 @@
 		font-size: 1.10rem;
 	}
 
-	.bc-discount {
+	.bc-price {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -145,10 +246,16 @@
 	}
 
 	.bc-discount-icon {
+		margin-left: 2rem;
 		color: #177000;
 	}
 
-	.bc-discount-amount {
-		margin-left: 0.75rem;
+	.bc-total {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 1.10rem;
+		font-weight: 500;
+		color: black;
 	}
 </style>

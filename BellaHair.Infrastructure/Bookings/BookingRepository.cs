@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
+using BellaHair.Infrastructure.PrivateCustomers;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
 {
@@ -15,9 +11,13 @@ namespace BellaHair.Infrastructure.Bookings
     public class BookingRepository : IBookingRepository
     {
         private readonly BellaHairContext _db;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public BookingRepository(BellaHairContext db)
-            => _db = db;
+        public BookingRepository(BellaHairContext db, ICustomerVisitsService customerVisitsService)
+        {
+            _db = db;
+            _customerVisitsService = customerVisitsService;
+        }
 
         public async Task AddAsync(Booking booking)
         {
@@ -31,8 +31,20 @@ namespace BellaHair.Infrastructure.Bookings
 
         public async Task<Booking> GetAsync(Guid id)
         {
-            return await _db.Bookings.FindAsync(id) ??
+            var booking = await _db.Bookings
+                .Include(b => b.Customer)
+                .Include(b => b.Employee)
+                .Include(b => b.Treatment)
+                .SingleOrDefaultAsync(b => b.Id == id) ??
                 throw new KeyNotFoundException($"Booking with id {id} is not found.");
+
+            if (booking.Customer != null)
+            {
+                var visits = await _customerVisitsService.GetCustomerVisitsAsync(booking.Customer.Id);
+                booking.Customer.SetVisits(visits);
+            }
+
+            return booking;
         }
 
         public async Task SaveChangesAsync()

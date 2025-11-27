@@ -1,4 +1,5 @@
 ﻿<!-- Dennis -->
+<!-- Mikkel Klitgaard-->
 
 @attribute [StreamRendering]
 
@@ -7,15 +8,17 @@
 @using BellaHair.Domain
 @using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Presentation.WebUI.Components.Pages.Discounts.CampaignDiscount
 
 @rendermode InteractiveServer
 
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
 @inject ISnackbar Snackbar;
+@inject ICampaignDiscountQuery CampaignDiscountQuery
 
-<Modal @bind-IsVisible="@_showNewModal">
+<Modal IsVisible="@_showNewModal">
 	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
-	@if (_activeTab == DiscountTab.Campaign) { <p>Ny kampagnerabat</p> }
+	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign" OnCancel="HandleOnCancel"/> }
 </Modal>
 
 <PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
@@ -38,7 +41,7 @@
 	{
 		@foreach (var campaignDiscount in _discounts.OfType<CampaignDiscountViewModel>())
 		{
-
+			<CampaignDiscountCard CampaignDiscount="campaignDiscount" OnDelete="@HandleOnDeleteCampaignClick"></CampaignDiscountCard>
 		}
 	}
 </div>
@@ -60,6 +63,7 @@
 	private int LoyaltyCount;
 	private int CampaignCount;
 
+
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
@@ -67,6 +71,21 @@
 		await UpdateCounts();
 		await HandleLoyaltySelectorClick();
 	}
+
+	private async Task HandleOnCreateCampaign()
+	{
+		_showNewModal = false;
+
+		await UpdateCounts(DiscountTab.Campaign);
+		await HandleCampaignSelectorClick();
+	}
+
+	private void HandleOnCancel()
+	{
+		_showNewModal = false;
+		Snackbar.Add("Handlingen blev afbrudt.", Severity.Info);
+	}
+
 
 	private async Task HandleLoyaltySelectorClick()
 	{
@@ -85,11 +104,29 @@
 		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
-	private void HandleCampaignSelectorClick()
+	private async Task HandleCampaignSelectorClick()
 	{
-		_discounts = [];
+		try
+		{
+			var discounts = await CampaignDiscountQuery.GetAllAsync();
 
-		_activeTab = DiscountTab.Campaign;
+			_discounts = discounts
+				.OrderBy(d => d.StartDate)
+				.Select(d => (IDiscountViewModel)new CampaignDiscountViewModel(
+					d.Id, d.Name, d.DiscountPercent, d.StartDate, d.EndDate, d.Treatments.ToList()
+					)).ToList();
+
+			_activeTab = DiscountTab.Campaign;
+		}
+		catch (DomainException dex)
+		{
+			Snackbar.Add(dex.Message, Severity.Error);
+		}
+		catch (Exception)
+		{
+			Snackbar.Add("Noget gik galt.", Severity.Error);
+		}
+
 	}
 
 	private async Task UpdateCounts(DiscountTab? discount = null)
@@ -97,7 +134,7 @@
 		//Hvis discount er null opdateres alle counts (første tjek)
 		//Hvis discount er angivet opdateres kun den forbundne count (andet tjek)
 		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await LoyaltyDiscountQuery.GetCountAsync();
-		//if (discount == null || discount == DiscountTab.Campaign) CampaignCount = await _campaignDiscountQuery.GetCountAsync();
+		if (discount == null || discount == DiscountTab.Campaign) CampaignCount = await CampaignDiscountQuery.GetCountAsync();
 	}
 
 	//EventCallback som gives til LoyaltyDiscountCard så koden automatisk kan køres når der trykkes på slet knappen.
@@ -106,4 +143,11 @@
 		_discounts = _discounts?.Where(d => d.Id != Id).ToList();
 		await UpdateCounts(DiscountTab.Loyalty);
 	}
+
+	private async Task HandleOnDeleteCampaignClick(Guid id)
+	{
+		_discounts = _discounts?.Where(d => d.Id != id).ToList();
+		await UpdateCounts(DiscountTab.Campaign);
+	}
+
 }
