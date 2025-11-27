@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Bookings;
-using BellaHair.Domain.PrivateCustomers;
-using BellaHair.Domain.SharedValueObjects;
+﻿using BellaHair.Domain.Bookings;
 
 namespace BellaHair.Domain.Discounts
 {
@@ -17,7 +9,7 @@ namespace BellaHair.Domain.Discounts
 
 
 #pragma warning disable CS8618
-        private BirthdayDiscount() {}
+        private BirthdayDiscount() { }
 #pragma warning restore CS8618
 
         private BirthdayDiscount(string name, DiscountPercent discountPercent)
@@ -27,13 +19,20 @@ namespace BellaHair.Domain.Discounts
             DiscountPercent = discountPercent;
         }
 
-        public static BirthdayDiscount Create(string discountName, DiscountPercent discountPercent) 
+        public static BirthdayDiscount Create(string discountName, DiscountPercent discountPercent)
             => new(discountName, discountPercent);
 
 
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
-            throw new NotImplementedException();
+            if (booking.StartDateTime.Month != booking.Customer.Birthday.Month)
+                return BookingDiscount.Inactive(Name);
+
+            if (booking.Customer.HasUsedBirthdayDiscount(booking.StartDateTime.Year))
+                return BookingDiscount.Inactive(Name);
+
+            var discount = booking.Total * DiscountPercent.Value;
+            return BookingDiscount.Active(Name, discount);
         }
     }
     public class BirthdayDiscountException(string message) : DomainException(message);
