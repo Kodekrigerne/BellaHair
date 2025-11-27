@@ -7,6 +7,7 @@
         DateOnly Date,
         TimeOnly StartTime,
         TimeOnly EndTime,
+        bool IsPaid,
         decimal Total,
         string EmployeeFullName,
         string CustomerFullName,
