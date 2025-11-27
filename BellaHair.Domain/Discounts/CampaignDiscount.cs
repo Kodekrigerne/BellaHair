@@ -25,33 +25,33 @@ namespace BellaHair.Domain.Discounts
         private CampaignDiscount() { }
 #pragma warning restore CS8618
 
-        private CampaignDiscount(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatments)
+        private CampaignDiscount(string discountName, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatments)
         {
+            var treatmentList = treatments.ToList();
+
             if (endDate < startDate)
                 throw new CampaignDiscountException("Startdato skal være før slutdato.");
-
-            var treatmentList = treatments.ToList();
 
             if (treatmentList.Count == 0)
                 throw new CampaignDiscountException("Kampagnerabatten skal gælde for mindst én behandling.");
 
             Id = Guid.NewGuid();
-            Name = name;
+            Name = discountName;
             DiscountPercent = discountPercent;
             StartDate = startDate;
             EndDate = endDate;
             TreatmentIds = treatmentList;
         }
 
-        public static CampaignDiscount Create(string name, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatmentIds) =>
-            new(name, discountPercent, startDate, endDate, treatmentIds);
+        public static CampaignDiscount Create(string discountName, DiscountPercent discountPercent, DateTime startDate, DateTime endDate, IEnumerable<Guid> treatmentIds) =>
+            new(discountName, discountPercent, startDate, endDate, treatmentIds);
 
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
             if (booking.Treatment == null)
                 throw new InvalidOperationException("Treatment must be included in booking to calculate discount.");
 
-            if (booking.StartDateTime < StartDate || booking.StartDateTime > EndDate)
+            if (booking.StartDateTime < StartDate.Date || booking.StartDateTime > EndDate.Date)
                 return BookingDiscount.Inactive(Name);
 
             if (!TreatmentIds.Contains(booking.Treatment.Id))
