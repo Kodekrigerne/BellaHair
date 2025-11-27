@@ -7,12 +7,12 @@
     public interface IBookingCommand
     {
         Task CreateBooking(CreateBookingCommand command);
-        Task PayBooking(PayBookingCommand command);
+        Task PayAndInvoiceBooking(PayAndInvoiceBookingCommand command);
         Task UpdateBooking(UpdateBookingCommand command);
         Task DeleteBooking(DeleteBookingCommand command);
     }
 
-    public record PayBookingCommand(Guid Id, DiscountData? Discount);
+    public record PayAndInvoiceBookingCommand(Guid Id, DiscountData? Discount);
     public record DiscountData(string Name, decimal Amount);
 
     public record UpdateBookingCommand(Guid Id, DateTime StartDateTime, Guid EmployeeId, Guid TreatmentId);

@@ -2,9 +2,12 @@
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Bookings;
+using QuestPDF.Fluent;
+using QuestPDF.Infrastructure;
 
 namespace BellaHair.Application
 {
@@ -19,6 +22,9 @@ namespace BellaHair.Application
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
         private readonly IDiscountCalculatorService _discountCalculatorService;
+        private readonly IInvoiceChecker _invoiceChecker;
+        private readonly IInvoiceRepository _invoiceRepository;
+        private readonly IInvoiceDocumentDataSource _invoiceDocumentDataSource;
 
         public BookingCommandHandler(
             IEmployeeRepository employeeRepository,
@@ -27,7 +33,10 @@ namespace BellaHair.Application
             IBookingRepository bookingRepository,
             ICurrentDateTimeProvider currentDateTimeProvider,
             IBookingOverlapChecker bookingOverlapChecker,
-            IDiscountCalculatorService discountCalculatorService)
+            IDiscountCalculatorService discountCalculatorService,
+            IInvoiceChecker invoiceChecker,
+            IInvoiceRepository invoiceRepository,
+            IInvoiceDocumentDataSource invoiceDocumentDataSource)
         {
             _employeeRepository = employeeRepository;
             _privateCustomerRepository = privateCustomerRepository;
@@ -36,6 +45,9 @@ namespace BellaHair.Application
             _currentDateTimeProvider = currentDateTimeProvider;
             _bookingOverlapChecker = bookingOverlapChecker;
             _discountCalculatorService = discountCalculatorService;
+            _invoiceChecker = invoiceChecker;
+            _invoiceRepository = invoiceRepository;
+            _invoiceDocumentDataSource = invoiceDocumentDataSource;
         }
 
         async Task IBookingCommand.CreateBooking(CreateBookingCommand command)
@@ -72,7 +84,7 @@ namespace BellaHair.Application
             await _bookingRepository.SaveChangesAsync();
         }
 
-        async Task IBookingCommand.PayBooking(PayBookingCommand command)
+        async Task IBookingCommand.PayAndInvoiceBooking(PayAndInvoiceBookingCommand command)
         {
             var booking = await _bookingRepository.GetAsync(command.Id);
 
@@ -84,6 +96,18 @@ namespace BellaHair.Application
 
             booking.PayBooking(_currentDateTimeProvider);
             await _bookingRepository.SaveChangesAsync();
+
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(command.Id);
+            var document = new InvoiceDocument(model);
+
+            byte[] pdfBytes = document.GeneratePdf();
+
+            var invoice = Invoice.Create(model.Id, booking, pdfBytes);
+
+            await _invoiceRepository.AddAsync(invoice);
+            await _invoiceRepository.SaveChangesAsync();
         }
 
         async Task IBookingCommand.UpdateBooking(UpdateBookingCommand command)

@@ -23,7 +23,6 @@
 @inject IDiscountQuery DiscountQuery;
 @inject NavigationManager NavigationManager;
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider;
-@inject IInvoiceCommand InvoiceCommand;
 @inject IInvoiceQuery InvoiceQuery;
 
 <div class="kk-container">
@@ -557,12 +556,10 @@
 
 		try
 		{
-			var command = new PayBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount));
-			await BookingCommand.PayBooking(command);
+			var command = new PayAndInvoiceBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount));
+            await BookingCommand.PayAndInvoiceBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
 
-			var invoiceCommand = new CreateInvoiceCommand(Id!.Value);
-			await InvoiceCommand.CreateInvoiceAsync(invoiceCommand);
 			var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
 			Snackbar.Add("Faktura oprettet", Severity.Success, config =>
 				{
@@ -570,7 +567,7 @@
 					config.ActionColor = Color.Primary;
 					config.OnClick = snackbar =>
 						{
-							InvoiceQuery.GetInvoiceByBookingId(queryCommand);
+							InvoiceQuery.GetInvoiceByBookingIdAsync(queryCommand);
 							return Task.CompletedTask;
 						};
 				}

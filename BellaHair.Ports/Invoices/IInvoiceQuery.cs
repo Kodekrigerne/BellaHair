@@ -8,7 +8,7 @@ namespace BellaHair.Ports.Invoices
 
     public interface IInvoiceQuery
     {
-        Task GetInvoiceByBookingId(GetInvoiceByBookingIdQuery query);
+        Task GetInvoiceByBookingIdAsync(GetInvoiceByBookingIdQuery query);
         Task<int> GetNextInvoiceIdAsync();
     }
 

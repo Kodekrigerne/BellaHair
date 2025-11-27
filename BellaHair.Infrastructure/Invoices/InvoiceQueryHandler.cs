@@ -22,7 +22,7 @@ namespace BellaHair.Infrastructure.Invoices
             _jsRuntime = jsRuntime;
         }
 
-        async Task IInvoiceQuery.GetInvoiceByBookingId(GetInvoiceByBookingIdQuery query)
+        async Task IInvoiceQuery.GetInvoiceByBookingIdAsync(GetInvoiceByBookingIdQuery query)
         {
             var invoice = await _db.Invoices
                 .FirstOrDefaultAsync(i => i.Booking.Id == query.BookingId)
