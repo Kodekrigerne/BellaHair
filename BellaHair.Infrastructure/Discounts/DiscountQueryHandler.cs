@@ -11,16 +11,18 @@ namespace BellaHair.Infrastructure.Discounts
     public class DiscountQueryHandler : IDiscountQuery
     {
         private readonly BellaHairContext _db;
+        private readonly IBookingRepository _bookingRepository;
         private readonly IDiscountCalculatorService _discountCalculatorService;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly ICustomerVisitsService _customerVisitsService;
 
-        public DiscountQueryHandler(BellaHairContext db, IDiscountCalculatorService discountCalculatorService, ICurrentDateTimeProvider currentDateTimeProvider, ICustomerVisitsService customerVisitsService)
+        public DiscountQueryHandler(BellaHairContext db, IDiscountCalculatorService discountCalculatorService, ICurrentDateTimeProvider currentDateTimeProvider, ICustomerVisitsService customerVisitsService, IBookingRepository bookingRepository)
         {
             _db = db;
             _discountCalculatorService = discountCalculatorService;
             _currentDateTimeProvider = currentDateTimeProvider;
             _customerVisitsService = customerVisitsService;
+            _bookingRepository = bookingRepository;
         }
 
         async Task<BookingDiscountDTO?> IDiscountQuery.FindBestDiscount(FindBestDiscountQuery query)
@@ -37,9 +39,11 @@ namespace BellaHair.Infrastructure.Discounts
             var visits = await _customerVisitsService.GetCustomerVisitsAsync(customer.Id);
             customer.SetVisits(visits);
 
+            Booking? booking = null;
+            if (query.StartDateTime < now && query.BookingId != null) booking = await _bookingRepository.GetAsync(query.BookingId.Value);
+            else booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider);
             //Det er nødvendigt at oprette en booking for at finde en rabat
             //Denne booking gemmes dog ikke
-            var booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider);
 
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
 

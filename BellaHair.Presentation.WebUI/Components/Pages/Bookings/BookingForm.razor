@@ -167,7 +167,6 @@
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
 						<div class="discount-section">
-							@if(!_isPaid || IsEditable()) { <button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button> }
 							@if (_discount != null)
 							{
 								<p class="discount-name">Rabat: @_discount.Name</p>
@@ -261,7 +260,7 @@
 		}
 
 		if (Mode == BookingMode.New) await HandlePickCustomerClick();
-		else if (Mode == BookingMode.View) await LoadBooking();
+		else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
 	}
 
 	private async Task LoadBooking()
@@ -293,6 +292,8 @@
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
 			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+
+			if (!_isPaid) await GetBestDiscount();
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
@@ -460,7 +461,9 @@
 			return;
 		}
 
-		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id);
+		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id, Id);
+
+		await GetBestDiscount();
 
 		_timeIsAvailable = !(await BookingQuery.BookingHasOverlap(query));
 		_statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
@@ -511,14 +514,14 @@
 		await HandlePickStartDateTimeClick();
 	}
 
-	private async Task HandleGetDiscountClick(MouseEventArgs args)
+	private async Task GetBestDiscount()
 	{
 		if (_startDate == null || _startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
 		try
 		{
 			var startDateTime = _startDate.Value.Add(_startTime.Value);
-			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
+			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
@@ -796,6 +799,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+		margin-top: 1rem;
 	}
 
 	.availability-status {
