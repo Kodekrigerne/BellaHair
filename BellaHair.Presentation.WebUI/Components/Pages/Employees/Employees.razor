@@ -1,5 +1,6 @@
 ﻿@attribute [StreamRendering]
 @using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents
 @using BellaHair.Ports.Employees
@@ -29,7 +30,7 @@
 
 			@foreach (var employee in _employees)
 			{
-				<EmployeeCard employeeSimpleViewModel="employee" OnDelete="@HandleDeleteClick"/>
+				<EmployeeCard Employee="employee" OnDelete="@HandleDeleteClick" OnChange="LoadEmployees"></EmployeeCard>
 			}
 		}
 </div>
@@ -41,7 +42,7 @@
 	/// <summary>
 	/// List of viewmodels used to store employee data
 	/// </summary>
-	private List<EmployeeSimpleViewModel>? _employees = null;
+	private List<EmployeeViewModel>? _employees = null;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -58,24 +59,36 @@
 	{
 		try
 		{
-			var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeSimpleViewModel(	e.Id,
-																			e.Name,
-																			e.Email,
-																			e.PhoneNumber,
-																			e.TreatmentNames))
-																							.OrderBy(e => e.Name)
-																							.ToList();
+			var employees = await EmployeeQuery.GetAllEmployeesAsync();
+			_employees = employees.Select(e => new EmployeeViewModel(e.Id,
+																	 e.FirstName,
+																	 e.MiddleName,
+																	 e.LastName,
+																	 e.FullName,
+																	 e.Email,
+																	 e.PhoneNumber,
+																	 e.StreetName,
+																	 e.City,
+																	 e.StreetNumber,
+																	 e.ZipCode,
+																	 e.FullAddress,
+																	 e.Treatments.Select(t => new EmployeeTreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).ToList(),
+																	 e.Floor))
+																	 .OrderBy(e => e.FirstName)
+																	 .ToList();
 		}
+
 		catch (DomainException ex)
 		{
 
 			_errorMessage = ex.Message;
 		}
+
 		catch (Exception ex)
 		{
 			_errorMessage = ex.Message; // TODO: "Noget gik galt"
 		}
+
 	}
 
 	private async Task HandleCreate()
