@@ -577,34 +577,6 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
-
-		// var invoiceCommand = new CreateInvoiceCommand(Id!.Value);
-
-		// try
-		// {
-		// 	await InvoiceCommand.CreateInvoiceAsync(invoiceCommand);
-
-		// 	var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
-
-		// 	Snackbar.Add("Faktura oprettet", Severity.Success, config =>
-		// {
-		// 	config.Action = "Se faktura";
-		// 	config.ActionColor = Color.Primary;
-		// 	config.OnClick = snackbar =>
-		// 	{
-		// 		InvoiceQuery.GetInvoiceByBookingId(queryCommand);
-		// 		return Task.CompletedTask;
-		// 	};
-		// });
-		// }
-		// catch (InvoiceException ex)
-		// {
-		// 	Snackbar.Add($"{ex.Message}", Severity.Error);
-		// }
-		// catch (DomainException ex)
-		// {
-		// 	Snackbar.Add($"Noget gik galt - Fejlbesked: '{ex}'.", Severity.Error);
-		// }
 	}
 
 	private void HandleEditClick()
