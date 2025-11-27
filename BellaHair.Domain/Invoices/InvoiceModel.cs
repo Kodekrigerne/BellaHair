@@ -11,13 +11,14 @@ namespace BellaHair.Domain.Invoices
 
     public class InvoiceModel
     {
-        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, BookingDiscount discount)
+        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, BookingDiscount discount, decimal total)
         {
             Id = id;
             IssueDate = issueDate;
             Customer = customer;
             Treatments.Add(treatment);
             Discount = discount;
+            Total = total;
         }
 
         public int Id { get; set; }
@@ -25,5 +26,6 @@ namespace BellaHair.Domain.Invoices
         public CustomerSnapshot Customer { get; set; }
         public List<TreatmentSnapshot> Treatments { get; set; } = [];
         public BookingDiscount Discount { get; set; }
+        public decimal Total { get; set; }
     }
 }

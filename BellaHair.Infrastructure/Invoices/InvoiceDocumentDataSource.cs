@@ -32,13 +32,15 @@ public class InvoiceDocumentDataSource : IInvoiceDocumentDataSource
         var currentDate = _currentDateTimeProvider.GetCurrentDateTime();
         var id = await _db.Invoices.MaxAsync(i => (int?)i.Id) + 1 ?? 1;
         var discount = booking.Discount;
+        var total = booking.Total;
 
         return new InvoiceModel(
             id,
             currentDate,
             booking.CustomerSnapshot!,
             booking.TreatmentSnapshot!,
-            discount!)
+            discount!,
+            total)
         { };
     }
 }

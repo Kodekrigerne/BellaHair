@@ -97,13 +97,15 @@ public class InvoiceDocument : IDocument
 
             column.Item().PaddingTop(30).Element(ComposeTable);
 
-            var totalPriceWithTax = Model.Treatments.Sum(x => x.Price * 1);
-            var totalPriceWithoutTax = totalPriceWithTax * 0.8m;
-            var tax = totalPriceWithTax - totalPriceWithoutTax;
+            var totalNoDiscountNoTax = Model.Total * 0.8m;
+            var discountNoTax = Model.Discount.Amount * 0.8m;
+            var totalWithDiscountNoTax = totalNoDiscountNoTax - discountNoTax;
+            var tax = totalWithDiscountNoTax * 0.25m;
+            var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
 
-            column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalPriceWithoutTax:N2}").FontSize(12);
+            column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalWithDiscountNoTax:N2}").FontSize(12);
             column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
-            column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalPriceWithTax:N2}").FontSize(15).SemiBold();
+            column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold();
 
             //if (!string.IsNullOrWhiteSpace(Model.Comments))
             //    column.Item().PaddingTop(25).Element(ComposeComments);
@@ -141,9 +143,23 @@ public class InvoiceDocument : IDocument
             {
                 table.Cell().Element(CellStyle).Text((Model.Treatments.IndexOf(treatment) + 1).ToString());
                 table.Cell().Element(CellStyle).Text(treatment.Name);
-                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price:N2}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 0.8m:N2}");
                 table.Cell().Element(CellStyle).AlignRight().Text("1");
-                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 1:N2}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 0.8m * 1:N2}");
+
+                static IContainer CellStyle(IContainer container)
+                {
+                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                }
+            }
+
+            if (Model.Discount.Amount > 0)
+            {
+                table.Cell().Element(CellStyle).Text("");
+                table.Cell().Element(CellStyle).Text($"Rabat: {Model.Discount.Name}");
+                table.Cell().Element(CellStyle).AlignRight().Text("");
+                table.Cell().Element(CellStyle).AlignRight().Text("");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr -{Model.Discount.Amount * 0.8m:N2}");
 
                 static IContainer CellStyle(IContainer container)
                 {
