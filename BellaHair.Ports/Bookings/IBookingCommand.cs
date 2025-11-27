@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Ports.Bookings
+﻿using BellaHair.Domain.Discounts;
+
+namespace BellaHair.Ports.Bookings
 {
     //Dennis
     /// <summary>
@@ -13,7 +15,7 @@
     }
 
     public record PayBookingCommand(Guid Id, DiscountData? Discount);
-    public record DiscountData(string Name, decimal Amount);
+    public record DiscountData(string Name, decimal Amount, DiscountType Type);
 
     public record UpdateBookingCommand(Guid Id, DateTime StartDateTime, Guid EmployeeId, Guid TreatmentId);
 
