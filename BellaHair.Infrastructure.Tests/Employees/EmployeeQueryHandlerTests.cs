@@ -36,7 +36,7 @@ namespace BellaHair.Infrastructure.Tests.Employees
             _db.SaveChanges();
 
             // Act
-            var employeesFromDb = handler.GetAllEmployeesSimpleAsync().GetAwaiter().GetResult();
+            var employeesFromDb = handler.GetAllEmployeesAsync().GetAwaiter().GetResult();
 
             // Assert
             Assert.Multiple(() =>

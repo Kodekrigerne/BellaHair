@@ -17,15 +17,15 @@ namespace BellaHair.Infrastructure.Bookings
             _currentDateTimeProvider = currentDateTimeProvider;
         }
 
-        async Task<bool> IBookingOverlapChecker.OverlapsWithBooking(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId)
+        async Task<bool> IBookingOverlapChecker.OverlapsWithBooking(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId, Guid? bookingId = null)
         {
-            if (await CheckEmployeeOverlap(startDateTime, durationMinutes, employeeId)) return true;
-            if (await CheckCustomerOverlap(startDateTime, durationMinutes, customerId)) return true;
+            if (await CheckEmployeeOverlap(startDateTime, durationMinutes, employeeId, bookingId)) return true;
+            if (await CheckCustomerOverlap(startDateTime, durationMinutes, customerId, bookingId)) return true;
 
             return false;
         }
 
-        private async Task<bool> CheckEmployeeOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId)
+        private async Task<bool> CheckEmployeeOverlap(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid? bookingId = null)
         {
             var endDateTime = startDateTime.AddMinutes(durationMinutes);
 
@@ -34,7 +34,7 @@ namespace BellaHair.Infrastructure.Bookings
             var bookings = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
-                .Where(b => b.Employee!.Id == employeeId);
+                .Where(b => b.Employee!.Id == employeeId && b.Id != bookingId);
 
             //ny starter < eksisterende slutter && eksisterende starter < ny slutter
             bool overlap = await bookings.AnyAsync(b =>
@@ -45,14 +45,14 @@ namespace BellaHair.Infrastructure.Bookings
             return overlap;
         }
 
-        private async Task<bool> CheckCustomerOverlap(DateTime startDateTime, int durationMinutes, Guid customerId)
+        private async Task<bool> CheckCustomerOverlap(DateTime startDateTime, int durationMinutes, Guid customerId, Guid? bookingId = null)
         {
             var endDateTime = startDateTime.AddMinutes(durationMinutes);
 
             var bookings = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
-                .Where(b => b.Customer!.Id == customerId);
+                .Where(b => b.Customer!.Id == customerId && b.Id != bookingId);
 
             //ny starter < eksisterende slutter && eksisterende starter < ny slutter
             bool overlap = await bookings.AnyAsync(b =>

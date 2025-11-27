@@ -1,79 +1,92 @@
 ﻿@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents;
 @inject IEmployeeCommand EmployeeCommand
 @inject IEmployeeQuery EmployeeQuery
 @inject ISnackbar SnackBar
 
-
-	<Modal @bind-IsVisible="@_showNewModal">
+	<Modal @bind-IsVisible="@_showDeleteModal">
 		<div class="modal-centered-content">
-				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
 
 			@* Hvis medarbejderen har fremtidige bookinger, vises dette. *@
 			@if (_futureBookings)
 			{
-				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @employeeSimpleViewModel.Name har fremtidige bookinger.
+				<DeleteConfirmationIcon Class="delete-confirmation-icon"/>
+				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @Employee.FullName har fremtidige bookinger.
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
-			<button class="btn-add" onclick="@CloseModal">Annuller</button>
+			<button class="btn-add" onclick="@CloseDeleteModal">Annuller</button>
 			}
 
 			@* Hvis medarbejderen ikke har fremtidige bookinger, vises dette. *@
 			else
 			{
-
-				<h4>Slet: @employeeSimpleViewModel.Name?</h4>
-
-				<p style="max-width: 22rem; text-align: center;">	Er du sikker på, at du vil slette denne medarbejder?
-																	Denne handling kan ikke fortrydes.						</p>
-
-				<div class="remove-confirmation-buttons">
-					<button class="btn-remove" onclick="@HandleOnDeleteConfirm">Ja, slet</button>
-					<button class="btn-add" onclick="@CloseModal">Annuller</button>
-				</div>
+			<DeleteComponent EntityName="@Employee.FullName" OnCancel="@CloseDeleteModal" OnDeleteConfirm="@HandleOnDeleteConfirm" EntityTypeName="medarbejder"/>
 			}
 		</div>
 	</Modal>
 
+	<Modal @bind-IsVisible="@showEditModal">
+
+		<UpdateEmployeeForm EmployeeToUpdate="@Employee" OnCancel="@HandleCancel" OnUpdate="@HandleUpdate"/>
+	
+	</Modal>
+
 
 		<div class="employee-card">														@*Contains the entire singular employee card layout*@
-						
-				<div class="employee-avatar">											@*Contains the avatar with intials*@
-					@GetEmployeeInitials(@employeeSimpleViewModel.Name)
+	<div class="employee-avatar">
+		@*Contains the avatar with intials*@
+		@GetEmployeeInitials(@Employee.FullName)
+	</div>
+	<div>
+		@*Positions other info to position next to avatar*@
+		<h3>@Employee.FullName</h3>
+
+			<div class="employee-contact-details">
+				<div class="employee-single-contact-detail">
+					<MailIcon Class="employee-icons" />
+					@Employee.Email
 				</div>
-					<div>																@*Positions other info to position next to avatar*@
-					<h3>@employeeSimpleViewModel.Name</h3>
 
-						<div class="employee-contact-details">
-							<div class="employee-single-contact-detail">
-								<MailIcon Class="employee-icons" />
-									@employeeSimpleViewModel.Email
-								</div>
+				<div class="employee-single-contact-detail">
+					<PhoneIcon Class="employee-icons" />
+					@Employee.PhoneNumber
+				</div>
 
-							<div class="employee-single-contact-detail">
-								<PhoneIcon Class="employee-icons"/>
-									@employeeSimpleViewModel.PhoneNumber
-							</div>
-						</div>
-			<div class="delete-button">
-						<BinDeleteButton OnClick="@HandleOnDeleteClick"/>
+				<div class="employee-single-contact-detail">
+				<MudIcon Icon="@Icons.Material.Filled.LocationOn" Class="employee-icons" />
+					@Employee.FullAddress
+				</div>
 			</div>
+						
 						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in employeeSimpleViewModel.TreatmentNames)
+						@foreach (var treatment in Employee.Treatments)
 							{															
-								<div class="treatment-employee-card">@treatment</div>	@*Contains individual treatment and their layout*@
+								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
 							}
 						</div>
 					</div>
-				</div>
+
+	<div class="delete-edit-buttons d-flex gap-2" style="width: 0%;">
+		<EditButton onclick="@(() => showEditModal = true)" />
+			<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+	</div>
+	</div>
+
 
 @code
 {
-	private bool _showNewModal = false;
+
+	private bool _showDeleteModal = false;
+	public bool showEditModal = false;
 	private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
-	public required EmployeeSimpleViewModel employeeSimpleViewModel { get; set; }
+	public required EventCallback OnChange { get; set; }
+
+
+	[Parameter, EditorRequired]
+	public required EmployeeViewModel Employee { get; set; }
 
 	[Parameter, EditorRequired]
 	public required EventCallback<Guid> OnDelete { get; set; }
@@ -91,23 +104,34 @@
 
 	}
 
+	private async Task HandleUpdate()
+	{
+		showEditModal = false;
+		await OnChange.InvokeAsync();
+	}
+
+	private void HandleCancel()
+	{
+		showEditModal = false;
+	}
+
 	// Viser modalen og tjekker, om der er fremtidige bookinger.
 	private async Task HandleOnDeleteClick()
 	{
-		_showNewModal = true;
-		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(employeeSimpleViewModel.Id);
+		_showDeleteModal = true;
+		_futureBookings = await EmployeeQuery.EmployeeHasFutureBookings(Employee.Id);
 	}
 
 	// Sletter emdarbejderen, hvis der ikke er fremtidige bookinger og lukker modalen samt laver snackbar som bekræftelse.
 	private async Task HandleOnDeleteConfirm()
 	{
-		var command = new DeleteEmployeeCommand(employeeSimpleViewModel.Id);
+		var command = new DeleteEmployeeCommand(Employee.Id);
 		try
 		{
 			await EmployeeCommand.DeleteEmployeeCommand(command);
-			CloseModal();
+			CloseDeleteModal();
 			SnackBar.Add("Medarbejderen blev slettet.", Severity.Success);
-			await OnDelete.InvokeAsync(employeeSimpleViewModel.Id);
+			await OnDelete.InvokeAsync(Employee.Id);
 		}
 
 		catch (Exception e)
@@ -117,6 +141,6 @@
 	}
 
 	// Lukker modalen
-	private void CloseModal() => _showNewModal = false;
+	private void CloseDeleteModal() => _showDeleteModal = false;
 
 }
