@@ -11,19 +11,29 @@ namespace BellaHair.Domain.Tests.Discounts
 {
     internal sealed class CampaignDiscountTests
     {
-        // TODO: Mangler List<Guid> i TestCase
-        [TestCase("Efterårskampagne",0.20, new DateTime(2025,12,1),new DateTime(2025,12,20),)
-        public void Given_ValidCampaignDiscount_Then_CreatesCampaignDiscount(string name, decimal discountPercent, DateTime startDate, DateTime endDate, List<Guid> treatmentIds)
+
+        [Test]
+        public void Given_ValidCampaignDiscount_Then_CreatesCampaignDiscount()
         {
-            var validDiscountPercent = DiscountPercent.FromDecimal(discountPercent);
+            // Arrange
+            var name = "Vinterkampagne";
+            var discountPercent = DiscountPercent.FromDecimal(0.20m);
+            var startDate = new DateTime(2025, 12, 1);
+            var endDate = new DateTime(2026, 3, 1);
+
+            var treatmentIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            // Act
 
             var campaignDiscount =
-                CampaignDiscount.Create(name, validDiscountPercent, startDate, endDate, treatmentIds);
+                CampaignDiscount.Create(name, discountPercent, startDate, endDate, treatmentIds);
+
+            // Assert
 
             Assert.Multiple(() =>
             {
                 Assert.That(campaignDiscount.Name, Is.EqualTo(name));
-                Assert.That(campaignDiscount.DiscountPercent, Is.EqualTo(validDiscountPercent));
+                Assert.That(campaignDiscount.DiscountPercent, Is.EqualTo(discountPercent));
                 Assert.That(campaignDiscount.StartDate, Is.EqualTo(startDate));
                 Assert.That(campaignDiscount.EndDate, Is.EqualTo(endDate));
                 Assert.That(campaignDiscount.TreatmentIds, Is.EqualTo(treatmentIds));   
@@ -32,7 +42,7 @@ namespace BellaHair.Domain.Tests.Discounts
 
         }
 
-        public void Given_StartDateIsAfterEndDate_Then_ThrowsException(string name, decimal discountPercent, DateTime startDate, DateTime endDate, List<Guid> treatmentIds)
+        public void Given_StartDateIsAfterEndDate_Then_ThrowsException()
         {
             var validDiscountPercent = DiscountPercent.FromDecimal(discountPercent);
 
