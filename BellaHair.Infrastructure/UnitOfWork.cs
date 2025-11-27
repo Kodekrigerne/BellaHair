@@ -1,8 +1,16 @@
 ﻿using BellaHair.Application;
 using Microsoft.EntityFrameworkCore.Storage;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Infrastructure
 {
+
+    /// <summary>
+    /// Provides a unit of work implementation for managing database transactions and saving changes within a single
+    /// context.
+    /// </summary>
+
     public class UnitOfWork : IUnitOfWork
     {
         private readonly BellaHairContext _db;

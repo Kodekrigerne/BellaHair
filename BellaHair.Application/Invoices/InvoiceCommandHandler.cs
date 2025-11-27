@@ -1,8 +1,15 @@
 ﻿using BellaHair.Domain.Invoices;
 using BellaHair.Ports.Invoices;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Application.Invoices
 {
+
+    /// <summary>
+    /// Handles commands related to invoice operations, including sending invoices to customers via email.
+    /// </summary>
+
     public class InvoiceCommandHandler : IInvoiceCommand
     {
         private readonly IInvoiceRepository _invoiceRepository;

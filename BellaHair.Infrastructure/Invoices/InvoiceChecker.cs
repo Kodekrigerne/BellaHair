@@ -1,8 +1,15 @@
 ﻿using BellaHair.Domain.Invoices;
 using Microsoft.EntityFrameworkCore;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Infrastructure.Invoices
 {
+
+    /// <summary>
+    /// Provides methods for checking invoice and payment status for bookings.
+    /// </summary>
+
     public class InvoiceChecker : IInvoiceChecker
     {
         private readonly BellaHairContext _db;

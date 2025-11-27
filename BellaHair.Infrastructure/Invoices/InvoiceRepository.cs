@@ -1,8 +1,15 @@
 ﻿using BellaHair.Domain.Invoices;
 using Microsoft.EntityFrameworkCore;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Infrastructure.Invoices
 {
+
+    /// <summary>
+    /// Provides methods for managing and retrieving invoices from the data store.
+    /// </summary>
+
     public class InvoiceRepository : IInvoiceRepository
     {
         private readonly BellaHairContext _db;

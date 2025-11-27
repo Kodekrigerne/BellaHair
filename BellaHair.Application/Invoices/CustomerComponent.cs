@@ -1,6 +1,12 @@
 ﻿using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
+// Mikkel Dahlmann
+
+/// <summary>
+/// Represents a component that displays customer contact information in a formatted layout.
+/// </summary>
+
 public class CustomerComponent : IComponent
 {
     private string Address { get; }
