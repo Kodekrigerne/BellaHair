@@ -1,0 +1,12 @@
+﻿
+.header-and-employee {
+    display: flex;
+    position: relative;
+}
+
+employee-picker {
+    display: flex;
+    flex-direction: column;
+    text-align: end;
+}
+

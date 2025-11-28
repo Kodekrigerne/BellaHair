@@ -109,9 +109,11 @@ namespace BellaHair.Infrastructure.Bookings
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllWithinPeriodOnEmployee(DateTime startDate, DateTime endDate, Guid employeeId)
         {
-            var bookings = await _db.Bookings.AsNoTracking().Where(b => b.StartDateTime.Date >= startDate.Date && b.EndDateTime.Date <= endDate.Date && b.Employee.Id == employeeId).Include(b => b.Treatment)
+            var bookings = await _db.Bookings.AsNoTracking()
+                .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
+                .Where(b => b.Employee.Id == employeeId && b.StartDateTime.Date <= startDate.Date && endDate.Date >= b.EndDateTime.Date)
                 .ToListAsync();
 
             return MapToBookingDTOs(bookings);
