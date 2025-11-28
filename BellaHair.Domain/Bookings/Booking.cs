@@ -35,6 +35,9 @@ namespace BellaHair.Domain.Bookings
         private decimal? _totalBase;
         public decimal TotalBase => IsPaid ? _totalBase!.Value : CalculateTotalBase();
 
+        private decimal? _totalWithDiscount;
+        public decimal TotalWithDiscount => IsPaid ? _totalWithDiscount!.Value : CalculateTotalWithDiscount();
+
         private Booking() { }
 
         private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
@@ -76,6 +79,7 @@ namespace BellaHair.Domain.Bookings
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(Treatment);
             _totalBase = CalculateTotalBase();
+            _totalWithDiscount = CalculateTotalWithDiscount();
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
         }
@@ -87,6 +91,15 @@ namespace BellaHair.Domain.Bookings
             if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
 
             return Treatment.Price.Value;
+        }
+
+        private decimal CalculateTotalWithDiscount()
+        {
+            if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
+            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
+
+            var discountAmount = Discount?.Amount ?? 0;
+            return Treatment.Price.Value - discountAmount;
         }
 
         //Kald altid denne metode når bookingen ændres
