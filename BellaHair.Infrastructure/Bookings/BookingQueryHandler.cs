@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Ports.Bookings;
+using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
@@ -41,7 +42,12 @@ namespace BellaHair.Infrastructure.Bookings
             booking.Treatment?.Id ?? booking.TreatmentSnapshot?.TreatmentId
                 ?? throw new InvalidOperationException($"Booking {booking.Id} does not have a treatment attached."),
 
-            booking.Discount != null ? new DiscountDTO(booking.Discount.Name, booking.Discount.Amount) : null
+            booking.Discount != null 
+                ? new DiscountDTO(
+                    booking.Discount.Name, 
+                    booking.Discount.Amount, 
+                    (DiscountTypeDTO)booking.Discount.Type) 
+                : null
             );
         }
 
@@ -102,13 +108,14 @@ namespace BellaHair.Infrastructure.Bookings
 
                 // Hvis bookingen er betalt (?) bruger vi den snapshottede treatment tid da dennes historiske værdi er mest relevant
                 // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
+                //TODO: Ryd op i det her
                 b.IsPaid
                     ? b.TreatmentSnapshot?.DurationMinutes
                         ?? throw new InvalidOperationException($"Booking {b.Id} is paid but missing a TreatmentSnapshot.")
                     : b.Treatment?.DurationMinutes.Value
                         ?? throw new InvalidOperationException($"Booking {b.Id} is unpaid but missing a treatment."),
 
-                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount) : null
+                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountTypeDTO)b.Discount.Type) : null
                 );
             });
         }

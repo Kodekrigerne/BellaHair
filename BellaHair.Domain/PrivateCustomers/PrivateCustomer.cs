@@ -18,6 +18,9 @@ namespace BellaHair.Domain.PrivateCustomers
         // Den offentlige liste af bookings gøres immutable gennem casting til en IReadOnlyCollection.
         public IReadOnlyCollection<Booking> Bookings => _bookings.AsReadOnly();
 
+        private readonly List<int> _birthdayDiscountUsedYears = [];
+        public IReadOnlyCollection<int> BirthdayDiscountUsedYears => _birthdayDiscountUsedYears.AsReadOnly();
+
         private PrivateCustomer() { }
 
         private PrivateCustomer(Name name, Address address, PhoneNumber phoneNumber,
@@ -67,6 +70,21 @@ namespace BellaHair.Domain.PrivateCustomers
             if (birthday > currentDateTimeProvider.GetCurrentDateTime().AddYears(-18))
                 throw new PrivateCustomerException("Customers must be 18 years of age");
         }
+
+        public bool HasUsedBirthdayDiscount(int year)
+        {
+            return _birthdayDiscountUsedYears.Contains(year);
+        }
+
+        public void RegisterBirthdayDiscountUsed(int year)
+        {
+            if (_birthdayDiscountUsedYears.Contains(year))
+                throw new PrivateCustomerException($"Kunden har allerede brugt fødselsdagsrabat i år {year}.");
+
+            _birthdayDiscountUsedYears.Add(year);
+        }
+
+
     }
 
     public class PrivateCustomerException(string message) : DomainException(message);

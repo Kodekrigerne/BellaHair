@@ -1,5 +1,4 @@
 ﻿using BellaHair.Domain.Bookings;
-using BellaHair.Domain.Treatments;
 
 namespace BellaHair.Domain.Discounts
 {
@@ -15,10 +14,11 @@ namespace BellaHair.Domain.Discounts
     public class CampaignDiscount : DiscountBase
     {
         public string Name { get; private set; }
+        public override DiscountType Type => DiscountType.CampaignDiscount;
         public DiscountPercent DiscountPercent { get; private set; }
         public DateTime StartDate { get; private set; }
         public DateTime EndDate { get; private set; }
-        public  List<Guid> TreatmentIds { get; private set; } = [];
+        public List<Guid> TreatmentIds { get; private set; } = [];
 
 
 #pragma warning disable CS8618
@@ -52,13 +52,13 @@ namespace BellaHair.Domain.Discounts
                 throw new InvalidOperationException("Treatment must be included in booking to calculate discount.");
 
             if (booking.StartDateTime < StartDate.Date || booking.StartDateTime > EndDate.Date)
-                return BookingDiscount.Inactive(Name);
+                return BookingDiscount.Inactive(Name, Type);
 
             if (!TreatmentIds.Contains(booking.Treatment.Id))
-                return BookingDiscount.Inactive(Name);
+                return BookingDiscount.Inactive(Name, Type);
 
             var discount = booking.TotalBase * DiscountPercent.Value;
-            return BookingDiscount.Active(Name, discount);
+            return BookingDiscount.Active(Name, discount, Type);
         }
     }
 
