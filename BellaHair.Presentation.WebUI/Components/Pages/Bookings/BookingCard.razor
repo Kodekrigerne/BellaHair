@@ -19,8 +19,8 @@
 			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
 		</div>
 		<div style="display: flex; flex-direction: row; gap: 2px;">
-			<EditButton Class="@(CanEdit() ? "edit-active" : "btn-inactive")" OnClick="HandleEditClick" />
-			<BinDeleteButton Class="@(CanDelete() ? "" : "btn-inactive")" OnClick="HandleDeleteClick" />
+			<EditButton Class="@(CanEdit() ? "edit-active" : "btn-inactive")" Title="@(CanEdit() ? null : "Denne booking kan ikke redigeres")" OnClick="HandleEditClick" />
+			<BinDeleteButton Class="@(CanDelete() ? "" : "btn-inactive")" Title="@(CanDelete() ? null : "Denne booking kan ikke slettes")" OnClick="HandleDeleteClick" />
 		</div>
 	</div>
 	<div class="bc-body">
