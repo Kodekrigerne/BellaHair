@@ -25,20 +25,18 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
 
             booking.Update(startDateTime, employee, treatment, dateTimeProvider.Object);
 
-            //TODO: FixtureBuilder 1.0.3
             Assert.Multiple(() =>
             {
                 Assert.That(booking.Employee, Is.Not.Null);
                 Assert.That(booking.Employee!.Id, Is.EqualTo(employee.Id));
                 Assert.That(booking.Treatment, Is.Not.Null);
                 Assert.That(booking.Treatment!.Id, Is.EqualTo(treatment.Id));
-                Assert.That(booking.Customer, Is.Not.Null);
                 Assert.That(booking.IsPaid, Is.False);
                 Assert.That(booking.StartDateTime, Is.EqualTo(startDateTime));
                 Assert.That(booking.PaidDateTime, Is.Null);
-                //Assert.That(booking.CustomerSnapshot, Is.Null);
-                //Assert.That(booking.TreatmentSnapshot, Is.Null);
-                //Assert.That(booking.EmployeeSnapshot, Is.Null);
+                Assert.That(booking.CustomerSnapshot, Is.Null);
+                Assert.That(booking.TreatmentSnapshot, Is.Null);
+                Assert.That(booking.EmployeeSnapshot, Is.Null);
                 Assert.That(booking.EndDateTime, Is.EqualTo(startDateTime.AddMinutes(treatment.DurationMinutes.Value)));
                 Assert.That(booking.TotalBase, Is.EqualTo(treatment.Price.Value));
             });
