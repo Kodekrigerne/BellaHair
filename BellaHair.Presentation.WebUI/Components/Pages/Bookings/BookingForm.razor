@@ -386,9 +386,13 @@
 	{
 		if (_employee == null) return;
 
-		if (_now.DayOfWeek == DayOfWeek.Saturday) _startDate = _now.Date.AddDays(2);
-		else if (_now.DayOfWeek == DayOfWeek.Sunday) _startDate = _now.Date.AddDays(1);
-		else _startDate = _now;
+		var openToDate = _now;
+
+		if (openToDate.TimeOfDay.Hours >= 18) openToDate = openToDate.Date.AddDays(1);
+		if (openToDate.DayOfWeek == DayOfWeek.Saturday) openToDate = openToDate.Date.AddDays(2);
+		else if (openToDate.DayOfWeek == DayOfWeek.Sunday) openToDate = openToDate.Date.AddDays(1);
+
+		_startDate = openToDate;
 
 		_activePicker = Picker.Time;
 		StateHasChanged();
