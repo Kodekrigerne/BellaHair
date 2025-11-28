@@ -11,7 +11,14 @@ namespace BellaHair.Domain.Invoices
 
     public class InvoiceModel
     {
-        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, decimal total, BookingDiscount? discount)
+        public int Id { get; private set; }
+        public DateTime IssueDate { get; private set; }
+        public CustomerSnapshot Customer { get; private set; }
+        public List<TreatmentSnapshot> Treatments { get; private set; } = [];
+        public BookingDiscount? Discount { get; private set; }
+        public decimal Total { get; private set; }
+
+        private InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, decimal total, BookingDiscount? discount)
         {
             Id = id;
             IssueDate = issueDate;
@@ -21,11 +28,9 @@ namespace BellaHair.Domain.Invoices
             Discount = discount;
         }
 
-        public int Id { get; set; }
-        public DateTime IssueDate { get; set; }
-        public CustomerSnapshot Customer { get; set; }
-        public List<TreatmentSnapshot> Treatments { get; set; } = [];
-        public BookingDiscount? Discount { get; set; }
-        public decimal Total { get; set; }
+        public static InvoiceModel Create(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, decimal total, BookingDiscount? discount)
+        {
+            return new InvoiceModel(id, issueDate, customer, treatment, total, discount);
+        }
     }
 }

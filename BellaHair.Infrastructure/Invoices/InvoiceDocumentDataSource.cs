@@ -34,13 +34,12 @@ public class InvoiceDocumentDataSource : IInvoiceDocumentDataSource
         var discount = booking.Discount;
         var total = booking.Total;
 
-        return new InvoiceModel(
+        return InvoiceModel.Create(
             id,
             currentDate,
             booking.CustomerSnapshot!,
             booking.TreatmentSnapshot!,
             total,
-            discount)
-        { };
+            discount);
     }
 }

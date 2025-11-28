@@ -24,6 +24,7 @@ namespace BellaHair.Domain.Invoices
             Id = id;
             Booking = booking;
             InvoicePdf = invoicePdf;
+            BookingId = booking.Id;
         }
 
         public static Invoice Create(int id, Booking booking, Byte[] invoicePdf)
