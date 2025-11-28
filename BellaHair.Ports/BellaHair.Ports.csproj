@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BellaHair.Domain\BellaHair.Domain.csproj" />
-  </ItemGroup>
-
 </Project>
