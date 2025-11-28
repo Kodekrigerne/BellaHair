@@ -1,12 +1,17 @@
 ﻿
 .header-and-employee {
     display: flex;
-    position: relative;
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
 employee-picker {
     display: flex;
     flex-direction: column;
-    text-align: end;
+    float: right;
+    
 }
 
+.header-and-employee p {
+    margin-bottom: 0;
+}

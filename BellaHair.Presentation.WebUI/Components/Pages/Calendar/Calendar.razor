@@ -14,137 +14,138 @@
 
 
 <div class="header-and-employee">
-	<div class="top-page-item">
-<h3>Kalender</h3>
-
-<p>Vælg den medarbejder, du vil se kalenderen for.</p>
-	</div>
-	<div class="top-page-item end-100">
-<RadzenDropDown TValue="Guid" Data="@_employees" TextProperty="Fullname" ValueProperty="Id" @bind-Value="@(_pickedEmployeeId)" Change="@HandlePickedEmployee"/>
-	</div>
+    <div>
+        <h3>Kalender</h3>
+        <p>Vælg den medarbejder, du vil se kalenderen for.</p>
+    </div>
+    <div class="top-page-item">
+        <RadzenDropDown TValue="Guid" Data="@_employees" TextProperty="Fullname" ValueProperty="Id" @bind-Value="@(_pickedEmployeeId)" Change="@HandlePickedEmployee" />
+    </div>
 </div>
-<br />
 
-<Radzen.Blazor.RadzenScheduler	
-								@ref="scheduler"
-								Data="@_bookings"
-								TItem="BookingCalendarViewModel"
-							   StartProperty="StartDateTime"
-							   EndProperty="EndDateTime"
-								Date="_pickedStartDateTime"
-								@bind-CurrentDate="@currentDate"
-							   Style="height: 650px;"
-							   TextProperty="TreatmentName" 
-							   AppointmentRender="@OnAppointmentRender"
-							   AppointmentSelect="@OnAppointmentSelect"
-								NextText="Næste"
-								PrevText="Tilbage" 
-								
-								
-													>
-													<br />
+<Radzen.Blazor.RadzenScheduler @ref="scheduler"
+                               Data="@_bookings"
+                               TItem="BookingCalendarViewModel"
+                               StartProperty="StartDateTime"
+                               EndProperty="EndDateTime"
+                               @bind-CurrentDate="@currentDate"
+                               Style="height: 650px;"
+                               TextProperty="TreatmentName"
+                               AppointmentRender="@OnAppointmentRender"
+                               AppointmentSelect="@OnAppointmentSelect"
+                               NextText="Næste"
+                               PrevText="Tilbage"
+                               LoadData="@OnLoadData"
+                               Culture="@dkCulture">
+    <br />
 
-	<RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
-					EndTime="@(TimeSpan.FromHours(19))"
-					MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d"/>
+    <RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
+                    EndTime="@(TimeSpan.FromHours(19))"
+                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
 
-	<RadzenDayView StartTime="@(TimeSpan.FromHours(8))"
-					EndTime="@(TimeSpan.FromHours(19))"
-					MinutesPerSlot="30" TimeFormat="HH:mm"  />
+    <RadzenDayView StartTime="@(TimeSpan.FromHours(8))"
+                   EndTime="@(TimeSpan.FromHours(19))"
+                   MinutesPerSlot="30" TimeFormat="HH:mm" />
 
-	<RadzenMonthView />
+    <RadzenMonthView />
 
 </Radzen.Blazor.RadzenScheduler>
 
 @code {
 
-	RadzenScheduler<BookingCalendarViewModel> scheduler;
-	public List<BookingCalendarViewModel> _bookings { get; set; } = new List<BookingCalendarViewModel>();
-	public List<EmployeeNameViewModel> _employees { get; set; } = new List<EmployeeNameViewModel>();
+    System.Globalization.CultureInfo dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
 
-	public DateTime currentDate = DateTime.Today;
+    RadzenScheduler<BookingCalendarViewModel> scheduler;
+    public List<BookingCalendarViewModel> _bookings { get; set; } = new List<BookingCalendarViewModel>();
+    public List<EmployeeNameViewModel> _employees { get; set; } = new List<EmployeeNameViewModel>();
 
-	public Guid _pickedEmployeeId { get; set; }
-	public DateTime _pickedStartDateTime { get; set; }
-	public DateTime _pickedEndDateTime { get; set; }
+    public DateTime currentDate = DateTime.Today;
+
+    public Guid _pickedEmployeeId { get; set; }
+
+    public DateTime _pickedStartDateTime { get; set; }
+    public DateTime _pickedEndDateTime { get; set; }
 
 
-	protected async override Task OnInitializedAsync()
-	{
-		await LoadEmployees();
-		await InitialPickEmployeeAndDates();
-		await LoadBookings(_pickedStartDateTime, _pickedEndDateTime, _pickedEmployeeId);
-	}
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadEmployees();
 
-	private async Task LoadEmployees()
-	{
-		try {
-			var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
-			_employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.Name)).OrderBy(e => e.FullName).ToList();
-		}
-		catch (Exception e)
-		{
-			Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
-		}
-	}
+        if (_employees.Any())
+        {
+            _pickedEmployeeId = _employees.First().Id;
+        }
+    }
 
-	private async Task InitialPickEmployeeAndDates()
-	{
-		_pickedEmployeeId = _employees.First().Id;
-		_pickedStartDateTime = DateTime.Now.Date;
-		_pickedEndDateTime = DateTime.Now.Date.AddDays(7);
-	}
+    private async Task LoadEmployees()
+    {
+        try
+        {
+            var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
+            _employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.Name)).OrderBy(e => e.FullName).ToList();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
+        }
+    }
 
-	private async Task HandlePickedEmployee(object value)
-	{
-		await LoadBookings(_pickedStartDateTime, _pickedEndDateTime, _pickedEmployeeId);
-		if (scheduler != null)
-		{
-			await scheduler.Reload(); // <-- This is essential
-		}
-	}
+    private async Task HandlePickedEmployee(object value)
+    {
+        if (scheduler != null)
+        {
+            await scheduler.Reload();
+        }
+    }
 
-	private async Task LoadBookings(DateTime pickedStartDate, DateTime pickedEndDate, Guid pickedEmployeeId)
-	{
-		try
-		{
-			var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(pickedStartDate, pickedEndDate, pickedEmployeeId);
+    private async Task OnLoadData(SchedulerLoadDataEventArgs args)
+    {
+        _pickedStartDateTime = args.Start;
+        _pickedEndDateTime = args.End;
 
-			_bookings = bookings.Select(b => new BookingCalendarViewModel(
-				b.Id,
-				b.StartDateTime,
-				b.EndDateTime,
-				DateOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.EndDateTime),
-				b.EmployeeFullName,
-				b.CustomerFullName,
-				b.TreatmentName,
-				b.DurationMinutes
-			)).OrderBy(b => b.StartDateTime).ToList();
-		}
-		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
-		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
-	}	
+        if (_pickedEmployeeId != Guid.Empty)
+        {
+            await LoadBookings(_pickedStartDateTime, _pickedEndDateTime, _pickedEmployeeId);
+        }
+    }
 
-	private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<BookingCalendarViewModel> args)
-	{
-		// Define your desired color (using Hex, RGB, or standard color names)
-		string fixedColor = "#eb8ac7"; // Example: A nice solid green
-		string textColor = "white";    // Ensure text is visible
+    private async Task LoadBookings(DateTime pickedStartDate, DateTime pickedEndDate, Guid pickedEmployeeId)
+    {
+        try
+        {
+            var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(pickedStartDate, pickedEndDate, pickedEmployeeId);
 
-		// Apply the style to the appointment element
-		args.Attributes["style"] =
-			$"background-color: {fixedColor};" +
-			$"border-color: {fixedColor};" +
-			$"color: {textColor};" +
-			$"border-radius: 4px;";
-	}
+            _bookings = bookings.Select(b => new BookingCalendarViewModel(
+                b.Id,
+                b.StartDateTime,
+                b.EndDateTime,
+                DateOnly.FromDateTime(b.StartDateTime),
+                TimeOnly.FromDateTime(b.StartDateTime),
+                TimeOnly.FromDateTime(b.EndDateTime),
+                b.EmployeeFullName,
+                b.CustomerFullName,
+                b.TreatmentName,
+                b.DurationMinutes
+            )).OrderBy(b => b.StartDateTime).ToList();
+        }
+        catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+        catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+    }
 
-	private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<BookingCalendarViewModel> args)
-	{
-		NavigationManager.NavigateTo($"/booking/{args.Data.Id}");
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<BookingCalendarViewModel> args)
+    {
+        string fixedColor = "#eb8ac7";
+        string textColor = "white";
 
-	}
+        args.Attributes["style"] =
+            $"background-color: {fixedColor};" +
+            $"border-color: {fixedColor};" +
+            $"color: {textColor};" +
+            $"border-radius: 4px;";
+    }
 
+    private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<BookingCalendarViewModel> args)
+    {
+        NavigationManager.NavigateTo($"/booking/{args.Data.Id}");
+    }
 }
