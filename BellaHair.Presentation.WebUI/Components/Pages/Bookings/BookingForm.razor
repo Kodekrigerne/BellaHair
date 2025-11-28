@@ -236,6 +236,7 @@
 
 	private MudDatePicker? _datePickerRef;
 	private MudTimePicker? _timePickerRef;
+	private bool _ignoreDateChanged = false;
 
 	private PrivateCustomerViewModel? _customer;
 	private TreatmentViewModel? _treatment;
@@ -391,8 +392,15 @@
 
 		_activePicker = Picker.Time;
 		StateHasChanged();
+
 		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
+		//_ignoreDateChanged er nødvendigt her pga. en bug i Mudblazor hvor opdatering af _startDate
+		//	fører til kald af dens DateChanged (HandleDateChanged), selvom det er one-way binding.
+		//Da blazor batcher state changes opdaterer _startDateTime først når vi kalder Task.Delay
+		_ignoreDateChanged = true;
 		await Task.Delay(1);
+		_ignoreDateChanged = false;
+
 		if (_datePickerRef != null) {
 			await _datePickerRef.OpenAsync();
 		}
@@ -428,7 +436,7 @@
 		}
 		else
 		{
-			if (_timePickerRef != null) await _timePickerRef.OpenAsync();
+			if (_timePickerRef != null && !_ignoreDateChanged) await _timePickerRef.OpenAsync();
 		}
 	}
 
