@@ -91,6 +91,8 @@ namespace BellaHair.Application
 
         async Task IBookingCommand.PayAndInvoiceBooking(PayAndInvoiceBookingCommand command)
         {
+            // Der startes en transaction for at bevare atomicity i forbindelse med først betaling af booking og derefter
+            // oprettelse af fakturaen, der afhænger af at bookingen i databasen er markeret betalt.
             await _unitOfWork.BeginTransactionAsync();
 
             try
@@ -121,10 +123,15 @@ namespace BellaHair.Application
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitTransactionAsync();
             }
-            // TODO : Catch mere specifik exception
+            catch (DomainException ex)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw new DomainException($"Fejl under betaling og fakturering af booking: {ex.Message}", ex);
+            }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackTransactionAsync();
+                throw new Exception($"Fejl under betaling og fakturering af booking: {ex.Message}", ex);
             }
         }
 
