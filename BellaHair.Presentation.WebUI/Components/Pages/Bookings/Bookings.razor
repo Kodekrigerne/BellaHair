@@ -6,6 +6,7 @@
 @using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using Microsoft.AspNetCore.WebUtilities
+@using System.Globalization
 
 @rendermode InteractiveServer
 
@@ -147,8 +148,8 @@
 			b.CustomerPhone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.CustomerEmail.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.TreatmentName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("d. MMMM. yyyy").Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("dd/MM").Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+			b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
 		).ToList();
 	}
 }
