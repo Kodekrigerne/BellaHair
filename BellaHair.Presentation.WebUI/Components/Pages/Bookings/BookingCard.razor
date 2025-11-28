@@ -43,7 +43,8 @@
 
 		<div class="bc-body-right">
 			<div class="bc-price">
-				<span>Total:</span>
+				@if (WarnNotPaid()) { <span style="color: red;">Denne booking er ikke betalt</span> }
+				<span style="margin-left: 2rem;">Total:</span>
 				<span>@Booking.TotalBase.ToString("C2")</span>
 				@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
 				{
@@ -111,6 +112,11 @@
 		if (Booking.IsPaid) return false;
 		if (Booking.StartDateTime < _now && Booking.StartDateTime.Date == _now.Date) return false;
 		return true;
+	}
+
+	private bool WarnNotPaid()
+	{
+		return !Booking.IsPaid && Booking.EndDateTime < _now;
 	}
 }
 
