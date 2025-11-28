@@ -34,8 +34,7 @@ namespace BellaHair.Domain.Tests.Invoices
             });
         }
 
-        //[Test]
-        // TODO: - Dennis
+        [Test]
         public void CreateInvoice_Given_ValidInputs_Then_CreatesInvoice()
         {
             // Arrange
