@@ -2,6 +2,7 @@
 using BellaHair.Domain.Bookings;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
+using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
 {
@@ -35,9 +36,9 @@ namespace BellaHair.Infrastructure.Bookings
             return new BookingWithRelationsDTO(
             booking.StartDateTime,
             booking.IsPaid,
-            booking.Employee?.Id ?? booking.EmployeeSnapshot.EmployeeId,
-            booking.Customer?.Id ?? booking.CustomerSnapshot.CustomerId,
-            booking.Treatment?.Id ?? booking.TreatmentSnapshot.TreatmentId,
+            booking.Employee?.Id ?? booking.EmployeeSnapshot!.EmployeeId,
+            booking.Customer?.Id ?? booking.CustomerSnapshot!.CustomerId,
+            booking.Treatment?.Id ?? booking.TreatmentSnapshot!.TreatmentId,
 
             booking.Discount != null
                 ? new DiscountDTO(
