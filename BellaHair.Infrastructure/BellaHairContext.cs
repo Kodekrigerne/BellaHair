@@ -81,7 +81,8 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<PrivateCustomer>().Ignore(p => p.Visits);
 
             modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.DiscountPercent);
-            modelBuilder.Entity<CampaignDiscount>().OwnsOne(l => l.DiscountPercent);
+            modelBuilder.Entity<CampaignDiscount>().OwnsOne(c => c.DiscountPercent);
+            modelBuilder.Entity<BirthdayDiscount>().OwnsOne(b => b.DiscountPercent);
         }
     }
 }
