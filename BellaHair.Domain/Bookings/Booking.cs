@@ -99,7 +99,7 @@ namespace BellaHair.Domain.Bookings
             if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
 
             var discountAmount = Discount?.Amount ?? 0;
-            return Treatment.Price.Value - discountAmount;
+            return CalculateTotalBase() - discountAmount;
         }
 
         //Kald altid denne metode når bookingen ændres
