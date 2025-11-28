@@ -23,6 +23,10 @@
     </div>
 </div>
 
+@* Radzens scheduler komponent som vi bruger til at vise bookings filtreret på medarbejder. 
+   Vi bruger "Allbookinginfo" fra viewmodellen til at displaye info på bookingen da vi ikke kunne tilgå deres templates. 
+*@
+
 <Radzen.Blazor.RadzenScheduler @ref="scheduler"
                                Data="@_bookings"
                                TItem="BookingCalendarViewModel"
@@ -30,7 +34,7 @@
                                EndProperty="EndDateTime"
                                @bind-CurrentDate="@currentDate"
                                Style="height: 650px;"
-                               TextProperty="TreatmentName"
+                               TextProperty="AllBookingInfo"
                                AppointmentRender="@OnAppointmentRender"
                                AppointmentSelect="@OnAppointmentSelect"
                                NextText="Næste"
@@ -38,6 +42,8 @@
                                LoadData="@OnLoadData"
                                Culture="@dkCulture">
     <br />
+
+    @* De forskellige views (dag, uge, måned) - begrænset tiden indenfor åbningstiderne og sat tidsformatet *@
 
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
                     EndTime="@(TimeSpan.FromHours(19))"
@@ -53,6 +59,7 @@
 
 @code {
 
+    // Bruges til at sætte format for dato i header på kalender
     System.Globalization.CultureInfo dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
 
     RadzenScheduler<BookingCalendarViewModel> scheduler;
@@ -66,7 +73,7 @@
     public DateTime _pickedStartDateTime { get; set; }
     public DateTime _pickedEndDateTime { get; set; }
 
-
+    // Indlæser medarbejdere og vælger den første medarbejder på listen
     protected async override Task OnInitializedAsync()
     {
         await LoadEmployees();
@@ -77,6 +84,7 @@
         }
     }
 
+    // Henter medarbejdere fra databasen og sorterer alfabetisk efter fornavn
     private async Task LoadEmployees()
     {
         try
@@ -90,6 +98,7 @@
         }
     }
 
+    // Genindlæser siden når medarbejder er valgt
     private async Task HandlePickedEmployee(object value)
     {
         if (scheduler != null)
@@ -98,6 +107,7 @@
         }
     }
 
+    // Indlæser data på ny når der ændres i kalenderen
     private async Task OnLoadData(SchedulerLoadDataEventArgs args)
     {
         _pickedStartDateTime = args.Start;
@@ -109,6 +119,7 @@
         }
     }
 
+    // Henter bookings fra DB filtreret efter den valgte startdato, slutdato og valgte medarbejder.
     private async Task LoadBookings(DateTime pickedStartDate, DateTime pickedEndDate, Guid pickedEmployeeId)
     {
         try
@@ -125,13 +136,15 @@
                 b.EmployeeFullName,
                 b.CustomerFullName,
                 b.TreatmentName,
-                b.DurationMinutes
+                b.DurationMinutes,
+                $"{b.TreatmentName} ({b.DurationMinutes} min)\nKunde: {b.CustomerFullName}" // Samler al information så vi kan displaye det i kalenderen.
             )).OrderBy(b => b.StartDateTime).ToList();
         }
         catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
         catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
     }
 
+    // Styler hvordan bookings skal se ud i kalenderen - sætter farver og hvordan tekst displayes.
     private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<BookingCalendarViewModel> args)
     {
         string fixedColor = "#eb8ac7";
@@ -141,9 +154,11 @@
             $"background-color: {fixedColor};" +
             $"border-color: {fixedColor};" +
             $"color: {textColor};" +
-            $"border-radius: 4px;";
+            $"border-radius: 4px;" +
+            $"white-space: pre-wrap;";
     }
 
+    // Navigerer til bookingdetaljesiden på den booking der trykkes på
     private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<BookingCalendarViewModel> args)
     {
         NavigationManager.NavigateTo($"/booking/{args.Data.Id}");

@@ -15,6 +15,7 @@
         string? DiscountName,
         decimal? DiscountAmount);
 
+     // Bruges til booking-kalender siden
     public record BookingCalendarViewModel(
         Guid Id,
         DateTime StartDateTime,
@@ -25,7 +26,8 @@
         string EmployeeFullName,
         string CustomerFullName,
         string TreatmentName,
-        int DurationMinutes
+        int DurationMinutes,
+        string AllBookingInfo
         );
         
     public record BookingTimesOnlyViewModel(DateTime StartDateTime, DateTime EndDateTime);

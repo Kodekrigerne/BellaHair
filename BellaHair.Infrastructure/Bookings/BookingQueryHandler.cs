@@ -107,6 +107,15 @@ namespace BellaHair.Infrastructure.Bookings
                 ));
         }
 
+
+        /// <summary>
+        /// Returns all bookings on specific employee within a specific range of date.
+        /// Only used for booking calendar view to limit bookings loaded for effeciency.
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllWithinPeriodOnEmployee(DateTime startDate, DateTime endDate, Guid employeeId)
         {
             var bookings = await _db.Bookings.AsNoTracking()
