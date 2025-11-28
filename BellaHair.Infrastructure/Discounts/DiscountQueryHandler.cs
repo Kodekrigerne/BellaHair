@@ -1,8 +1,10 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
+using BellaHair.Domain.Discounts;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BellaHair.Infrastructure.Discounts
 {
@@ -47,7 +49,7 @@ namespace BellaHair.Infrastructure.Discounts
 
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
 
-            return discount == null ? null : new BookingDiscountDTO(discount.Name, discount.Amount, discount.Type);
+            return discount == null ? null : new BookingDiscountDTO(discount.Name, discount.Amount, (DiscountTypeDTO)discount.Type);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using BellaHair.Domain.Discounts;
-
-namespace BellaHair.Ports.Discounts
+﻿namespace BellaHair.Ports.Discounts
 {
     //Dennis
     /// <summary>
@@ -16,5 +14,5 @@ namespace BellaHair.Ports.Discounts
 
     public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, Guid? BookingId = null);
 
-    public record BookingDiscountDTO(string Name, decimal Amount, DiscountType Type);
+    public record BookingDiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 }

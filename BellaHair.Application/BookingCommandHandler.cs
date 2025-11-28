@@ -78,7 +78,8 @@ namespace BellaHair.Application
 
             if (command.Discount != null)
             {
-                var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount, command.Discount.Type);
+                var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount, (DiscountType)command.Discount.Type);
+
                 booking.SetDiscount(discount);
             }
 

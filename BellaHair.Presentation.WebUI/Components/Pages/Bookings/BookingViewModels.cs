@@ -1,4 +1,4 @@
-﻿using BellaHair.Domain.Discounts;
+﻿using BellaHair.Ports.Discounts;
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
 {
@@ -20,5 +20,5 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
 
     public record BookingTimesOnlyViewModel(DateTime StartDateTime, DateTime EndDateTime);
 
-    public record BookingDiscountViewModel(string Name, decimal Amount, DiscountType Type);
+    public record BookingDiscountViewModel(string Name, decimal Amount, DiscountTypeDTO Type);
 }
