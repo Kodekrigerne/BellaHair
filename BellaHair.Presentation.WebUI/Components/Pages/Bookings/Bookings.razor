@@ -5,6 +5,7 @@
 @using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using Microsoft.AspNetCore.WebUtilities
 
 @rendermode InteractiveServer
 
@@ -49,6 +50,13 @@
 		await base.OnInitializedAsync();
 
 		await HandleNewSelectorClick();
+
+		var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+		if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("search", out var value))
+		{
+			SearchTerm = value!;
+			ApplyFilter();
+		}
 	}
 
 	private async Task HandleNewSelectorClick()
