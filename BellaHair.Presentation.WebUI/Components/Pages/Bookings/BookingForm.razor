@@ -198,13 +198,17 @@
 								}
 							</div>
 						}
-						else if (Mode == BookingMode.Edit)
-						{
-							<div class="btn-group">
+					}
+					@if (Mode == BookingMode.Edit)
+					{
+						<div class="btn-group">
+							@if (_timeIsAvailable != null && _timeIsAvailable == true)
+							{
 								<button class="btn-view btn-save" @onclick="HandleSaveChangesClick">Gem ændringer</button>
-								<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
-							</div>
-						}
+							}
+							<button class="btn-view btn-reset" @onclick="HandleResetChangesClick">Nulstil ændringer</button>
+							<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
+						</div>
 					}
 				</div>
 			}
@@ -293,7 +297,11 @@
 
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
-			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+
+			if (Mode == BookingMode.View)
+				_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+			else if (Mode == BookingMode.Edit)
+				_statusMessage = string.Empty;
 
 			if (!_isPaid) await GetBestDiscount();
 		}
@@ -576,7 +584,7 @@
 	private async Task HandleDeleteClick()
 	{
 		if (Id == null) return;
-	
+
 		try
 		{
 			var command = new DeleteBookingCommand(Id.Value);
@@ -605,6 +613,11 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
+	}
+
+	private async Task HandleResetChangesClick()
+	{
+		await LoadBooking();
 	}
 }
 
@@ -892,6 +905,14 @@
 
 		.btn-delete:hover {
 			background-color: #c62828;
+		}
+
+	.btn-reset {
+		background-color: red;
+	}
+
+		.btn-reset:hover {
+			background-color: red;
 		}
 
 	.date-picker-container {
