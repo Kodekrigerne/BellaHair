@@ -111,6 +111,7 @@
 	private void HandleDeleteClick(Guid id)
 	{
 		_bookings = _bookings.Where(b => b.Id != id).ToList();
+		ApplyFilter();
 	}
 
 	private void ApplyFilter()

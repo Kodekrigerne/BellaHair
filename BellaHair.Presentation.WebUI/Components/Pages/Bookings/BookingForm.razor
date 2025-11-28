@@ -22,6 +22,10 @@
 @inject NavigationManager NavigationManager;
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 
+<Modal @bind-IsVisible="_showDeleteModal">
+	<DeleteComponent EntityTypeName="Booking" EntityName="Booking" OnCancel="@(() => { _showDeleteModal = false; })" OnDeleteConfirm="HandleDeleteClick" />
+</Modal>
+
 <div class="kk-container">
 	<div class="body-container">
 		<div class="body-left">
@@ -190,7 +194,7 @@
 								@if (IsEditable())
 								{
 									<button class="btn-view btn-edit" @onclick="HandleEditClick">Rediger booking</button>
-									<button class="btn-view btn-delete" @onclick="HandleDeleteClick">Slet booking</button>
+									<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
 								}
 							</div>
 						}
@@ -198,7 +202,7 @@
 						{
 							<div class="btn-group">
 								<button class="btn-view btn-save" @onclick="HandleSaveChangesClick">Gem ændringer</button>
-								<button class="btn-view btn-delete" @onclick="HandleDeleteClick">Slet booking</button>
+								<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
 							</div>
 						}
 					}
@@ -221,6 +225,8 @@
 
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
+
+	private bool _showDeleteModal = false;
 
 	private DateTime _now;
 
