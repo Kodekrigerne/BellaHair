@@ -56,7 +56,7 @@ namespace BellaHair.Infrastructure
                 .UsePropertyAccessMode(PropertyAccessMode.Field);
 
             //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
-            modelBuilder.Entity<Booking>().Ignore(b => b.Total);
+            modelBuilder.Entity<Booking>().Ignore(b => b.TotalBase);
             //Vi mapper backing fieldet i stedet for propertien
             modelBuilder.Entity<Booking>().Property<decimal?>("_total")
                 .HasColumnName("Total")
