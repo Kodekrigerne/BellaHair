@@ -42,17 +42,17 @@
 		</div>
 
 		<div class="bc-body-right">
-				<div class="bc-price">
-					<span>Total:</span>
-					<span>@Booking.TotalBase.ToString("C2")</span>
-					@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
-					{
-						<DiscountIcon Class="bc-discount-icon" />
-						<span>Rabat: @Booking.DiscountName</span>
-						<span>-@Booking.DiscountAmount!.Value.ToString("C2")</span>
-						<span style="margin-left: 2rem;">Total med rabat: @Booking.TotalWithDiscount.ToString("C2")</span>
-					}
-				</div>
+			<div class="bc-price">
+				<span>Total:</span>
+				<span>@Booking.TotalBase.ToString("C2")</span>
+				@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
+				{
+					<DiscountIcon Class="bc-discount-icon" />
+					<span>Rabat: @Booking.DiscountName</span>
+					<span>-@Booking.DiscountAmount!.Value.ToString("C2")</span>
+					<span style="margin-left: 2rem;">Total med rabat: @Booking.TotalWithDiscount.ToString("C2")</span>
+				}
+			</div>
 		</div>
 	</div>
 </div>
