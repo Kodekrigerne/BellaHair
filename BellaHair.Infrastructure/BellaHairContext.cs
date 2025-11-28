@@ -58,8 +58,15 @@ namespace BellaHair.Infrastructure
             //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
             modelBuilder.Entity<Booking>().Ignore(b => b.TotalBase);
             //Vi mapper backing fieldet i stedet for propertien
-            modelBuilder.Entity<Booking>().Property<decimal?>("_total")
-                .HasColumnName("Total")
+            modelBuilder.Entity<Booking>().Property<decimal?>("_totalBase")
+                .HasColumnName("TotalBase")
+                .IsRequired(false);
+
+            //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
+            modelBuilder.Entity<Booking>().Ignore(b => b.TotalWithDiscount);
+            //Vi mapper backing fieldet i stedet for propertien
+            modelBuilder.Entity<Booking>().Property<decimal?>("_totalWithDiscount")
+                .HasColumnName("TotalWithDiscount")
                 .IsRequired(false);
 
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
