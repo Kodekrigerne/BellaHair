@@ -80,29 +80,25 @@ namespace BellaHair.Infrastructure.Bookings
         {
             // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
             // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
-            return bookings.Select(b => new BookingDTO(
+            return bookings.Select(b =>
+            {
+                if (b.Employee == null && b.EmployeeSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} does not have an employee attached.");
+                if (b.Customer == null && b.CustomerSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached.");
+                if (b.Treatment == null && b.TreatmentSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} does not have a treatment attached.");
+
+                return new BookingDTO(
                 b.Id,
                 b.StartDateTime,
                 b.EndDateTime,
                 b.IsPaid,
                 b.TotalBase,
-                b.Employee?.Name.FullName ?? b.EmployeeSnapshot?.FullName
-                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have an employee attached."),
-
-                b.Customer?.Name.FullName ?? b.CustomerSnapshot?.FullName
-                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
-
-                b.Customer?.Address.FullAddress ?? b.CustomerSnapshot?.FullAddress
-                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
-
-                b.Customer?.PhoneNumber.Value ?? b.CustomerSnapshot?.PhoneNumber
-                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
-
-                b.Customer?.Email.Value ?? b.CustomerSnapshot?.Email
-                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
-
-                b.Treatment?.Name ?? b.TreatmentSnapshot?.Name
-                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a treatment attached."),
+                b.TotalWithDiscount,
+                b.Employee?.Name.FullName ?? b.EmployeeSnapshot!.FullName,
+                b.Customer?.Name.FullName ?? b.CustomerSnapshot!.FullName,
+                b.Customer?.Address.FullAddress ?? b.CustomerSnapshot!.FullAddress,
+                b.Customer?.PhoneNumber.Value ?? b.CustomerSnapshot!.PhoneNumber,
+                b.Customer?.Email.Value ?? b.CustomerSnapshot!.Email,
+                b.Treatment?.Name ?? b.TreatmentSnapshot!.Name,
 
                 // Hvis bookingen er betalt (?) bruger vi den snapshottede treatment tid da dennes historiske værdi er mest relevant
                 // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
@@ -113,7 +109,8 @@ namespace BellaHair.Infrastructure.Bookings
                         ?? throw new InvalidOperationException($"Booking {b.Id} is unpaid but missing a treatment."),
 
                 b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount) : null
-                ));
+                );
+            });
         }
     }
 }
