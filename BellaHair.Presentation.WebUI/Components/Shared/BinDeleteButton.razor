@@ -1,6 +1,6 @@
 ﻿<!-- Dennis -->
 
-<button class="bin-delete-button @Class" @onclick:stopPropagation @onclick="@OnClick">
+<button class="bin-delete-button @Class" title="@Title" @onclick:stopPropagation @onclick="@OnClick">
 	<BinIcon Class="delete-icon" />
 </button>
 
@@ -10,6 +10,9 @@
 
 	[Parameter]
 	public string? Class { get; set; }
+
+	[Parameter]
+	public string? Title { get; set; }
 }
 
 <style>
