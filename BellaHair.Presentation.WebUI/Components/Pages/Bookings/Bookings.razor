@@ -13,6 +13,11 @@
 @inject IBookingQuery BookingQuery
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar;
+@inject IBookingCommand BookingCommand
+
+<Modal @bind-IsVisible="_showDeleteModal">
+	<DeleteComponent EntityTypeName="Booking" EntityName="Booking" OnCancel="@(() => { _showDeleteModal = false; })" OnDeleteConfirm="HandleConfirmDelete" />
+</Modal>
 
 <PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/ny"); })" />
 
@@ -38,6 +43,8 @@
 	private enum BookingTab { New, Old }
 	private BookingTab _activeTab;
 
+	private bool _showDeleteModal = false;
+	private Guid _bookingToDelete;
 	private DateTime _now;
 	private List<BookingViewModel> _bookings = [];
 	private List<BookingViewModel> _filteredBookings = [];
@@ -110,8 +117,25 @@
 
 	private void HandleDeleteClick(Guid id)
 	{
-		_bookings = _bookings.Where(b => b.Id != id).ToList();
+		_bookingToDelete = id;
+		_showDeleteModal = true;
+	}
+
+	private async Task HandleConfirmDelete()
+	{
+		try
+		{
+			await BookingCommand.DeleteBooking(new DeleteBookingCommand(_bookingToDelete));
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+
+		_showDeleteModal = false;
+		
+		_bookings = _bookings.Where(b => b.Id != _bookingToDelete).ToList();
+		_bookingToDelete = default;
 		ApplyFilter();
+		Snackbar.Add("Bookingen blev slettet.", Severity.Success);
 	}
 
 	private void ApplyFilter()
