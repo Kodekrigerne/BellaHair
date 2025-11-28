@@ -7,22 +7,24 @@ using QuestPDF.Infrastructure;
 /// Represents a component that displays customer contact information in a formatted layout.
 /// </summary>
 
-public class CustomerComponent : IComponent
+public class ContactComponent : IComponent
 {
     private string Address { get; }
     private string Name { get; }
     private string Email { get; }
     private string PhoneNumber { get; }
     private string Title { get; }
+    private string CvrNumber { get; }
 
 
-    public CustomerComponent(string title, string address, string name, string email, string phoneNumber)
+    public ContactComponent(string title, string address, string name, string email, string phoneNumber, string? cvrNumber = null)
     {
         Title = title;
         Address = address;
         Name = name;
         Email = email;
         PhoneNumber = phoneNumber;
+        CvrNumber = cvrNumber ?? "";
     }
 
     public void Compose(IContainer container)
@@ -37,6 +39,7 @@ public class CustomerComponent : IComponent
             column.Item().Text(Address);
             column.Item().Text($"Telefon: {PhoneNumber}");
             column.Item().Text($"Email: {Email}");
+            column.Item().Text($"CVR: {CvrNumber}");
         });
     }
 }

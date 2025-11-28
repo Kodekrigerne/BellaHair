@@ -11,21 +11,21 @@ namespace BellaHair.Domain.Invoices
 
     public class InvoiceModel
     {
-        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, BookingDiscount discount, decimal total)
+        public InvoiceModel(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, decimal total, BookingDiscount? discount)
         {
             Id = id;
             IssueDate = issueDate;
             Customer = customer;
             Treatments.Add(treatment);
-            Discount = discount;
             Total = total;
+            Discount = discount;
         }
 
         public int Id { get; set; }
         public DateTime IssueDate { get; set; }
         public CustomerSnapshot Customer { get; set; }
         public List<TreatmentSnapshot> Treatments { get; set; } = [];
-        public BookingDiscount Discount { get; set; }
+        public BookingDiscount? Discount { get; set; }
         public decimal Total { get; set; }
     }
 }

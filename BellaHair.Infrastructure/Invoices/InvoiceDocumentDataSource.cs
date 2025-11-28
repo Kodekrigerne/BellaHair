@@ -39,8 +39,8 @@ public class InvoiceDocumentDataSource : IInvoiceDocumentDataSource
             currentDate,
             booking.CustomerSnapshot!,
             booking.TreatmentSnapshot!,
-            discount!,
-            total)
+            total,
+            discount)
         { };
     }
 }

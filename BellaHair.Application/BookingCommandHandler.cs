@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain;
+﻿using BellaHair.Application.Invoices;
+using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
@@ -6,6 +7,7 @@ using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Bookings;
+using Microsoft.Extensions.Options;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
@@ -25,6 +27,7 @@ namespace BellaHair.Application
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IInvoiceDocumentDataSource _invoiceDocumentDataSource;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly BusinessInfoSettings _businessInfoSettings;
 
         public BookingCommandHandler(
             IEmployeeRepository employeeRepository,
@@ -36,7 +39,8 @@ namespace BellaHair.Application
             IDiscountCalculatorService discountCalculatorService,
             IInvoiceRepository invoiceRepository,
             IInvoiceDocumentDataSource invoiceDocumentDataSource,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IOptions<BusinessInfoSettings> businessInfoSettings)
         {
             _employeeRepository = employeeRepository;
             _privateCustomerRepository = privateCustomerRepository;
@@ -48,6 +52,7 @@ namespace BellaHair.Application
             _invoiceRepository = invoiceRepository;
             _invoiceDocumentDataSource = invoiceDocumentDataSource;
             _unitOfWork = unitOfWork;
+            _businessInfoSettings = businessInfoSettings.Value;
         }
 
         async Task IBookingCommand.CreateBooking(CreateBookingCommand command)
@@ -105,7 +110,7 @@ namespace BellaHair.Application
                 QuestPDF.Settings.License = LicenseType.Community;
 
                 var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(command.Id);
-                var document = new InvoiceDocument(model);
+                var document = new InvoiceDocument(model, _businessInfoSettings);
 
                 byte[] pdfBytes = document.GeneratePdf();
 

@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Invoices;
+﻿using BellaHair.Application.Invoices;
+using BellaHair.Domain.Invoices;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -14,10 +15,11 @@ public class InvoiceDocument : IDocument
 {
     public InvoiceModel Model { get; }
     public Byte[] LogoContent { get; }
-
-    public InvoiceDocument(InvoiceModel model)
+    public BusinessInfoSettings BusinessInfoSettings { get; }
+    public InvoiceDocument(InvoiceModel model, BusinessInfoSettings businessInfoSettings)
     {
         Model = model;
+        BusinessInfoSettings = businessInfoSettings;
 
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = "BellaHair.Application.Invoices.BellaHairLogo.png";
@@ -90,25 +92,35 @@ public class InvoiceDocument : IDocument
 
             column.Item().Row(row =>
             {
-                row.RelativeItem().Component(new CustomerComponent("Afsender:", "Nygade 1, 7100 Vejle", "BellaHair - CVR-nr: 12345678", "kontakt@bellahair.dk", "40284846"));
+                row.RelativeItem().Component(new ContactComponent("Afsender:", BusinessInfoSettings.Address, BusinessInfoSettings.Name, BusinessInfoSettings.Email, BusinessInfoSettings.PhoneNumber, BusinessInfoSettings.CvrNumber));
                 row.ConstantItem(50);
-                row.RelativeItem().Component(new CustomerComponent("Modtager:", Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
+                row.RelativeItem().Component(new ContactComponent("Modtager:", Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
             });
 
             column.Item().PaddingTop(30).Element(ComposeTable);
 
-            var totalNoDiscountNoTax = Model.Total * 0.8m;
-            var discountNoTax = Model.Discount.Amount * 0.8m;
-            var totalWithDiscountNoTax = totalNoDiscountNoTax - discountNoTax;
-            var tax = totalWithDiscountNoTax * 0.25m;
-            var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
+            if (Model.Discount != null)
+            {
+                var totalNoDiscountNoTax = Model.Total * 0.8m;
+                var discountNoTax = Model.Discount.Amount * 0.8m;
+                var totalWithDiscountNoTax = totalNoDiscountNoTax - discountNoTax;
+                var tax = totalWithDiscountNoTax * 0.25m;
+                var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
 
-            column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalWithDiscountNoTax:N2}").FontSize(12);
-            column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
-            column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold();
+                column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalWithDiscountNoTax:N2}").FontSize(12);
+                column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
+                column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold();
+            }
+            else
+            {
+                var totalNoDiscountNoTax = Model.Total * 0.8m;
+                var tax = totalNoDiscountNoTax * 0.25m;
+                var totalWithTax = totalNoDiscountNoTax * 1.25m;
 
-            //if (!string.IsNullOrWhiteSpace(Model.Comments))
-            //    column.Item().PaddingTop(25).Element(ComposeComments);
+                column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalNoDiscountNoTax:N2}").FontSize(12);
+                column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
+                column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalWithTax:N2}").FontSize(15).SemiBold();
+            }
         });
     }
 
@@ -153,7 +165,7 @@ public class InvoiceDocument : IDocument
                 }
             }
 
-            if (Model.Discount.Amount > 0)
+            if (Model.Discount != null)
             {
                 table.Cell().Element(CellStyle).Text("");
                 table.Cell().Element(CellStyle).Text($"Rabat: {Model.Discount.Name}");
@@ -168,14 +180,4 @@ public class InvoiceDocument : IDocument
             }
         });
     }
-
-    //public void ComposeComments(IContainer container)
-    //{
-    //    container.Background(Colors.Grey.Lighten3).Padding(10).Column(column =>
-    //    {
-    //        column.Spacing(5);
-    //        column.Item().Text("Kommentarer").FontSize(14);
-    //        column.Item().Text(Model.Comments);
-    //    });
-    //}
 }
