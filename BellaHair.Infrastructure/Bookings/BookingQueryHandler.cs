@@ -92,6 +92,15 @@ namespace BellaHair.Infrastructure.Bookings
                 b.Customer?.Name.FullName ?? b.CustomerSnapshot?.FullName
                     ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
 
+                b.Customer?.Address.FullAddress ?? b.CustomerSnapshot?.FullAddress
+                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
+
+                b.Customer?.PhoneNumber.Value ?? b.CustomerSnapshot?.PhoneNumber
+                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
+
+                b.Customer?.Email.Value ?? b.CustomerSnapshot?.Email
+                    ?? throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached."),
+
                 b.Treatment?.Name ?? b.TreatmentSnapshot?.Name
                     ?? throw new InvalidOperationException($"Booking {b.Id} does not have a treatment attached."),
 

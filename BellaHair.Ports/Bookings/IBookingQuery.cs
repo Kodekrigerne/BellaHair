@@ -30,6 +30,9 @@
         decimal Total,
         string EmployeeFullName,
         string CustomerFullName,
+        string CustomerAddress,
+        string CustomerPhone,
+        string CustomerEmail,
         string TreatmentName,
         int DurationMinutes,
         DiscountDTO? Discount);
