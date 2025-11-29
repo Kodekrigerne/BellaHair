@@ -1,10 +1,12 @@
 ﻿<!-- Dennis -->
 
 @using BellaHair.Domain
+@using BellaHair.Domain.Invoices
 @using BellaHair.Infrastructure
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Discounts
 @using BellaHair.Ports.Employees
+@using BellaHair.Ports.Invoices
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
@@ -21,6 +23,9 @@
 @inject IDiscountQuery DiscountQuery;
 @inject NavigationManager NavigationManager;
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider;
+@inject IInvoiceQuery InvoiceQuery;
+@inject IInvoiceCommand InvoiceCommand;
+@inject IJSRuntime JSRuntime;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -158,8 +163,9 @@
 			@if (_timeIsAvailable != null)
 			{
 				<div class="right-bottom">
+					
 					<p class="availability-status">@_statusMessage</p>
-
+			
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
 						<div class="discount-section">
@@ -177,6 +183,14 @@
 								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
 							}
 						</div>
+						
+						@if (_isPaid)
+						{
+							<div class="btn-group">
+								<button class="btn-view btn-pay" @onclick="HandleViewInvoiceClick" style="width: 50%">Se faktura</button>
+								<button class="btn-view btn-pay" @onclick="HandleEmailInvoice" style="width: 50%">Email faktura til kunde</button>
+							</div>
+						}
 
 						if (Mode == BookingMode.New)
 						{
@@ -553,9 +567,22 @@
 
 		try
 		{
-			var command = new PayBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount, _discount.Type ));
-			await BookingCommand.PayBooking(command);
+			var command = new PayAndInvoiceBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount, _discount.Type));
+			await BookingCommand.PayAndInvoiceBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
+
+			var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
+			Snackbar.Add("Faktura oprettet", Severity.Success, config =>
+				{
+					config.Action = "Se faktura";
+					config.ActionColor = Color.Primary;
+					config.OnClick = async snackbar =>
+						{
+							await HandleViewInvoiceClick();
+						};
+				}
+			);
+
 			await LoadBooking();
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
@@ -570,7 +597,7 @@
 	private async Task HandleDeleteClick()
 	{
 		if (Id == null) return;
-	
+
 		try
 		{
 			var command = new DeleteBookingCommand(Id.Value);
@@ -599,6 +626,43 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
+	}
+
+	private async Task HandleViewInvoiceClick()
+	{
+		try
+		{
+			var command = new GetInvoiceByBookingIdQuery(Id!.Value);
+			var invoicePdf = await InvoiceQuery.GetInvoicePdfByBookingIdAsync(command);
+			await JSRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(invoicePdf));
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error); 
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+	}
+
+	private async Task HandleEmailInvoice()
+	{
+		try
+		{
+			var email = _customer!.Email;
+			var command = new EmailInvoiceToCustomerCommand(Id!.Value, email);
+			await InvoiceCommand.EmailInvoiceToCustomerAsync(command);
+			Snackbar.Add($"Faktura afsendt til {email}", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
 	}
 }
 
