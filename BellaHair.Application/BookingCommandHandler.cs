@@ -25,7 +25,6 @@ namespace BellaHair.Application
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
         private readonly IDiscountCalculatorService _discountCalculatorService;
         private readonly IInvoiceRepository _invoiceRepository;
-        private readonly IInvoiceDocumentDataSource _invoiceDocumentDataSource;
         private readonly IUnitOfWork _unitOfWork;
         private readonly BusinessInfoSettings _businessInfoSettings;
 
@@ -38,7 +37,6 @@ namespace BellaHair.Application
             IBookingOverlapChecker bookingOverlapChecker,
             IDiscountCalculatorService discountCalculatorService,
             IInvoiceRepository invoiceRepository,
-            IInvoiceDocumentDataSource invoiceDocumentDataSource,
             IUnitOfWork unitOfWork,
             IOptions<BusinessInfoSettings> businessInfoSettings)
         {
@@ -50,7 +48,6 @@ namespace BellaHair.Application
             _bookingOverlapChecker = bookingOverlapChecker;
             _discountCalculatorService = discountCalculatorService;
             _invoiceRepository = invoiceRepository;
-            _invoiceDocumentDataSource = invoiceDocumentDataSource;
             _unitOfWork = unitOfWork;
             _businessInfoSettings = businessInfoSettings.Value;
         }
@@ -111,12 +108,12 @@ namespace BellaHair.Application
 
                 QuestPDF.Settings.License = LicenseType.Community;
 
-                var model = await _invoiceDocumentDataSource.GetInvoiceDetailsAsync(command.Id);
-                var document = new InvoiceDocument(model, _businessInfoSettings);
+                var invoiceData = await _invoiceRepository.GetInvoiceDataAsync(command.Id);
+                var document = new InvoiceDocument(invoiceData, _businessInfoSettings);
 
                 byte[] pdfBytes = document.GeneratePdf();
 
-                var invoice = Invoice.Create(model.Id, booking, pdfBytes);
+                var invoice = Invoice.Create(invoiceData.Id, booking, pdfBytes);
 
                 await _invoiceRepository.AddAsync(invoice);
 

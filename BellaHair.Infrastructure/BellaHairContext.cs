@@ -34,8 +34,7 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Invoice)
                 .WithOne(i => i.Booking)
-                .HasForeignKey<Invoice>(i => i.BookingId)
-                .IsRequired(false);
+                .HasForeignKey<Invoice>(i => i.BookingId);
 
             //Selvom vores Booking relationer er nullable er det stadig nødvendigt at fortælle databasen at de må være null
             modelBuilder.Entity<Booking>().HasOne(b => b.Treatment).WithMany().OnDelete(DeleteBehavior.SetNull);

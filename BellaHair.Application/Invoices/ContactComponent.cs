@@ -39,7 +39,7 @@ public class ContactComponent : IComponent
             column.Item().Text(Address);
             column.Item().Text($"Telefon: {PhoneNumber}");
             column.Item().Text($"Email: {Email}");
-            column.Item().Text($"CVR: {CvrNumber}");
+            if (CvrNumber != "") column.Item().Text($"CVR: {CvrNumber}");
         });
     }
 }

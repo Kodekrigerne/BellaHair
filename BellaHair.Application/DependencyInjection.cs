@@ -1,5 +1,6 @@
 ﻿using BellaHair.Application.Discounts;
 using BellaHair.Application.Employees;
+using BellaHair.Application.Invoices;
 using BellaHair.Application.PrivateCustomers;
 using BellaHair.Application.Treatments;
 using BellaHair.Ports.Bookings;
@@ -24,7 +25,7 @@ namespace BellaHair.Application
 
             serviceCollection.AddScoped<IPrivateCustomerCommand, PrivateCustomerCommandHandler>();
 
-            serviceCollection.AddScoped<IInvoiceCommand, Invoices.InvoiceCommandHandler>();
+            serviceCollection.AddScoped<IInvoiceCommand, InvoiceCommandHandler>();
 
             return serviceCollection;
         }

@@ -1,6 +1,5 @@
 ﻿using BellaHair.Ports.Invoices;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.JSInterop;
 
 // Mikkel Dahlmann
 
@@ -14,15 +13,13 @@ namespace BellaHair.Infrastructure.Invoices
     public class InvoiceQueryHandler : IInvoiceQuery
     {
         private readonly BellaHairContext _db;
-        private readonly IJSRuntime _jsRuntime;
 
-        public InvoiceQueryHandler(BellaHairContext db, IJSRuntime jsRuntime)
+        public InvoiceQueryHandler(BellaHairContext db)
         {
             _db = db;
-            _jsRuntime = jsRuntime;
         }
 
-        async Task IInvoiceQuery.GetInvoiceByBookingIdAsync(GetInvoiceByBookingIdQuery query)
+        async Task<byte[]> IInvoiceQuery.GetInvoicePdfByBookingIdAsync(GetInvoiceByBookingIdQuery query)
         {
             var invoice = await _db.Invoices
                 .FirstOrDefaultAsync(i => i.Booking.Id == query.BookingId)
@@ -30,7 +27,7 @@ namespace BellaHair.Infrastructure.Invoices
 
             byte[] pdfBytes = invoice.InvoicePdf;
 
-            await _jsRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(pdfBytes));
+            return pdfBytes;
         }
     }
 }

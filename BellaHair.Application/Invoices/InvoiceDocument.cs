@@ -13,14 +13,17 @@ using System.Reflection;
 
 public class InvoiceDocument : IDocument
 {
-    public InvoiceModel Model { get; }
+    public InvoiceData Data { get; }
     public Byte[] LogoContent { get; }
     public BusinessInfoSettings BusinessInfoSettings { get; }
-    public InvoiceDocument(InvoiceModel model, BusinessInfoSettings businessInfoSettings)
+    public InvoiceDocument(InvoiceData data, BusinessInfoSettings businessInfoSettings)
     {
-        Model = model;
+        Data = data;
         BusinessInfoSettings = businessInfoSettings;
 
+        // Logo er gemt som embedded resource, dvs. skrevet ind i .dll-filen.
+        // For at tilgå logo fra .dll skal vi bruge Assembly klassen, og
+        // "udlæse" logoet som en stream.
         var assembly = Assembly.GetExecutingAssembly();
         var resourceName = "BellaHair.Application.Invoices.BellaHairLogo.png";
 
@@ -64,19 +67,19 @@ public class InvoiceDocument : IDocument
             row.RelativeItem().Column(column =>
             {
                 column.Item()
-                    .Text($"Faktura #{Model.Id}")
+                    .Text($"Faktura #{Data.Id}")
                     .FontSize(24).Bold().FontColor(Colors.Black);
 
                 column.Item().Text(text =>
                 {
                     text.Span("Fakturadato: ").SemiBold();
-                    text.Span($"{Model.IssueDate:d}");
+                    text.Span($"{Data.IssueDate:d}");
                 });
 
                 column.Item().Text(text =>
                 {
                     text.Span("Betalt: ").SemiBold();
-                    text.Span($"{Model.IssueDate:d}");
+                    text.Span($"{Data.IssueDate:d}");
                 });
             });
 
@@ -94,15 +97,15 @@ public class InvoiceDocument : IDocument
             {
                 row.RelativeItem().Component(new ContactComponent("Afsender:", BusinessInfoSettings.Address, BusinessInfoSettings.Name, BusinessInfoSettings.Email, BusinessInfoSettings.PhoneNumber, BusinessInfoSettings.CvrNumber));
                 row.ConstantItem(50);
-                row.RelativeItem().Component(new ContactComponent("Modtager:", Model.Customer.FullAddress, Model.Customer.FullName, Model.Customer.Email, Model.Customer.PhoneNumber));
+                row.RelativeItem().Component(new ContactComponent("Modtager:", Data.Customer.FullAddress, Data.Customer.FullName, Data.Customer.Email, Data.Customer.PhoneNumber));
             });
 
             column.Item().PaddingTop(30).Element(ComposeTable);
 
-            if (Model.Discount != null)
+            if (Data.Discount != null)
             {
-                var totalNoDiscountNoTax = Model.Total * 0.8m;
-                var discountNoTax = Model.Discount.Amount * 0.8m;
+                var totalNoDiscountNoTax = Data.Total * 0.8m;
+                var discountNoTax = Data.Discount.Amount * 0.8m;
                 var totalWithDiscountNoTax = totalNoDiscountNoTax - discountNoTax;
                 var tax = totalWithDiscountNoTax * 0.25m;
                 var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
@@ -113,7 +116,7 @@ public class InvoiceDocument : IDocument
             }
             else
             {
-                var totalNoDiscountNoTax = Model.Total * 0.8m;
+                var totalNoDiscountNoTax = Data.Total * 0.8m;
                 var tax = totalNoDiscountNoTax * 0.25m;
                 var totalWithTax = totalNoDiscountNoTax * 1.25m;
 
@@ -151,9 +154,9 @@ public class InvoiceDocument : IDocument
                 }
             });
 
-            foreach (var treatment in Model.Treatments)
+            foreach (var treatment in Data.Treatments)
             {
-                table.Cell().Element(CellStyle).Text((Model.Treatments.IndexOf(treatment) + 1).ToString());
+                table.Cell().Element(CellStyle).Text((Data.Treatments.IndexOf(treatment) + 1).ToString());
                 table.Cell().Element(CellStyle).Text(treatment.Name);
                 table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 0.8m:N2}");
                 table.Cell().Element(CellStyle).AlignRight().Text("1");
@@ -165,13 +168,13 @@ public class InvoiceDocument : IDocument
                 }
             }
 
-            if (Model.Discount != null)
+            if (Data.Discount != null)
             {
                 table.Cell().Element(CellStyle).Text("");
-                table.Cell().Element(CellStyle).Text($"Rabat: {Model.Discount.Name}");
+                table.Cell().Element(CellStyle).Text($"Rabat: {Data.Discount.Name}");
                 table.Cell().Element(CellStyle).AlignRight().Text("");
                 table.Cell().Element(CellStyle).AlignRight().Text("");
-                table.Cell().Element(CellStyle).AlignRight().Text($"kr -{Model.Discount.Amount * 0.8m:N2}");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr -{Data.Discount.Amount * 0.8m:N2}");
 
                 static IContainer CellStyle(IContainer container)
                 {

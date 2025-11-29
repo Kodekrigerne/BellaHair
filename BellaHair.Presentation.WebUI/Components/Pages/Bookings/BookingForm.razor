@@ -25,6 +25,7 @@
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 @inject IInvoiceQuery InvoiceQuery;
 @inject IInvoiceCommand InvoiceCommand;
+@inject IJSRuntime JSRuntime;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -575,10 +576,9 @@
 				{
 					config.Action = "Se faktura";
 					config.ActionColor = Color.Primary;
-					config.OnClick = snackbar =>
+					config.OnClick = async snackbar =>
 						{
-							InvoiceQuery.GetInvoiceByBookingIdAsync(queryCommand);
-							return Task.CompletedTask;
+							await HandleViewInvoiceClick();
 						};
 				}
 			);
@@ -633,7 +633,8 @@
 		try
 		{
 			var command = new GetInvoiceByBookingIdQuery(Id!.Value);
-			await InvoiceQuery.GetInvoiceByBookingIdAsync(command);
+			var invoicePdf = await InvoiceQuery.GetInvoicePdfByBookingIdAsync(command);
+			await JSRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(invoicePdf));
 		}
 		catch (DomainException ex)
 		{

@@ -20,7 +20,7 @@ namespace BellaHair.Domain.Tests.Invoices
             decimal total = 100;
 
             // Act
-            var model = InvoiceModel.Create(id, issueDate, customerSnapshot, treatmentSnapshot, total, discount);
+            var model = new InvoiceData(id, issueDate, customerSnapshot, treatmentSnapshot, total, discount);
 
             // Assert
             Assert.Multiple(() =>
