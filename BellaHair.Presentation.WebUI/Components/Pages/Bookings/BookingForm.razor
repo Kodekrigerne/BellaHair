@@ -679,15 +679,9 @@
 			var invoicePdf = await InvoiceQuery.GetInvoicePdfByBookingIdAsync(command);
 			await JSRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(invoicePdf));
 		}
-		catch (DomainException ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error); 
-		}
-		catch (Exception ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error);
-		}
-	}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+}
 
 	private async Task HandleEmailInvoice()
 	{
@@ -698,14 +692,8 @@
 			await InvoiceCommand.EmailInvoiceToCustomerAsync(command);
 			Snackbar.Add($"Faktura afsendt til {email}", Severity.Success);
 		}
-		catch (DomainException ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error);
-		}
-		catch (Exception ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error);
-		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private async Task HandleResetChangesClick()
