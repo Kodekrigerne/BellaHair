@@ -98,8 +98,13 @@ namespace BellaHair.Application
 
                 if (command.Discount != null)
                 {
-                    var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount);
+                    var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount, (DiscountType)command.Discount.Type);
+
                     booking.SetDiscount(discount);
+                }
+                if (booking.Discount.Type == DiscountType.BirthdayDiscount)
+                {
+                    booking.Customer.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
                 }
 
                 booking.PayBooking(_currentDateTimeProvider);
@@ -130,6 +135,8 @@ namespace BellaHair.Application
                 await _unitOfWork.RollbackTransactionAsync();
                 throw new Exception($"Fejl under betaling og fakturering af booking: {ex.Message}", ex);
             }
+            
+
         }
 
         async Task IBookingCommand.UpdateBooking(UpdateBookingCommand command)

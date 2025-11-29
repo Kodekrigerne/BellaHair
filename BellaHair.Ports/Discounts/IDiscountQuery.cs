@@ -14,5 +14,5 @@
 
     public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, Guid? BookingId = null);
 
-    public record BookingDiscountDTO(string Name, decimal Amount);
+    public record BookingDiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 }

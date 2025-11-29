@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Ports.Bookings
+﻿using BellaHair.Ports.Discounts;
+
+namespace BellaHair.Ports.Bookings
 {
     //Dennis
     /// <summary>
@@ -12,8 +14,8 @@
         Task DeleteBooking(DeleteBookingCommand command);
     }
 
+    public record DiscountData(string Name, decimal Amount, DiscountTypeDTO Type);
     public record PayAndInvoiceBookingCommand(Guid Id, DiscountData? Discount);
-    public record DiscountData(string Name, decimal Amount);
 
     public record UpdateBookingCommand(Guid Id, DateTime StartDateTime, Guid EmployeeId, Guid TreatmentId);
 

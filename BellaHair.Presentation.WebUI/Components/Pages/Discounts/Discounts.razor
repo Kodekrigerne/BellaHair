@@ -29,14 +29,26 @@
 	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter (@CampaignCount)</button>
 </div>
 
-<div class="kk-container">
+//TODO: Work in progress. Bliver færdiggjort i ny branch
+
 	@if (_discounts == null) { <p>Loading</p> }
 	else if (_activeTab == DiscountTab.Loyalty)
 	{
+		<h3>Stamkunderabat</h3>
+	<div class="kk-container">
+			@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
+			{
+				<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteLoyaltyClick"/>
+			}
+	</div>
+
+	<h3>Stamkunderabat</h3>
+	<div class="kk-container">
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
 			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteLoyaltyClick"/>
 		}
+	</div>
 	}
 	else if (_activeTab == DiscountTab.Campaign)
 	{
@@ -45,7 +57,6 @@
 			<CampaignDiscountCard CampaignDiscount="campaignDiscount" OnDelete="@HandleOnDeleteCampaignClick"></CampaignDiscountCard>
 		}
 	}
-</div>
 
 @code {
 	private enum DiscountTab { Loyalty, Campaign }

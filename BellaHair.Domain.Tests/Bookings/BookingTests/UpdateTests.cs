@@ -38,7 +38,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
                 Assert.That(booking.TreatmentSnapshot, Is.Null);
                 Assert.That(booking.EmployeeSnapshot, Is.Null);
                 Assert.That(booking.EndDateTime, Is.EqualTo(startDateTime.AddMinutes(treatment.DurationMinutes.Value)));
-                Assert.That(booking.Total, Is.EqualTo(treatment.Price.Value));
+                Assert.That(booking.TotalBase, Is.EqualTo(treatment.Price.Value));
             });
         }
 

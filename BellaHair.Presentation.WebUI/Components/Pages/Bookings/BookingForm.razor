@@ -283,7 +283,7 @@
 			_isPaid = booking.IsPaid;
 
 			if (booking.Discount != null) {
-				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
+				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
 			}
 
 			var c = await CustomerQuery.GetPrivateCustomerAsync(new GetPrivateCustomerQuery(booking.CustomerId));
@@ -535,7 +535,7 @@
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
-			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount);
+			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount, discountDTO.Type);
 		}
 		catch
 		{
@@ -567,7 +567,7 @@
 
 		try
 		{
-			var command = new PayAndInvoiceBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount));
+			var command = new PayAndInvoiceBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount, _discount.Type));
 			await BookingCommand.PayAndInvoiceBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
 
