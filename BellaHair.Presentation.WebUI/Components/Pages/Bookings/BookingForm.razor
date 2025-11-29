@@ -214,6 +214,10 @@
 			}
 		</div>
 	</div>
+	@if (_startDate != null && _employees != null && _employees.Count > 0 && (_activePicker == Picker.Employee || _activePicker == Picker.Time))
+	{
+		<EmployeeDailyCalendar EmployeeBookingData="_employees" CurrentDate="_startDate.Value" CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
+	} 
 </div>
 
 @code {
@@ -294,7 +298,7 @@
 				e.Id,
 				e.Name,
 				e.Bookings
-					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime)).ToList());
+					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
 
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
@@ -372,38 +376,47 @@
 					e.Id,
 					e.Name,
 					e.Bookings
-						.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
+						.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime))
 						.ToList()))
 				.OrderBy(e => e.Name)
 				.ToList();
 
 			_activePicker = Picker.Employee;
+
+			await SetStartDateToNextOpen();
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
-	private async Task HandlePickStartDateTimeClick()
+	private async Task SetStartDateToNextOpen()
 	{
-		if (_employee == null) return;
-
 		var openToDate = _now;
 
 		if (openToDate.TimeOfDay.Hours >= 18) openToDate = openToDate.Date.AddDays(1);
 		if (openToDate.DayOfWeek == DayOfWeek.Saturday) openToDate = openToDate.Date.AddDays(2);
 		else if (openToDate.DayOfWeek == DayOfWeek.Sunday) openToDate = openToDate.Date.AddDays(1);
 
-		_startDate = openToDate;
+		await SetStartDate(openToDate);
+	}
 
-		_activePicker = Picker.Time;
-		StateHasChanged();
-
+	private async Task SetStartDate(DateTime newStartDate)
+	{
 		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
 		//_ignoreDateChanged er nødvendigt her pga. en bug i Mudblazor hvor opdatering af _startDate
 		//	fører til kald af dens DateChanged (HandleDateChanged), selvom det er one-way binding.
 		//Da blazor batcher state changes opdaterer _startDateTime først når vi kalder Task.Delay
 		_ignoreDateChanged = true;
+		_startDate = newStartDate;
 		await Task.Delay(1);
 		_ignoreDateChanged = false;
+	}
+
+	private async Task HandlePickStartDateTimeClick()
+	{
+		if (_employee == null) return;
+
+		_activePicker = Picker.Time;
+		StateHasChanged();
 
 		if (_datePickerRef != null) {
 			await _datePickerRef.OpenAsync();
@@ -524,7 +537,11 @@
 		SetNulls();
 
 		if (_employees.Count == 0) await HandlePickEmployeeClick();
-		else _activePicker = Picker.Employee;
+		else
+		{
+			await SetStartDateToNextOpen();
+			_activePicker = Picker.Employee;
+		}	
 	}
 
 	private async Task HandleChangeTimeClick()
@@ -630,6 +647,11 @@
 	private async Task HandleResetChangesClick()
 	{
 		await LoadBooking();
+	}
+
+	private async Task HandleAvailabilityCalenderDateChanged(DateTime args)
+	{
+		await SetStartDate(args);
 	}
 }
 
