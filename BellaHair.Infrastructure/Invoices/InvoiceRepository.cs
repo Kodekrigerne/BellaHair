@@ -56,7 +56,7 @@ namespace BellaHair.Infrastructure.Invoices
             // Denne løsning kan lade sig gøre, så længe der ikke er tale om et fler-bruger system.
             var id = await _db.Invoices.MaxAsync(i => (int?)i.Id) + 1 ?? 1;
             var discount = booking.Discount;
-            var total = booking.Total;
+            var total = booking.TotalBase;
 
             return new InvoiceData(
                 id,
