@@ -389,7 +389,8 @@
         }
       }
     };
-  }
+    }
+
   function findHandler(events, callable, delegationSelector = null) {
     return Object.values(events).find(event => event.callable === callable && event.delegationSelector === delegationSelector);
   }

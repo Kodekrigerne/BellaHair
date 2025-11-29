@@ -9,13 +9,13 @@ namespace BellaHair.Ports.Bookings
     public interface IBookingCommand
     {
         Task CreateBooking(CreateBookingCommand command);
-        Task PayBooking(PayBookingCommand command);
+        Task PayAndInvoiceBooking(PayAndInvoiceBookingCommand command);
         Task UpdateBooking(UpdateBookingCommand command);
         Task DeleteBooking(DeleteBookingCommand command);
     }
 
-    public record PayBookingCommand(Guid Id, DiscountData? Discount);
     public record DiscountData(string Name, decimal Amount, DiscountTypeDTO Type);
+    public record PayAndInvoiceBookingCommand(Guid Id, DiscountData? Discount);
 
     public record UpdateBookingCommand(Guid Id, DateTime StartDateTime, Guid EmployeeId, Guid TreatmentId);
 

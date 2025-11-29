@@ -17,6 +17,38 @@
 
 			@* Needed for snackbars *@
 			<MudSnackbarProvider @rendermode="InteractiveServer" />
+
+			<!-- Mikkel Dahlmann -->
+			<!-- JS-script der åbner PDF i ny browsertab -->
+			<!-- Script genereret via Google Gemini prompt:
+                "Create a JavaScript function, that takes a Base64 encoded string
+				of a PDF file as input, and opens the PDF in a new browser tab." -->
+			<script>
+				function openPdfInNewTab(bytesBase64) 
+				{
+					// 1. Convert Base64 string to a Uint8Array
+					const data = window.atob(bytesBase64);
+					const bytes = new Uint8Array(data.length);
+					for (let i = 0; i < data.length; i++) {
+						bytes[i] = data.charCodeAt(i);
+					}
+
+					// 2. Create a blob from the PDF bytes
+					const blob = new Blob([bytes.buffer], { type: 'application/pdf' });
+
+					// 3. Create a temporary URL for the Blob
+					const url = window.URL.createObjectURL(blob);
+
+					// 4. Open the URL in a new browser tab
+					window.open(url, '_blank');
+
+					// 5. Clean up the temporary URL to free memory
+					// (A slight delay is often necessary before revoking the URL)
+					setTimeout(() => {
+						window.URL.revokeObjectURL(url);
+					}, 100);
+				}
+			</script>
 		</article>
 	</main>
 </div>

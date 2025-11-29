@@ -1,10 +1,12 @@
 ﻿using BellaHair.Application.Discounts;
 using BellaHair.Application.Employees;
+using BellaHair.Application.Invoices;
 using BellaHair.Application.PrivateCustomers;
 using BellaHair.Application.Treatments;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
+using BellaHair.Ports.Invoices;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +24,8 @@ namespace BellaHair.Application
             serviceCollection.AddScoped<ICampaignDiscountCommand, CampaignDiscountCommandHandler>();
 
             serviceCollection.AddScoped<IPrivateCustomerCommand, PrivateCustomerCommandHandler>();
+
+            serviceCollection.AddScoped<IInvoiceCommand, InvoiceCommandHandler>();
 
             return serviceCollection;
         }
