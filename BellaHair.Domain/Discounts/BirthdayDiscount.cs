@@ -32,7 +32,7 @@ namespace BellaHair.Domain.Discounts
             if (booking.Customer.HasUsedBirthdayDiscount(booking.StartDateTime.Year))
                 return BookingDiscount.Inactive(Name, Type);
 
-            var discount = booking.Total * DiscountPercent.Value;
+            var discount = booking.TotalBase * DiscountPercent.Value;
             return BookingDiscount.Active(Name, discount, Type);
         }
     }

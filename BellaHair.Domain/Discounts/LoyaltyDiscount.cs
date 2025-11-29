@@ -35,7 +35,7 @@ namespace BellaHair.Domain.Discounts
 
             if (booking.Customer.Visits < MinimumVisits) return BookingDiscount.Inactive(Name, Type);
 
-            var discountAmount = booking.Total * DiscountPercent.Value;
+            var discountAmount = booking.TotalBase * DiscountPercent.Value;
             return BookingDiscount.Active(Name, discountAmount, Type);
         }
     }

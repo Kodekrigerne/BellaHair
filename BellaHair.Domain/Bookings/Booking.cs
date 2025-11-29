@@ -32,8 +32,11 @@ namespace BellaHair.Domain.Bookings
         public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored
         //_total is only set (and saved in the database) after booking is paid, and is therefore nullable
-        private decimal? _total;
-        public decimal Total => IsPaid ? _total!.Value : CalculateTotal();
+        private decimal? _totalBase;
+        public decimal TotalBase => IsPaid ? _totalBase!.Value : CalculateTotalBase();
+
+        private decimal? _totalWithDiscount;
+        public decimal TotalWithDiscount => IsPaid ? _totalWithDiscount!.Value : CalculateTotalWithDiscount();
 
         private Booking() { }
 
@@ -75,18 +78,28 @@ namespace BellaHair.Domain.Bookings
             EmployeeSnapshot = EmployeeSnapshot.FromEmployee(Employee);
             CustomerSnapshot = CustomerSnapshot.FromCustomer(Customer);
             TreatmentSnapshot = TreatmentSnapshot.FromTreatment(Treatment);
-            _total = CalculateTotal();
+            _totalBase = CalculateTotalBase();
+            _totalWithDiscount = CalculateTotalWithDiscount();
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
-        private decimal CalculateTotal()
+        private decimal CalculateTotalBase()
         {
             if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
             if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
 
             return Treatment.Price.Value;
+        }
+
+        private decimal CalculateTotalWithDiscount()
+        {
+            if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
+            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
+
+            var discountAmount = Discount?.Amount ?? 0;
+            return CalculateTotalBase() - discountAmount;
         }
 
         //Kald altid denne metode når bookingen ændres
