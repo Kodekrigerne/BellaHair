@@ -1,4 +1,5 @@
-﻿@using BellaHair.Ports.PrivateCustomers
+﻿@using BellaHair.Ports.Discounts
+@using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 @using BellaHair.Presentation.WebUI.Components.Shared
 
@@ -39,7 +40,20 @@
 	</div>
 
 	<div class="privatecustomer-details">
-		<h3>@PrivateCustomer.FullName</h3>
+		<div class="privatecustomer-contact-body" style="color: black;">	
+			<h3>
+				@PrivateCustomer.FullName
+			</h3>
+			<div class="
+				@(
+					loyaltyLevel == "Almindelig" ? "regular-customer" :
+					loyaltyLevel == "Ny kunde" ? "new-customer" :
+					"loyalty-customer"
+				)">
+				@loyaltyLevel
+			</div>
+		</div>
+			
 		
 		<div class="privatecustomer-contact-body">
 			
@@ -87,9 +101,20 @@
 	[Parameter, EditorRequired]
 	public required EventCallback OnChange { get; set; }
 
+	[Parameter, EditorRequired]
+	public required List<LoyaltyDiscountDTO> LoyaltyDiscounts { get; set; }
+
 	private bool showEditModal = false;
 	private bool showDeleteModal = false;
 	private bool _futureBookings = false;
+	private string loyaltyLevel = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		CalculateLoyaltyLevel();
+	}
 
 	// Viser modal, og tjekker for future-bookings.
 	private async Task HandleOnDeleteClick()
@@ -135,7 +160,7 @@
 	private int CalculateAge()
 	{
 
-// TODO: Brug GetCurrentDate metode når den er CrossCut 
+		// TODO: Brug GetCurrentDate metode når den er CrossCut 
 		DateTime today = DateTime.Today;
 
 		// År udregnet fra nuværende år minus fødselsår.
@@ -148,5 +173,26 @@
 		}
 
 		return age;
+	}
+
+	private void CalculateLoyaltyLevel()
+	{
+		var discount = LoyaltyDiscounts
+		.Where(ld => ld.MinimumVisits < PrivateCustomer.Visits)
+		.DefaultIfEmpty()
+		.Max();
+
+		if (discount != null)
+		{
+			loyaltyLevel = discount.Name;
+		}
+		else if (discount == null && PrivateCustomer.Visits > 0)
+		{
+			loyaltyLevel = "Almindelig";
+		}
+		else
+		{
+			loyaltyLevel = "Ny kunde";
+		}
 	}
 }

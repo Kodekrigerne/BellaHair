@@ -80,3 +80,36 @@
     top: unset !important;
     right: unset !important;
 }
+
+.loyalty-customer {
+    vertical-align: top;
+    background-color: #c084fc26;
+    padding: 1px 6px 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    font-weight: 500;
+    color: #8200db;
+}
+
+.regular-customer {
+    vertical-align: top;
+    background-color: #36415327;
+    padding: 1px 6px 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    font-weight: 500;
+    color: #364153;
+}
+
+.new-customer {
+    vertical-align: top;
+    background-color: #0082361d;
+    padding: 1px 6px 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    font-weight: 500;
+    color: #008236;
+}

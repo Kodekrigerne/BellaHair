@@ -4,12 +4,14 @@
 @using BellaHair.Domain
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
+@inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
 
 
 <PageHeader HeaderText="Kundekatalog" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
@@ -40,7 +42,7 @@
 		foreach (var customer in filteredCustomers)
 		{
 			<!-- Card komponent der tager imod en customer. OnChange er komponentens EventCallBack. -->
-			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers"></PrivateCustomerCard>
+			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers" LoyaltyDiscounts="loyaltyDiscounts"></PrivateCustomerCard>
 		}
 	}
 </div>
@@ -50,6 +52,7 @@
 
 	private List<PrivateCustomerDTO>? allCustomers;
 	private List<PrivateCustomerDTO>? filteredCustomers;
+	private List<LoyaltyDiscountDTO>? loyaltyDiscounts;
 
 	private string SearchTerm { get; set; } = string.Empty;
 
@@ -58,6 +61,8 @@
 		await base.OnInitializedAsync();
 
 		await LoadCustomers();
+
+		await LoadLoyaltyDiscounts();
 	}
 
 	private async Task LoadCustomers()
@@ -80,7 +85,7 @@
 		}
 	}
 
-    // Metode til at filtrere kunder baseret på søgetermen.
+	// Metode til at filtrere kunder baseret på søgetermen.
 	private void ApplyFilter()
 	{
 		if (string.IsNullOrWhiteSpace(SearchTerm))
@@ -111,5 +116,10 @@
 	{
 		showCreateModal = false;
 		Snackbar.Add("Handlingen blev afbrudt.", Severity.Info);
+	}
+
+	private async Task LoadLoyaltyDiscounts()
+	{
+		loyaltyDiscounts = await LoyaltyDiscountQuery.GetAllAsync();
 	}
 }
