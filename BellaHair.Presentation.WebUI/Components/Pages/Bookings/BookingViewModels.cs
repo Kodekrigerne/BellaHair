@@ -22,7 +22,7 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
         string? DiscountName,
         decimal? DiscountAmount);
 
-    public record BookingTimesOnlyViewModel(DateTime StartDateTime, DateTime EndDateTime);
+    public record BookingTimesOnlyViewModel(Guid Id, DateTime StartDateTime, DateTime EndDateTime);
 
     public record BookingDiscountViewModel(string Name, decimal Amount, DiscountTypeDTO Type);
 }
