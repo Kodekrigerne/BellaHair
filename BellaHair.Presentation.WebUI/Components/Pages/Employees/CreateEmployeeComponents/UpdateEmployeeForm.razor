@@ -150,7 +150,7 @@
         EmployeeModel.PhoneNumber = EmployeeToUpdate.PhoneNumber;
         EmployeeModel.Email = EmployeeToUpdate.Email;
         EmployeeModel.Floor = EmployeeToUpdate.Floor;
-        EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList();
+        EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList() ?? [];
     }
 
     private async Task LoadTreatments()

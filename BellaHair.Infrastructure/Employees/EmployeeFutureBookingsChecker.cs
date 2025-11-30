@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
 // Linnea
@@ -30,11 +31,23 @@ namespace BellaHair.Infrastructure.Employees
         /// <param name="id">The unique identifier of the employee to check for future bookings.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
         /// employee has at least one future booking with a treatment; otherwise, <see langword="false"/>.</returns>
+        
         async Task<bool> IEmployeeFutureBookingsChecker.EmployeeHasFutureBookings(Guid id)
         {
             return (await _db.Employees.AsNoTracking().Include(e => e.Bookings.Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime()))
                 .FirstAsync(p => p.Id == id))
                 .Bookings.Any();
+        }
+
+
+        //return await _db.Bookings
+        //        .AsNoTracking()
+        //        .Where(b => b.Treatment!.Id == treatmentId)
+        //        .AnyAsync(b => b.EndDateTime > currentDateTime);
+
+        async Task<bool> IEmployeeFutureBookingsChecker.EmployeeHasFutureBookingsWithTreatments(Guid employeeId, List<Guid> toBeRemovedTreatmentIds)
+        {
+            return (await _db.Employees.AsNoTracking().Include(e => e.Bookings.Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())).FirstAsync(p => p.Id == employeeId)).Bookings.Any(b => b.Treatment.Id)
         }
     }
 }
