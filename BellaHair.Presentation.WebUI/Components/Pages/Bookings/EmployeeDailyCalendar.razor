@@ -2,9 +2,11 @@
 
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
 @using System.Globalization
+@using Microsoft.Extensions.Options
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IOptions<OpeningTimesSettings> OpeningTimes
 
 <div class="day-container">
     <div class="day-header">
@@ -52,23 +54,31 @@
 </div>
 
 @code {
-        [Parameter, EditorRequired]
-        public required DateTime CurrentDate { get; set; }
+    [Parameter, EditorRequired]
+    public required DateTime CurrentDate { get; set; }
 
-        [Parameter, EditorRequired]
-        public required List<EmployeeNameWithBookingsViewModel> EmployeeBookingData { get; set; }
+    [Parameter, EditorRequired]
+    public required List<EmployeeNameWithBookingsViewModel> EmployeeBookingData { get; set; }
 
-        [Parameter]
-        public EventCallback<DateTime> CurrentDateChanged { get; set; }
+    [Parameter]
+    public EventCallback<DateTime> CurrentDateChanged { get; set; }
 
-    private int[] _hours = [10, 11, 12, 13, 14, 15, 16, 17];
+    private int[] _hours = [];
     private const int HourWidthRem = 4;
     private const int MinutesPerHour = 60;
-    private const int OpeningHour = 10;
+    private int _openingHour;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _hours = Enumerable.Range(OpeningTimes.Value.OpeningTime.Hour, (OpeningTimes.Value.ClosingTime.Hour - OpeningTimes.Value.OpeningTime.Hour)).ToArray();
+        _openingHour = OpeningTimes.Value.OpeningTime.Hour;
+    }
 
     private double GetBookingStart(BookingTimesOnlyViewModel booking)
     {
-        var openingTime = booking.StartDateTime.Date.AddHours(OpeningHour);
+        var openingTime = booking.StartDateTime.Date.AddHours(_openingHour);
         var minutesSinceOpeningTime = (booking.StartDateTime - openingTime).TotalMinutes;
         return (minutesSinceOpeningTime / MinutesPerHour) * HourWidthRem;
     }
