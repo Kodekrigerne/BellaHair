@@ -13,6 +13,7 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using Microsoft.Extensions.Options
 
 @inject ISnackbar Snackbar;
 @inject IPrivateCustomerQuery CustomerQuery;
@@ -26,6 +27,7 @@
 @inject IInvoiceQuery InvoiceQuery;
 @inject IInvoiceCommand InvoiceCommand;
 @inject IJSRuntime JSRuntime;
+@inject IOptions<OpeningTimesSettings> OpeningTimes;
 
 <Modal @bind-IsVisible="_showDeleteModal">
 	<DeleteComponent EntityTypeName="Booking" EntityName="Booking" OnCancel="@(() => { _showDeleteModal = false; })" OnDeleteConfirm="HandleDeleteClick" />
@@ -488,28 +490,24 @@
 	{
 		if (_startDate == null || _startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
-		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var treatmentEnd = startDateTime.AddMinutes(_treatment.DurationMinutes);
+		var startTime = TimeOnly.FromTimeSpan(_startTime.Value);
+		var treatmentEnd = startTime.AddMinutes(_treatment.DurationMinutes);
 
-		//TODO: Ryk til appsettings.json
-		var date = _startDate.Value.Date;
-		var earliest = date.AddHours(10);
-		var latest = date.AddHours(18);
-
-		if (startDateTime < earliest)
+		if (startTime < OpeningTimes.Value.OpeningTime)
 		{
 			_timeIsAvailable = false;
 			_statusMessage = "Kan ikke starte booking før åbningstid";
 			return;
 		}
 
-		if (treatmentEnd > latest)
+		if (treatmentEnd > OpeningTimes.Value.ClosingTime)
 		{
 			_timeIsAvailable = false;
 			_statusMessage = "Booking skal slutte før lukketid";
 			return;
 		}
 
+		var startDateTime = _startDate.Value.Add(_startTime.Value);
 		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id, Id);
 
 		await GetBestDiscount();
