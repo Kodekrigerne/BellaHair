@@ -1,7 +1,4 @@
-﻿using BellaHair.Domain.SharedValueObjects;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using static MudBlazor.Colors;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BellaHair.Presentation.WebUI.Components.Shared.ValidationAttributes;
 
@@ -15,7 +12,7 @@ public class DanishPhoneNumberAttribute : ValidationAttribute
 {
     // Overskriver standard fejlbeskeden.
     public DanishPhoneNumberAttribute() :
-        base("Feltet kan kun indeholde et 8-cifret telefonnummer.")
+        base("Skal være 8 cifre.")
     {
     }
 
