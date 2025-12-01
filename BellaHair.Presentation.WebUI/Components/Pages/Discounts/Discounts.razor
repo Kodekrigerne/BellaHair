@@ -26,12 +26,13 @@
 <div style="margin-bottom:20px;">
 	<button @onclick="HandleGeneralSelectorClick" class="@(_activeTab == DiscountTab.General ? "btn-select-active" : "btn-select")">Generelt</button>
 	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter (@CampaignCount)</button>
+	<hr />
 </div>
 
 @if (_discounts == null) { <p>Loading</p> }
 else if (_activeTab == DiscountTab.General)
 {
-	<h3>Stamkunderabat (@LoyaltyCount)</h3>
+	<h4>Stamkunderabat (@LoyaltyCount)</h4>
 	<div class="kk-container">
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
@@ -39,7 +40,7 @@ else if (_activeTab == DiscountTab.General)
 		}
 	</div>
 
-	<h3>Fødselsdagsrabat</h3>
+	<h4>Fødselsdagsrabat</h4>
 	<div class="kk-container">
 
 		<BirthdayDiscountCard BirthdayDiscount="_birthdayDiscount"/>
