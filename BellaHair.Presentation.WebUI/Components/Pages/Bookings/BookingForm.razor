@@ -221,7 +221,7 @@
 							{
 								<button class="btn-view btn-save" @onclick="HandleSaveChangesClick">Gem ændringer</button>
 							}
-							<button class="btn-view btn-reset" @onclick="HandleResetChangesClick">Nulstil ændringer</button>
+							<button class="btn-view btn-reset" @onclick="HandleResetChangesClick">Fortryd ændringer</button>
 							<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
 						</div>
 					}
@@ -439,8 +439,11 @@
 	{
 		if (_employee == null) return;
 
+		if (_startDate == null) await SetStartDateToNextOpen();
+
 		_activePicker = Picker.Time;
 		StateHasChanged();
+
 
 		if (_datePickerRef != null) {
 			await _datePickerRef.OpenAsync();
@@ -687,7 +690,7 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
-}
+	}
 
 	private async Task HandleEmailInvoice()
 	{
@@ -705,6 +708,7 @@
 	private async Task HandleResetChangesClick()
 	{
 		await LoadBooking();
+		Mode = BookingMode.View;
 	}
 
 	private async Task HandleAvailabilityCalenderDateChanged(DateTime args)
@@ -1000,11 +1004,11 @@
 		}
 
 	.btn-reset {
-		background-color: red;
+		background-color: #ff9800;
 	}
 
 		.btn-reset:hover {
-			background-color: red;
+			background-color: #fb8c00;
 		}
 
 	.date-picker-container {
