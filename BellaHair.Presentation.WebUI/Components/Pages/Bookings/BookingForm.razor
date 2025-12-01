@@ -442,8 +442,7 @@
 		if (_startDate == null) await SetStartDateToNextOpen();
 
 		_activePicker = Picker.Time;
-		StateHasChanged();
-
+		await Task.Delay(1);
 
 		if (_datePickerRef != null) {
 			await _datePickerRef.OpenAsync();
