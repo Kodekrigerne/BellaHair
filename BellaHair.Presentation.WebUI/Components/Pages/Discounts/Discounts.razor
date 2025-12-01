@@ -25,12 +25,11 @@
 <PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
 
 <div>
-	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
+	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Generelt</button>
 	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter (@CampaignCount)</button>
 </div>
 
-//TODO: Work in progress. Bliver færdiggjort i ny branch
-
+getb
 	@if (_discounts == null) { <p>Loading</p> }
 	else if (_activeTab == DiscountTab.Loyalty)
 	{
