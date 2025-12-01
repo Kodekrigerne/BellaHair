@@ -14,16 +14,21 @@
 
 <!-- Modal til sletning -->
 <Modal @bind-IsVisible="@showDeleteModal">
-	@if (_futureBookings)
-	{
-		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
-	}
-	else
-	{
-		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-		<button class="btn-remove" @onclick="@HandleOnDeleteConfirm">Slet</button>
-		<button class="btn-add" @onclick="@HandleCancel">Annuller</button>
-	}
+	<div class="modal-centered-content">
+		@if (_futureBookings)
+		{
+			<DeleteConfirmationIcon Class="delete-confirmation-icon" />
+			<p style="max-width: 24rem; text-align: center;">
+				Kunden @PrivateCustomer.FullName har fremtidige bookinger.
+				Disse skal slettes før kunden kan slettes.
+			</p>
+			<button class="btn-add" @onclick="@HandleCancel">Annuller</button>
+		}
+		else
+		{
+			<DeleteComponent EntityName="@PrivateCustomer.FullName" OnCancel="@HandleCancel" OnDeleteConfirm="@HandleOnDeleteConfirm" EntityTypeName="kunde" />
+		}
+	</div>
 </Modal>
 
 
