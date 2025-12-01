@@ -422,7 +422,7 @@
 
 	private async Task SetStartDateToNextOpen()
 	{
-		var openToDate = _now;
+		var openToDate = _now.Date;
 
 		if (openToDate.TimeOfDay.Hours >= 18) openToDate = openToDate.Date.AddDays(1);
 		if (openToDate.DayOfWeek == DayOfWeek.Saturday) openToDate = openToDate.Date.AddDays(2);

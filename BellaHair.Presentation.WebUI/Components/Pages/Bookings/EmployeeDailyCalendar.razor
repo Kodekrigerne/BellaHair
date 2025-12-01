@@ -38,12 +38,12 @@
                         {
                             <div class="day-hour"></div>
                         }
-                        @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate))
+                        @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate.Date))
                         {
                             <div @onclick="@(() => HandleBookingClick(booking.Id))" class="appointment"
                                  style="left: @(GetBookingStart(booking))rem; width: @(GetBookingWidth(booking))rem;"
                                  title="@booking.StartDateTime.ToString("HH:mm") - @booking.EndDateTime.ToString("HH:mm")">
-                                <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span>
+                                @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
                             </div>
                         }
                     </div>
