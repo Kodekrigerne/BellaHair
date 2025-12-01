@@ -33,6 +33,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<ILoyaltyDiscountQuery, LoyaltyDiscountQueryHandler>();
             serviceCollection.AddScoped<ICampaignDiscountRepository, CampaignDiscountRepository>();
             serviceCollection.AddScoped<ICampaignDiscountQuery, CampaignDiscountQueryHandler>();
+            serviceCollection.AddScoped<IBirthdayDiscountQuery, BirthdayDiscountQueryHandler>();
 
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
