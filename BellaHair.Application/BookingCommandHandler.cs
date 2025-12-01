@@ -109,7 +109,8 @@ namespace BellaHair.Application
 
                     if (booking.Discount!.Type == DiscountType.BirthdayDiscount)
                     {
-                        booking.Customer!.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
+                        if (booking.Customer == null) throw new InvalidOperationException("Booking must be loaded with customer included.");
+                        booking.Customer.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
                     }
                 }
 

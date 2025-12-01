@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
@@ -41,6 +36,12 @@ namespace BellaHair.Application.Employees
                 command.StreetNumber,
                 command.ZipCode,
                 command.Floor);
+
+
+
+            var treatmentsToRemove = employeeToUpdate.Treatments.Select(t => t.Id).ToList().Except(command.TreatmentIds);
+            if (await _employeeFutureBookingsChecker.EmployeeHasFutureBookingsWithTreatments(employeeToUpdate.Id, [.. treatmentsToRemove]))
+                throw new EmployeeException("Medarbejderen har fremtidige bookinger med den behandling, du forsøger at fjerne.");
 
             var updatedTreatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
 

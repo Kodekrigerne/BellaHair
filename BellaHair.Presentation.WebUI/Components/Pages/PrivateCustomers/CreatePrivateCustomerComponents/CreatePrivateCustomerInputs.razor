@@ -10,19 +10,19 @@
 		<div class="pc-input">
 			<label for="first-name-input" class="required">Fornavn</label>
 			<InputText autocomplete="off" id="first-name-input" @ref="_firstNameInput" @bind-Value="PrivateCustomerModel.FirstName" style="width: 150px" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.FirstName)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.FirstName)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 
 		<div class="pc-input">
 			<label for="middle-name-input">Mellemnavn</label>
 			<InputText autocomplete="off" id="middle-name-input" @bind-Value="PrivateCustomerModel.MiddleName" style="width: 150px" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.MiddleName)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.MiddleName)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 
 		<div class="pc-input">
 			<label for="last-name-input" class="required">Efternavn</label>
 			<InputText autocomplete="off" id="last-name-input" @bind-Value="PrivateCustomerModel.LastName" style="width: 150px" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.LastName)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.LastName)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 	
 	</div>
@@ -32,19 +32,19 @@
 		<div class="pc-input">
 			<label for="email-input" class="required">Email</label>
 			<InputText autocomplete="off" id="email-input" @bind-Value="PrivateCustomerModel.Email" style="width:195px;"/>
-			<ValidationMessage For="@(() => PrivateCustomerModel.Email)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Email)" style="max-width: 195px; font-size: 12px;" />
 		</div>
 
 		<div class="pc-input">
 			<label for="phonenumber-input" class="required">Telefon</label>
 			<InputText autocomplete="off" id="phonenumber-input" @bind-Value="PrivateCustomerModel.PhoneNumber" style="width: 100px; " />
-			<ValidationMessage For="@(() => PrivateCustomerModel.PhoneNumber)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.PhoneNumber)" style="max-width: 100px; font-size: 12px;" />
 		</div>
 			
 		<div class="pc-input">
 			<label for="birthday-input" class="required">Fødselsdato</label>
 			<InputDate autocomplete="off" id="birthday-input" @bind-Value="PrivateCustomerModel.Birthday" style="width: 100px; " />
-			<ValidationMessage For="@(() => PrivateCustomerModel.Birthday)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.Birthday)" style="max-width: 100px; font-size: 12px;" />
 		</div>
 
 	</div>
@@ -60,13 +60,13 @@
 		<div class="pc-input">
 			<label for="streetname-input" class="required">Vejnavn</label>
 			<InputText autocomplete="off" id="streetname-input" @bind-Value="PrivateCustomerModel.StreetName" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.StreetName)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.StreetName)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 
 		<div class="pc-input">
 			<label for="street-number-input" class="required">Vejnummer</label>
 			<InputText autocomplete="off" id="street-number-input" @bind-Value="PrivateCustomerModel.StreetNumber" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.StreetNumber)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.StreetNumber)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 
 		<div class="pc-input">
@@ -82,13 +82,13 @@
 		<div class="pc-input">
 			<label for="city-name-input" class="required">By</label>
 			<InputText autocomplete="new password" id="city-name-input" @bind-Value="PrivateCustomerModel.City" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.City)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.City)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 
 		<div class="pc-input">
 			<label for="zipcode-input" class="required">Postnummer</label>
 			<InputNumber autocomplete="off" id="zipcode-input" @bind-Value="PrivateCustomerModel.ZipCode" />
-			<ValidationMessage For="@(() => PrivateCustomerModel.ZipCode)" />
+			<ValidationMessage For="@(() => PrivateCustomerModel.ZipCode)" style="max-width: 150px; font-size: 12px;" />
 		</div>
 
 	</div>
