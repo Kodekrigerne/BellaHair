@@ -128,11 +128,11 @@
         
         catch(DomainException e) 
         {
-            Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+            Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
         }
         catch(Exception e)
         {
-            Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+            Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
         }
 
     }
@@ -150,7 +150,7 @@
         EmployeeModel.PhoneNumber = EmployeeToUpdate.PhoneNumber;
         EmployeeModel.Email = EmployeeToUpdate.Email;
         EmployeeModel.Floor = EmployeeToUpdate.Floor;
-        EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList();
+        EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList() ?? [];
     }
 
     private async Task LoadTreatments()
