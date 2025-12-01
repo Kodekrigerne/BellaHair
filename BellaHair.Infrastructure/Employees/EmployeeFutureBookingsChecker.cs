@@ -39,12 +39,6 @@ namespace BellaHair.Infrastructure.Employees
                 .Bookings.Any();
         }
 
-
-        //return await _db.Bookings
-        //        .AsNoTracking()
-        //        .Where(b => b.Treatment!.Id == treatmentId)
-        //        .AnyAsync(b => b.EndDateTime > currentDateTime);
-
         async Task<bool> IEmployeeFutureBookingsChecker.EmployeeHasFutureBookingsWithTreatments(Guid employeeId, List<Guid> toBeRemovedTreatmentIds)
         {
             return (await _db.Bookings.AsNoTracking().Where(b => b.Employee.Id == employeeId).AnyAsync(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime() && b.Treatment != null && toBeRemovedTreatmentIds.Contains(b.Treatment.Id)));
