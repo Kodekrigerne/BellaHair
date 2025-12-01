@@ -11,7 +11,7 @@
 @inject IEmployeeQuery EmployeeQuery
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
-
+@inject IJSRuntime JSRuntime
 
 <div class="header-and-employee">
     <div>
@@ -22,10 +22,6 @@
         <RadzenDropDown TValue="Guid" Data="@_employees" TextProperty="Fullname" ValueProperty="Id" @bind-Value="@(_pickedEmployeeId)" Change="@HandlePickedEmployee" />
     </div>
 </div>
-
-@* Radzens scheduler komponent som vi bruger til at vise bookings filtreret på medarbejder.  
-   Vi bruger "Allbookinginfo" fra viewmodellen til at displaye info på bookingen da vi ikke kunne tilgå deres templates. 
-*@
 
 <Radzen.Blazor.RadzenScheduler @ref="scheduler"
                                Data="@_bookings"
@@ -43,8 +39,6 @@
                                Culture="@dkCulture">
     <br />
 
-    @* De forskellige views (dag, uge, måned) - begrænset tiden indenfor åbningstiderne og sat tidsformatet *@
-
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
                     EndTime="@(TimeSpan.FromHours(19))"
                     MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
@@ -58,33 +52,74 @@
 </Radzen.Blazor.RadzenScheduler>
 
 @code {
-
-    // Bruges til at sætte format for dato i header på kalender
     System.Globalization.CultureInfo dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
-
     RadzenScheduler<BookingCalendarViewModel> scheduler;
+
     public List<BookingCalendarViewModel> _bookings { get; set; } = new List<BookingCalendarViewModel>();
     public List<EmployeeNameViewModel> _employees { get; set; } = new List<EmployeeNameViewModel>();
 
     public DateTime currentDate = DateTime.Today;
-
     public Guid _pickedEmployeeId { get; set; }
 
-    public DateTime _pickedStartDateTime { get; set; }
-    public DateTime _pickedEndDateTime { get; set; }
+    // --- URL PARAMETERS ---
+    [SupplyParameterFromQuery(Name = "date")]
+    public DateTime? UrlDate { get; set; }
 
-    // Indlæser medarbejdere og vælger den første medarbejder på listen
+    [SupplyParameterFromQuery(Name = "employeeId")]
+    public Guid? UrlEmployeeId { get; set; }
+
     protected async override Task OnInitializedAsync()
     {
         await LoadEmployees();
+    }
 
-        if (_employees.Any())
+    // 1. READ URL (Runs on page load and Back button)
+    protected override async Task OnParametersSetAsync()
+    {
+        // Restore Employee
+        if (UrlEmployeeId.HasValue && _employees.Any(e => e.Id == UrlEmployeeId.Value))
+        {
+            _pickedEmployeeId = UrlEmployeeId.Value;
+        }
+        else if (_pickedEmployeeId == Guid.Empty && _employees.Any())
         {
             _pickedEmployeeId = _employees.First().Id;
         }
+
+        // Restore Date (Only if different to avoid loop)
+        if (UrlDate.HasValue && UrlDate.Value.Date != currentDate.Date)
+        {
+            currentDate = UrlDate.Value;
+        }
     }
 
-    // Henter medarbejdere fra databasen og sorterer alfabetisk efter fornavn
+    // 2. LOAD DATA & WRITE URL
+    private async Task OnLoadData(SchedulerLoadDataEventArgs args)
+    {
+        // A. Load the data
+        if (_pickedEmployeeId != Guid.Empty)
+        {
+            await LoadBookings(args.Start, args.End, _pickedEmployeeId);
+        }
+
+        // B. Update URL Silently (This fixes the exception!)
+        // We use JavaScript to change the URL text without stopping the code.
+        var dateStr = args.Start.ToString("yyyy-MM-dd");
+        var newUrl = $"/kalender?date={dateStr}&employeeId={_pickedEmployeeId}";
+
+        try
+        {
+            // This line updates the address bar but DOES NOT trigger a reload or exception
+            await JSRuntime.InvokeVoidAsync("window.history.replaceState", null, "", newUrl);
+        }
+        catch { /* Ignore */ }
+    }
+
+    private async Task HandlePickedEmployee(object value)
+    {
+        if (scheduler != null) await scheduler.Reload();
+    }
+
     private async Task LoadEmployees()
     {
         try
@@ -92,73 +127,30 @@
             var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
             _employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.Name)).OrderBy(e => e.FullName).ToList();
         }
-        catch (Exception e)
-        {
-            Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
-        }
+        catch (Exception e) { Snackbar.Add($"Fejl: {e.Message}", Severity.Error); }
     }
 
-    // Genindlæser siden når medarbejder er valgt
-    private async Task HandlePickedEmployee(object value)
-    {
-        if (scheduler != null)
-        {
-            await scheduler.Reload();
-        }
-    }
-
-    // Indlæser data på ny når der ændres i kalenderen
-    private async Task OnLoadData(SchedulerLoadDataEventArgs args)
-    {
-        _pickedStartDateTime = args.Start;
-        _pickedEndDateTime = args.End;
-
-        if (_pickedEmployeeId != Guid.Empty)
-        {
-            await LoadBookings(_pickedStartDateTime, _pickedEndDateTime, _pickedEmployeeId);
-        }
-    }
-
-    // Henter bookings fra DB filtreret efter den valgte startdato, slutdato og valgte medarbejder.
-    private async Task LoadBookings(DateTime pickedStartDate, DateTime pickedEndDate, Guid pickedEmployeeId)
+    private async Task LoadBookings(DateTime start, DateTime end, Guid empId)
     {
         try
         {
-            var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(pickedStartDate, pickedEndDate, pickedEmployeeId);
+            var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(start, end, empId);
 
             _bookings = bookings.Select(b => new BookingCalendarViewModel(
-                b.Id,
-                b.StartDateTime,
-                b.EndDateTime,
-                DateOnly.FromDateTime(b.StartDateTime),
-                TimeOnly.FromDateTime(b.StartDateTime),
-                TimeOnly.FromDateTime(b.EndDateTime),
-                b.EmployeeFullName,
-                b.CustomerFullName,
-                b.TreatmentName,
-                b.DurationMinutes,
-                $"{b.TreatmentName} ({b.DurationMinutes} min)\nKunde: {b.CustomerFullName}" // Samler al information så vi kan displaye det i kalenderen.
+                b.Id, b.StartDateTime, b.EndDateTime,
+                DateOnly.FromDateTime(b.StartDateTime), TimeOnly.FromDateTime(b.StartDateTime), TimeOnly.FromDateTime(b.EndDateTime),
+                b.EmployeeFullName, b.CustomerFullName, b.TreatmentName, b.DurationMinutes,
+                $"{b.CustomerFullName}\n{b.TreatmentName}\n({b.EmployeeFullName})"
             )).OrderBy(b => b.StartDateTime).ToList();
         }
-        catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
-        catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+        catch (Exception) { }
     }
 
-    // Styler hvordan bookings skal se ud i kalenderen - sætter farver og hvordan tekst displayes.
     private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<BookingCalendarViewModel> args)
     {
-        string fixedColor = "#eb8ac7";
-        string textColor = "white";
-
-        args.Attributes["style"] =
-            $"background-color: {fixedColor};" +
-            $"border-color: {fixedColor};" +
-            $"color: {textColor};" +
-            $"border-radius: 4px;" +
-            $"white-space: pre-wrap;";
+        args.Attributes["style"] = "background-color: #eb8ac7; border-color: #eb8ac7; color: white; border-radius: 4px; white-space: pre-wrap;";
     }
 
-    // Navigerer til bookingdetaljesiden på den booking der trykkes på
     private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<BookingCalendarViewModel> args)
     {
         NavigationManager.NavigateTo($"/booking/{args.Data.Id}");
