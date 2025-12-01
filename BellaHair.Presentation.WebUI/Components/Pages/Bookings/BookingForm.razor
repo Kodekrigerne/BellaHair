@@ -229,7 +229,7 @@
 			}
 		</div>
 	</div>
-	@if (_startDate != null && _employees != null && _employees.Count > 0 && (_activePicker == Picker.Employee || _activePicker == Picker.Time))
+	@if (_startDate != null && _employees != null && _employees.Count > 0 && (Mode == BookingMode.New || Mode == BookingMode.Edit))
 	{
 		<EmployeeDailyCalendar EmployeeBookingData="_employees" CurrentDate="_startDate.Value" CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
 	} 
@@ -394,7 +394,18 @@
 	{
 		if (_treatment == null) return;
 
-		try {
+		await LoadEmployees();
+		await SetStartDateToNextOpen();
+
+		_activePicker = Picker.Employee;
+	}
+
+	private async Task LoadEmployees()
+	{
+		if (_treatment == null) return;
+
+		try
+		{
 			_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
 				.Select(e => new EmployeeNameWithBookingsViewModel(
 					e.Id,
@@ -404,10 +415,6 @@
 						.ToList()))
 				.OrderBy(e => e.Name)
 				.ToList();
-
-			_activePicker = Picker.Employee;
-
-			await SetStartDateToNextOpen();
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
@@ -569,8 +576,8 @@
 	private async Task HandleChangeTimeClick()
 	{
 		if (Mode == BookingMode.View) return;
-
-		SetNulls();
+		
+		if (_activePicker != Picker.Time && (_startDate == null || _startTime == null)) SetNulls();
 
 		await HandlePickStartDateTimeClick();
 	}
@@ -640,8 +647,10 @@
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
 	}
 
-	private void HandleEditClick()
+	private async Task HandleEditClick()
 	{
+		await LoadEmployees();
+		await SetStartDateToNextOpen();
 		Mode = BookingMode.Edit;
 	}
 
