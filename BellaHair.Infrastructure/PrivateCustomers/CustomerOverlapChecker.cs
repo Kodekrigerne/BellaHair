@@ -1,11 +1,5 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.PrivateCustomers;
+﻿using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
@@ -20,14 +14,13 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task ICustomerOverlapChecker.OverlapsWithCustomer(string phoneNumber, string email)
         {
-            await _db.PrivateCustomers
-                .AnyAsync(p = p.)
+            if (await _db.PrivateCustomers
+                .AnyAsync(c => c.PhoneNumber.Value == phoneNumber))
+                throw new PrivateCustomerException("Der findes allerede en kunde med det angivne telefonnummer.");
 
-
-            //if (await _db.PrivateCustomers.AnyAsync(p = p.PhoneNumber == phoneNumber)
-            //{
-            //    throw new PrivateCustomerException("Der findes allerede en kunde med det angivne telefonnummer.");
-            //}
+            if (await _db.PrivateCustomers
+                .AnyAsync(c => c.Email.Value == email))
+                throw new PrivateCustomerException("Der findes allerede en kunde med den angivne email.");
         }
     }
 }

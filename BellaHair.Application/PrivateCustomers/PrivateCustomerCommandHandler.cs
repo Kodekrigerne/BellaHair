@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.PrivateCustomers;
@@ -15,37 +10,42 @@ namespace BellaHair.Application.PrivateCustomers
     /// <summary>
     /// Handles commands related to creating, updating, and deleting private customer entities.
     /// </summary>
-    
+
     public class PrivateCustomerCommandHandler : IPrivateCustomerCommand
     {
         private readonly IPrivateCustomerRepository _privateCustomerRepo;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly IPCustomerFutureBookingChecker _pCustomerFutureBookingChecker;
+        private readonly ICustomerOverlapChecker _customerOverlapChecker;
 
         public PrivateCustomerCommandHandler(
-            IPrivateCustomerRepository privateCustomerRepo, 
-            ICurrentDateTimeProvider currentDateTimeProvider, 
-            IPCustomerFutureBookingChecker pCustomerFutureBookingChecker)
+            IPrivateCustomerRepository privateCustomerRepo,
+            ICurrentDateTimeProvider currentDateTimeProvider,
+            IPCustomerFutureBookingChecker pCustomerFutureBookingChecker,
+            ICustomerOverlapChecker customerOverlapChecker)
         {
             _privateCustomerRepo = privateCustomerRepo;
             _currentDateTimeProvider = currentDateTimeProvider;
             _pCustomerFutureBookingChecker = pCustomerFutureBookingChecker;
+            _customerOverlapChecker = customerOverlapChecker;
         }
 
         async Task IPrivateCustomerCommand.CreatePrivateCustomerAsync(CreatePrivateCustomerCommand command)
         {
+            await _customerOverlapChecker.OverlapsWithCustomer(command.PhoneNumber, command.Email);
+
             var name = Name.FromStrings(
                 command.FirstName,
                 command.LastName,
                 command.MiddleName);
-            
+
             var address = Address.Create(
                 command.StreetName,
                 command.City,
                 command.StreetNumber,
                 command.ZipCode,
                 command.Floor);
-            
+
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var email = Email.FromString(command.Email);
 
@@ -67,7 +67,7 @@ namespace BellaHair.Application.PrivateCustomers
 
             // Tjekker for fremtidige bookinger tilknyttet kunden der ønskes slettet.
             // Kaster en fejl, hvis kunden har fremtidige bookinger.
-            if (await _pCustomerFutureBookingChecker.CheckFutureBookings(customerToDelete.Id)) 
+            if (await _pCustomerFutureBookingChecker.CheckFutureBookings(customerToDelete.Id))
                 throw new PrivateCustomerException("Customer has future bookings. Delete bookings prior to deleting customer.");
 
             _privateCustomerRepo.Delete(customerToDelete);
@@ -83,14 +83,14 @@ namespace BellaHair.Application.PrivateCustomers
                 command.FirstName,
                 command.LastName,
                 command.MiddleName);
-            
+
             var updatedAddress = Address.Create(
                 command.StreetName,
                 command.City,
                 command.StreetNumber,
                 command.ZipCode,
                 command.Floor);
-            
+
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
             var updatedEmail = Email.FromString(command.Email);
 
