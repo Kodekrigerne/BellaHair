@@ -140,21 +140,21 @@
 							<div class="date-picker-section">
 								<p class="date-picker-label">Vælg en dato</p>
 								<MudDatePicker @ref="_datePickerRef"
-								               Class="mud-picker-with-border"
-								               Date="_startDate"
-								               DateChanged="HandleDateChanged"
-								               PickerVariant="PickerVariant.Dialog"
-								               IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
+								Class="mud-picker-with-border"
+								Date="_startDate"
+								DateChanged="HandleDateChanged"
+								PickerVariant="PickerVariant.Dialog"
+								IsDateDisabledFunc="@(dt => dt.Date < _now.Date || dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday)" />
 							</div>
 
 							<div class="date-picker-section">
 								<p class="date-picker-label">Vælg en tid</p>
 								<MudTimePicker @ref="_timePickerRef"
-								               Class="mud-picker-with-border"
-								               Time="_startTime"
-								               MinuteSelectionStep="5"
-								               TimeChanged="HandleTimeChanged"
-								               PickerVariant="PickerVariant.Dialog" />
+								Class="mud-picker-with-border"
+								Time="_startTime"
+								MinuteSelectionStep="5"
+								TimeChanged="HandleTimeChanged"
+								PickerVariant="PickerVariant.Dialog" />
 							</div>
 						}
 					</div>
@@ -173,7 +173,7 @@
 								<div class="bday-selector">
 									<div class="bday-checkbox-div">
 										<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
-										       @bind:after="GetBestDiscount"/>
+										@bind:after="GetBestDiscount"/>
 										<label class="bday-check-label" for="bdCheck">
 											<div class="bday-icon-txt-wrap">
 												<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
@@ -279,7 +279,7 @@
 	private List<TreatmentViewModel> _treatments = [];
 	private List<EmployeeNameWithBookingsViewModel> _employees = [];
 
-	private bool _useBirthdayDiscount;
+	private bool _useBirthdayDiscount = true;
 	private bool _showBirthdayOption;
 
 	protected override async Task OnInitializedAsync()
@@ -328,12 +328,7 @@
 			_timeIsAvailable = true;
 			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
 
-			if (!_isPaid)
-			{
-				_showBirthdayOption = false;
-				_useBirthdayDiscount = true; 
-				await GetBestDiscount();
-			}
+			if (!_isPaid) await GetBestDiscount();
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
