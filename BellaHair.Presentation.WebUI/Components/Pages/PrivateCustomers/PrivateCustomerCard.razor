@@ -184,7 +184,6 @@
 	{
 		var discount = LoyaltyDiscounts
 		.Where(ld => ld.MinimumVisits < PrivateCustomer.Visits)
-		.DefaultIfEmpty()
 		.MaxBy(ld => ld!.MinimumVisits);
 
 		if (discount != null)

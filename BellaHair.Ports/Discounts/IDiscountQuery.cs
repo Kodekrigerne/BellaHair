@@ -12,7 +12,7 @@
         Task<BookingDiscountDTO?> FindBestDiscount(FindBestDiscountQuery query);
     }
 
-    public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, Guid? BookingId = null);
+    public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, bool IncludeBirthdayDiscount,Guid? BookingId = null);
 
     public record BookingDiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 }
