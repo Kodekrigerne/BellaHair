@@ -164,25 +164,28 @@
 			{
 				<div class="right-bottom">
 
-					<p class="availability-status">@_statusMessage</p>
-					
 					@if (Mode == BookingMode.View && !_isPaid)
 					{
-						@if (_isBirthdayPossible)
+						@if (_showBirthdayOption)
 						{
-							<div class="bday-selector">
-								<div class="bday-checkbox-div">
-									<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
-									       @bind:after="ToggleBirthdayCheckboxClick"/>
-									<label class="bday-check-label" for="bdCheck">
-										<div class="bday-icon-txt-wrap">
-											<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
-										</div>
-									</label>
+							<div class="kk-container">
+								<strong>@_customer?.FullName</strong> har fødselsdag i denne måned!
+								<div class="bday-selector">
+									<div class="bday-checkbox-div">
+										<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
+										       @bind:after="GetBestDiscount"/>
+										<label class="bday-check-label" for="bdCheck">
+											<div class="bday-icon-txt-wrap">
+												<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
+											</div>
+										</label>
+									</div>
 								</div>
 							</div>
 						}
 					}
+
+					<p class="availability-status">@_statusMessage</p>
 
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
@@ -276,8 +279,8 @@
 	private List<TreatmentViewModel> _treatments = [];
 	private List<EmployeeNameWithBookingsViewModel> _employees = [];
 
-	private bool _useBirthdayDiscount = true;
-	private bool _isBirthdayPossible = false;
+	private bool _useBirthdayDiscount;
+	private bool _showBirthdayOption;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -327,7 +330,7 @@
 
 			if (!_isPaid)
 			{
-				_isBirthdayPossible = false;
+				_showBirthdayOption = false;
 				_useBirthdayDiscount = true; 
 				await GetBestDiscount();
 			}
@@ -564,7 +567,7 @@
 
 			if (discountDTO == null)
 			{
-				if (_useBirthdayDiscount) _isBirthdayPossible = false;
+				_showBirthdayOption = false;
 
 				Snackbar.Add("Fandt ingen rabat", Severity.Warning);
 				return;
@@ -572,12 +575,8 @@
 
 			if (discountDTO.Type == DiscountTypeDTO.BirthdayDiscount)
 			{
-				_isBirthdayPossible = true;
-				_useBirthdayDiscount = true; // Sørg for at den er tændt
-			}
-			else if (_useBirthdayDiscount) 
-			{
-				_isBirthdayPossible = false;
+				_showBirthdayOption = true;
+				_useBirthdayDiscount = true; 
 			}
 
 			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount, discountDTO.Type);
@@ -587,11 +586,6 @@
 			Snackbar.Add("Der opstod en fejl ved hentning af rabat", Severity.Error);
 
 		}
-	}
-
-	private async Task ToggleBirthdayCheckboxClick()
-	{
-		await GetBestDiscount();
 	}
 
 	private async Task HandleCreateBookingClick()
@@ -1036,10 +1030,8 @@
 	}
 
 	.bday-selector {
-		margin-bottom: 10px;
-		padding: 10px;
 		border-radius: 5px;
-		display:inline-block;
+		margin-top:10px;
 	}
 
 	.bday-check-label, .bday-check-input {
@@ -1053,12 +1045,18 @@
 	.bday-icon-txt-wrap {
 		display:flex;
 		align-items: center;
+		user-select:none;
 	}
 
 	.bday-icon{
 		height:20px;
 		width:20px;
 		margin-right:6px;
+	}
+
+	.kk-container{
+		margin-left: 0;
+		margin-top:0px;
 	}
 
 </style>
