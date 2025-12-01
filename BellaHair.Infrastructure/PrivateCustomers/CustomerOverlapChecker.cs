@@ -1,8 +1,14 @@
 ﻿using BellaHair.Domain.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 
+
+// Mikkel Dahlmann
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
+    /// <summary>
+    /// Provides functionality to check for overlapping customer records based on phone number or email address.
+    /// </summary>
+
     public class CustomerOverlapChecker : ICustomerOverlapChecker
     {
         public BellaHairContext _db;
@@ -12,6 +18,9 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _db = db;
         }
 
+        // Tjekker for overlapende kunder baseret på telefonnummer eller email.
+        // CustomerID gives med for at undgå at sammenligne med sig selv ved opdatering af en eksisterende kunde.
+        // CustomerID er nullable og sættes default til null, da metoden også kan bruges ved oprettelse af nye kunder.
         async Task ICustomerOverlapChecker.OverlapsWithCustomer(string phoneNumber, string email, Guid? customerId = null)
         {
             if (await _db.PrivateCustomers
