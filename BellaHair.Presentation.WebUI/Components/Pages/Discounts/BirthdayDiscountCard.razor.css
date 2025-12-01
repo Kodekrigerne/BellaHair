@@ -1,0 +1,25 @@
+﻿.bdc-card {
+    padding: 15px;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, #fff7e6, #ffecb3);
+    border: 1px solid #ffcc80;
+    border-radius: 8px;
+    position: relative;
+}
+
+.bdc-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.bdc-text {
+    font-size: 0.85rem;
+    color: #777;
+    font-style: italic;
+    margin-bottom:0px;
+}
+
+.line{
+    margin-top:10px;
+}
