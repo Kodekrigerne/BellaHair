@@ -1,7 +1,6 @@
 ﻿<!-- Dennis -->
 
 @using BellaHair.Domain
-@using BellaHair.Domain.Invoices
 @using BellaHair.Infrastructure
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Discounts
@@ -303,17 +302,26 @@
 				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
 			}
 
-			var c = await CustomerQuery.GetPrivateCustomerAsync(new GetPrivateCustomerQuery(booking.CustomerId));
-			_customer = new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits);
+			_customer = new PrivateCustomerViewModel(
+				booking.Customer.Id,
+				booking.Customer.FullName,
+				booking.Customer.Birthday,
+				booking.Customer.PhoneNumber,
+				booking.Customer.PhoneNumber,
+				booking.Customer.FullAddress,
+				booking.Customer.Visits);
 
-			var t = await TreatmentQuery.GetAsync(new GetQuery(booking.TreatmentId));
-			_treatment = new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount);
+			_treatment = new TreatmentViewModel(
+				booking.Treatment.Id,
+				booking.Treatment.Name,
+				booking.Treatment.Price,
+				booking.Treatment.Duration,
+				booking.Treatment.EmployeeCount);
 
-			var e = await EmployeeQuery.GetWithFutureBookingsAsync(new GetWithFutureBookingsQuery(booking.EmployeeId));
 			_employee = new EmployeeNameWithBookingsViewModel(
-				e.Id,
-				e.Name,
-				e.Bookings
+				booking.Employee.Id,
+				booking.Employee.Name,
+				booking.Employee.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
 
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
@@ -329,7 +337,7 @@
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
 		{
-			Snackbar.Add("Noget gik galt.", Severity.Error);
+			Snackbar.Add("Noget gik galt", Severity.Error);
 			NavigationManager.NavigateTo("/bookings");
 		}
 	}

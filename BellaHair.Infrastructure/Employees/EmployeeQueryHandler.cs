@@ -118,9 +118,7 @@ namespace BellaHair.Infrastructure.Employees
                         .Select(b => new BookingTimesOnlyDTO(
                             b.Id,
                             b.StartDateTime,
-                            b.EndDateTime,
-                            b.Treatment!.DurationMinutes.Value)
-                            )
+                            b.EndDateTime))
                 .ToList()))
                 .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Employee {query.Id} not found.");
         }
@@ -140,9 +138,7 @@ namespace BellaHair.Infrastructure.Employees
                         .Select(b => new BookingTimesOnlyDTO(
                             b.Id,
                             b.StartDateTime,
-                            b.EndDateTime,
-                            b.Treatment!.DurationMinutes.Value)
-                            )
+                            b.EndDateTime))
                         .ToList()))
                 .ToListAsync();
         }
