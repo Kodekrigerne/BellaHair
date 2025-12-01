@@ -128,3 +128,23 @@
     font-weight: 500;
     color: #008236;
 }
+
+.btn-add {
+    height: 20px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 8px;
+    margin-top: 4px;
+    vertical-align: top;
+    border-radius: 8px;
+    font-size: 12px;
+    display: flex;
+    color: #8200db;
+    background-color: #c084fc26;
+    border: 2px, solid, purple;
+    font-weight: 500;
+}
+
+.btn-add:hover{
+    color: white;
+}
