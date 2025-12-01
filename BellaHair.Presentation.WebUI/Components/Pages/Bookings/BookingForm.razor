@@ -33,6 +33,7 @@
 </Modal>
 
 <div class="kk-container">
+	<p>@_startDate</p>
 	<div class="body-container">
 		<div class="body-left">
 			<div class="left-container">
@@ -650,7 +651,6 @@
 	private async Task HandleEditClick()
 	{
 		await LoadEmployees();
-		await SetStartDateToNextOpen();
 		Mode = BookingMode.Edit;
 	}
 
