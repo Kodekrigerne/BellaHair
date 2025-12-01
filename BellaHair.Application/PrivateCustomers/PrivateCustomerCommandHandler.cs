@@ -32,22 +32,22 @@ namespace BellaHair.Application.PrivateCustomers
 
         async Task IPrivateCustomerCommand.CreatePrivateCustomerAsync(CreatePrivateCustomerCommand command)
         {
-            await _customerOverlapChecker.OverlapsWithCustomer(command.PhoneNumber, command.Email);
+            await _customerOverlapChecker.OverlapsWithCustomer(command.PhoneNumber, command.Email.ToLowerInvariant());
 
             var name = Name.FromStrings(
-                command.FirstName,
-                command.LastName,
-                command.MiddleName);
+                FormatName(command.FirstName),
+                FormatName(command.LastName),
+                FormatName(command.MiddleName));
 
             var address = Address.Create(
-                command.StreetName,
-                command.City,
+                FormatName(command.StreetName),
+                FormatName(command.City),
                 command.StreetNumber,
                 command.ZipCode,
                 command.Floor);
 
             var phoneNumber = PhoneNumber.FromString(command.PhoneNumber);
-            var email = Email.FromString(command.Email);
+            var email = Email.FromString(command.Email.ToLowerInvariant());
 
             var customerToCreate = PrivateCustomer.Create(
                 name,
@@ -77,22 +77,24 @@ namespace BellaHair.Application.PrivateCustomers
 
         async Task IPrivateCustomerCommand.UpdatePrivateCustomerAsync(UpdatePrivateCustomerCommand command)
         {
+            await _customerOverlapChecker.OverlapsWithCustomer(command.PhoneNumber, command.Email.ToLowerInvariant(), command.Id);
+
             var customerToUpdate = await _privateCustomerRepo.GetAsync(command.Id);
 
             var updatedName = Name.FromStrings(
-                command.FirstName,
-                command.LastName,
-                command.MiddleName);
+                FormatName(command.FirstName),
+                FormatName(command.LastName),
+                FormatName(command.MiddleName));
 
             var updatedAddress = Address.Create(
-                command.StreetName,
-                command.City,
+                FormatName(command.StreetName),
+                FormatName(command.City),
                 command.StreetNumber,
                 command.ZipCode,
                 command.Floor);
 
             var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
-            var updatedEmail = Email.FromString(command.Email);
+            var updatedEmail = Email.FromString(command.Email.ToLowerInvariant());
 
             customerToUpdate.Update(
                 updatedName,
@@ -103,6 +105,16 @@ namespace BellaHair.Application.PrivateCustomers
                 _currentDateTimeProvider);
 
             await _privateCustomerRepo.SaveChangesAsync();
+        }
+
+        private string FormatName(string? input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            string firstChar = input[0].ToString().ToUpperInvariant();
+            string restOfString = input.Substring(1).ToLowerInvariant();
+
+            return firstChar + restOfString;
         }
     }
 }

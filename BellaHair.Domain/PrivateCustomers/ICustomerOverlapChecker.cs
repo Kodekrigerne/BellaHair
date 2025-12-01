@@ -2,6 +2,6 @@
 {
     public interface ICustomerOverlapChecker
     {
-        Task OverlapsWithCustomer(string phoneNumber, string email);
+        Task OverlapsWithCustomer(string phoneNumber, string email, Guid? customerId = null);
     }
 }

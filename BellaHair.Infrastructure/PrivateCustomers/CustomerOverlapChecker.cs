@@ -12,13 +12,15 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             _db = db;
         }
 
-        async Task ICustomerOverlapChecker.OverlapsWithCustomer(string phoneNumber, string email)
+        async Task ICustomerOverlapChecker.OverlapsWithCustomer(string phoneNumber, string email, Guid? customerId = null)
         {
             if (await _db.PrivateCustomers
+                .Where(p => p.Id != customerId)
                 .AnyAsync(c => c.PhoneNumber.Value == phoneNumber))
                 throw new PrivateCustomerException("Der findes allerede en kunde med det angivne telefonnummer.");
 
             if (await _db.PrivateCustomers
+                .Where(p => p.Id != customerId)
                 .AnyAsync(c => c.Email.Value == email))
                 throw new PrivateCustomerException("Der findes allerede en kunde med den angivne email.");
         }
