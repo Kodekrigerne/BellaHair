@@ -57,7 +57,7 @@ namespace BellaHair.Domain.Discounts
             if (!TreatmentIds.Contains(booking.Treatment.Id))
                 return BookingDiscount.Inactive(Name, Type);
 
-            var discount = booking.TotalBase * DiscountPercent.Value;
+            var discount = booking.Treatment.Price.Value * DiscountPercent.Value;
             return BookingDiscount.Active(Name, discount, Type);
         }
     }

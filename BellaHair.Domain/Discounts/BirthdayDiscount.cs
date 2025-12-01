@@ -26,13 +26,18 @@ namespace BellaHair.Domain.Discounts
 
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
+            if (booking.Customer == null) 
+                throw new InvalidOperationException("Customer must be included with Booking in order to calculate discount");
+            if (booking.Treatment == null)
+                throw new InvalidOperationException("Treatment must be included with Booking in order to calculate discount");
+
             if (booking.StartDateTime.Month != booking.Customer.Birthday.Month)
                 return BookingDiscount.Inactive(Name, Type);
 
             if (booking.Customer.HasUsedBirthdayDiscount(booking.StartDateTime.Year))
                 return BookingDiscount.Inactive(Name, Type);
 
-            var discount = booking.TotalBase * DiscountPercent.Value;
+            var discount = booking.Treatment.Price.Value * DiscountPercent.Value;
             return BookingDiscount.Active(Name, discount, Type);
         }
     }

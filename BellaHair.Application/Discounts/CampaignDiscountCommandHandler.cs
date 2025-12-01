@@ -14,14 +14,12 @@ namespace BellaHair.Application.Discounts
     public class CampaignDiscountCommandHandler : ICampaignDiscountCommand
     {
         private readonly ICampaignDiscountRepository _campaignDiscountRepo;
-        private readonly ITreatmentRepository _treatmentRepo;
 
 
         public CampaignDiscountCommandHandler(
-            ICampaignDiscountRepository campaignDiscountRepo, ITreatmentRepository treatmentRepo)
+            ICampaignDiscountRepository campaignDiscountRepo)
         {
             _campaignDiscountRepo = campaignDiscountRepo;
-            _treatmentRepo = treatmentRepo;
         }
 
 

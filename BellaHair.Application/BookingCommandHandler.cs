@@ -102,7 +102,7 @@ namespace BellaHair.Application
 
                     booking.SetDiscount(discount);
                 }
-                if (booking.Discount.Type == DiscountType.BirthdayDiscount)
+                if (booking.Customer != null && booking.Discount!.Type == DiscountType.BirthdayDiscount)
                 {
                     booking.Customer.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
                 }
