@@ -53,13 +53,18 @@
 	{
 		await base.OnInitializedAsync();
 
-        var searchedTerm = SearchTerm;
+		string? searchedTerm = null;
+
+		if (SearchTerm != null) searchedTerm = SearchTerm;
 
 		if(Tab == "old") await HandleOldSelectorClick();
 		else await HandleNewSelectorClick();
 
-		SearchTerm = searchedTerm;
-        ApplyFilter();
+		if (searchedTerm != null)
+		{
+			SearchTerm = searchedTerm;
+			ApplyFilter();
+		}
 	}
 
 	private async Task HandleNewSelectorClick()
