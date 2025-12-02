@@ -2,6 +2,7 @@
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 
 namespace BellaHair.Domain.Bookings
@@ -31,6 +32,9 @@ namespace BellaHair.Domain.Bookings
         public DateTime? PaidDateTime { get; private set; }
         public Invoice? Invoice { get; private set; }
 
+        private List<ProductLine> _productLines;
+        public IReadOnlyList<ProductLine> ProductLines => _productLines.AsReadOnly();
+
         public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored
         //_total is only set (and saved in the database) after booking is paid, and is therefore nullable
@@ -40,9 +44,11 @@ namespace BellaHair.Domain.Bookings
         private decimal? _totalWithDiscount;
         public decimal TotalWithDiscount => IsPaid ? _totalWithDiscount!.Value : CalculateTotalWithDiscount();
 
+#pragma warning disable CS8618
         private Booking() { }
+#pragma warning restore CS8618
 
-        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
+        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime, IEnumerable<ProductLine> productLines)
         {
             Customer = customer;
             Employee = employee;
@@ -50,6 +56,7 @@ namespace BellaHair.Domain.Bookings
             StartDateTime = startDateTime;
             CreatedDateTime = currentDateTime;
             IsPaid = false;
+            _productLines = [.. productLines];
             UpdateEndDateTime();
         }
 
@@ -58,7 +65,8 @@ namespace BellaHair.Domain.Bookings
             Employee employee,
             Treatment treatment,
             DateTime startDateTime,
-            ICurrentDateTimeProvider currentDateTimeProvider)
+            ICurrentDateTimeProvider currentDateTimeProvider,
+             IEnumerable<ProductLineData> productLineDatas)
         {
             var currentDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
@@ -67,7 +75,14 @@ namespace BellaHair.Domain.Bookings
 
             ValidateEmployeeTreatment(employee, treatment);
 
-            return new(customer, employee, treatment, startDateTime, currentDateTime);
+            List<ProductLine> productLines = [];
+            foreach (var productLineData in productLineDatas)
+            {
+                var productLine = ProductLine.Create(productLineData.Quantity, productLineData.Product);
+                productLines.Add(productLine);
+            }
+
+            return new(customer, employee, treatment, startDateTime, currentDateTime, productLines);
         }
 
         public void PayBooking(ICurrentDateTimeProvider currentDateTimeProvider)
@@ -156,5 +171,6 @@ namespace BellaHair.Domain.Bookings
         }
     }
 
+    public record ProductLineData(Quantity Quantity, Product Product);
     public class BookingException(string message) : Exception(message);
 }
