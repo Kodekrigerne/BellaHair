@@ -69,16 +69,9 @@ namespace BellaHair.Application
                 command.CustomerId))
                 throw new DomainException("Kan ikke oprette booking som overlapper med eksisterende booking.");
 
-            List<ProductLineData> productLines = [];
-            foreach (var productLine in command.ProductLines)
-            {
-                var quantity = Quantity.FromInt(productLine.Quantity);
-                var product = await _productRepository.GetAsync(productLine.ProductId);
+            var productLineDatas = await ConvertToProductLineData(command.ProductLines);
 
-                productLines.Add(new ProductLineData(quantity, product));
-            }
-
-            var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider, productLines);
+            var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider, productLineDatas);
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
@@ -172,22 +165,27 @@ namespace BellaHair.Application
                 booking.Id))
                 throw new DomainException("Kan ikke ændre booking som overlapper med eksisterende booking.");
 
-            List<ProductLineData> productLines = [];
-            foreach (var productLine in command.ProductLines)
-            {
-                var quantity = Quantity.FromInt(productLine.Quantity);
-                var product = await _productRepository.GetAsync(productLine.ProductId);
-
-                productLines.Add(new ProductLineData(quantity, product));
-            }
+            var productLineDatas = await ConvertToProductLineData(command.ProductLines);
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking);
             if (discount != null) booking.SetDiscount(discount);
 
-            booking.Update(command.StartDateTime, employee, treatment, productLines, _currentDateTimeProvider);
+            booking.Update(command.StartDateTime, employee, treatment, productLineDatas, _currentDateTimeProvider);
 
             await _bookingRepository.SaveChangesAsync();
+        }
+
+        private async Task<IEnumerable<ProductLineData>> ConvertToProductLineData(IEnumerable<CreateProductLine> createProductLines)
+        {
+            var productLineDatas = await Task.WhenAll(
+                createProductLines.Select(async pl =>
+                {
+                    var quantity = Quantity.FromInt(pl.Quantity);
+                    var product = await _productRepository.GetAsync(pl.ProductId);
+                    return new ProductLineData(quantity, product);
+                }));
+            return productLineDatas;
         }
     }
 }

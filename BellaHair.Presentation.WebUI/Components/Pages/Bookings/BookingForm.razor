@@ -609,13 +609,9 @@
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
 
-		List<CreateProductLine> productLines = [];
-		foreach (var productLine in _productLines)
-		{
-			productLines.Add(new CreateProductLine(productLine.Quantity, productLine.ProductId));
-		}
+		var createProductLines = _productLines.Select(pl => new CreateProductLine(pl.Quantity, pl.ProductId)).ToList();
 
-		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id, productLines);
+		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id, createProductLines);
 
 		try
 		{
@@ -683,13 +679,9 @@
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
 
-		List<CreateProductLine> productLines = [];
-		foreach (var productLine in _productLines)
-		{
-			productLines.Add(new CreateProductLine(productLine.Quantity, productLine.ProductId));
-		}
+		var createProductLines = _productLines.Select(pl => new CreateProductLine(pl.Quantity, pl.ProductId)).ToList();
 
-		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id, productLines);
+		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id, createProductLines);
 
 		try
 		{

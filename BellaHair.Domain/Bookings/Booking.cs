@@ -78,12 +78,7 @@ namespace BellaHair.Domain.Bookings
 
             ValidateEmployeeTreatment(employee, treatment);
 
-            List<ProductLine> productLines = [];
-            foreach (var productLineData in productLineDatas)
-            {
-                var productLine = ProductLine.Create(productLineData.Quantity, productLineData.Product);
-                productLines.Add(productLine);
-            }
+            List<ProductLine> productLines = productLineDatas.Select(pld => ProductLine.Create(pld.Quantity, pld.Product)).ToList();
 
             return new(customer, employee, treatment, startDateTime, currentDateTime, productLines);
         }
@@ -172,12 +167,8 @@ namespace BellaHair.Domain.Bookings
             Employee = employee;
             Treatment = treatment;
 
-            List<ProductLine> productLines = [];
-            foreach (var productLineData in productLineDatas)
-            {
-                var productLine = ProductLine.Create(productLineData.Quantity, productLineData.Product);
-                productLines.Add(productLine);
-            }
+            List<ProductLine> productLines = productLineDatas.Select(pld => ProductLine.Create(pld.Quantity, pld.Product)).ToList();
+
             _productLines = productLines;
 
             UpdateEndDateTime();
