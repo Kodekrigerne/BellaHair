@@ -3,6 +3,7 @@ using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
@@ -93,7 +94,8 @@ namespace BellaHair.Infrastructure
 
             modelBuilder.Entity<PrivateCustomer>().Ignore(p => p.Visits);
 
-            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.DiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.TreatmentDiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.ProductDiscountPercent);
             modelBuilder.Entity<CampaignDiscount>().OwnsOne(c => c.DiscountPercent);
             modelBuilder.Entity<BirthdayDiscount>().OwnsOne(b => b.DiscountPercent);
 
@@ -103,6 +105,8 @@ namespace BellaHair.Infrastructure
                 entity.HasKey(i => i.Id);
                 entity.Property(i => i.Id).ValueGeneratedNever();
             });
+
+            modelBuilder.Entity<Product>().ComplexProperty(p => p.Price);
         }
     }
 }
