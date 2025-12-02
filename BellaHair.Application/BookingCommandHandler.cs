@@ -5,6 +5,7 @@ using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Bookings;
 using Microsoft.Extensions.Options;
@@ -25,6 +26,7 @@ namespace BellaHair.Application
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
         private readonly IDiscountCalculatorService _discountCalculatorService;
         private readonly IInvoiceRepository _invoiceRepository;
+        private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly BusinessInfoSettings _businessInfoSettings;
 
@@ -38,7 +40,8 @@ namespace BellaHair.Application
             IDiscountCalculatorService discountCalculatorService,
             IInvoiceRepository invoiceRepository,
             IUnitOfWork unitOfWork,
-            IOptions<BusinessInfoSettings> businessInfoSettings)
+            IOptions<BusinessInfoSettings> businessInfoSettings,
+            IProductRepository productRepository)
         {
             _employeeRepository = employeeRepository;
             _privateCustomerRepository = privateCustomerRepository;
@@ -50,6 +53,7 @@ namespace BellaHair.Application
             _invoiceRepository = invoiceRepository;
             _unitOfWork = unitOfWork;
             _businessInfoSettings = businessInfoSettings.Value;
+            _productRepository = productRepository;
         }
 
         async Task IBookingCommand.CreateBooking(CreateBookingCommand command)
@@ -69,9 +73,9 @@ namespace BellaHair.Application
             foreach (var productLine in command.ProductLines)
             {
                 var quantity = Quantity.FromInt(productLine.Quantity);
-                var product = _productRepository.GetAsync(productLine.ProductId);
+                var product = await _productRepository.GetAsync(productLine.ProductId);
 
-                new ProductLineData(quantity, product);
+                productLines.Add(new ProductLineData(quantity, product));
             }
 
             var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider, productLines);
@@ -172,9 +176,9 @@ namespace BellaHair.Application
             foreach (var productLine in command.ProductLines)
             {
                 var quantity = Quantity.FromInt(productLine.Quantity);
-                var product = _productRepository.GetAsync(productLine.ProductId);
+                var product = await _productRepository.GetAsync(productLine.ProductId);
 
-                new ProductLineData(quantity, product);
+                productLines.Add(new ProductLineData(quantity, product));
             }
 
             //Den bedste rabat findes og tilføjes til bookingen

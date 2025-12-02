@@ -19,6 +19,7 @@ namespace BellaHair.Infrastructure
         public DbSet<Treatment> Treatments { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<Product> Products { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
