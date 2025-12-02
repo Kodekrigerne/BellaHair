@@ -30,6 +30,9 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.Configure<BusinessInfoSettings>(
                 builder.Configuration.GetSection(BusinessInfoSettings.SectionName));
 
+            builder.Services.Configure<OpeningTimesSettings>(
+                builder.Configuration.GetSection(OpeningTimesSettings.SectionName));
+
             builder.Services.AddMudServices(config =>
             {
                 config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;

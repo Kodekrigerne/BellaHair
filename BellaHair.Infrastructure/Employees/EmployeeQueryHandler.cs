@@ -1,6 +1,4 @@
 ﻿using BellaHair.Domain;
-using BellaHair.Domain.Employees;
-using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Employees;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
@@ -118,10 +116,9 @@ namespace BellaHair.Infrastructure.Employees
                     e.Bookings
                         .Where(b => b.EndDateTime > now)
                         .Select(b => new BookingTimesOnlyDTO(
+                            b.Id,
                             b.StartDateTime,
-                            b.EndDateTime,
-                            b.Treatment!.DurationMinutes.Value)
-                            )
+                            b.EndDateTime))
                 .ToList()))
                 .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Employee {query.Id} not found.");
         }
@@ -139,10 +136,9 @@ namespace BellaHair.Infrastructure.Employees
                     e.Bookings
                         .Where(b => b.EndDateTime > now)
                         .Select(b => new BookingTimesOnlyDTO(
+                            b.Id,
                             b.StartDateTime,
-                            b.EndDateTime,
-                            b.Treatment!.DurationMinutes.Value)
-                            )
+                            b.EndDateTime))
                         .ToList()))
                 .ToListAsync();
         }

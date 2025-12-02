@@ -1,4 +1,7 @@
 ﻿using BellaHair.Ports.Discounts;
+using BellaHair.Ports.Employees;
+using BellaHair.Ports.PrivateCustomers;
+using BellaHair.Ports.Treatments;
 
 namespace BellaHair.Ports.Bookings
 {
@@ -17,9 +20,9 @@ namespace BellaHair.Ports.Bookings
     public record BookingWithRelationsDTO(
         DateTime StartDateTime,
         bool IsPaid,
-        Guid EmployeeId,
-        Guid CustomerId,
-        Guid TreatmentId,
+        EmployeeNameWithBookingsDTO Employee,
+        PrivateCustomerSimpleDTO Customer,
+        TreatmentDTO Treatment,
         DiscountDTO? Discount);
 
     public record DiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
