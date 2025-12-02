@@ -3,6 +3,7 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents;
 @inject IEmployeeCommand EmployeeCommand
 @inject IEmployeeQuery EmployeeQuery
+@inject NavigationManager NavigationManager
 @inject ISnackbar SnackBar
 
 	<Modal @bind-IsVisible="@_showDeleteModal">
@@ -38,7 +39,7 @@
 		@*Contains the avatar with intials*@
 		@GetEmployeeInitials(@Employee.FullName)
 	</div>
-	<div>
+	<div class="employee-content">
 		@*Positions other info to position next to avatar*@
 		<h3>@Employee.FullName</h3>
 
@@ -58,13 +59,21 @@
 					@Employee.FullAddress
 				</div>
 			</div>
-						
-						<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
+		<div class="treatment-calendar-button-container">
+			<div class="treatments-employees-container">
+				@*Contains all treatments and makes it possible to position them together*@
 						@foreach (var treatment in Employee.Treatments)
 							{															
 								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
 							}
 						</div>
+
+						<div class="calendar-button">
+							<button class="btn-add" @onclick="NavigateToCalendar"> <VisitsIcon Class="employee-icons" /> Se kalender</button>
+						</div>
+		</div>
+
+
 					</div>
 
 	<div class="delete-edit-buttons d-flex gap-2" style="width: 0%;">
@@ -142,5 +151,12 @@
 
 	// Lukker modalen
 	private void CloseDeleteModal() => _showDeleteModal = false;
+
+
+	// Navigerer til kalenderen for den medarbejder, der trykkes på
+	private void NavigateToCalendar()
+	{
+		NavigationManager.NavigateTo($"/kalender?date={DateTime.Now.ToString("yyyy-MM-dd")}&employeeId={Employee.Id}");
+	}
 
 }

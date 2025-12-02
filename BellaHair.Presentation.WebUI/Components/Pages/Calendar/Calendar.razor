@@ -40,11 +40,6 @@
                                Culture="@dkCulture">
     <br />
 
-    @if (_bookings.Count == 0)
-    {
-        <p style="text-align: center; color: red">OBS: Den valgte medarbejder har ikke nogen bookings.</p>                
-    }
-
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
                     EndTime="@(TimeSpan.FromHours(19))"
                     MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
@@ -53,7 +48,8 @@
 
 </Radzen.Blazor.RadzenScheduler>
 
-@code {
+@code
+{
     System.Globalization.CultureInfo dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
     RadzenScheduler<BookingCalendarViewModel> scheduler;
 
@@ -116,17 +112,17 @@
             await LoadBookings(args.Start, args.End, _pickedEmployeeId);
         }
 
-        // B. Update URL Silently (This fixes the exception!)
-        // We use JavaScript to change the URL text without stopping the code.
+        // Opdaterer URL'en
         var dateStr = args.Start.ToString("yyyy-MM-dd");
         var newUrl = $"/kalender?date={dateStr}&employeeId={_pickedEmployeeId}";
 
+
         try
         {
-            // This line updates the address bar but DOES NOT trigger a reload or exception
+            // Opdaterer adressen
             await JSRuntime.InvokeVoidAsync("window.history.replaceState", null, "", newUrl);
         }
-        catch { /* Ignore */ }
+        catch { /* Ignorerer exceptions fra Javascript */ }
     }
 
     private async Task HandlePickedEmployee(object value)
@@ -139,7 +135,7 @@
         try
         {
             var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
-            _employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.Name)).OrderBy(e => e.FullName).ToList();
+            _employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.FullName)).OrderBy(e => e.FullName).ToList();
         }
         catch (Exception e) { Snackbar.Add($"Fejl: {e.Message}", Severity.Error); }
     }
