@@ -26,7 +26,7 @@ namespace BellaHair.Domain.Tests.Discounts
                 Assert.That(loyaltyDiscount.Id, Is.Not.EqualTo(Guid.Empty));
                 Assert.That(loyaltyDiscount.Name, Is.EqualTo(name));
                 Assert.That(loyaltyDiscount.MinimumVisits, Is.EqualTo(minimumVisits));
-                Assert.That(loyaltyDiscount.DiscountPercent.Value, Is.EqualTo(discountPercent.Value));
+                Assert.That(loyaltyDiscount.TreatmentDiscountPercent.Value, Is.EqualTo(discountPercent.Value));
             }
         }
 
@@ -48,7 +48,7 @@ namespace BellaHair.Domain.Tests.Discounts
         {
             var loyaltyDiscount = Fixture.New<LoyaltyDiscount>()
                 .With(l => l.MinimumVisits, 5)
-                .With(l => l.DiscountPercent.Value, 0.10m)
+                .With(l => l.TreatmentDiscountPercent.Value, 0.10m)
                 .With(l => l.Name, "Test discount Name")
                 .Build();
 

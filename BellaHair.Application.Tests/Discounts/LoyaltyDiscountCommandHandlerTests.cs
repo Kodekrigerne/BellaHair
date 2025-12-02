@@ -25,7 +25,7 @@ namespace BellaHair.Application.Tests.Discounts
             {
                 Assert.That(discountFromDb!.Name, Is.EqualTo(command.Name));
                 Assert.That(discountFromDb!.MinimumVisits, Is.EqualTo(command.MinimumVisits));
-                Assert.That(discountFromDb!.DiscountPercent.Value, Is.EqualTo(command.DiscountPercent));
+                Assert.That(discountFromDb!.TreatmentDiscountPercent.Value, Is.EqualTo(command.DiscountPercent));
             });
         }
 

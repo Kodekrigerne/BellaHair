@@ -105,7 +105,8 @@ namespace BellaHair.Infrastructure
                 .Property<List<int>>("_birthdayDiscountUsedYears")
                 .HasColumnName("BirthdayDiscountUsedYears");
 
-            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.DiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.TreatmentDiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.ProductDiscountPercent);
             modelBuilder.Entity<CampaignDiscount>().OwnsOne(c => c.DiscountPercent);
             modelBuilder.Entity<BirthdayDiscount>().OwnsOne(b => b.DiscountPercent);
 
