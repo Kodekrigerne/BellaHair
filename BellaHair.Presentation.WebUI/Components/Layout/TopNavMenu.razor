@@ -7,19 +7,26 @@
 
 @rendermode InteractiveServer
 
-<div class="navbar">
+<nav class="navbar">
 	
-	<!-- TODO Skal slettes, når development afsluttes og der overgås til MS SQL server -->
+	@* <!-- TODO Skal slettes, når development afsluttes og der overgås til MS SQL server -->
 	<button class="btn-remove" onclick="@(() => {
-	DataProvider.ReinstateData();
-	NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);})">Rebuild DB</button>
+	DataProvider.ReinstateData(); 
+	NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);})">Rebuild DB</button> *@
 
-	<NavLink href="" Match="NavLinkMatch.All"><HomeIcon Class="nav-icon"/> Hjem</NavLink>
-	<NavLink href="weather"><VisitsIcon Class="nav-icon"/> Kalender</NavLink> @* Husk at ændre url-sti fra weather > kalender *@
-	<NavLink href="bookings">Bookings</NavLink>
-	<NavLink href="kunder"><PersonCheckmarkIcon Class="nav-icon"/> Kunder</NavLink>
-	<NavLink href="medarbejdere"><PersonCheckmarkIcon Class="nav-icon"/> Medarbejdere</NavLink>
-	<NavLink href="behandlinger"><TreatmentIcon Class="nav-icon"/> Behandlinger</NavLink>
-	<NavLink href="produkter">Produkter</NavLink>
-	<NavLink href="rabatter"><PercentIcon Class="nav-icon"/> Rabatter</NavLink>
-</div>
+	<div class="nav-bellahair">
+		<img src="images/BellaHairLogo.png" class="bella-logo"/>
+	</div>
+	
+	<div class="nav-links">
+		<NavLink href="" Match="NavLinkMatch.All"><HomeIcon Class="nav-icon"/> Hjem</NavLink>
+		<NavLink href="weather"><VisitsIcon Class="nav-icon"/> Kalender</NavLink> @* Husk at ændre url-sti fra weather > kalender *@
+		<NavLink href="bookings"><BookingsIcon Class="nav-icon"/> Bookings</NavLink>
+		<NavLink href="kunder"><CustomerIcon Class="nav-icon"/> Kunder</NavLink>
+		<NavLink href="medarbejdere"><PersonCheckmarkIcon Class="nav-icon"/> Medarbejdere</NavLink>
+		<NavLink href="behandlinger"><TreatmentIcon Class="nav-icon"/> Behandlinger</NavLink>
+		<NavLink href="produkter"><ProductIcon Class="nav-icon"/> Produkter</NavLink>
+		<NavLink href="rabatter"><PercentIcon Class="nav-icon"/> Rabatter</NavLink>
+	</div>
+
+</nav>
