@@ -1,10 +1,8 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
-using BellaHair.Domain.Discounts;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BellaHair.Infrastructure.Discounts
 {
@@ -43,7 +41,7 @@ namespace BellaHair.Infrastructure.Discounts
 
             Booking? booking = null;
             if (query.StartDateTime < now && query.BookingId != null) booking = await _bookingRepository.GetAsync(query.BookingId.Value);
-            else booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider);
+            else booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider, []);
             //Det er nødvendigt at oprette en booking for at finde en rabat
             //Denne booking gemmes dog ikke
 
