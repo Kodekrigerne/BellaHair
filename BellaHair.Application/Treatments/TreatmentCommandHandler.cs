@@ -19,15 +19,21 @@ namespace BellaHair.Application.Treatments
 
         private readonly ITreatmentRepository _treatmentRepository;
         private readonly IFutureBookingWithTreatmentChecker _bookingChecker;
+        private readonly ITreatmentDuplicateChecker _duplicateChecker;
 
-        public TreatmentCommandHandler(ITreatmentRepository treatmentRepository, IFutureBookingWithTreatmentChecker bookingChecker)
+        public TreatmentCommandHandler(ITreatmentRepository treatmentRepository, IFutureBookingWithTreatmentChecker bookingChecker, ITreatmentDuplicateChecker duplicateChecker)
         {
             _treatmentRepository = treatmentRepository;
             _bookingChecker = bookingChecker;
+            _duplicateChecker = duplicateChecker;
         }
 
         async Task ITreatmentCommand.CreateTreatmentAsync(CreateTreatmentCommand command)
         {
+            if (await _duplicateChecker.IsDuplicateAsync(command.Name, command.DurationMinutes))
+                throw new TreatmentDuplicateException(
+                    "Denne behandling findes allerede.");
+
             var price = Price.FromDecimal(command.Price);
             var duration = DurationMinutes.FromInt(command.DurationMinutes);
 
