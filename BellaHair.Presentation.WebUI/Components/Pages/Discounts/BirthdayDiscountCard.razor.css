@@ -1,0 +1,61 @@
+﻿/* Mikkel Klitgaard */
+
+.bdc-card {
+    padding: 15px;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, #fff7e6, #ffecb3);
+    border: 1px solid #ffcc80;
+    border-radius: 8px;
+    position: relative;
+}
+
+.bdc-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.bdc-text {
+    font-size: 0.85rem;
+    color: #777;
+    font-style: italic;
+    margin-bottom:0px;
+}
+
+.line{
+    margin-top:10px;
+}
+
+.p-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.header-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.percent-wrapper {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    background-color: #920dfc;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.icon-wrap {
+    margin-right: 6px;
+    font-weight: normal;
+}
+
+.bday-txt{
+
+    font-style:italic;
+}

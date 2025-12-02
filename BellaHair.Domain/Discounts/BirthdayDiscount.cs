@@ -2,6 +2,15 @@
 
 namespace BellaHair.Domain.Discounts
 {
+    // Mikkel Klitgaard
+    /// <summary>
+    /// Represents a discount that is applied to a booking when the customer's birthday occurs in the same month as the
+    /// booking date.
+    /// </summary>
+    /// <remarks>A birthday discount is only active if the booking's customer has not already used a birthday
+    /// discount in the same year and the booking occurs in the customer's birthday month. The discount percentage and
+    /// name are specified when creating the discount. This type is typically used to provide special offers to
+    /// customers during their birthday month.</remarks>
     public class BirthdayDiscount : DiscountBase
     {
         public string Name { get; private set; }
@@ -41,5 +50,4 @@ namespace BellaHair.Domain.Discounts
             return BookingDiscount.Active(Name, discount, Type);
         }
     }
-    public class BirthdayDiscountException(string message) : DomainException(message);
 }
