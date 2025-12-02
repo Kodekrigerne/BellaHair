@@ -1,6 +1,5 @@
 ﻿<!-- Dennis -->
 @page "/bookings"
-@page "/bookings&search={SearchTerm}"
 
 @using BellaHair.Domain
 @using BellaHair.Ports.Bookings
@@ -43,18 +42,27 @@
 	private List<BookingViewModel> _filteredBookings = [];
 
 	[Parameter]
+	[SupplyParameterFromQuery(Name = "search")]
 	public string SearchTerm { get; set; } = string.Empty;
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "tab")]
+	public string? Tab { get; set; }
 
 	protected async override Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
-		await HandleNewSelectorClick();
+		string? searchedTerm = null;
 
-		var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
-		if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("search", out var value))
+		if (SearchTerm != null) searchedTerm = SearchTerm;
+
+		if(Tab == "old") await HandleOldSelectorClick();
+		else await HandleNewSelectorClick();
+
+		if (searchedTerm != null)
 		{
-			SearchTerm = value!;
+			SearchTerm = searchedTerm;
 			ApplyFilter();
 		}
 	}

@@ -6,6 +6,7 @@
 @inject IPrivateCustomerCommand PrivateCustomerCommand
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 
 <!-- Mikkel Dahlmann -->
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
@@ -84,7 +85,12 @@
 
 			<div class="privatecustomer-contact-details">
 				<VisitsIcon Class="privatecustomer-icons" />
-				Antal bookinger: @PrivateCustomer.Visits
+				<button class="btn-add" @onclick="NavigateToNewCustomerBookings">Kommende bookinger</button>
+			</div>
+			
+			<div class="privatecustomer-contact-details">
+				<VisitsIcon Class="privatecustomer-icons" />
+				<button class="btn-add bookings" @onclick="NavigateToOldCustomerBookings">Tidligere bookinger (@PrivateCustomer.Visits)</button>
 			</div>
 
 		</div>
@@ -184,7 +190,7 @@
 	{
 		var discount = LoyaltyDiscounts
 		.Where(ld => ld.MinimumVisits < PrivateCustomer.Visits)
-		.MaxBy(ld => ld!.MinimumVisits);
+		.MaxBy(ld => ld.MinimumVisits);
 
 		if (discount != null)
 		{
@@ -199,4 +205,14 @@
 			loyaltyLevel = "Ny kunde";
 		}
 	}
+
+	private void NavigateToNewCustomerBookings()
+	{
+		NavigationManager.NavigateTo($"/bookings?search={PrivateCustomer.PhoneNumber}&tab=new");
+    }
+	
+	private void NavigateToOldCustomerBookings()
+	{
+		NavigationManager.NavigateTo($"/bookings?search={PrivateCustomer.PhoneNumber}&tab=old");
+    }
 }
