@@ -223,60 +223,60 @@ namespace BellaHair.Presentation.WebUI
 
             // Peter Svendsen bookings
             var b1 = Booking.Create(_peterse, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(-30), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(-30), _mockPastDateTimeProvider, []);
             b1.PayBooking(_currentDateTimeProvider);
             _db.Add(b1);
 
             var b2 = Booking.Create(_peterse, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(-15), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(-15), _mockPastDateTimeProvider, []);
             b2.PayBooking(_currentDateTimeProvider);
             _db.Add(b2);
 
             var b3 = Booking.Create(_peterse, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-5), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-5), _mockPastDateTimeProvider, []);
             b3.PayBooking(_currentDateTimeProvider);
             _db.Add(b3);
 
             // Lis Mortensen bookings
             var b4 = Booking.Create(_lismk, _sorenJ, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(-25), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(-25), _mockPastDateTimeProvider, []);
             b4.PayBooking(_currentDateTimeProvider);
             _db.Add(b4);
 
             var b5 = Booking.Create(_lismk, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(-20), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(-20), _mockPastDateTimeProvider, []);
             b5.PayBooking(_currentDateTimeProvider);
             _db.Add(b5);
 
             var b6 = Booking.Create(_lismk, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(-8), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(-8), _mockPastDateTimeProvider, []);
             b6.PayBooking(_currentDateTimeProvider);
             _db.Add(b6);
 
             // Lars Christiansen bookings
             var b7 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(-28), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(-28), _mockPastDateTimeProvider, []);
             b7.PayBooking(_currentDateTimeProvider);
             _db.Add(b7);
 
             var b8 = Booking.Create(_larsc, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(-12), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(-12), _mockPastDateTimeProvider, []);
             b8.PayBooking(_currentDateTimeProvider);
             _db.Add(b8);
 
             var b9 = Booking.Create(_larsc, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 30, 0).AddDays(-3), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 11, 30, 0).AddDays(-3), _mockPastDateTimeProvider, []);
             b9.PayBooking(_currentDateTimeProvider);
             _db.Add(b9);
 
             // Oskar Issaksen bookings
             var b10 = Booking.Create(_oskarit, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-22), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-22), _mockPastDateTimeProvider, []);
             b10.PayBooking(_currentDateTimeProvider);
             _db.Add(b10);
 
             var b11 = Booking.Create(_oskarit, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 0, 0).AddDays(-10), _mockPastDateTimeProvider);
+                new DateTime(now.Year, now.Month, now.Day, 12, 0, 0).AddDays(-10), _mockPastDateTimeProvider, []);
             b11.PayBooking(_currentDateTimeProvider);
             _db.Add(b11);
 
@@ -284,59 +284,59 @@ namespace BellaHair.Presentation.WebUI
 
             // Peter Svendsen bookings
             _db.Add(Booking.Create(_peterse, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(3), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(3), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_peterse, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(10), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(10), _mockPastDateTimeProvider, []));
 
             // Lis Mortensen bookings
             _db.Add(Booking.Create(_lismk, _sorenJ, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 9, 30, 0).AddDays(5), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 9, 30, 0).AddDays(5), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_lismk, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(14), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(14), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_lismk, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 30, 0).AddDays(21), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 15, 30, 0).AddDays(21), _mockPastDateTimeProvider, []));
 
             // Lars Christiansen bookings
             _db.Add(Booking.Create(_larsc, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(7), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(7), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 16, 30, 0).AddDays(18), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 16, 30, 0).AddDays(18), _mockPastDateTimeProvider, []));
 
             // Oskar Issaksen bookings
             _db.Add(Booking.Create(_oskarit, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(2), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(2), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_oskarit, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(12), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(12), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_oskarit, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(25), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(25), _mockPastDateTimeProvider, []));
 
             // Additional bookings for variety - mixing treatments and employees
 
             // More Henny bookings (past)
             _db.Add(Booking.Create(_peterse, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(-18), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(-18), _mockPastDateTimeProvider, []));
 
             // More Peter bookings (future)
             _db.Add(Booking.Create(_lismk, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(8), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(8), _mockPastDateTimeProvider, []));
 
             // More Maria bookings (past and future)
             _db.Add(Booking.Create(_larsc, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-7), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-7), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_oskarit, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(15), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(15), _mockPastDateTimeProvider, []));
 
             // More Søren M bookings
             _db.Add(Booking.Create(_peterse, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-14), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-14), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(20), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(20), _mockPastDateTimeProvider, []));
 
             // More Søren J bookings
             _db.Add(Booking.Create(_lismk, _sorenJ, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(-6), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(-6), _mockPastDateTimeProvider, []));
             _db.Add(Booking.Create(_oskarit, _sorenJ, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(28), _mockPastDateTimeProvider));
+                new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(28), _mockPastDateTimeProvider, []));
         }
 
         // Bruges da Bookings skal have en ICurrentDateTimeProvider som giver deres CreatedDate som skal være i fortiden i forhold til StartTime.
