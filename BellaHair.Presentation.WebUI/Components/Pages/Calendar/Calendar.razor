@@ -5,6 +5,7 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
 @using BellaHair.Infrastructure
+@using Microsoft.Extensions.Options
 @using Radzen
 @rendermode InteractiveServer
 @inject IBookingQuery BookingQuery
@@ -12,6 +13,7 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IOptions<OpeningTimesSettings> OpeningTimes;
 
 
 <div class="header-and-employee">
@@ -30,7 +32,7 @@
                                StartProperty="StartDateTime"
                                EndProperty="EndDateTime"
                                @bind-CurrentDate="@currentDate"
-                               Style="height: 650px;"
+                               Style="height: 33rem;"
                                TextProperty="AllBookingInfo"
                                AppointmentRender="@OnAppointmentRender"
                                AppointmentSelect="@OnAppointmentSelect"
@@ -40,8 +42,8 @@
                                Culture="@dkCulture">
     <br />
 
-    <RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
-                    EndTime="@(TimeSpan.FromHours(19))"
+    <RadzenWeekView StartTime="@(TimeSpan.FromHours(OpeningTimes.Value.OpeningTime.Hour))"
+                    EndTime="@(TimeSpan.FromHours(OpeningTimes.Value.ClosingTime.Hour))"
                     MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
 
     <RadzenMonthView />
