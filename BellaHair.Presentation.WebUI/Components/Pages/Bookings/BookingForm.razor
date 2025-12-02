@@ -615,7 +615,8 @@
 		try
 		{
 			var startDateTime = _startDate.Value.Add(_startTime.Value);
-			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, _useBirthdayDiscount, Id);
+			var createProductLines = _productLines.Select(pl => new CreateProductLine(pl.Quantity, pl.ProductId)).ToList();
+			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, _useBirthdayDiscount, createProductLines, Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 

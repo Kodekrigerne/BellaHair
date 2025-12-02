@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Infrastructure.PrivateCustomers;
+using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,14 +42,31 @@ namespace BellaHair.Infrastructure.Discounts
 
             Booking? booking = null;
             if (query.StartDateTime < now && query.BookingId != null) booking = await _bookingRepository.GetAsync(query.BookingId.Value);
-            else booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider, []);
+            else
+            {
+                var productLineDatas = await ConvertToProductLineData(query.ProductLines);
+                booking = Booking.Create(customer, employee, treatment, query.StartDateTime, _currentDateTimeProvider, productLineDatas);
+            }
             //Det er nødvendigt at oprette en booking for at finde en rabat
             //Denne booking gemmes dog ikke
-
 
             var discount = await _discountCalculatorService.GetBestDiscount(booking, query.IncludeBirthdayDiscount);
 
             return discount == null ? null : new BookingDiscountDTO(discount.Name, discount.Amount, (DiscountTypeDTO)discount.Type);
+        }
+
+
+        private async Task<IEnumerable<ProductLineData>> ConvertToProductLineData(IEnumerable<CreateProductLine> createProductLines)
+        {
+            var productLineDatas = await Task.WhenAll(
+                createProductLines.Select(async pl =>
+                {
+                    var quantity = Quantity.FromInt(pl.Quantity);
+                    var product = await _db.Products.FindAsync(pl.ProductId)
+                        ?? throw new KeyNotFoundException($"Product with ID {pl.ProductId} not found.");
+                    return new ProductLineData(quantity, product);
+                }));
+            return productLineDatas;
         }
     }
 }
