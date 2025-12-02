@@ -2,7 +2,7 @@
 
 namespace BellaHair.Domain.Bookings
 {
-    public class ProductLine
+    public class ProductLine : EntityBase
     {
         public Quantity Quantity { get; private set; }
         public Product Product { get; private set; }
@@ -13,6 +13,7 @@ namespace BellaHair.Domain.Bookings
 
         private ProductLine(Quantity quantity, Product product)
         {
+            Id = Guid.NewGuid();
             Quantity = quantity;
             Product = product;
         }

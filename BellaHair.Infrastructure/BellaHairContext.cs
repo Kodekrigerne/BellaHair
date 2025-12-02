@@ -77,6 +77,12 @@ namespace BellaHair.Infrastructure
                 .HasColumnName("TotalWithDiscount")
                 .IsRequired(false);
 
+            modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLines)
+                .OwnsOne(pl => pl.Quantity);
+
+            modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLineSnapshots)
+                .HasKey(pls => pls.ProductLineId);
+
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
 
@@ -95,8 +101,7 @@ namespace BellaHair.Infrastructure
 
             modelBuilder.Entity<PrivateCustomer>().Ignore(p => p.Visits);
 
-            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.TreatmentDiscountPercent);
-            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.ProductDiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.DiscountPercent);
             modelBuilder.Entity<CampaignDiscount>().OwnsOne(c => c.DiscountPercent);
             modelBuilder.Entity<BirthdayDiscount>().OwnsOne(b => b.DiscountPercent);
 

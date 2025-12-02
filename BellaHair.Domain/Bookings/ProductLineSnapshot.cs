@@ -2,6 +2,7 @@
 {
     public record ProductLineSnapshot
     {
+        public Guid ProductLineId { get; private init; }
         public Guid ProductId { get; private init; }
         public string Name { get; private init; }
         public string Description { get; private init; }
@@ -14,6 +15,7 @@
 
         private ProductLineSnapshot(ProductLine productLine)
         {
+            ProductLineId = productLine.Id;
             ProductId = productLine.Product.Id;
             Name = productLine.Product.Name;
             Description = productLine.Product.Description;
