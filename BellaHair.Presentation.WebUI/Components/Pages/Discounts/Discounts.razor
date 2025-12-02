@@ -33,6 +33,7 @@
 else if (_activeTab == DiscountTab.General)
 {
 	<h4>Stamkunderabat (@LoyaltyCount)</h4>
+
 	<div class="kk-container">
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
@@ -41,6 +42,7 @@ else if (_activeTab == DiscountTab.General)
 	</div>
 
 	<h4>Fødselsdagsrabat</h4>
+
 	<div class="kk-container">
 
 		<BirthdayDiscountCard BirthdayDiscount="_birthdayDiscount"/>
@@ -49,10 +51,14 @@ else if (_activeTab == DiscountTab.General)
 }
 else if (_activeTab == DiscountTab.Campaign)
 {
+
+	<h4>Kampagnerabatter</h4>
+	<div class="kk-container">
 	@foreach (var campaignDiscount in _discounts.OfType<CampaignDiscountViewModel>())
 	{
 		<CampaignDiscountCard CampaignDiscount="campaignDiscount" OnDelete="@HandleOnDeleteCampaignClick"></CampaignDiscountCard>
 	}
+	</div>
 }
 
 @code {
