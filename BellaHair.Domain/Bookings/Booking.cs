@@ -181,6 +181,7 @@ namespace BellaHair.Domain.Bookings
                 var productLine = ProductLine.Create(productLineData.Quantity, productLineData.Product);
                 productLines.Add(productLine);
             }
+            _productLines = productLines;
 
             UpdateEndDateTime();
         }
