@@ -6,6 +6,7 @@
 
 @inject ICampaignDiscountCommand CampaignDiscountCommand
 @inject ISnackbar Snackbar;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 <div class="cdc-card">
 	<div class="header-wrapper">
@@ -29,7 +30,10 @@
 		}
 		<div class="active-wrapper">
 			
-			@if (CampaignDiscount.StartDate < DateTime.Now && CampaignDiscount.EndDate > DateTime.Now) _isActive = true;
+			@if (CampaignDiscount.StartDate.Date < CurrentDateTimeProvider.GetCurrentDateTime() 
+			     && CampaignDiscount.EndDate.Date > CurrentDateTimeProvider.GetCurrentDateTime()) 
+				_isActive = true;
+
 			else _isActive = false;
 			<button class="@(_isActive ? "btn-active" : "btn-inactive")">
 				@(_isActive ? "Aktiv" : "Inaktiv")
