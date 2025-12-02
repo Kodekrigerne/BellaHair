@@ -90,7 +90,7 @@ namespace BellaHair.Domain.Bookings
 
         public void PayBooking(ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            if (Employee == null || Customer == null || Treatment == null)
+            if (Employee == null || Customer == null || Treatment == null || _productLines == null)
                 throw new InvalidOperationException("all booking relations must be populated when calling PayBooking.");
 
             if (IsPaid == true) throw new BookingException("Kan ikke betale en booking som allerede er betalt.");
@@ -102,6 +102,14 @@ namespace BellaHair.Domain.Bookings
             _totalWithDiscount = CalculateTotalWithDiscount();
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
+
+            List<ProductLineSnapshot> productLineSnapshots = [];
+            foreach (var productLine in _productLines)
+            {
+                var productLineSnapshot = ProductLineSnapshot.FromProductLine(productLine);
+                productLineSnapshots.Add(productLineSnapshot);
+            }
+            ProductLineSnapshots = productLineSnapshots.ToImmutableList();
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
