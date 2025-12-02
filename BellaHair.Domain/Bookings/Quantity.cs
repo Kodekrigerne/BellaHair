@@ -4,6 +4,8 @@
     {
         public int Value { get; private init; }
 
+        private Quantity() { }
+
         private Quantity(int value)
         {
             Value = value;

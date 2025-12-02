@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Discounts;
+﻿using System.Collections.Immutable;
+using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
@@ -34,6 +35,8 @@ namespace BellaHair.Domain.Bookings
 
         private List<ProductLine> _productLines;
         public IReadOnlyList<ProductLine> ProductLines => _productLines.AsReadOnly();
+
+        public ImmutableList<ProductLineSnapshot>? ProductLineSnapshots { get; private set; }
 
         public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored
