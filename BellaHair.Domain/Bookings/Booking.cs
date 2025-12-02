@@ -116,7 +116,7 @@ namespace BellaHair.Domain.Bookings
         private decimal CalculateTotalBase()
         {
             if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
-            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
+            if (Treatment == null || _productLines == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
 
             var price = 0m;
             price += Treatment.Price.Value;
@@ -129,9 +129,6 @@ namespace BellaHair.Domain.Bookings
 
         private decimal CalculateTotalWithDiscount()
         {
-            if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
-            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
-
             var discountAmount = Discount?.Amount ?? 0;
             return CalculateTotalBase() - discountAmount;
         }
