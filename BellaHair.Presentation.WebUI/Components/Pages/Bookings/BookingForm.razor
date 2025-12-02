@@ -244,8 +244,8 @@
 
 	[Parameter]
 	public Guid? Id { get; set; }
-
 	private bool _isPaid;
+	private List<ProductLineModel> _productLines = [];
 
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
@@ -577,7 +577,7 @@
 	private async Task HandleChangeTimeClick()
 	{
 		if (Mode == BookingMode.View) return;
-		
+
 		if (_activePicker != Picker.Time && (_startDate == null || _startTime == null)) SetNulls();
 
 		await HandlePickStartDateTimeClick();
@@ -608,7 +608,14 @@
 			_startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
+
+		List<CreateProductLine> productLines = [];
+		foreach (var productLine in _productLines)
+		{
+			productLines.Add(new CreateProductLine(productLine.Quantity, productLine.ProductId));
+		}
+
+		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id, productLines);
 
 		try
 		{
@@ -675,7 +682,14 @@
 			_startTime == null || _treatment == null || _employee == null || _customer == null || Id == null) return;
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id);
+
+		List<CreateProductLine> productLines = [];
+		foreach (var productLine in _productLines)
+		{
+			productLines.Add(new CreateProductLine(productLine.Quantity, productLine.ProductId));
+		}
+
+		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id, productLines);
 
 		try
 		{
