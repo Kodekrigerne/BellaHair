@@ -8,9 +8,13 @@
 @inject ISnackbar Snackbar;
 
 <div class="ldc-card">
-	<p>@LoyaltyDiscount.Name</p>
+	<div class="header-wrapper">
+		<p class="p-header">@LoyaltyDiscount.Name</p>
+	</div>
 	<p class="ldc-visits">Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
-	<p>Rabat: @((LoyaltyDiscount.DiscountPercent * 100).ToString("0"))%</p>
+	<hr>
+	Fordele:
+	<
 	<BinDeleteButton Class="delete-btn" OnClick="@HandleOnDeleteClick"/>
 </div>
 
@@ -36,25 +40,3 @@
 	}
 }
 
-<style>
-	.ldc-card {
-		padding: 1rem;
-		margin-bottom: 1rem;
-		background: linear-gradient(to right, oklch(.97 .014 254.604), oklch(.977 .014 308.299)); /* blue-50, purple-50 */
-		border-style: solid;
-		border-width: 1px;
-		border-color: oklch(.882 .059 254.128); /* blue-200 */
-		border-radius: 8px;
-		position: relative;
-	}
-
-	.ldc-visits {
-		color: oklch(.446 .03 256.802); /* grey-600 */
-	}
-
-	.delete-btn {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-	}
-</style>
