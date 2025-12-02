@@ -1,12 +1,18 @@
 ﻿<!-- Mikkel Dahlmann -->
 
-<button class="edit-button" @onclick="@OnClick">
+<button class="edit-button @Class" title="@Title" @onclick:stopPropagation @onclick="@OnClick">
 	<EditIcon Class="edit-icon" />
 </button>
 
 @code {
 	[Parameter]
+	public string? Class { get; set; }
+
+	[Parameter]
 	public EventCallback OnClick { get; set; }
+
+	[Parameter]
+	public string? Title { get; set; }
 }
 
 <style>
@@ -25,7 +31,7 @@
 	}
 
 		.edit-button:hover {
-			background-color: lavender;
+			background-color: #BBDEFB;
 			transition: background-color 0.2s;
 		}
 
@@ -36,6 +42,6 @@
 	.edit-icon {
 		height: 1.5rem;
 		width: 1.5rem;
-		fill: dimgrey !important;
+		fill: #2196F3 !important;
 	}
 </style>

@@ -1,0 +1,116 @@
+﻿@using BellaHair.Ports.Treatments
+@using System.Linq.Expressions
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@* Gør så den kan bruges i Editformen og binder sig til en liste med Guid (vores treatmentIds) *@
+@inherits InputBase<List<Guid>>
+
+<div class="inputs-items-container kk-container" style="border-radius: 8px">
+    <h5 style="margin-top: 2px; text-align: center">Vælg behandlinger</h5>
+
+    <div style="height: 300px; overflow-y: scroll;">
+        <br />
+
+
+        <div class="treatments-container">
+
+            @if (Treatments == null || !Treatments.Any())
+            {
+                <p style="padding: 10px; color: grey;">Ingen behandlinger fundet...</p>
+            }
+
+
+            else
+            {
+                @foreach (var treatment in Treatments)
+                {
+                    // Tjekker om treatmenten er valgt ved at kigge på om inputtets liste indeholder treatmenten
+                    bool isSelected = CurrentValue != null && CurrentValue.Contains(treatment.Id);
+
+
+                    // Ændrer på formatteringen af treatmentet, hvis den er valgt (markeret: lilla / ikke markeret: hvid)
+                    string itemStyle = isSelected
+                    ? "border: 2px solid #990dff; background-color: #f6e6fc; color: black; position: relative; cursor: pointer;"
+                    : "border: 2px solid lightgrey; background-color: white; color: black; position: relative; cursor: pointer;";
+
+
+                    <div @key="treatment.Id"
+                         @onclick="() => ToggleSelection(treatment.Id)"
+                         class="treatment-item"
+                         style="@itemStyle;">
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                            <p style="font-weight: bold; color: #2b2b2b">@treatment.Name</p>
+
+                            @* Skifter tjek-ikonet alt efter om den er valgt *@
+						<div>
+								@if (isSelected)
+								{
+									<CheckedCirle/>
+								}
+								else
+								{
+									<UncheckedCircle/>
+								}
+							</div>
+
+                        </div>
+
+                            <div class="d-flex align-items-start" style="gap: 2rem">
+
+                                <div class="treatment-icon-format">
+                                     <DurationIcon Class="treatment-list-icon" /> <p class="treatment-text">@treatment.DurationMinutes min</p>
+                                </div>
+
+                                <div class="treatment-icon-format">
+                                    <PriceIcon Class="treatment-list-icon"/> <p class="treatment-text">@treatment.Price.ToString("C")</p>
+                                </div>
+
+                           </div> 
+                </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public List<TreatmentViewModel> Treatments { get; set; } = new();
+
+    private async Task ToggleSelection(Guid treatmentId)
+    {
+        // Sikrer at værdien på værdierne ikke er null
+        if (CurrentValue == null)
+        {
+            CurrentValue = new List<Guid>();
+        }
+
+        // Tilføjer treatmenten hvis den ikke allerede er valgt
+        if (CurrentValue.Contains(treatmentId))
+        {
+            CurrentValue.Remove(treatmentId);
+        }
+        else
+        {
+            CurrentValue.Add(treatmentId);
+        }
+
+        // Fortæller Editformen at det er lavet ændringer
+        EditContext.NotifyFieldChanged(FieldIdentifier);
+
+        // Opdaterer Editformen
+        await ValueChanged.InvokeAsync(CurrentValue);
+    }
+
+    // Nødvendig da vi arver fra InputBase men bliver ikke brugt
+    protected override bool TryParseValueFromString(string? value, out List<Guid> result, out string? validationErrorMessage)
+    {
+        result = CurrentValue ?? new List<Guid>();
+        validationErrorMessage = null;
+        return true;
+    }
+}

@@ -1,10 +1,12 @@
 ﻿<!-- Dennis -->
 
 @using BellaHair.Domain
+@using BellaHair.Domain.Invoices
 @using BellaHair.Infrastructure
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Discounts
 @using BellaHair.Ports.Employees
+@using BellaHair.Ports.Invoices
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
@@ -21,6 +23,9 @@
 @inject IDiscountQuery DiscountQuery;
 @inject NavigationManager NavigationManager;
 @inject ICurrentDateTimeProvider CurrentDateTimeProvider;
+@inject IInvoiceQuery InvoiceQuery;
+@inject IInvoiceCommand InvoiceCommand;
+@inject IJSRuntime JSRuntime;
 
 <div class="kk-container">
 	<div class="body-container">
@@ -158,12 +163,12 @@
 			@if (_timeIsAvailable != null)
 			{
 				<div class="right-bottom">
+					
 					<p class="availability-status">@_statusMessage</p>
-
+			
 					@if (_timeIsAvailable != null && _timeIsAvailable == true)
 					{
 						<div class="discount-section">
-							@if(!_isPaid || IsEditable()) { <button class="btn-discount" @onclick="HandleGetDiscountClick">Hent bedste rabat</button> }
 							@if (_discount != null)
 							{
 								<p class="discount-name">Rabat: @_discount.Name</p>
@@ -178,6 +183,14 @@
 								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
 							}
 						</div>
+						
+						@if (_isPaid)
+						{
+							<div class="btn-group">
+								<button class="btn-view btn-pay" @onclick="HandleViewInvoiceClick" style="width: 50%">Se faktura</button>
+								<button class="btn-view btn-pay" @onclick="HandleEmailInvoice" style="width: 50%">Email faktura til kunde</button>
+							</div>
+						}
 
 						if (Mode == BookingMode.New)
 						{
@@ -257,7 +270,7 @@
 		}
 
 		if (Mode == BookingMode.New) await HandlePickCustomerClick();
-		else if (Mode == BookingMode.View) await LoadBooking();
+		else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
 	}
 
 	private async Task LoadBooking()
@@ -270,7 +283,7 @@
 			_isPaid = booking.IsPaid;
 
 			if (booking.Discount != null) {
-				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount);
+				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
 			}
 
 			var c = await CustomerQuery.GetPrivateCustomerAsync(new GetPrivateCustomerQuery(booking.CustomerId));
@@ -289,6 +302,8 @@
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
 			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+
+			if (!_isPaid) await GetBestDiscount();
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
@@ -333,15 +348,15 @@
 	private async Task HandlePickTreatmentClick()
 	{
 		if (_customer == null) return;
-		
+
 		try {
 
-		_treatments = (await TreatmentQuery.GetAllAsync())
-		.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
-		.OrderBy(t => t.Name)
-		.ToList();
+			_treatments = (await TreatmentQuery.GetAllAsync())
+			.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+			.OrderBy(t => t.Name)
+			.ToList();
 
-		_activePicker = Picker.Treatments;
+			_activePicker = Picker.Treatments;
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
@@ -351,17 +366,17 @@
 		if (_treatment == null) return;
 
 		try {
-		_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
-			.Select(e => new EmployeeNameWithBookingsViewModel(
-				e.Id,
-				e.Name,
-				e.Bookings
-					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
-					.ToList()))
-			.OrderBy(e => e.Name)
-			.ToList();
+			_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
+				.Select(e => new EmployeeNameWithBookingsViewModel(
+					e.Id,
+					e.Name,
+					e.Bookings
+						.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
+						.ToList()))
+				.OrderBy(e => e.Name)
+				.ToList();
 
-		_activePicker = Picker.Employee;
+			_activePicker = Picker.Employee;
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
@@ -456,7 +471,9 @@
 			return;
 		}
 
-		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id);
+		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id, Id);
+
+		await GetBestDiscount();
 
 		_timeIsAvailable = !(await BookingQuery.BookingHasOverlap(query));
 		_statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
@@ -507,18 +524,18 @@
 		await HandlePickStartDateTimeClick();
 	}
 
-	private async Task HandleGetDiscountClick(MouseEventArgs args)
+	private async Task GetBestDiscount()
 	{
 		if (_startDate == null || _startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
 		try
 		{
 			var startDateTime = _startDate.Value.Add(_startTime.Value);
-			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
+			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 			if (discountDTO == null) Snackbar.Add("Fandt ingen rabat", Severity.Warning);
-			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount);
+			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount, discountDTO.Type);
 		}
 		catch
 		{
@@ -550,9 +567,22 @@
 
 		try
 		{
-			var command = new PayBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount));
-			await BookingCommand.PayBooking(command);
+			var command = new PayAndInvoiceBookingCommand(Id.Value, _discount == null ? null : new DiscountData(_discount.Name, _discount.Amount, _discount.Type));
+			await BookingCommand.PayAndInvoiceBooking(command);
 			Snackbar.Add("Bookingen er betalt", Severity.Success);
+
+			var queryCommand = new GetInvoiceByBookingIdQuery(Id!.Value);
+			Snackbar.Add("Faktura oprettet", Severity.Success, config =>
+				{
+					config.Action = "Se faktura";
+					config.ActionColor = Color.Primary;
+					config.OnClick = async snackbar =>
+						{
+							await HandleViewInvoiceClick();
+						};
+				}
+			);
+
 			await LoadBooking();
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
@@ -567,7 +597,7 @@
 	private async Task HandleDeleteClick()
 	{
 		if (Id == null) return;
-	
+
 		try
 		{
 			var command = new DeleteBookingCommand(Id.Value);
@@ -596,6 +626,43 @@
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
+	}
+
+	private async Task HandleViewInvoiceClick()
+	{
+		try
+		{
+			var command = new GetInvoiceByBookingIdQuery(Id!.Value);
+			var invoicePdf = await InvoiceQuery.GetInvoicePdfByBookingIdAsync(command);
+			await JSRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(invoicePdf));
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error); 
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+	}
+
+	private async Task HandleEmailInvoice()
+	{
+		try
+		{
+			var email = _customer!.Email;
+			var command = new EmailInvoiceToCustomerCommand(Id!.Value, email);
+			await InvoiceCommand.EmailInvoiceToCustomerAsync(command);
+			Snackbar.Add($"Faktura afsendt til {email}", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
 	}
 }
 
@@ -776,6 +843,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+		margin-top: 1rem;
 	}
 
 	.availability-status {

@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace BellaHair.Infrastructure
         public DbSet<PrivateCustomer> PrivateCustomers { get; set; }
         public DbSet<Treatment> Treatments { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +31,10 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>().OwnsOne(b => b.EmployeeSnapshot);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.CustomerSnapshot);
             modelBuilder.Entity<Booking>().OwnsOne(b => b.TreatmentSnapshot);
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Invoice)
+                .WithOne(i => i.Booking)
+                .HasForeignKey<Invoice>(i => i.BookingId);
 
             //Selvom vores Booking relationer er nullable er det stadig nødvendigt at fortælle databasen at de må være null
             modelBuilder.Entity<Booking>().HasOne(b => b.Treatment).WithMany().OnDelete(DeleteBehavior.SetNull);
@@ -56,10 +62,17 @@ namespace BellaHair.Infrastructure
                 .UsePropertyAccessMode(PropertyAccessMode.Field);
 
             //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
-            modelBuilder.Entity<Booking>().Ignore(b => b.Total);
+            modelBuilder.Entity<Booking>().Ignore(b => b.TotalBase);
             //Vi mapper backing fieldet i stedet for propertien
-            modelBuilder.Entity<Booking>().Property<decimal?>("_total")
-                .HasColumnName("Total")
+            modelBuilder.Entity<Booking>().Property<decimal?>("_totalBase")
+                .HasColumnName("TotalBase")
+                .IsRequired(false);
+
+            //Vi ignorerer Total da den ikke har nogen setter men istedet har et backing field
+            modelBuilder.Entity<Booking>().Ignore(b => b.TotalWithDiscount);
+            //Vi mapper backing fieldet i stedet for propertien
+            modelBuilder.Entity<Booking>().Property<decimal?>("_totalWithDiscount")
+                .HasColumnName("TotalWithDiscount")
                 .IsRequired(false);
 
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
@@ -81,7 +94,15 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<PrivateCustomer>().Ignore(p => p.Visits);
 
             modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.DiscountPercent);
-            modelBuilder.Entity<CampaignDiscount>().OwnsOne(l => l.DiscountPercent);
+            modelBuilder.Entity<CampaignDiscount>().OwnsOne(c => c.DiscountPercent);
+            modelBuilder.Entity<BirthdayDiscount>().OwnsOne(b => b.DiscountPercent);
+
+            // Vi fortæller EF, at Id for Invoice ikke genereres af databasen
+            modelBuilder.Entity<Invoice>(entity =>
+            {
+                entity.HasKey(i => i.Id);
+                entity.Property(i => i.Id).ValueGeneratedNever();
+            });
         }
     }
 }

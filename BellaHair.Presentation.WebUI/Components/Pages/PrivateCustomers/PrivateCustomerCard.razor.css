@@ -80,3 +80,71 @@
     top: unset !important;
     right: unset !important;
 }
+
+.modal-centered-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+}
+
+::deep .delete-confirmation-icon {
+    width: 5rem;
+    height: 5rem;
+    color: firebrick;
+    margin-bottom: 1rem;
+}
+
+.loyalty-customer {
+    vertical-align: top;
+    background-color: #c084fc26;
+    padding: 1px 6px 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    font-weight: 500;
+    color: #8200db;
+}
+
+.regular-customer {
+    vertical-align: top;
+    background-color: #36415327;
+    padding: 1px 6px 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    font-weight: 500;
+    color: #364153;
+}
+
+.new-customer {
+    vertical-align: top;
+    background-color: #0082361d;
+    padding: 1px 6px 2px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    display: flex;
+    font-weight: 500;
+    color: #008236;
+}
+
+.btn-add {
+    height: 20px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 8px;
+    margin-top: 4px;
+    vertical-align: top;
+    border-radius: 8px;
+    font-size: 12px;
+    display: flex;
+    color: #8200db;
+    background-color: #c084fc26;
+    border: 2px, solid, purple;
+    font-weight: 500;
+}
+
+.btn-add:hover{
+    color: white;
+}

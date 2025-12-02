@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Ports.Bookings
+﻿using BellaHair.Ports.Discounts;
+
+namespace BellaHair.Ports.Bookings
 {
     //Dennis
     /// <summary>
@@ -21,21 +23,25 @@
         Guid TreatmentId,
         DiscountDTO? Discount);
 
-    public record DiscountDTO(string Name, decimal Amount);
+    public record DiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 
     public record BookingDTO(
         Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
         bool IsPaid,
-        decimal Total,
+        decimal TotalBase,
+        decimal TotalWithDiscount,
         string EmployeeFullName,
         string CustomerFullName,
+        string CustomerAddress,
+        string CustomerPhone,
+        string CustomerEmail,
         string TreatmentName,
         int DurationMinutes,
         DiscountDTO? Discount);
 
     public record GetWithRelationsQuery(Guid Id);
 
-    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId);
+    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId, Guid? bookingId = null);
 }

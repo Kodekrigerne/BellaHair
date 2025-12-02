@@ -15,6 +15,8 @@ namespace BellaHair.Domain.Discounts
         /// Calculates the discount for a given booking, based on the specific discount instance and booking.
         /// </summary>
         /// <returns>A BookingDiscount.</returns>
+        public abstract DiscountType Type { get; }
+
         public abstract BookingDiscount CalculateBookingDiscount(Booking booking);
     }
 }

@@ -1,0 +1,172 @@
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Employees
+@using BellaHair.Ports.Treatments
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+
+@inject IEmployeeQuery EmployeeQuery
+@inject IEmployeeCommand EmployeeCommand
+@inject ITreatmentQuery TreatmentQuery
+@inject ISnackbar Snackbar
+
+<h3 style="text-align: center">Rediger medarbejder</h3>
+<br />
+<p style="text-align: center">Rediger medarbejderens oplysninger dér, hvor de skal ændres.</p>
+
+<EditForm EditContext="@editContext" OnValidSubmit="@UpdateEmployee">
+
+    <DataAnnotationsValidator/>
+
+    <div class="inputs-container">
+
+            <div>
+                <CreateEmployeeInputs EmployeeModel="EmployeeModel" />
+            </div>
+
+            <div class="inputs-items-container">
+                <CreateEmployeeTreatmentSelector @bind-Value="SelectedTreatmentIds" Treatments="_treatments"/>
+            </div>
+    </div>
+
+    <div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
+        <button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
+        <button class="btn-remove" type="reset" @onclick="@HandleReset">Nulstil ændringer</button>
+        <button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
+    </div>
+
+</EditForm>
+
+
+
+@code {
+    [Parameter, EditorRequired]
+    public required EventCallback OnUpdate { get; set; }
+
+    [Parameter, EditorRequired]
+    public required EventCallback OnCancel { get; set; }
+
+    [Parameter, EditorRequired]
+    public EmployeeViewModel? EmployeeToUpdate { get; set; }
+
+    public List<Guid> SelectedTreatmentIds { get; set; } = [];
+
+    private EditContext? editContext { get; set; }
+
+    public NewEmployeeModel EmployeeModel { get; set; } = new NewEmployeeModel();
+
+    private bool InputHasChanged;
+
+    private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
+
+    protected async override void OnInitialized()
+    {
+        if (EmployeeToUpdate != null)
+        {
+            await LoadTreatments();
+            InitializeViewModel();
+            SelectedTreatmentIds = EmployeeModel.TreatmentIds.ToList();
+        }        
+        else
+        {
+            Snackbar.Add("Noget gik galt.", Severity.Error);
+        }
+    }
+
+    private void InitializeViewModel()
+    {
+        MapViewModeltoNewModel();
+        editContext = new EditContext(EmployeeModel);
+        editContext.OnFieldChanged += HandleFieldChanged!;
+        InputHasChanged = false;
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        InputHasChanged = editContext!.IsModified();
+        StateHasChanged();
+    }
+
+    private async Task HandleCancel()
+    {
+        Snackbar.Add("Redigering blev afbrudt.", Severity.Warning);
+        await OnCancel.InvokeAsync();
+    }
+
+    private void HandleReset()
+    {
+        SelectedTreatmentIds = EmployeeToUpdate!.Treatments.Select(t => t.Id).ToList();
+        InitializeViewModel();
+        StateHasChanged();
+    }
+
+    private async Task UpdateEmployee()
+    {
+        try
+        {
+            if (EmployeeModel!.MiddleName == string.Empty) EmployeeModel.MiddleName = null;
+
+            var command = new UpdateEmployeeCommand(
+                EmployeeModel.Id,
+                EmployeeModel.FirstName,
+                EmployeeModel.LastName,
+                EmployeeModel.Email,
+                EmployeeModel.PhoneNumber,
+                EmployeeModel.StreetName,
+                EmployeeModel.CityName,
+                EmployeeModel.StreetNumber,
+                EmployeeModel.ZipCode,
+                SelectedTreatmentIds,
+                EmployeeModel.MiddleName,
+                EmployeeModel.Floor
+                );
+
+            await EmployeeCommand.UpdateEmployeeAsync(command);
+
+            Snackbar.Add($"Medarbejderen '{command.FirstName} {command.LastName}' blev opdateret", Severity.Success);
+
+            await OnUpdate.InvokeAsync();
+        }
+        
+        catch(DomainException e) 
+        {
+            Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
+        }
+        catch(Exception e)
+        {
+            Snackbar.Add($"Noget gik galt: {e.Message}", Severity.Error);
+        }
+
+    }
+
+    private void MapViewModeltoNewModel()
+    {
+        EmployeeModel!.Id = EmployeeToUpdate!.Id;
+        EmployeeModel.FirstName = EmployeeToUpdate.FirstName;
+        EmployeeModel.MiddleName = EmployeeToUpdate.MiddleName;
+        EmployeeModel.LastName = EmployeeToUpdate.LastName;
+        EmployeeModel.StreetName = EmployeeToUpdate.StreetName;
+        EmployeeModel.StreetNumber = EmployeeToUpdate.StreetNumber;
+        EmployeeModel.CityName = EmployeeToUpdate.City;
+        EmployeeModel.ZipCode = EmployeeToUpdate.ZipCode;
+        EmployeeModel.PhoneNumber = EmployeeToUpdate.PhoneNumber;
+        EmployeeModel.Email = EmployeeToUpdate.Email;
+        EmployeeModel.Floor = EmployeeToUpdate.Floor;
+        EmployeeModel.TreatmentIds = EmployeeToUpdate.Treatments.Select(t => t.Id).ToList() ?? [];
+    }
+
+    private async Task LoadTreatments()
+    {
+        try
+        {
+            var treatments = await TreatmentQuery.GetAllAsync();
+            _treatments = treatments
+                .OrderBy(t => t.Name)
+                .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Der skete en fejl under indlæsning af behandlinger: {ex.Message}", Severity.Error);
+        }
+    }
+
+}
