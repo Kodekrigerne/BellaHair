@@ -1,4 +1,7 @@
-﻿.ldc-card {
+﻿/* Dennis */
+/* Mikkel Klitgaard */
+
+.ldc-card {
     padding: 1rem;
     margin-bottom: 1rem;
     background: linear-gradient(to right, oklch(.97 .014 254.604), oklch(.977 .014 308.299)); /* blue-50, purple-50 */

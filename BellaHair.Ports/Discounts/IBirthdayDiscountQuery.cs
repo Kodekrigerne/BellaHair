@@ -1,5 +1,10 @@
 ﻿namespace BellaHair.Ports.Discounts
 {
+    // Mikkel Klitgaard
+    /// <summary>
+    /// Defines a query for retrieving the current birthday discount information asynchronously.
+    /// </summary>
+
     public interface IBirthdayDiscountQuery
     {
         Task<BirthdayDiscountDTO?> GetBirthdayDiscountAsync();
