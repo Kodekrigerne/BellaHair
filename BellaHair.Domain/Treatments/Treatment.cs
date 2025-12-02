@@ -17,7 +17,7 @@ namespace BellaHair.Domain.Treatments
         public string Name { get; private set; }
         public Price Price { get; private set; }
         public DurationMinutes DurationMinutes { get; private set; }
-        public IReadOnlyList<Employee> Employees;
+        public IReadOnlyList<Employee>? Employees;
 
 #pragma warning disable CS8618
         public Treatment() { }
@@ -26,7 +26,7 @@ namespace BellaHair.Domain.Treatments
         private Treatment(string treatmentName, Price price, DurationMinutes durationMinutes)
         {
             if (treatmentName.Any(c => !char.IsLetterOrDigit(c) && c != ' '))
-                throw new TreatmentException("Name of treatment should only consist of letters or numbers");
+                throw new TreatmentException("Behandlingsnavn må kun bestå af bogstaver og tal.");
 
             Id = Guid.NewGuid();
             Name = treatmentName;
