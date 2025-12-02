@@ -1,5 +1,11 @@
 ﻿namespace BellaHair.Domain.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Represents a snapshot of a product line on a booking. These should be used rather than product lines when a booking has been paid.
+    /// Contains all relevant information directly rather than containing a product snapshot
+    /// This should be owned and managed by Booking.
+    /// </summary>
     public record ProductLineSnapshot
     {
         public Guid ProductLineId { get; private init; }

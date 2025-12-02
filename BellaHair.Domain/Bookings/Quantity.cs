@@ -1,5 +1,9 @@
 ﻿namespace BellaHair.Domain.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Value object representing a quantity of an item. Must be a positive number.
+    /// </summary>
     public record Quantity
     {
         public int Value { get; private init; }

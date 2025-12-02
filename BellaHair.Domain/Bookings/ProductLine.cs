@@ -2,6 +2,11 @@
 
 namespace BellaHair.Domain.Bookings
 {
+    //Dennis
+    /// <summary>
+    /// Represents a product line on a booking with a quantity and a product.
+    /// Should be owned and managed by Booking.
+    /// </summary>
     public class ProductLine : EntityBase
     {
         public Quantity Quantity { get; private set; }
