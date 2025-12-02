@@ -13,6 +13,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
+
 <div class="header-and-employee">
     <div>
         <h3>Kalender</h3>
@@ -39,13 +40,14 @@
                                Culture="@dkCulture">
     <br />
 
+    @if (_bookings.Count == 0)
+    {
+        <p style="text-align: center; color: red">OBS: Den valgte medarbejder har ikke nogen bookings.</p>                
+    }
+
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(8))"
                     EndTime="@(TimeSpan.FromHours(19))"
                     MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
-
-    <RadzenDayView StartTime="@(TimeSpan.FromHours(8))"
-                   EndTime="@(TimeSpan.FromHours(19))"
-                   MinutesPerSlot="30" TimeFormat="HH:mm" />
 
     <RadzenMonthView />
 
@@ -58,45 +60,57 @@
     public List<BookingCalendarViewModel> _bookings { get; set; } = new List<BookingCalendarViewModel>();
     public List<EmployeeNameViewModel> _employees { get; set; } = new List<EmployeeNameViewModel>();
 
-    public DateTime currentDate = DateTime.Today;
+    public DateTime currentDate { get; set; }
     public Guid _pickedEmployeeId { get; set; }
 
-    // --- URL PARAMETERS ---
+    private bool _checkForInitialLoad = false;
+
     [SupplyParameterFromQuery(Name = "date")]
     public DateTime? UrlDate { get; set; }
-
     [SupplyParameterFromQuery(Name = "employeeId")]
     public Guid? UrlEmployeeId { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         await LoadEmployees();
+
+        if (UrlDate != null) currentDate = UrlDate.Value;
+        else currentDate = DateTime.Today;
+
+        // Vi sætter denne til sand så vi kan følge i OnLoadData() om data loades ifbm initialisering eller om det er til når vi ændrer på dato
+        _checkForInitialLoad = true;
     }
 
-    // 1. READ URL (Runs on page load and Back button)
     protected override async Task OnParametersSetAsync()
     {
-        // Restore Employee
+        // Henter medarbejder fra URLen
         if (UrlEmployeeId.HasValue && _employees.Any(e => e.Id == UrlEmployeeId.Value))
         {
             _pickedEmployeeId = UrlEmployeeId.Value;
         }
+
+        // Vælger første medarbejder på listen hvis URL ikke indeholder medarbejder
         else if (_pickedEmployeeId == Guid.Empty && _employees.Any())
         {
             _pickedEmployeeId = _employees.First().Id;
         }
 
-        // Restore Date (Only if different to avoid loop)
+        // Justerer datoen så den bliver sat til denne uges mandag (nødvendigt for at alt indlæses rigtigt)
+        UrlDate = DateToThisWeeksMonday(currentDate);
+
+        // Henter datoen fra URLen
         if (UrlDate.HasValue && UrlDate.Value.Date != currentDate.Date)
         {
             currentDate = UrlDate.Value;
         }
     }
 
-    // 2. LOAD DATA & WRITE URL
     private async Task OnLoadData(SchedulerLoadDataEventArgs args)
     {
-        // A. Load the data
+        if (_checkForInitialLoad) { args.Start = currentDate; args.End = currentDate.AddDays(7); scheduler.CurrentDate = args.Start; }
+        _checkForInitialLoad = false;
+
+
         if (_pickedEmployeeId != Guid.Empty)
         {
             await LoadBookings(args.Start, args.End, _pickedEmployeeId);
@@ -154,5 +168,23 @@
     private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<BookingCalendarViewModel> args)
     {
         NavigationManager.NavigateTo($"/booking/{args.Data.Id}");
+    }
+
+    private DateTime DateToThisWeeksMonday(DateTime dateToChange)
+    {
+        if (dateToChange.DayOfWeek != DayOfWeek.Monday)
+        {
+            // DayOfWeek enum: Sunday=0, Monday=1, ..., Saturday=6
+            int daysUntilTargetDay = (int)dateToChange.DayOfWeek;
+
+            // Udregner antal dage der skal trækkes fra til at gå til mandag.
+            // "+ 6) % 7" justerer for søndag (0 i enum) 
+            int daysToSubtract = (daysUntilTargetDay + 6) % 7;
+
+            // Use AddDays() with a negative value to go backwards.
+            return dateToChange.Date.AddDays(-daysToSubtract);
+        }
+
+        return dateToChange;
     }
 }
