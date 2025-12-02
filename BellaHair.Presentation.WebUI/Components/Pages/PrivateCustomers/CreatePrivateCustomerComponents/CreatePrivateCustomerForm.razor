@@ -1,4 +1,5 @@
-﻿@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+﻿@using BellaHair.Domain
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using System.Linq;
 @using BellaHair.Ports.Employees
@@ -74,6 +75,10 @@
 
 			await OnCreate.InvokeAsync();
 
+		}
+		catch (DomainException e)
+		{
+			Snackbar.Add($"{e.Message}", Severity.Error);
 		}
 		catch (Exception e)
 		{
