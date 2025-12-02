@@ -23,3 +23,37 @@
 .line{
     margin-top:10px;
 }
+
+.p-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.header-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.percent-wrapper {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    background-color: #920dfc;
+    color: white;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.icon-wrap {
+    margin-right: 6px;
+    font-weight: normal;
+}
+
+.bday-txt{
+
+    font-style:italic;
+}

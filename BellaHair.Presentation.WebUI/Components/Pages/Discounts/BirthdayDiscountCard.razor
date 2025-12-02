@@ -1,11 +1,17 @@
-﻿ 
+﻿@using BellaHair.Presentation.WebUI.Components.Shared
+ 
 <div class="bdc-card">
-	<div class="bdc-content">
-		<p class="bdc-title">@BirthdayDiscount.Name</p>
-		<p class="bdc-text">Gælder kun i kundens fødselsdagsmåned</p>
-		<hr class="line"/>
-		<p class="bdc-discount">Rabat: @((BirthdayDiscount.DiscountPercent * 100).ToString("0"))%</p>
+	<div class="header-wrapper">
+		<p class="p-header">@BirthdayDiscount.Name</p>
+		<div class="percent-wrapper">
+			<div class="icon-wrap">
+				<PercentIcon/> |
+			</div>
+			@((BirthdayDiscount.DiscountPercent * 100).ToString("0"))%
+		</div>
 	</div>
+	<hr />
+	<p class="bday-txt">Gælder på én behandling i hele måneden kunden har fødselsdag</p>
 </div>
 
 @code {
