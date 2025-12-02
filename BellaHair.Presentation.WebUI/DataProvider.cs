@@ -114,8 +114,8 @@ namespace BellaHair.Presentation.WebUI
         {
             _db.Add(LoyaltyDiscount.Create("Stamkunde Nikkel", 1, DiscountPercent.FromDecimal(0.01m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
-            _db.Add(LoyaltyDiscount.Create("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m)));
-            _db.Add(LoyaltyDiscount.Create("Stamkunde Guld", 15, DiscountPercent.FromDecimal(0.15m)));
+            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
+            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 15, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
         }
 
         private void AddEmployees()
