@@ -155,7 +155,7 @@ namespace BellaHair.Domain.Bookings
                 throw new BookingException("Afviklede bookinger kan først slettes dagen efter hvis ikke betalt.");
         }
 
-        public void Update(DateTime startDateTime, Employee employee, Treatment treatment, ICurrentDateTimeProvider currentDateTimeProvider)
+        public void Update(DateTime startDateTime, Employee employee, Treatment treatment, IEnumerable<ProductLineData> productLineDatas, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             var now = currentDateTimeProvider.GetCurrentDateTime();
 
@@ -168,6 +168,13 @@ namespace BellaHair.Domain.Bookings
             StartDateTime = startDateTime;
             Employee = employee;
             Treatment = treatment;
+
+            List<ProductLine> productLines = [];
+            foreach (var productLineData in productLineDatas)
+            {
+                var productLine = ProductLine.Create(productLineData.Quantity, productLineData.Product);
+                productLines.Add(productLine);
+            }
 
             UpdateEndDateTime();
         }
