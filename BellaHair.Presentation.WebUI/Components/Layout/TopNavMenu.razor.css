@@ -23,10 +23,15 @@
     <NavLink> renderes som et a-tag
 */
     .navbar ::deep a {
+        display:flex;
         color: #434141;
         text-align: center;
         padding: 14px;
         text-decoration: none;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap: 8px;
     }
         .navbar ::deep a:hover {
             background: #fbf5ff;
@@ -39,6 +44,7 @@
             color: #c216c2;
             border-radius: 16px;
             transition: background-color 0.5s;
+            font-weight: 600;
         }
 
 /* Main content (padding-top for at kunne se indhold under navigationsbar) */
@@ -48,3 +54,14 @@ main {
 }
 
 
+::deep .nav-icon {
+    height: 20px;
+    width: 20px;
+    display: inline-block;
+    flex-shrink: 0;
+    fill:#343434ff;
+}
+
+::deep .nav-icon.active{
+    fill: purple;
+}

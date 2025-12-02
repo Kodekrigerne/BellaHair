@@ -1,4 +1,6 @@
-﻿@*Mikkel Klitgaard*@
+﻿@using BellaHair.Presentation.WebUI.Components.Shared
+
+@*Mikkel Klitgaard*@
 
 @inject DataProvider DataProvider
 @inject NavigationManager NavigationManager
@@ -12,13 +14,12 @@
 	DataProvider.ReinstateData();
 	NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);})">Rebuild DB</button>
 
-	<NavLink href="" Match="NavLinkMatch.All">Hjem</NavLink>
-	<NavLink href="weather">Kalender</NavLink> @* Husk at ændre url-sti fra weather > kalender *@
+	<NavLink href="" Match="NavLinkMatch.All"><HomeIcon Class="nav-icon"/> Hjem</NavLink>
+	<NavLink href="weather"><VisitsIcon Class="nav-icon"/> Kalender</NavLink> @* Husk at ændre url-sti fra weather > kalender *@
 	<NavLink href="bookings">Bookings</NavLink>
-	<NavLink href="venteliste">Venteliste</NavLink>
-	<NavLink href="kunder">Kunder</NavLink>
-	<NavLink href="medarbejdere">Medarbejdere</NavLink>
-	<NavLink href="behandlinger">Behandlinger</NavLink>
+	<NavLink href="kunder"><PersonCheckmarkIcon Class="nav-icon"/> Kunder</NavLink>
+	<NavLink href="medarbejdere"><PersonCheckmarkIcon Class="nav-icon"/> Medarbejdere</NavLink>
+	<NavLink href="behandlinger"><TreatmentIcon Class="nav-icon"/> Behandlinger</NavLink>
 	<NavLink href="produkter">Produkter</NavLink>
-	<NavLink href="rabatter">Rabatter</NavLink>
+	<NavLink href="rabatter"><PercentIcon Class="nav-icon"/> Rabatter</NavLink>
 </div>
