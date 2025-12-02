@@ -1,0 +1,60 @@
+﻿/* Dennis */
+/* Mikkel Klitgaard */
+
+.ldc-card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, oklch(.97 .014 254.604), oklch(.977 .014 308.299)); /* blue-50, purple-50 */
+    border-style: solid;
+    border-width: 1px;
+    border-color: oklch(.882 .059 254.128); /* blue-200 */
+    border-radius: 8px;
+    position: relative;
+}
+
+.ldc-visits {
+    margin: 0px;
+    font-size: 12px;
+    color: grey;
+    margin-bottom: 2px;
+}
+
+::deep .delete-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.p-header {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+hr{
+    margin: 6px 0px 10px 0px;
+}
+
+.header-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.percent-wrapper {
+    display: flex;
+    align-items: center;
+    line-height: 1; 
+    background-color: #920dfc;
+    color: white;
+    padding: 5px 8px; 
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    width:70px;
+}
+
+.icon-wrap {
+    margin-right: 6px;
+    font-weight: normal;
+}

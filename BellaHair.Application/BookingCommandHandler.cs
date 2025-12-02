@@ -68,7 +68,7 @@ namespace BellaHair.Application
             var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider);
 
             //Den bedste rabat findes og tilføjes til bookingen
-            var discount = await _discountCalculatorService.GetBestDiscount(booking);
+            var discount = await _discountCalculatorService.GetBestDiscount(booking, true);
             if (discount != null) booking.SetDiscount(discount);
 
             await _bookingRepository.AddAsync(booking);
@@ -160,7 +160,7 @@ namespace BellaHair.Application
                 throw new DomainException("Kan ikke ændre booking som overlapper med eksisterende booking.");
 
             //Den bedste rabat findes og tilføjes til bookingen
-            var discount = await _discountCalculatorService.GetBestDiscount(booking);
+            var discount = await _discountCalculatorService.GetBestDiscount(booking, true);
             if (discount != null) booking.SetDiscount(discount);
 
             booking.Update(command.StartDateTime, employee, treatment, _currentDateTimeProvider);

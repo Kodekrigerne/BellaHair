@@ -47,7 +47,8 @@ namespace BellaHair.Infrastructure.Discounts
             //Det er nødvendigt at oprette en booking for at finde en rabat
             //Denne booking gemmes dog ikke
 
-            var discount = await _discountCalculatorService.GetBestDiscount(booking);
+
+            var discount = await _discountCalculatorService.GetBestDiscount(booking, query.IncludeBirthdayDiscount);
 
             return discount == null ? null : new BookingDiscountDTO(discount.Name, discount.Amount, (DiscountTypeDTO)discount.Type);
         }

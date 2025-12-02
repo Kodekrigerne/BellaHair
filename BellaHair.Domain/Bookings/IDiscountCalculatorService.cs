@@ -9,6 +9,6 @@ namespace BellaHair.Domain.Bookings
     //TODO: Kald denne i BookingCommandHandler.CreateBooking GetBestDiscount
     public interface IDiscountCalculatorService
     {
-        Task<BookingDiscount?> GetBestDiscount(Booking booking);
+        Task<BookingDiscount?> GetBestDiscount(Booking booking, bool includeBirthdayDiscount);
     }
 }
