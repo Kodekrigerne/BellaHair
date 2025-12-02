@@ -16,6 +16,7 @@
 @inject ISnackbar Snackbar;
 @inject ICampaignDiscountQuery CampaignDiscountQuery
 @inject IBirthdayDiscountQuery BirthdayDiscountQuery
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 <Modal IsVisible="@_showNewModal">
 <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign" OnCancel="HandleOnCancel"/>
@@ -124,7 +125,7 @@ else if (_activeTab == DiscountTab.Campaign)
 		{
 			var discounts = await CampaignDiscountQuery.GetAllAsync();
 
-			var now = DateTime.Now;
+			var now = CurrentDateTimeProvider.GetCurrentDateTime();
 
 			_discounts = discounts
 				.OrderByDescending(d => d.StartDate <= now && d.EndDate >= now)
