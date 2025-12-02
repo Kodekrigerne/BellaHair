@@ -23,7 +23,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            booking.Update(startDateTime, employee, treatment, dateTimeProvider.Object);
+            booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object);
 
             Assert.Multiple(() =>
             {
@@ -57,7 +57,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, dateTimeProvider.Object));
+            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, dateTimeProvider.Object));
+            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, dateTimeProvider.Object));
+            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
-            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, dateTimeProvider.Object));
+            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
     }
 }

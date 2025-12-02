@@ -21,7 +21,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
             //Act
-            var booking = Booking.Create(customer, employee, treatment, startDateTime, dateTimeProvider.Object);
+            var booking = Booking.Create(customer, employee, treatment, startDateTime, dateTimeProvider.Object, []);
 
             //Assert
             Assert.Multiple(() =>
@@ -56,7 +56,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
 
             //Act & Assert
             Assert.Throws<BookingException>(
-                () => Booking.Create(customer, employee, treatment2, DateTime.Now.AddMinutes(5), dateTimeProvider.Object));
+                () => Booking.Create(customer, employee, treatment2, DateTime.Now.AddMinutes(5), dateTimeProvider.Object, []));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
 
             //Act & Assert
             Assert.Throws<BookingException>(
-                () => Booking.Create(customer, employee, treatment2, DateTime.Now.AddMinutes(-5), dateTimeProvider.Object));
+                () => Booking.Create(customer, employee, treatment2, DateTime.Now.AddMinutes(-5), dateTimeProvider.Object, []));
         }
     }
 }
