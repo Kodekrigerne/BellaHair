@@ -125,7 +125,7 @@ else if (_activeTab == DiscountTab.Campaign)
 		{
 			var discounts = await CampaignDiscountQuery.GetAllAsync();
 
-			var now = CurrentDateTimeProvider.GetCurrentDateTime(); ;
+			var now = CurrentDateTimeProvider.GetCurrentDateTime();
 
 			_discounts = discounts
 				.OrderByDescending(d => d.StartDate <= now && d.EndDate >= now)
