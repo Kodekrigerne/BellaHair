@@ -29,56 +29,12 @@
 			</div>
 
 		</div>
+		<div>
+			<CreateEmployeeTreatmentSelector @bind-Value="SelectedTreatmentIds" Treatments="_treatments" />
 
-		<div class="inputs-items-container kk-container" style="border-radius: 8px">
-
-		<h5 style="margin-top: 2px;">Vælg behandlinger</h5>
-		<div style="height: 300px; overflow-y: scroll;">
-		<br />
-
-        <div class="treatments-container"> @* Container for column layout *@
-            @foreach (var treatment in _treatments)
-            {
-					// Logic for changing layout depending on whether item is selected.
-                    bool isSelected = SelectedTreatmentIds.Contains(treatment.Id);
-					string itemStyle = isSelected 
-						? "border: 2px solid #990dff; background-color: #f6e6fc; color: black; position: relative; cursor: pointer;" // Purple border, light purple background
-						: "border: 2px solid lightgrey; background-color: white; color: black; position: relative; cursor: pointer;"; // Grey border, white background
-                
-                
-                <div @onclick="@(() => ToggleTreatmentSelection(treatment.Id))" class="treatment-item" style="@(itemStyle)">
-                    
-						<div type="input" style="text-align: left;">@treatment.Name</div>
-							<div>
-								@if (isSelected)
-								{
-									<CheckedCirle/>
-								}
-								else
-								{
-									<UncheckedCircle/>
-								}
-							</div>
-
-						<div class="d-flex align-items-start" style="gap: 15px">
-
-						<div class="treatment-icon-format">
-							<DurationIcon Class="treatment-list-icon"/> <p class="treatment-text">@treatment.DurationMinutes min</p>
-						</div>
-
-						<div class="treatment-icon-format">
-							<p class="treatment-text">@treatment.Price.ToString("C")</p>
-						</div>
-					</div>
-
-                </div>
-            }
-			</div> 
-
-		</div>	
 			Valgt: @SelectedTreatmentIds.Count() behandlinger
 		</div>
-	</div>
+		</div>
 
 	<div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
 		 <button class="btn-add" type="submit">Opret</button>
@@ -109,23 +65,6 @@
 		_errorMessage = null;
 		_newEmployeeModel = new NewEmployeeModel();
 		await LoadTreatments();
-	}
-
-	private void ToggleTreatmentSelection(Guid treatmentId)
-	{
-		if (SelectedTreatmentIds.Contains(treatmentId))
-		{
-			// Hvis behandlingen er valgt, fjernes den fra de valgte behandlinger
-			SelectedTreatmentIds.Remove(treatmentId);
-		}
-		else
-		{
-			// Hvis den ikke i forvejen er valgt, tilføjes den til de valgte behandlinger
-			SelectedTreatmentIds.Add(treatmentId);
-		}
-
-		// Genindlæser/opdaterer komponentet med det valgte
-		StateHasChanged();
 	}
 
 	private void ClearTreatments()

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain;
+﻿using BellaHair.Domain;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
@@ -24,6 +19,43 @@ namespace BellaHair.Application.Employees
             _employeeRepo = employeeRepo;
             _treatmentRepo = treatmentRepo;
             _employeeFutureBookingsChecker = employeeFutureBookingsChecker;
+        }
+
+        public async Task UpdateEmployeeAsync(UpdateEmployeeCommand command)
+        {
+            var employeeToUpdate = await _employeeRepo.GetWithTreatmentsAsync(command.Id);
+
+            var updatedName = Name.FromStrings(
+                command.FirstName,
+                command.LastName,
+                command.MiddleName);
+
+            var updatedAddress = Address.Create(
+                command.StreetName,
+                command.City,
+                command.StreetNumber,
+                command.ZipCode,
+                command.Floor);
+
+
+
+            var treatmentsToRemove = employeeToUpdate.Treatments.Select(t => t.Id).ToList().Except(command.TreatmentIds);
+            if (await _employeeFutureBookingsChecker.EmployeeHasFutureBookingsWithTreatments(employeeToUpdate.Id, [.. treatmentsToRemove]))
+                throw new EmployeeException("Medarbejderen har fremtidige bookinger med den behandling, du forsøger at fjerne.");
+
+            var updatedTreatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
+
+            var updatedPhoneNumber = PhoneNumber.FromString(command.PhoneNumber);
+            var updatedEmail = Email.FromString(command.Email);
+
+            employeeToUpdate.Update(
+                updatedName,
+                updatedEmail,
+                updatedPhoneNumber,
+                updatedAddress,
+                updatedTreatments);
+
+            await _employeeRepo.SaveChangesAsync();
         }
 
         async Task IEmployeeCommand.CreateEmployeeCommand(CreateEmployeeCommand command)

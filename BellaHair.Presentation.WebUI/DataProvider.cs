@@ -64,9 +64,16 @@ namespace BellaHair.Presentation.WebUI
             AddEmployees();
             AddBookings();
             AddCampaignDiscounts();
+            AddBirthdayDiscounts();
 
             _db.SaveChanges();
         }
+
+        private void AddBirthdayDiscounts()
+        {
+            _db.Add(BirthdayDiscount.Create("Fødselsdagsrabat", DiscountPercent.FromDecimal(0.50m)));
+        }
+
 
         private void AddCampaignDiscounts()
         {

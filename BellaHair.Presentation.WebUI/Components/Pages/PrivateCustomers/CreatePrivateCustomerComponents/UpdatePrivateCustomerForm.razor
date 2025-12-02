@@ -130,7 +130,7 @@
 		}
 		catch (DomainException e)
 		{
-			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+			Snackbar.Add(e.Message, Severity.Error);
 		}
 		catch (Exception e)
 		{

@@ -1,47 +1,58 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BellaHair.Presentation.WebUI.Components.Shared.ValidationAttributes;
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel.DataAnnotations;
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents
 {
     public class NewEmployeeModel
     {
 
-        [Required(ErrorMessage = "Fornavn er påkrævet")]
-        [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Fornavn må ikke indeholde specialtegn.")]
-        public string FirstName { get; set; } = string.Empty;
+        public Guid Id;
+        private string _firstName = string.Empty;
+        private string? _middleName = string.Empty;
+        private string _lastName = string.Empty;
+        private string _streetName = string.Empty;
+        private string _city = string.Empty;
+        private string _streetNumber = string.Empty;
+        private string _phoneNumber = string.Empty;
+        private string _email = string.Empty;
 
-        [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Mellemnavn må ikke indeholde specialtegn.")]
-        public string? MiddleName { get; set; } = "";
+        [Required(ErrorMessage = "Fornavn er påkrævet")]
+        [LettersDashOnly]
+        public string FirstName { get => _firstName; set => _firstName = value.Trim(); }
+
+        [LettersDashOnly]
+        public string? MiddleName { get => _middleName; set => _middleName = value?.Trim(); }
 
         [Required(ErrorMessage = "Efternavn er påkrævet")]
-        [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Efternavn må ikke indeholde specialtegn.")]
-        public string LastName { get; set; } = string.Empty;
+        [LettersDashOnly]
+        public string LastName { get => _lastName; set => _lastName = value.Trim(); }
 
         [Required(ErrorMessage = "Email er påkrævet")]
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Email er ikke udfyldt korrekt.")]
-        public string Email { get; set; } = string.Empty;
+        [Email]
+        public string Email { get => _email; set => _email = value.Trim(); }
 
         [Required(ErrorMessage = "Telefonnummer er påkrævet")]
-        [Phone(ErrorMessage = "Telefonnummer er ikke udfyldt korrekt.")]
-        [RegularExpression(@"^\d{8}$", ErrorMessage = "Telefonnummer skal være 8 cifre.")]
-        public string PhoneNumber { get; set; } = string.Empty;
+        [DanishPhoneNumber]
+        public string PhoneNumber { get => _phoneNumber; set => _phoneNumber = value.Trim(); }
 
         [Required(ErrorMessage = "Vejnavn er påkrævet")]
-        [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Vejnavn må ikke indeholde specialtegn.")]
-        public string StreetName { get; set; } = string.Empty;
+        [LettersNumbersOnly]
+        public string StreetName { get => _streetName; set => _streetName = value.Trim(); }
 
         [Required(ErrorMessage = "Bynavn er påkrævet")]
-        [RegularExpression(@"^[\p{L}\s.'-]+$", ErrorMessage = "Bynavn må ikke indeholde specialtegn.")]
-        public string CityName { get; set; } = string.Empty;
+        [LettersDashWhiteSpaceOnly]
+        public string CityName { get => _city; set => _city = value.Trim(); }
 
         [Required(ErrorMessage = "Vejnummer er påkrævet")]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Vejnummer skal være et tal.")]
-        public string StreetNumber { get; set; } = string.Empty;
+        [LettersNumbersOnly]
+        public string StreetNumber { get => _streetNumber; set => _streetNumber = value.Trim(); }
 
         [Required(ErrorMessage = "Postnummer er påkrævet")]
-        [RegularExpression(@"^\d{4}$", ErrorMessage = "Postnummer skal bestå af 4 tal.")]
+        [ZipCode]
         public int ZipCode { get; set; }
 
+        [NumbersOnly]
         public int? Floor { get; set; }
 
         public IEnumerable<Guid> TreatmentIds { get; set; } = [];

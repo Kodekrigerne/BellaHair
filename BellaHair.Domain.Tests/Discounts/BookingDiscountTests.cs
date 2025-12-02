@@ -11,9 +11,10 @@ namespace BellaHair.Domain.Tests.Discounts
             //Arrange
             var name = "Test Name";
             var discountAmount = 5.25m;
+            var type = DiscountType.CampaignDiscount;
 
             //Act
-            var bookingDiscount = BookingDiscount.Active(name, discountAmount);
+            var bookingDiscount = BookingDiscount.Active(name, discountAmount, type);
 
             //Assert
             Assert.Multiple(() =>
@@ -29,9 +30,10 @@ namespace BellaHair.Domain.Tests.Discounts
         {
             //Arrange
             var name = "Test Name";
+            var type = DiscountType.LoyaltyDiscount;
 
             //Act
-            var bookingDiscount = BookingDiscount.Inactive(name);
+            var bookingDiscount = BookingDiscount.Inactive(name,type);
 
             //Assert
             Assert.Multiple(() =>

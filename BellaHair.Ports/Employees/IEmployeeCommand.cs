@@ -15,10 +15,34 @@ namespace BellaHair.Ports.Employees
     {
         Task CreateEmployeeCommand(CreateEmployeeCommand command);
         Task DeleteEmployeeCommand(DeleteEmployeeCommand command);
+        Task UpdateEmployeeAsync(UpdateEmployeeCommand command);
     }
 
-    public record CreateEmployeeCommand(string FirstName, string LastName, string
-        Email, string PhoneNumber, string StreetName, string City, string StreetNumber, int ZipCode, IEnumerable<Guid> TreatmentIds, string? MiddleName = null, int? Floor = null);
+    public record CreateEmployeeCommand(string FirstName,
+                                        string LastName,
+                                        string Email,
+                                        string PhoneNumber,
+                                        string StreetName,
+                                        string City,
+                                        string StreetNumber,
+                                        int ZipCode,
+                                        IEnumerable<Guid> TreatmentIds,
+                                        string? MiddleName = null,
+                                        int? Floor = null);
+
+    public record UpdateEmployeeCommand(Guid Id,
+                                        string FirstName,
+                                        string LastName,
+                                        string Email,
+                                        string PhoneNumber,
+                                        string StreetName,
+                                        string City,
+                                        string StreetNumber,
+                                        int ZipCode,
+                                        IEnumerable<Guid> TreatmentIds,
+                                        string? MiddleName = null,
+                                        int? Floor = null);
 
     public record DeleteEmployeeCommand(Guid Id);
+
 }

@@ -1,4 +1,5 @@
 using BellaHair.Application;
+using BellaHair.Application.Invoices;
 using BellaHair.Infrastructure;
 using BellaHair.Presentation.WebUI.Components;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,12 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddInfrastructureServices();
 
             builder.Services.AddScoped<DataProvider>();
+
+            builder.Services.Configure<BusinessInfoSettings>(
+                builder.Configuration.GetSection(BusinessInfoSettings.SectionName));
+
+            builder.Services.Configure<OpeningTimesSettings>(
+                builder.Configuration.GetSection(OpeningTimesSettings.SectionName));
 
             builder.Services.AddMudServices(config =>
             {

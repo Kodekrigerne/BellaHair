@@ -1,14 +1,28 @@
 ﻿@using System.Globalization
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings.Icons
+@using BellaHair.Presentation.WebUI.Components.Shared
+@using BellaHair.Ports.Invoices
+@inject IInvoiceQuery InvoiceQuery
+
+@rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+@inject IBookingCommand BookingCommand;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider;
 
-<button class="bc-container" @onclick="HandleBookingClick">
+<div class="bc-container" @onclick="HandleBookingClick">
 	<div class="bc-header">
 		<p class="bc-customer">@Booking.CustomerFullName</p>
 		<div>
 			<p class="bc-date">@Booking.Date.ToString("dddd, MMMM dd, yyyy", new CultureInfo("da-DK"))</p>
 			<p class="bc-time">@Booking.StartTime - @Booking.EndTime</p>
+		</div>
+		<div style="display: flex; flex-direction: row; gap: 2px;">
+			<EditButton Class="@(CanEdit() ? "edit-active" : "btn-inactive")" Title="@(CanEdit() ? null : "Denne booking kan ikke redigeres")" OnClick="HandleEditClick" />
+			<BinDeleteButton Class="@(CanDelete() ? "" : "btn-inactive")" Title="@(CanDelete() ? null : "Denne booking kan ikke slettes")" OnClick="HandleDeleteClick" />
 		</div>
 	</div>
 	<div class="bc-body">
@@ -19,7 +33,7 @@
 			</div>
 
 			<div class="bc-duration">
-				<DurationIcon Class="bc-duration-icon" />
+				<BookingDurationIcon Class="bc-duration-icon" />
 				<span>@Booking.DurationMinutes min</span>
 			</div>
 
@@ -30,27 +44,74 @@
 		</div>
 
 		<div class="bc-body-right">
-			@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
-			{
-				<div class="bc-price">
-					<span>Total:</span>
-					<span style="margin-right: 2rem;">@Booking.Total.ToString("C2")</span>
+			<div class="bc-price">
+				@if (WarnNotPaid()) { <span style="color: red;">Denne booking er ikke betalt</span> }
+				<span style="margin-left: 2rem;">Total:</span>
+				<span>@Booking.TotalBase.ToString("C2")</span>
+				@if (Booking.DiscountName != null || Booking.DiscountAmount != null)
+				{
 					<DiscountIcon Class="bc-discount-icon" />
 					<span>Rabat: @Booking.DiscountName</span>
 					<span>-@Booking.DiscountAmount!.Value.ToString("C2")</span>
-				</div>
-			}
+					<span style="margin-left: 2rem;">Total med rabat: @Booking.TotalWithDiscount.ToString("C2")</span>
+				}
+			</div>
 		</div>
 	</div>
-</button>
+</div>
 
 @code {
 	[Parameter, EditorRequired]
 	public required BookingViewModel Booking { get; set; }
 
+	[Parameter]
+	public EventCallback<Guid> OnClickDelete { get; set; }
+
+	private DateTime _now;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+	}
+
 	private void HandleBookingClick()
 	{
 		NavigationManager.NavigateTo($"/booking/{Booking.Id}");
+	}
+
+	private void HandleEditClick()
+	{
+		if (!CanEdit()) return;
+
+		NavigationManager.NavigateTo($"/booking/{Booking.Id}/rediger");
+	}
+
+	private async Task HandleDeleteClick()
+	{
+		if (!CanDelete()) return;
+		
+		if (OnClickDelete.HasDelegate) await OnClickDelete.InvokeAsync(Booking.Id);
+	}
+
+	private bool CanEdit()
+	{
+		if (Booking.IsPaid) return false;
+		if (Booking.StartDateTime < _now) return false;
+		return true;
+	}
+
+	private bool CanDelete()
+	{
+		if (Booking.IsPaid) return false;
+		if (Booking.StartDateTime < _now && Booking.StartDateTime.Date == _now.Date) return false;
+		return true;
+	}
+
+	private bool WarnNotPaid()
+	{
+		return !Booking.IsPaid && Booking.EndDateTime < _now;
 	}
 }
 
@@ -65,6 +126,8 @@
 		transition: box-shadow 0.2s ease, border 0.2s ease;
 		display: block;
 		width: 100%;
+		cursor: pointer;
+		user-select: none;
 	}
 
 
@@ -74,11 +137,12 @@
 		}
 
 	.bc-header {
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr auto auto;
 		align-items: flex-start;
 		margin-bottom: 1rem;
 		border-bottom: 1px solid #f0f0f0;
+		gap: 2rem;
 	}
 
 	.bc-customer {
@@ -102,6 +166,23 @@
 		font-size: 1.10rem;
 		color: black;
 	}
+
+	.btn-inactive {
+		color: lightgrey;
+	}
+
+	.btn-inactive .edit-icon {
+		fill: lightgrey !important;
+	}
+
+		.btn-inactive:hover {
+			background: none;
+			cursor: default;
+		}
+
+		.btn-inactive:active {
+			transform: none;
+		}
 
 	.bc-body {
 		display: flex;
@@ -159,6 +240,7 @@
 	}
 
 	.bc-discount-icon {
+		margin-left: 2rem;
 		color: #177000;
 	}
 

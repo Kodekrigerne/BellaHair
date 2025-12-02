@@ -1,0 +1,276 @@
+﻿<!-- Dennis -->
+
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees
+@using System.Globalization
+@using Microsoft.Extensions.Options
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IOptions<OpeningTimesSettings> OpeningTimes
+
+<div class="day-container">
+    <div class="day-header">
+        <button @onclick="HandlePreviousDateClick" class="nav-button">&lt;</button>
+        <span class="current-date">@CurrentDate.ToString("dddd, dd. MMMM yyyy", new CultureInfo("da-DK"))</span>
+        <button @onclick="HandleNextDateClick" class="nav-button">&gt;</button>
+    </div>
+
+    <div class="calendar-wrapper">
+        <div class="day-calendar-header">
+            <div class="header-spacer"></div>
+            @foreach (var hour in _hours)
+            {
+                <div class="hour-marker">
+                    <span class="hour-label">@hour:00</span>
+                </div>
+            }
+        </div>
+
+        <div class="day-calendar">
+            @foreach (var employee in EmployeeBookingData)
+            {
+                <div class="day-row">
+                    <div class="employee-name">
+                        <span>@employee.Name</span>
+                    </div>
+                    <div class="day-hours">
+                        @foreach (var hour in _hours)
+                        {
+                            <div class="day-hour"></div>
+                        }
+                        @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate.Date))
+                        {
+                            <div @onclick="@(() => HandleBookingClick(booking.Id))" class="appointment"
+                                 style="left: @(GetBookingStart(booking))rem; width: @(GetBookingWidth(booking))rem;"
+                                 title="@booking.StartDateTime.ToString("HH:mm") - @booking.EndDateTime.ToString("HH:mm")">
+                                @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required DateTime CurrentDate { get; set; }
+
+    [Parameter, EditorRequired]
+    public required List<EmployeeNameWithBookingsViewModel> EmployeeBookingData { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> CurrentDateChanged { get; set; }
+
+    private int[] _hours = [];
+    private const int HourWidthRem = 4;
+    private const int MinutesPerHour = 60;
+    private int _openingHour;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _hours = Enumerable.Range(OpeningTimes.Value.OpeningTime.Hour, (OpeningTimes.Value.ClosingTime.Hour - OpeningTimes.Value.OpeningTime.Hour)).ToArray();
+        _openingHour = OpeningTimes.Value.OpeningTime.Hour;
+    }
+
+    private double GetBookingStart(BookingTimesOnlyViewModel booking)
+    {
+        var openingTime = booking.StartDateTime.Date.AddHours(_openingHour);
+        var minutesSinceOpeningTime = (booking.StartDateTime - openingTime).TotalMinutes;
+        return (minutesSinceOpeningTime / MinutesPerHour) * HourWidthRem;
+    }
+
+    private double GetBookingWidth(BookingTimesOnlyViewModel booking)
+    {
+        var durationMinutes = (booking.EndDateTime - booking.StartDateTime).TotalMinutes;
+        return (durationMinutes / MinutesPerHour) * HourWidthRem;
+    }
+
+    private async Task HandleBookingClick(Guid id)
+    {
+        //Blazor kan ikke åbne links i ny tab, så vi bruger blazors javascript runtime til det
+        await JSRuntime.InvokeVoidAsync("open", NavigationManager.BaseUri + $"booking/{id}", "_blank");
+    }
+
+    private async Task HandlePreviousDateClick()
+    {
+        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(-1));
+    }
+
+    private async Task HandleNextDateClick()
+    {
+        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(1));
+    }
+}
+
+<style>
+    :root {
+        --hour-width: 4rem;
+        --hour-height: 3.5rem;
+        --employee-name-width: 10rem;
+        --border-color: #e0e0e0;
+        --header-bg: #f5f5f5;
+        --text-primary: #333;
+    }
+
+    .day-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        width: fit-content;
+    }
+
+    .day-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        padding: 0.5rem;
+        background: var(--header-bg);
+        border-radius: 6px;
+    }
+
+    .current-date {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        text-transform: capitalize;
+    }
+
+    .nav-button {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        color: var(--text-primary);
+    }
+
+        .nav-button:hover {
+            background: #f0f0f0;
+            border-color: #999;
+        }
+
+        .nav-button:active {
+            transform: scale(0.95);
+        }
+
+    .calendar-wrapper {
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+    }
+
+    .day-calendar-header {
+        display: flex;
+        background: var(--header-bg);
+        border-bottom: 2px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .header-spacer {
+        width: var(--employee-name-width);
+        min-width: var(--employee-name-width);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .hour-marker {
+        width: var(--hour-width);
+        padding: 0.75rem 0;
+        text-align: center;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .hour-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #666;
+    }
+
+    .day-calendar {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .day-row {
+        display: flex;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+    .employee-name {
+        width: var(--employee-name-width);
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        background: #fafafa;
+        border-right: 1px solid var(--border-color);
+    }
+
+    .day-hours {
+        display: flex;
+        position: relative;
+        min-height: var(--hour-height);
+    }
+
+    .day-hour {
+        height: var(--hour-height);
+        width: var(--hour-width);
+        border-right: 1px solid var(--border-color);
+        position: relative;
+    }
+
+        .day-hour::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #f0f0f0;
+        }
+
+    .appointment {
+        position: absolute;
+        background: #4CAF50;
+        height: calc(var(--hour-height) - 8px);
+        top: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        padding: 0 0.5rem;
+        overflow: hidden;
+        z-index: 5;
+    }
+
+        .appointment:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            z-index: 6;
+        }
+
+    .appointment-time {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+    }
+</style>

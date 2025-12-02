@@ -13,11 +13,23 @@ namespace BellaHair.Infrastructure.Discounts
 
         public DiscountCalculatorService(BellaHairContext db) => _db = db;
 
-        async Task<BookingDiscount?> IDiscountCalculatorService.GetBestDiscount(Booking booking)
+        async Task<BookingDiscount?> IDiscountCalculatorService.GetBestDiscount(Booking booking, bool includeBirthdayDiscount)
         {
             BookingDiscount? bestBookingDiscount = null;
+            List<DiscountBase> discounts;
 
-            var discounts = _db.Discounts.AsNoTracking().ToList();
+            var allDiscounts = await _db.Discounts.AsNoTracking().ToListAsync();
+
+            if (!includeBirthdayDiscount)
+            {
+                discounts = allDiscounts
+                    .Where(d => d.Type != DiscountType.BirthdayDiscount)
+                    .ToList();
+            }
+            else
+            {
+                 discounts = allDiscounts;
+            }
 
             List<Task> tasks = [];
 

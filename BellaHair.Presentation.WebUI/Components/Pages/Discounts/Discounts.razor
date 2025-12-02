@@ -15,47 +15,56 @@
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
 @inject ISnackbar Snackbar;
 @inject ICampaignDiscountQuery CampaignDiscountQuery
+@inject IBirthdayDiscountQuery BirthdayDiscountQuery
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 <Modal IsVisible="@_showNewModal">
-	@if (_activeTab == DiscountTab.Loyalty) { <p>Ny stamkunderabat</p> }
-	@if (_activeTab == DiscountTab.Campaign) { <CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign" OnCancel="HandleOnCancel"/> }
+<CreateCampaignDiscountForm OnCreate="HandleOnCreateCampaign" OnCancel="HandleOnCancel"/>
 </Modal>
 
-<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="@_newButtonText" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
+<PageHeader HeaderText="Rabatter" HeaderSubText="Administrer og tilføj rabatter" NewButtonText="Ny Kampagnerabat" OnNewButtonClicked="@(() => { _showNewModal = true; })"/>
 
-<div>
-	<button @onclick="HandleLoyaltySelectorClick" class="@(_activeTab == DiscountTab.Loyalty ? "btn-select-active" : "btn-select")">Stamkunderabatter (@LoyaltyCount)</button>
+<div style="margin-bottom:20px;">
+	<button @onclick="HandleGeneralSelectorClick" class="@(_activeTab == DiscountTab.General ? "btn-select-active" : "btn-select")">Generelt</button>
 	<button @onclick="HandleCampaignSelectorClick" class="@(_activeTab == DiscountTab.Campaign ? "btn-select-active" : "btn-select")">Kampagnerabatter (@CampaignCount)</button>
+	<hr />
 </div>
 
-<div class="kk-container">
-	@if (_discounts == null) { <p>Loading</p> }
-	else if (_activeTab == DiscountTab.Loyalty)
-	{
+@if (_discounts == null) { <p>Loading</p> }
+else if (_activeTab == DiscountTab.General)
+{
+	<h4>Stamkunderabat (@LoyaltyCount)</h4>
+
+	<div class="kk-container">
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
 			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteLoyaltyClick"/>
 		}
-	}
-	else if (_activeTab == DiscountTab.Campaign)
+	</div>
+
+	<h4>Fødselsdagsrabat</h4>
+
+	<div class="kk-container">
+
+		<BirthdayDiscountCard BirthdayDiscount="_birthdayDiscount"/>
+
+	</div>
+}
+else if (_activeTab == DiscountTab.Campaign)
+{
+
+	<h4>Kampagnerabatter</h4>
+	<div class="kk-container">
+	@foreach (var campaignDiscount in _discounts.OfType<CampaignDiscountViewModel>())
 	{
-		@foreach (var campaignDiscount in _discounts.OfType<CampaignDiscountViewModel>())
-		{
-			<CampaignDiscountCard CampaignDiscount="campaignDiscount" OnDelete="@HandleOnDeleteCampaignClick"></CampaignDiscountCard>
-		}
+		<CampaignDiscountCard CampaignDiscount="campaignDiscount" OnDelete="@HandleOnDeleteCampaignClick"></CampaignDiscountCard>
 	}
-</div>
+	</div>
+}
 
 @code {
-	private enum DiscountTab { Loyalty, Campaign }
+	private enum DiscountTab { General, Campaign }
 	private DiscountTab _activeTab;
-
-	private string _newButtonText => _activeTab switch
-	{
-		DiscountTab.Loyalty => "Ny stamkunderabat",
-		DiscountTab.Campaign => "Ny kampagnerabat",
-		_ => "Ny"
-	};
 
 	private bool _showNewModal = false;
 
@@ -63,13 +72,14 @@
 	private int LoyaltyCount;
 	private int CampaignCount;
 
+	private BirthdayDiscountViewModel? _birthdayDiscount;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
 		await UpdateCounts();
-		await HandleLoyaltySelectorClick();
+		await HandleGeneralSelectorClick();
 	}
 
 	private async Task HandleOnCreateCampaign()
@@ -87,18 +97,23 @@
 	}
 
 
-	private async Task HandleLoyaltySelectorClick()
+	private async Task HandleGeneralSelectorClick()
 	{
 		try
 		{
-			var discounts = await LoyaltyDiscountQuery.GetAllAsync();
+			var loyaltyDiscounts = await LoyaltyDiscountQuery.GetAllAsync();
 
-			_discounts = discounts
-			.OrderBy(d => d.Name)
+			_discounts = loyaltyDiscounts
+			.OrderBy(d => d.MinimumVisits)
 			.Select(d => (IDiscountViewModel)(new LoyaltyDiscountViewModel(d.Id, d.Name, d.MinimumVisits, d.DiscountPercent)))
 			.ToList();
 
-			_activeTab = DiscountTab.Loyalty;
+			var birthdayDiscount = await BirthdayDiscountQuery.GetBirthdayDiscountAsync();
+
+			if (birthdayDiscount != null)
+				_birthdayDiscount = new BirthdayDiscountViewModel(birthdayDiscount.Id, birthdayDiscount.Name, birthdayDiscount.DiscountPercent);
+
+			_activeTab = DiscountTab.General;
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
@@ -110,8 +125,11 @@
 		{
 			var discounts = await CampaignDiscountQuery.GetAllAsync();
 
+			var now = CurrentDateTimeProvider.GetCurrentDateTime(); ;
+
 			_discounts = discounts
-				.OrderBy(d => d.StartDate)
+				.OrderByDescending(d => d.StartDate <= now && d.EndDate >= now)
+				.ThenBy(d => d.StartDate)
 				.Select(d => (IDiscountViewModel)new CampaignDiscountViewModel(
 					d.Id, d.Name, d.DiscountPercent, d.StartDate, d.EndDate, d.Treatments.ToList()
 					)).ToList();
@@ -133,7 +151,7 @@
 	{
 		//Hvis discount er null opdateres alle counts (første tjek)
 		//Hvis discount er angivet opdateres kun den forbundne count (andet tjek)
-		if (discount == null || discount == DiscountTab.Loyalty) LoyaltyCount = await LoyaltyDiscountQuery.GetCountAsync();
+		if (discount == null || discount == DiscountTab.General) LoyaltyCount = await LoyaltyDiscountQuery.GetCountAsync();
 		if (discount == null || discount == DiscountTab.Campaign) CampaignCount = await CampaignDiscountQuery.GetCountAsync();
 	}
 
@@ -141,7 +159,7 @@
 	private async Task HandleOnDeleteLoyaltyClick(Guid Id)
 	{
 		_discounts = _discounts?.Where(d => d.Id != Id).ToList();
-		await UpdateCounts(DiscountTab.Loyalty);
+		await UpdateCounts(DiscountTab.General);
 	}
 
 	private async Task HandleOnDeleteCampaignClick(Guid id)

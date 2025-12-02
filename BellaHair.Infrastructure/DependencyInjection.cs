@@ -1,17 +1,21 @@
-﻿using BellaHair.Domain;
+﻿using BellaHair.Application;
+using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
+using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
+using BellaHair.Infrastructure.Invoices;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
+using BellaHair.Ports.Invoices;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +33,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<ILoyaltyDiscountQuery, LoyaltyDiscountQueryHandler>();
             serviceCollection.AddScoped<ICampaignDiscountRepository, CampaignDiscountRepository>();
             serviceCollection.AddScoped<ICampaignDiscountQuery, CampaignDiscountQueryHandler>();
+            serviceCollection.AddScoped<IBirthdayDiscountQuery, BirthdayDiscountQueryHandler>();
 
             serviceCollection.AddScoped<IEmployeeRepository, EmployeeRepository>();
             serviceCollection.AddScoped<IEmployeeQuery, EmployeeQueryHandler>();
@@ -41,6 +46,7 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();
             serviceCollection.AddScoped<IPCustomerFutureBookingChecker, PCustomerFutureBookingChecker>();
             serviceCollection.AddScoped<ICustomerVisitsService, CustomerVisitsService>();
+            serviceCollection.AddScoped<ICustomerOverlapChecker, CustomerOverlapChecker>();
 
             serviceCollection.AddScoped<ICurrentDateTimeProvider, CurrentDateTimeProvider>();
 
@@ -49,6 +55,13 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IBookingOverlapChecker, BookingOverlapChecker>();
             serviceCollection.AddScoped<IFutureBookingWithTreatmentChecker, FutureBookingWithTreatmentChecker>();
 
+            serviceCollection.AddScoped<IInvoiceQuery, InvoiceQueryHandler>();
+
+            serviceCollection.AddScoped<IInvoiceRepository, InvoiceRepository>();
+
+            serviceCollection.AddScoped<IEmailService, EmailService>();
+
+            serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return serviceCollection;
         }

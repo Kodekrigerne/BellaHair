@@ -36,12 +36,31 @@ namespace BellaHair.Infrastructure.Employees
         }
 
         // Henter alle medarbejdere med færre detaljer til overblikket
-        async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
+        async Task<List<EmployeeDTOFull>> IEmployeeQuery.GetAllEmployeesAsync()
         {
             var emp = await _db.Employees
                 .AsNoTracking()
-                .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName, x.PhoneNumber.Value, x.Email.Value, x.Treatments.Select(x => x.Name).ToList()))
-                .ToListAsync();
+                .Select(employee => new EmployeeDTOFull(employee.Id,
+                                                        employee.Name.FirstName,
+                                                        employee.Name.MiddleName ?? "",
+                                                        employee.Name.LastName,
+                                                        employee.Name.FullName,
+                                                        employee.Email.Value,
+                                                        employee.PhoneNumber.Value,
+                                                        employee.Address.StreetName,
+                                                        employee.Address.City,
+                                                        employee.Address.StreetNumber,
+                                                        employee.Address.ZipCode,
+                                                        employee.Address.FullAddress,
+                                                            employee.Treatments.Select(e => new TreatmentDTO(
+                                                                e.Id,
+                                                                e.Name,
+                                                                e.Price.Value,
+                                                                e.DurationMinutes.Value,
+                                                                e.Employees.Count)).ToList(),
+
+                                                        employee.Address.Floor))
+                                                        .ToListAsync();
 
             return emp;
         }
@@ -72,12 +91,14 @@ namespace BellaHair.Infrastructure.Employees
                 employee.Name.FirstName,
                 employee.Name.MiddleName ?? "",
                 employee.Name.LastName,
+                employee.Name.FullName,
                 employee.Email.Value,
                 employee.PhoneNumber.Value,
                 employee.Address.StreetName,
                 employee.Address.City,
                 employee.Address.StreetNumber,
                 employee.Address.ZipCode,
+                employee.Address.FullAddress,
                 treatments,
                 employee.Address.Floor);
         }
@@ -95,10 +116,9 @@ namespace BellaHair.Infrastructure.Employees
                     e.Bookings
                         .Where(b => b.EndDateTime > now)
                         .Select(b => new BookingTimesOnlyDTO(
+                            b.Id,
                             b.StartDateTime,
-                            b.EndDateTime,
-                            b.Treatment!.DurationMinutes.Value)
-                            )
+                            b.EndDateTime))
                 .ToList()))
                 .FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Employee {query.Id} not found.");
         }
@@ -116,10 +136,9 @@ namespace BellaHair.Infrastructure.Employees
                     e.Bookings
                         .Where(b => b.EndDateTime > now)
                         .Select(b => new BookingTimesOnlyDTO(
+                            b.Id,
                             b.StartDateTime,
-                            b.EndDateTime,
-                            b.Treatment!.DurationMinutes.Value)
-                            )
+                            b.EndDateTime))
                         .ToList()))
                 .ToListAsync();
         }

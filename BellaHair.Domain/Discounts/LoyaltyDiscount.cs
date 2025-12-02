@@ -9,6 +9,7 @@ namespace BellaHair.Domain.Discounts
     public class LoyaltyDiscount : DiscountBase
     {
         public string Name { get; private init; }
+        public override DiscountType Type => DiscountType.LoyaltyDiscount;
         public int MinimumVisits { get; private init; }
         public DiscountPercent DiscountPercent { get; private init; }
 
@@ -31,11 +32,12 @@ namespace BellaHair.Domain.Discounts
         public override BookingDiscount CalculateBookingDiscount(Booking booking)
         {
             if (booking.Customer == null) throw new InvalidOperationException("Customer must be included with Booking in order to calculate discount");
+            if (booking.Treatment == null) throw new InvalidOperationException("Treatment must be included with Booking in order to calculate discount");
 
-            if (booking.Customer.Visits < MinimumVisits) return BookingDiscount.Inactive(Name);
+            if (booking.Customer.Visits < MinimumVisits) return BookingDiscount.Inactive(Name, Type);
 
-            var discountAmount = booking.Total * DiscountPercent.Value;
-            return BookingDiscount.Active(Name, discountAmount);
+            var discountAmount = booking.Treatment.Price.Value * DiscountPercent.Value;
+            return BookingDiscount.Active(Name, discountAmount, Type);
         }
     }
 

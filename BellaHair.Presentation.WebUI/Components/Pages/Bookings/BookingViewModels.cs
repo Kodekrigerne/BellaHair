@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
+﻿using BellaHair.Ports.Discounts;
+
+namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
 {
     public record BookingViewModel(
         Guid Id,
@@ -7,9 +9,14 @@
         DateOnly Date,
         TimeOnly StartTime,
         TimeOnly EndTime,
-        decimal Total,
+        bool IsPaid,
+        decimal TotalBase,
+        decimal TotalWithDiscount,
         string EmployeeFullName,
         string CustomerFullName,
+        string CustomerAddress,
+        string CustomerPhone,
+        string CustomerEmail,
         string TreatmentName,
         int DurationMinutes,
         string? DiscountName,
@@ -30,7 +37,7 @@
         string AllBookingInfo
         );
         
-    public record BookingTimesOnlyViewModel(DateTime StartDateTime, DateTime EndDateTime);
+    public record BookingTimesOnlyViewModel(Guid Id, DateTime StartDateTime, DateTime EndDateTime);
 
-    public record BookingDiscountViewModel(string Name, decimal Amount);
+    public record BookingDiscountViewModel(string Name, decimal Amount, DiscountTypeDTO Type);
 }

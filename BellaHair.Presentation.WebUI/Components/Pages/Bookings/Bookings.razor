@@ -4,6 +4,8 @@
 @using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Globalization
 
 @rendermode InteractiveServer
 
@@ -11,6 +13,11 @@
 @inject IBookingQuery BookingQuery
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar;
+@inject IBookingCommand BookingCommand
+
+<Modal @bind-IsVisible="_showDeleteModal">
+	<DeleteComponent EntityTypeName="Booking" EntityName="Booking" OnCancel="@(() => { _showDeleteModal = false; })" OnDeleteConfirm="HandleConfirmDelete" />
+</Modal>
 
 <PageHeader HeaderText="Bookings" HeaderSubText="Administrer og opret nye rabatter" NewButtonText="Ny booking" OnNewButtonClicked="@(() => { NavigationManager.NavigateTo("/booking/ny"); })" />
 
@@ -20,14 +27,15 @@
 </div>
 
 <div class="kk-container">
-	@if (_bookings == null) { <p>Loading</p>
-	}
-	else
+	<div class="search-bar-container">
+		<h6>Bookings (@_filteredBookings.Count)</h6>
+		<input type="text" class="form-control booking-search" placeholder="Søg efter booking"
+			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
+
+	</div>
+	@foreach (var booking in _filteredBookings)
 	{
-		@foreach (var booking in _bookings)
-		{
-			<BookingCard Booking="@booking" />
-		}
+		<BookingCard Booking="@booking" OnClickDelete="HandleDeleteClick" />
 	}
 </div>
 
@@ -35,18 +43,41 @@
 	private enum BookingTab { New, Old }
 	private BookingTab _activeTab;
 
+	private bool _showDeleteModal = false;
+	private Guid _bookingToDelete;
 	private DateTime _now;
 	private List<BookingViewModel> _bookings = [];
+	private List<BookingViewModel> _filteredBookings = [];
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "search")]
+	public string SearchTerm { get; set; } = string.Empty;
+
+	[Parameter]
+	[SupplyParameterFromQuery(Name = "tab")]
+	public string? Tab { get; set; }
 
 	protected async override Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
-		await HandleNewSelectorClick();
+		string? searchedTerm = null;
+
+		if (SearchTerm != null) searchedTerm = SearchTerm;
+
+		if(Tab == "old") await HandleOldSelectorClick();
+		else await HandleNewSelectorClick();
+
+		if (searchedTerm != null)
+		{
+			SearchTerm = searchedTerm;
+			ApplyFilter();
+		}
 	}
 
 	private async Task HandleNewSelectorClick()
 	{
+		SearchTerm = string.Empty;
 		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 		await LoadBookings(BookingTab.New);
 		_activeTab = BookingTab.New;
@@ -54,6 +85,7 @@
 
 	private async Task HandleOldSelectorClick()
 	{
+		SearchTerm = string.Empty;
 		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 		await LoadBookings(BookingTab.Old);
 		_activeTab = BookingTab.Old;
@@ -72,16 +104,91 @@
 				DateOnly.FromDateTime(b.StartDateTime),
 				TimeOnly.FromDateTime(b.StartDateTime),
 				TimeOnly.FromDateTime(b.EndDateTime),
-				b.Total,
+				b.IsPaid,
+				b.TotalBase,
+				b.TotalWithDiscount,
 				b.EmployeeFullName,
 				b.CustomerFullName,
+				b.CustomerAddress,
+				b.CustomerPhone,
+				b.CustomerEmail,
 				b.TreatmentName,
 				b.DurationMinutes,
 				b.Discount?.Name,
 				b.Discount?.Amount
 			)).OrderBy(b => b.StartDateTime).ToList();
+
+			_filteredBookings = _bookings;
 		}
 		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
+
+	private void HandleDeleteClick(Guid id)
+	{
+		_bookingToDelete = id;
+		_showDeleteModal = true;
+	}
+
+	private async Task HandleConfirmDelete()
+	{
+		try
+		{
+			await BookingCommand.DeleteBooking(new DeleteBookingCommand(_bookingToDelete));
+		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+
+		_showDeleteModal = false;
+		
+		_bookings = _bookings.Where(b => b.Id != _bookingToDelete).ToList();
+		_bookingToDelete = default;
+		ApplyFilter();
+		Snackbar.Add("Bookingen blev slettet.", Severity.Success);
+	}
+
+	private void ApplyFilter()
+	{
+		_filteredBookings = _bookings.Where(b => 
+			b.CustomerFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.EmployeeFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.CustomerAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.CustomerPhone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.CustomerEmail.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.TreatmentName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			b.StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+		).ToList();
+	}
 }
+
+<style>
+	.search-bar-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+
+		.search-bar-container input:focus {
+			box-shadow: 0 0 0 0.15rem rgba(153, 0, 255, 0.65);
+			border: #55088c
+		}
+
+		.search-bar-container input::placeholder {
+			color: #aaaaaa;
+			opacity: 1;
+			font-size: 14px;
+		}
+
+		.search-bar-container input {
+			opacity: 1;
+			font-size: 14px;
+		}
+
+	.booking-search {
+		width: 300px;
+		background-color: #f9fafc;
+	}
+</style>

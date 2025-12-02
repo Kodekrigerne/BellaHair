@@ -1,10 +1,12 @@
-﻿@using BellaHair.Ports.PrivateCustomers
+﻿@using BellaHair.Ports.Discounts
+@using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject IPrivateCustomerCommand PrivateCustomerCommand
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 
 <!-- Mikkel Dahlmann -->
 <!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
@@ -13,16 +15,21 @@
 
 <!-- Modal til sletning -->
 <Modal @bind-IsVisible="@showDeleteModal">
-	@if (_futureBookings)
-	{
-		<h4>@PrivateCustomer.FullName kan ikke slettes. Slet først kundens fremtidige bookinger.</h4>
-	}
-	else
-	{
-		<h4>Slet kundeprofil - @PrivateCustomer.FullName</h4>
-		<button class="btn-remove" @onclick="@HandleOnDeleteConfirm">Slet</button>
-		<button class="btn-add" @onclick="@HandleCancel">Annuller</button>
-	}
+	<div class="modal-centered-content">
+		@if (_futureBookings)
+		{
+			<DeleteConfirmationIcon Class="delete-confirmation-icon" />
+			<p style="max-width: 24rem; text-align: center;">
+				Kunden @PrivateCustomer.FullName har fremtidige bookinger.
+				Disse skal slettes før kunden kan slettes.
+			</p>
+			<button class="btn-add" @onclick="@HandleCancel">Annuller</button>
+		}
+		else
+		{
+			<DeleteComponent EntityName="@PrivateCustomer.FullName" OnCancel="@HandleCancel" OnDeleteConfirm="@HandleOnDeleteConfirm" EntityTypeName="kunde" />
+		}
+	</div>
 </Modal>
 
 
@@ -39,7 +46,20 @@
 	</div>
 
 	<div class="privatecustomer-details">
-		<h3>@PrivateCustomer.FullName</h3>
+		<div class="privatecustomer-contact-body" style="color: black;">	
+			<h3>
+				@PrivateCustomer.FullName
+			</h3>
+			<div class="
+				@(
+					loyaltyLevel == "Almindelig" ? "regular-customer" :
+					loyaltyLevel == "Ny kunde" ? "new-customer" :
+					"loyalty-customer"
+				)">
+				@loyaltyLevel
+			</div>
+		</div>
+			
 		
 		<div class="privatecustomer-contact-body">
 			
@@ -65,7 +85,12 @@
 
 			<div class="privatecustomer-contact-details">
 				<VisitsIcon Class="privatecustomer-icons" />
-				Antal bookinger: @PrivateCustomer.Visits
+				<button class="btn-add" @onclick="NavigateToNewCustomerBookings">Kommende bookinger</button>
+			</div>
+			
+			<div class="privatecustomer-contact-details">
+				<VisitsIcon Class="privatecustomer-icons" />
+				<button class="btn-add bookings" @onclick="NavigateToOldCustomerBookings">Tidligere bookinger (@PrivateCustomer.Visits)</button>
 			</div>
 
 		</div>
@@ -87,9 +112,20 @@
 	[Parameter, EditorRequired]
 	public required EventCallback OnChange { get; set; }
 
+	[Parameter, EditorRequired]
+	public required List<LoyaltyDiscountDTO> LoyaltyDiscounts { get; set; }
+
 	private bool showEditModal = false;
 	private bool showDeleteModal = false;
 	private bool _futureBookings = false;
+	private string loyaltyLevel = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		CalculateLoyaltyLevel();
+	}
 
 	// Viser modal, og tjekker for future-bookings.
 	private async Task HandleOnDeleteClick()
@@ -135,7 +171,7 @@
 	private int CalculateAge()
 	{
 
-// TODO: Brug GetCurrentDate metode når den er CrossCut 
+		// TODO: Brug GetCurrentDate metode når den er CrossCut 
 		DateTime today = DateTime.Today;
 
 		// År udregnet fra nuværende år minus fødselsår.
@@ -149,4 +185,34 @@
 
 		return age;
 	}
+
+	private void CalculateLoyaltyLevel()
+	{
+		var discount = LoyaltyDiscounts
+		.Where(ld => ld.MinimumVisits < PrivateCustomer.Visits)
+		.MaxBy(ld => ld.MinimumVisits);
+
+		if (discount != null)
+		{
+			loyaltyLevel = discount.Name;
+		}
+		else if (discount == null && PrivateCustomer.Visits > 0)
+		{
+			loyaltyLevel = "Almindelig";
+		}
+		else
+		{
+			loyaltyLevel = "Ny kunde";
+		}
+	}
+
+	private void NavigateToNewCustomerBookings()
+	{
+		NavigationManager.NavigateTo($"/bookings?search={PrivateCustomer.PhoneNumber}&tab=new");
+    }
+	
+	private void NavigateToOldCustomerBookings()
+	{
+		NavigationManager.NavigateTo($"/bookings?search={PrivateCustomer.PhoneNumber}&tab=old");
+    }
 }
