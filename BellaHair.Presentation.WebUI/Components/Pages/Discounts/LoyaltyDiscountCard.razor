@@ -4,7 +4,7 @@
 @using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Shared;
 
-@inject ILoyaltyDiscountCommand _loyaltyDiscountCommand
+@inject ILoyaltyDiscountCommand LoyaltyDiscountCommand
 @inject ISnackbar Snackbar;
 
 <div class="ldc-card">
@@ -14,7 +14,6 @@
 	<p class="ldc-visits">Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
 	<hr>
 	Fordele:
-	<
 	<BinDeleteButton Class="delete-btn" OnClick="@HandleOnDeleteClick"/>
 </div>
 
@@ -31,7 +30,7 @@
 		try
 		{
 			var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
-			await _loyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
+			await LoyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
 			await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
 			Snackbar.Add("Stamkunderabat slettet.", Severity.Success);
 		}
