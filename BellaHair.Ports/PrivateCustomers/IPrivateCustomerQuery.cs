@@ -31,4 +31,13 @@
         string Email,
         DateTime Birthday,
         int Visits);
+
+    public record PrivateCustomerSimpleDTO(
+        Guid Id,
+        string FullName,
+        DateTime Birthday,
+        string Email,
+        string PhoneNumber,
+        string FullAddress,
+        int Visits);
 }

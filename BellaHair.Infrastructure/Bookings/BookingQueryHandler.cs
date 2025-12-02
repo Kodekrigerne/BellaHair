@@ -1,7 +1,11 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
+using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
+using BellaHair.Ports.Employees;
+using BellaHair.Ports.PrivateCustomers;
+using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Bookings
@@ -13,40 +17,68 @@ namespace BellaHair.Infrastructure.Bookings
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
+        private readonly ICustomerVisitsService _customerVisitsService;
 
-        public BookingQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider, IBookingOverlapChecker bookingOverlapChecker)
+        public BookingQueryHandler(BellaHairContext db, ICurrentDateTimeProvider currentDateTimeProvider, IBookingOverlapChecker bookingOverlapChecker, ICustomerVisitsService customerVisitsService)
         {
             _db = db;
             _currentDateTimeProvider = currentDateTimeProvider;
             _bookingOverlapChecker = bookingOverlapChecker;
+            _customerVisitsService = customerVisitsService;
         }
 
         async Task<BookingWithRelationsDTO> IBookingQuery.GetWithRelationsAsync(GetWithRelationsQuery query)
         {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
             var booking = await _db.Bookings
-                .Include(b => b.Employee)
                 .Include(b => b.Treatment)
+                .ThenInclude(bt => bt!.Employees)
                 .Include(b => b.Customer)
-                .FirstOrDefaultAsync(b => b.Id == query.Id) ?? throw new KeyNotFoundException($"Booking {query.Id} not found.");
+                .Include(b => b.Employee)
+                .ThenInclude(be => be!.Bookings.Where(beb => beb.EndDateTime > now))
+                .SingleOrDefaultAsync(b => b.Id == query.Id) ?? throw new Exception("");
 
             if (booking.Employee == null && booking.EmployeeSnapshot == null) throw new InvalidOperationException($"Booking {booking.Id} does not have an employee attached.");
             if (booking.Customer == null && booking.CustomerSnapshot == null) throw new InvalidOperationException($"Booking {booking.Id} does not have a customer attached.");
             if (booking.Treatment == null && booking.TreatmentSnapshot == null) throw new InvalidOperationException($"Booking {booking.Id} does not have a treatment attached.");
 
-            return new BookingWithRelationsDTO(
-            booking.StartDateTime,
-            booking.IsPaid,
-            booking.Employee?.Id ?? booking.EmployeeSnapshot!.EmployeeId,
-            booking.Customer?.Id ?? booking.CustomerSnapshot!.CustomerId,
-            booking.Treatment?.Id ?? booking.TreatmentSnapshot!.TreatmentId,
+            var employee = new EmployeeNameWithBookingsDTO(
+                booking.Employee?.Id ?? booking.EmployeeSnapshot!.EmployeeId,
+                booking.Employee?.Name.FullName ?? booking.EmployeeSnapshot!.FullName,
+                booking.Employee?.Bookings.Select(eb => new BookingTimesOnlyDTO(eb.Id, eb.StartDateTime, eb.EndDateTime)).ToList() ?? []);
 
-            booking.Discount != null
-                ? new DiscountDTO(
-                    booking.Discount.Name,
-                    booking.Discount.Amount,
-                    (DiscountTypeDTO)booking.Discount.Type)
-                : null
-            );
+            var treatment = new TreatmentDTO(
+                booking.Treatment?.Id ?? booking.TreatmentSnapshot!.TreatmentId,
+                booking.Treatment?.Name ?? booking.TreatmentSnapshot!.Name,
+                booking.Treatment?.Price.Value ?? booking.TreatmentSnapshot!.Price,
+                booking.Treatment?.DurationMinutes.Value ?? booking.TreatmentSnapshot!.DurationMinutes,
+                booking.Treatment?.Employees.Count ?? 0);
+
+            var visits = await _customerVisitsService.GetCustomerVisitsAsync(booking.Customer?.Id ?? booking.CustomerSnapshot!.CustomerId);
+
+            var customer = new PrivateCustomerSimpleDTO(
+                booking.Customer?.Id ?? booking.CustomerSnapshot!.CustomerId,
+                booking.Customer?.Name.FullName ?? booking.CustomerSnapshot!.FullName,
+                booking.Customer?.Birthday ?? booking.CustomerSnapshot!.Birthday,
+                booking.Customer?.Email.Value ?? booking.CustomerSnapshot!.Email,
+                booking.Customer?.PhoneNumber.Value ?? booking.CustomerSnapshot!.PhoneNumber,
+                booking.Customer?.Address.FullAddress ?? booking.CustomerSnapshot!.FullAddress,
+                0);
+
+            return new BookingWithRelationsDTO(
+                booking.StartDateTime,
+                booking.IsPaid,
+                employee,
+                customer,
+                treatment,
+                booking.Discount != null
+                    ? new DiscountDTO(
+                        booking.Discount.Name,
+                        booking.Discount.Amount,
+                        (DiscountTypeDTO)booking.Discount.Type)
+                    : null
+                    );
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()

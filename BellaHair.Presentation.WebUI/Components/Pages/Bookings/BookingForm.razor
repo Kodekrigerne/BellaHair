@@ -1,7 +1,6 @@
 ﻿<!-- Dennis -->
 
 @using BellaHair.Domain
-@using BellaHair.Domain.Invoices
 @using BellaHair.Infrastructure
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Discounts
@@ -13,6 +12,7 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using Microsoft.Extensions.Options
 
 @inject ISnackbar Snackbar;
 @inject IPrivateCustomerQuery CustomerQuery;
@@ -26,8 +26,14 @@
 @inject IInvoiceQuery InvoiceQuery;
 @inject IInvoiceCommand InvoiceCommand;
 @inject IJSRuntime JSRuntime;
+@inject IOptions<OpeningTimesSettings> OpeningTimes;
+
+<Modal @bind-IsVisible="_showDeleteModal">
+	<DeleteComponent EntityTypeName="Booking" EntityName="Booking" OnCancel="@(() => { _showDeleteModal = false; })" OnDeleteConfirm="HandleDeleteClick" />
+</Modal>
 
 <div class="kk-container">
+	<p>@_startDate</p>
 	<div class="body-container">
 		<div class="body-left">
 			<div class="left-container">
@@ -204,22 +210,30 @@
 								@if (IsEditable())
 								{
 									<button class="btn-view btn-edit" @onclick="HandleEditClick">Rediger booking</button>
-									<button class="btn-view btn-delete" @onclick="HandleDeleteClick">Slet booking</button>
+									<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
 								}
 							</div>
 						}
-						else if (Mode == BookingMode.Edit)
-						{
-							<div class="btn-group">
+					}
+					@if (Mode == BookingMode.Edit)
+					{
+						<div class="btn-group">
+							@if (_timeIsAvailable != null && _timeIsAvailable == true)
+							{
 								<button class="btn-view btn-save" @onclick="HandleSaveChangesClick">Gem ændringer</button>
-								<button class="btn-view btn-delete" @onclick="HandleDeleteClick">Slet booking</button>
-							</div>
-						}
+							}
+							<button class="btn-view btn-reset" @onclick="HandleResetChangesClick">Fortryd ændringer</button>
+							<button class="btn-view btn-delete" @onclick="@(() => { _showDeleteModal = true; })">Slet booking</button>
+						</div>
 					}
 				</div>
 			}
 		</div>
 	</div>
+	@if (_startDate != null && _employees != null && _employees.Count > 0 && (Mode == BookingMode.New || Mode == BookingMode.Edit))
+	{
+		<EmployeeDailyCalendar EmployeeBookingData="_employees" CurrentDate="_startDate.Value" CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
+	} 
 </div>
 
 @code {
@@ -236,10 +250,13 @@
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
 
+	private bool _showDeleteModal = false;
+
 	private DateTime _now;
 
 	private MudDatePicker? _datePickerRef;
 	private MudTimePicker? _timePickerRef;
+	private bool _ignoreDateChanged = false;
 
 	private PrivateCustomerViewModel? _customer;
 	private TreatmentViewModel? _treatment;
@@ -286,29 +303,42 @@
 				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
 			}
 
-			var c = await CustomerQuery.GetPrivateCustomerAsync(new GetPrivateCustomerQuery(booking.CustomerId));
-			_customer = new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits);
+			_customer = new PrivateCustomerViewModel(
+				booking.Customer.Id,
+				booking.Customer.FullName,
+				booking.Customer.Birthday,
+				booking.Customer.PhoneNumber,
+				booking.Customer.PhoneNumber,
+				booking.Customer.FullAddress,
+				booking.Customer.Visits);
 
-			var t = await TreatmentQuery.GetAsync(new GetQuery(booking.TreatmentId));
-			_treatment = new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount);
+			_treatment = new TreatmentViewModel(
+				booking.Treatment.Id,
+				booking.Treatment.Name,
+				booking.Treatment.Price,
+				booking.Treatment.Duration,
+				booking.Treatment.EmployeeCount);
 
-			var e = await EmployeeQuery.GetWithFutureBookingsAsync(new GetWithFutureBookingsQuery(booking.EmployeeId));
 			_employee = new EmployeeNameWithBookingsViewModel(
-				e.Id,
-				e.Name,
-				e.Bookings
-					.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime)).ToList());
+				booking.Employee.Id,
+				booking.Employee.Name,
+				booking.Employee.Bookings
+					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
 
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
-			_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+
+			if (Mode == BookingMode.View)
+				_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+			else if (Mode == BookingMode.Edit)
+				_statusMessage = string.Empty;
 
 			if (!_isPaid) await GetBestDiscount();
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
 		catch
 		{
-			Snackbar.Add("Noget gik galt.", Severity.Error);
+			Snackbar.Add("Noget gik galt", Severity.Error);
 			NavigationManager.NavigateTo("/bookings");
 		}
 	}
@@ -365,34 +395,63 @@
 	{
 		if (_treatment == null) return;
 
-		try {
+		await LoadEmployees();
+		await SetStartDateToNextOpen();
+
+		_activePicker = Picker.Employee;
+	}
+
+	private async Task LoadEmployees()
+	{
+		if (_treatment == null) return;
+
+		try
+		{
 			_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
 				.Select(e => new EmployeeNameWithBookingsViewModel(
 					e.Id,
 					e.Name,
 					e.Bookings
-						.Select(b => new BookingTimesOnlyViewModel(b.StartDateTime, b.EndDateTime))
+						.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime))
 						.ToList()))
 				.OrderBy(e => e.Name)
 				.ToList();
-
-			_activePicker = Picker.Employee;
 		}
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private async Task SetStartDateToNextOpen()
+	{
+		var openToDate = _now.Date;
+
+		if (openToDate.TimeOfDay.Hours >= 18) openToDate = openToDate.Date.AddDays(1);
+		if (openToDate.DayOfWeek == DayOfWeek.Saturday) openToDate = openToDate.Date.AddDays(2);
+		else if (openToDate.DayOfWeek == DayOfWeek.Sunday) openToDate = openToDate.Date.AddDays(1);
+
+		await SetStartDate(openToDate);
+	}
+
+	private async Task SetStartDate(DateTime newStartDate)
+	{
+		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
+		//_ignoreDateChanged er nødvendigt her pga. en bug i Mudblazor hvor opdatering af _startDate
+		//	fører til kald af dens DateChanged (HandleDateChanged), selvom det er one-way binding.
+		//Da blazor batcher state changes opdaterer _startDateTime først når vi kalder Task.Delay
+		_ignoreDateChanged = true;
+		_startDate = newStartDate;
+		await Task.Delay(1);
+		_ignoreDateChanged = false;
 	}
 
 	private async Task HandlePickStartDateTimeClick()
 	{
 		if (_employee == null) return;
 
-		if (_now.DayOfWeek == DayOfWeek.Saturday) _startDate = _now.Date.AddDays(2);
-		else if (_now.DayOfWeek == DayOfWeek.Sunday) _startDate = _now.Date.AddDays(1);
-		else _startDate = _now;
+		if (_startDate == null) await SetStartDateToNextOpen();
 
 		_activePicker = Picker.Time;
-		StateHasChanged();
-		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
 		await Task.Delay(1);
+
 		if (_datePickerRef != null) {
 			await _datePickerRef.OpenAsync();
 		}
@@ -428,7 +487,7 @@
 		}
 		else
 		{
-			if (_timePickerRef != null) await _timePickerRef.OpenAsync();
+			if (_timePickerRef != null && !_ignoreDateChanged) await _timePickerRef.OpenAsync();
 		}
 	}
 
@@ -449,28 +508,24 @@
 	{
 		if (_startDate == null || _startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
-		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var treatmentEnd = startDateTime.AddMinutes(_treatment.DurationMinutes);
+		var startTime = TimeOnly.FromTimeSpan(_startTime.Value);
+		var treatmentEnd = startTime.AddMinutes(_treatment.DurationMinutes);
 
-		//TODO: Ryk til appsettings.json
-		var date = _startDate.Value.Date;
-		var earliest = date.AddHours(10);
-		var latest = date.AddHours(18);
-
-		if (startDateTime < earliest)
+		if (startTime < OpeningTimes.Value.OpeningTime)
 		{
 			_timeIsAvailable = false;
 			_statusMessage = "Kan ikke starte booking før åbningstid";
 			return;
 		}
 
-		if (treatmentEnd > latest)
+		if (treatmentEnd > OpeningTimes.Value.ClosingTime)
 		{
 			_timeIsAvailable = false;
 			_statusMessage = "Booking skal slutte før lukketid";
 			return;
 		}
 
+		var startDateTime = _startDate.Value.Add(_startTime.Value);
 		var query = new BookingIsAvailableQuery(startDateTime, _treatment.DurationMinutes, _employee.Id, _customer.Id, Id);
 
 		await GetBestDiscount();
@@ -512,14 +567,18 @@
 		SetNulls();
 
 		if (_employees.Count == 0) await HandlePickEmployeeClick();
-		else _activePicker = Picker.Employee;
+		else
+		{
+			await SetStartDateToNextOpen();
+			_activePicker = Picker.Employee;
+		}	
 	}
 
 	private async Task HandleChangeTimeClick()
 	{
 		if (Mode == BookingMode.View) return;
-
-		SetNulls();
+		
+		if (_activePicker != Picker.Time && (_startDate == null || _startTime == null)) SetNulls();
 
 		await HandlePickStartDateTimeClick();
 	}
@@ -589,8 +648,9 @@
 		catch { Snackbar.Add("Noget gik galt", Severity.Error); }
 	}
 
-	private void HandleEditClick()
+	private async Task HandleEditClick()
 	{
+		await LoadEmployees();
 		Mode = BookingMode.Edit;
 	}
 
@@ -636,14 +696,8 @@
 			var invoicePdf = await InvoiceQuery.GetInvoicePdfByBookingIdAsync(command);
 			await JSRuntime.InvokeVoidAsync("openPdfInNewTab", Convert.ToBase64String(invoicePdf));
 		}
-		catch (DomainException ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error); 
-		}
-		catch (Exception ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error);
-		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
 	}
 
 	private async Task HandleEmailInvoice()
@@ -655,14 +709,19 @@
 			await InvoiceCommand.EmailInvoiceToCustomerAsync(command);
 			Snackbar.Add($"Faktura afsendt til {email}", Severity.Success);
 		}
-		catch (DomainException ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error);
-		}
-		catch (Exception ex)
-		{
-			Snackbar.Add(ex.Message, Severity.Error);
-		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
+		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private async Task HandleResetChangesClick()
+	{
+		await LoadBooking();
+		Mode = BookingMode.View;
+	}
+
+	private async Task HandleAvailabilityCalenderDateChanged(DateTime args)
+	{
+		await SetStartDate(args);
 	}
 }
 
@@ -950,6 +1009,14 @@
 
 		.btn-delete:hover {
 			background-color: #c62828;
+		}
+
+	.btn-reset {
+		background-color: #ff9800;
+	}
+
+		.btn-reset:hover {
+			background-color: #fb8c00;
 		}
 
 	.date-picker-container {

@@ -100,11 +100,18 @@ namespace BellaHair.Application
                 {
                     var discount = BookingDiscount.Active(command.Discount.Name, command.Discount.Amount, (DiscountType)command.Discount.Type);
 
+                    // Cast mellem enums fungerer udelukkende på integer værdier, vi kan tilføje et tjek af enshed efter
+                    // Hvis ikke de to enums er identiske får vi en fejl og kan derfor fange de silent fails der ellers kan opstå
+                    if (command.Discount.Type.ToString() != discount.Type.ToString())
+                        throw new InvalidCastException($"Enum member mismatch between {command.Discount.Type} and {discount.Type}");
+
                     booking.SetDiscount(discount);
-                }
-                if (booking.Customer != null && booking.Discount!.Type == DiscountType.BirthdayDiscount)
-                {
-                    booking.Customer.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
+
+                    if (booking.Discount!.Type == DiscountType.BirthdayDiscount)
+                    {
+                        if (booking.Customer == null) throw new InvalidOperationException("Booking must be loaded with customer included.");
+                        booking.Customer.RegisterBirthdayDiscountUsed(booking.StartDateTime.Year);
+                    }
                 }
 
                 booking.PayBooking(_currentDateTimeProvider);
@@ -135,8 +142,6 @@ namespace BellaHair.Application
                 await _unitOfWork.RollbackTransactionAsync();
                 throw new Exception($"Fejl under betaling og fakturering af booking: {ex.Message}", ex);
             }
-            
-
         }
 
         async Task IBookingCommand.UpdateBooking(UpdateBookingCommand command)
