@@ -1,55 +1,42 @@
-﻿@using BellaHair.Ports.Products
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Products
 @using BellaHair.Presentation.WebUI.Components.Shared
 @inject ISnackbar Snackbar
-<!-- Mikkel Klitgaard -->
+@inject IProductCommand ProductCommand
+
+<!-- Mikkel Dahlmann (Mikkel Klitgaard) -->
 
 
-<div class="treatment-card">
+<div class="product-card">
 
 	<BinDeleteButton Class="bin-btn" OnClick="@(() => { _showConfirmDelete = true; })" />
 
-	<div class="treatment-avatar">
+	<div class="product-avatar">
 		<TreatmentIcon Class="treatment-icon" />
 	</div>
 
-	<div class="treatment-details">
+	<div class="product-details">
 
-		<h6>@Treatment.Name</h6>
+		<h6>@Product.Name</h6>
 
-		<div class="offered-by-wrapper">
+		<p class="product-description">@Product.Description</p>
 
-			<button class="btn-offer" @onclick="@HandleOfferedByClick">
-				Udbydes af (@Treatment.EmployeeCount)
-			</button>
+		<hr class="product-line" />
 
-		</div>
+		<div class="product-pd-details">
 
-		<hr class="treatment-line" />
+			<PriceIcon Class="product-price-icon" />
+			@Product.Price.ToString("C")
 
-		<div class="price-duration-wrapper">
-
-			<div class="treatment-pd-details">
-
-				<PriceIcon Class="treatment-price-icon" />
-				@Treatment.Price.ToString("C")
-
-			</div>
-
-			<div class="treatment-pd-details">
-
-				<DurationIcon Class="treatment-duration-icon" />
-				@Treatment.DurationMinutes min
-
-			</div>
 		</div>
 	</div>
 </div>
 
 <Modal @bind-IsVisible="@_showConfirmDelete">
 
-	<h3>Slet behandling</h3>
-	<hr class="treatment-line" />
-	<p>Ønsker du at slette denne behandling?</p>
+	<h3>Slet '@Product.Name'</h3>
+	<hr class="product-line" />
+	<p>Ønsker du at slette dette produkt?</p>
 	Handlingen kan ikke fortrydes.
 
 	<div class="btn-wrapper">
@@ -68,10 +55,7 @@
 	public required ProductDTO Product { get; set; }
 
 	[Parameter, EditorRequired]
-	public required EventCallback OnDelete { get; set; }
-
-	[Parameter, EditorRequired]
-	public required EventCallback<Guid> OnShowOfferedBy { get; set; }
+	public required EventCallback OnChange { get; set; }
 
 	private bool _showConfirmDelete;
 
@@ -80,11 +64,11 @@
 	{
 		try
 		{
-			var command = new DeleteTreatmentCommand(Treatment.Id);
-			await _treatmentCommand.DeleteTreatmentAsync(command);
+			var command = new DeleteProductCommand(Product.Id);
+			await ProductCommand.DeleteProductAsync(command);
 
 			_showConfirmDelete = false;
-			await OnDelete.InvokeAsync();
+			await OnChange.InvokeAsync();
 			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
 		}
 		catch (DomainException ex)
@@ -98,10 +82,4 @@
 			Snackbar.Add("Der skete en uventet fejl.", Severity.Error);
 		}
 	}
-
-	private async Task HandleOfferedByClick()
-	{
-		await OnShowOfferedBy.InvokeAsync(Treatment.Id);
-	}
-
 }

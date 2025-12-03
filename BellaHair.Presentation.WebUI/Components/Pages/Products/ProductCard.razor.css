@@ -1,18 +1,28 @@
 ﻿/* Mikkel Klitgaard */
 
-::deep .treatment-price-icon,
-::deep .treatment-duration-icon {
-    width: 16px;
-    height: 16px;
+.product-description {
+    /* 1. Allows the text to flow */
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    /* 2. Set the maximum number of lines you want */
+    display: -webkit-box;
+    line-height: 150%;
+    min-height: 63px;
+    -webkit-line-clamp: 3; /* Example: limit to 3 lines */
+    /* 3. Specifies the flow direction */
+    -webkit-box-orient: vertical;
+    max-width: 90%;
+}
+
+::deep .product-price-icon {
+    width: 20px;
+    height: 20px;
     display: inline-block;
     justify-content: center;
+    margin-top: 1px;
 }
 
-::deep .treatment-duration-icon {
-    fill: #a91ce4;
-}
-
-::deep .treatment-price-icon {
+::deep .product-price-icon {
     fill: #707070;
 }
 
@@ -22,8 +32,7 @@
     display: inline-block;
 }
 
-
-.treatment-card {
+.product-card {
     font-family: system-ui;
     border-radius: 15px;
     border: none;
@@ -38,13 +47,13 @@
     min-width: 300px;
 }
 
-    .treatment-card:hover {
+    .product-card:hover {
         box-shadow: 2px 2px 5px rgba(0,0,0,0.25);
         background-color: #f7faff;
     }
 
 
-.treatment-avatar {
+.product-avatar {
     width: 4rem;
     height: 4rem;
     border-radius: 9999px;
@@ -55,41 +64,24 @@
     color: #f9fafc;
 }
 
-.treatment-pd-details {
+.product-pd-details {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-content: end;
     gap: 0.5rem;
     padding-bottom: 5px;
     color: dimgrey;
 }
 
-
-.price-duration-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.treatment-details {
+.product-details {
     flex-grow: 1;
+    max-width: 400px;
 }
 
-.treatment-line {
+.product-line {
     color: grey;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
-}
-
-
-
-.offered-by-wrapper {
-    margin-top: 2.5rem;
-}
-
-.btn-offer:hover {
-    cursor: pointer;
-    background-color: #efd3fb;
 }
 
 .btn-remove {

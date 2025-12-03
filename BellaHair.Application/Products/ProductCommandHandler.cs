@@ -22,9 +22,13 @@ namespace BellaHair.Application.Products
             await _productRepository.SaveChangesAsync();
         }
 
-        Task IProductCommand.DeleteProductAsync(DeleteProductCommand command)
+        async Task IProductCommand.DeleteProductAsync(DeleteProductCommand command)
         {
-            throw new NotImplementedException();
+            var productToDelete = await _productRepository.GetAsync(command.Id);
+
+            _productRepository.Delete(productToDelete);
+
+            await _productRepository.SaveChangesAsync();
         }
 
         Task IProductCommand.UpdateProductAsync(UpdateProductCommand command)
