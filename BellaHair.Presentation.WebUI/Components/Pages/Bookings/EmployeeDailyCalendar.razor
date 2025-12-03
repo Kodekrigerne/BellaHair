@@ -100,12 +100,18 @@
 
     private async Task HandlePreviousDateClick()
     {
-        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(-1));
+        int daysToMove;
+        if (CurrentDate.DayOfWeek == DayOfWeek.Monday) daysToMove = -3;
+        else daysToMove = -1;
+        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(daysToMove));
     }
 
     private async Task HandleNextDateClick()
     {
-        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(1));
+        int daysToMove;
+        if (CurrentDate.DayOfWeek == DayOfWeek.Friday) daysToMove = 3;
+        else daysToMove = 1;
+        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(daysToMove));
     }
 }
 
