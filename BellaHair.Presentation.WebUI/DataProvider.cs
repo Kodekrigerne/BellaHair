@@ -515,22 +515,24 @@ namespace BellaHair.Presentation.WebUI
 
                     Random random = new Random();
                     var employee = _employees[random.Next(1, 6)];
+                    var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
 
                     var bookingFaker = new Faker<Booking>("nb_NO")
                         .CustomInstantiator(f => Booking.Create(
                                                         f.PickRandom<PrivateCustomer>(customers),
                                                         employee,
-                                                        f.PickRandom<Treatment>(employee.Treatments),
+                                                        treatment,
                                                     new DateTime(
                                                             f.Date.Soon(60, DateTime.Now).Date.Year,
                                                             f.Date.Soon(60, DateTime.Now).Date.Month,
                                                             f.Date.Soon(60, DateTime.Now).Date.Day,
-                                                            f.Random.Int(10, 17),
-                                                            f.PickRandom(new[] { 0, 30 }), // Use PickRandom with an inline array
+                                                            f.Random.Int(OpeningTimes.Value.OpeningTime.Hour, OpeningTimes.Value.ClosingTime.Hour-treatment.DurationMinutes.Value),
+                                                            f.PickRandom(new[] { 0, 15, 30, 45 }), // Use PickRandom with an inline array
                                                             0),
                                                     _currentDateTimeProvider));
-                    var booking = bookingFaker.Generate();
                     
+                    
+                    var booking = bookingFaker.Generate();
                 }
                 catch (Exception)
                 {
