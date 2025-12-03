@@ -85,7 +85,7 @@
 				<div class="pick-container">
 					@if (_startDate == null && _startTime == null || _employee == null)
 					{
-						<button class="btn-pick" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
+						<button class="btn-pick @(_employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
 					}
 					else
 					{
@@ -257,6 +257,7 @@
 			StartDate="_startDate"
 			StartTime="_startTime"
 			EndTime="_endTime"
+			Employee="_employee"
 			CurrentDate="_startDate.Value"
 			CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
 	} 

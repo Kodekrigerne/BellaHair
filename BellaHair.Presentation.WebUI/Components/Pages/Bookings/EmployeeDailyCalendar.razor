@@ -48,7 +48,7 @@
                                     @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
                                 </div>
                             }
-                            @if (StartDate != null && StartDate == CurrentDate.Date && StartTime != null && EndTime != null)
+                            @if (StartDate != null && StartDate == CurrentDate.Date && StartTime != null && EndTime != null && employee.Id == Employee.Id)
                             {
                                 <div
                                     class="current-selection"
@@ -81,6 +81,9 @@
 
     [Parameter]
     public TimeSpan? EndTime { get; set; }
+
+    [Parameter]
+    public EmployeeNameWithBookingsViewModel? Employee { get; set; }
 
     private int[] _hours = [];
     private const int HourWidthRem = 4;
