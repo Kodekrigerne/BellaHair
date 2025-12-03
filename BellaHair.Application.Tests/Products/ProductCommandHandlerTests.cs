@@ -22,7 +22,7 @@ namespace BellaHair.Application.Tests.Products
             var productInDb = _db.Products.FirstOrDefault();
             Assert.Multiple(() =>
             {
-                Assert.That(productInDb.Name, Is.EqualTo(name));
+                Assert.That(productInDb!.Name, Is.EqualTo(name));
                 Assert.That(productInDb.Description, Is.EqualTo(description));
                 Assert.That(productInDb.Price.Value, Is.EqualTo(price));
             });

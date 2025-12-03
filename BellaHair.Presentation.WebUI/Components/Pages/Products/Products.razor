@@ -1,0 +1,38 @@
+﻿<!-- Mikkel Dahlmann -->
+
+@page "/produkter"
+
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+@inject ISnackbar Snackbar
+
+@attribute [StreamRendering]
+@rendermode InteractiveServer
+
+<PageHeader HeaderText="Produktkatalog" HeaderSubText="Administrer og tilføj produkter" NewButtonText="Tilføj nyt produkt" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
+
+
+<!-- Modal overlay der viser 'Opret ny kunde'-formular -->
+<Modal IsVisible="@showCreateModal">
+	<CreateProductForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreateProductForm>
+</Modal>
+
+
+
+
+@code {
+
+	private bool showCreateModal = false;
+
+	private async Task HandleCreate()
+	{
+
+	}
+
+	private void HandleCancel()
+	{
+		showCreateModal = false;
+		Snackbar.Add("Handlingen blev afbrudt", Severity.Info);
+	}
+
+}
