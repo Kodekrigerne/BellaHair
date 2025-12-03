@@ -12,11 +12,14 @@ namespace BellaHair.Domain.Products
         private Product() { }
 #pragma warning restore CS8618
 
-        public Product(string name, string description, Price price)
+        private Product(string name, string description, Price price)
         {
+            Id = Guid.NewGuid();
             Name = name;
             Description = description;
             Price = price;
         }
+
+        public static Product Create(string name, string description, Price price) => new(name, description, price);
     }
 }
