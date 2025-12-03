@@ -48,6 +48,13 @@
                                     @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
                                 </div>
                             }
+                            @if (StartDate != null && StartDate == CurrentDate.Date && StartTime != null && EndTime != null)
+                            {
+                                <div
+                                    class="current-selection"
+                                    style="left: @(GetSelectionStart(StartDate.Value, StartTime.Value, EndTime.Value))rem; width: @(GetSelectionWidth(StartTime.Value, EndTime.Value))rem">
+                                </div>
+                            }
                         </div>
                     </div>
                 }
@@ -65,6 +72,15 @@
 
     [Parameter]
     public EventCallback<DateTime> CurrentDateChanged { get; set; }
+
+    [Parameter]
+    public DateTime? StartDate { get; set; }
+
+    [Parameter]
+    public TimeSpan? StartTime { get; set; }
+
+    [Parameter]
+    public TimeSpan? EndTime { get; set; }
 
     private int[] _hours = [];
     private const int HourWidthRem = 4;
@@ -89,6 +105,20 @@
     private double GetBookingWidth(BookingTimesOnlyViewModel booking)
     {
         var durationMinutes = (booking.EndDateTime - booking.StartDateTime).TotalMinutes;
+        return (durationMinutes / MinutesPerHour) * HourWidthRem;
+    }
+
+    private double GetSelectionStart(DateTime startDate, TimeSpan startTime, TimeSpan endTime)
+    {
+        var openingTime = startDate.Date.AddHours(_openingHour);
+        var selectionStartDateTime = startDate.Date + startTime;
+        var minutesSinceOpeningTime = (selectionStartDateTime - openingTime).TotalMinutes;
+        return (minutesSinceOpeningTime / MinutesPerHour) * HourWidthRem;
+    }
+
+    private double GetSelectionWidth(TimeSpan startTime, TimeSpan endTime)
+    {
+        var durationMinutes = (endTime - startTime).TotalMinutes;
         return (durationMinutes / MinutesPerHour) * HourWidthRem;
     }
 
@@ -268,6 +298,15 @@
         padding: 0 0.5rem;
         overflow: hidden;
         z-index: 5;
+    }
+
+    .current-selection {
+        position: absolute;
+        height: calc(var(--hour-height) - 8px);
+        top: 4px;
+        border: solid 2px #00BFFF;
+        border-radius: 4px;
+        z-index: 7;
     }
 
         .appointment:hover {

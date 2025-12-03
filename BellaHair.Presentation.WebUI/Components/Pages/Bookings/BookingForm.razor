@@ -252,7 +252,13 @@
 	</div>
 	@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
 	{
-		<EmployeeDailyCalendar EmployeeBookingData="_employees" CurrentDate="_startDate.Value" CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
+		<EmployeeDailyCalendar
+			EmployeeBookingData="_employees"
+			StartDate="_startDate"
+			StartTime="_startTime"
+			EndTime="_endTime"
+			CurrentDate="_startDate.Value"
+			CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
 	} 
 </div>
 
