@@ -13,7 +13,8 @@
 @inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
-@inject IOptions<OpeningTimesSettings> OpeningTimes;
+@inject IOptions<OpeningTimesSettings> OpeningTimes
+@inject ICurrentDateTimeProvider CurrentDateTime
 
 
 <div class="header-and-employee">
@@ -73,7 +74,7 @@
         await LoadEmployees();
 
         if (UrlDate != null) currentDate = UrlDate.Value;
-        else currentDate = DateTime.Today;
+        else currentDate = CurrentDateTime.GetCurrentDateTime();
 
         // Vi sætter denne til sand så vi kan følge i OnLoadData() om data loades ifbm initialisering eller om det er til når vi ændrer på dato
         _checkForInitialLoad = true;
@@ -155,7 +156,10 @@
                 $"{b.CustomerFullName}\n{b.TreatmentName}\n({b.EmployeeFullName})"
             )).OrderBy(b => b.StartDateTime).ToList();
         }
-        catch (Exception) { }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Der skete en fejl ved indlæsning af bookings: {e.Message}", Severity.Error);
+        }
     }
 
     private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<BookingCalendarViewModel> args)

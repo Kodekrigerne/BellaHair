@@ -162,7 +162,7 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
-                .Where(b => b.Employee.Id == employeeId
+                .Where(b => b.Employee!.Id == employeeId
                     && b.StartDateTime < endDate
                     && b.EndDateTime > startDate)
                 .ToListAsync();

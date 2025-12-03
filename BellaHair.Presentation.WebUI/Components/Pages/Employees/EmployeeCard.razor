@@ -1,10 +1,13 @@
-﻿@using BellaHair.Ports.Employees
+﻿@using BellaHair.Domain
+@using BellaHair.Infrastructure
+@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents;
 @inject IEmployeeCommand EmployeeCommand
 @inject IEmployeeQuery EmployeeQuery
 @inject NavigationManager NavigationManager
 @inject ISnackbar SnackBar
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 	<Modal @bind-IsVisible="@_showDeleteModal">
 		<div class="modal-centered-content">
@@ -156,7 +159,7 @@
 	// Navigerer til kalenderen for den medarbejder, der trykkes på
 	private void NavigateToCalendar()
 	{
-		NavigationManager.NavigateTo($"/kalender?date={DateTime.Now.ToString("yyyy-MM-dd")}&employeeId={Employee.Id}");
+		NavigationManager.NavigateTo($"/kalender?date={CurrentDateTimeProvider.GetCurrentDateTime().ToString("yyyy-MM-dd")}&employeeId={Employee.Id}");
 	}
 
 }
