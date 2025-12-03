@@ -26,7 +26,7 @@
 	<button @onclick="HandleOldSelectorClick" class="@(_activeTab == BookingTab.Old ? "btn-select-active" : "btn-select")">Gamle bookinger</button>
 </div>
 
-<div class="kk-container">
+<div class="kk-container bookings-container">
 	<div class="search-bar-container">
 		<h6>Bookings (@_filteredBookings.Count)</h6>
 		<input type="text" class="form-control booking-search" placeholder="Søg efter booking"
@@ -163,12 +163,26 @@
 }
 
 <style>
+	.bookings-container {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: stretch;
+		gap: 1rem;
+		max-width: stretch;
+		max-height: 70vh;
+		overflow-y: auto;
+		scrollbar-width: none;
+	}
+
+	.bookings-container:hover {
+		scrollbar-width: thin;
+	}
+
 	.search-bar-container {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
-		margin-bottom: 1rem;
 	}
 
 		.search-bar-container input:focus {
