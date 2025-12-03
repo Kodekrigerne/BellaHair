@@ -33,7 +33,6 @@
 </Modal>
 
 <div class="kk-container">
-	<p>@_startDate</p>
 	<div class="body-container">
 		<div class="body-left">
 			<div class="left-container">
@@ -252,7 +251,7 @@
 			}
 		</div>
 	</div>
-	@if (_startDate != null && _employees != null && _employees.Count > 0 && (Mode == BookingMode.New || Mode == BookingMode.Edit))
+	@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
 	{
 		<EmployeeDailyCalendar EmployeeBookingData="_employees" CurrentDate="_startDate.Value" CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
 	} 
