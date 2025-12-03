@@ -9,48 +9,51 @@
 @inject IOptions<OpeningTimesSettings> OpeningTimes
 
 <div class="day-container">
-    <div class="day-header">
-        <button @onclick="HandlePreviousDateClick" class="nav-button">&lt;</button>
-        <span class="current-date">@CurrentDate.ToString("dddd, dd. MMMM yyyy", new CultureInfo("da-DK"))</span>
-        <button @onclick="HandleNextDateClick" class="nav-button">&gt;</button>
-    </div>
-
-    <div class="calendar-wrapper">
-        <div class="day-calendar-header">
-            <div class="header-spacer"></div>
-            @foreach (var hour in _hours)
-            {
-                <div class="hour-marker">
-                    <span class="hour-label">@hour:00</span>
-                </div>
-            }
+    @if (EmployeeBookingData.Count == 0) { <p>Ingen medarbejdere fundet med den valgte behandling</p> }
+    else {
+        <div class="day-header">
+            <button @onclick="HandlePreviousDateClick" class="nav-button">&lt;</button>
+            <span class="current-date">@CurrentDate.ToString("dddd, dd. MMMM yyyy", new CultureInfo("da-DK"))</span>
+            <button @onclick="HandleNextDateClick" class="nav-button">&gt;</button>
         </div>
 
-        <div class="day-calendar">
-            @foreach (var employee in EmployeeBookingData)
-            {
-                <div class="day-row">
-                    <div class="employee-name">
-                        <span>@employee.Name</span>
+        <div class="calendar-wrapper">
+            <div class="day-calendar-header">
+                <div class="header-spacer"></div>
+                @foreach (var hour in _hours)
+                {
+                    <div class="hour-marker">
+                        <span class="hour-label">@hour:00</span>
                     </div>
-                    <div class="day-hours">
-                        @foreach (var hour in _hours)
-                        {
-                            <div class="day-hour"></div>
-                        }
-                        @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate.Date))
-                        {
-                            <div @onclick="@(() => HandleBookingClick(booking.Id))" class="appointment"
-                                 style="left: @(GetBookingStart(booking))rem; width: @(GetBookingWidth(booking))rem;"
-                                 title="@booking.StartDateTime.ToString("HH:mm") - @booking.EndDateTime.ToString("HH:mm")">
-                                @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
-                            </div>
-                        }
+                }
+            </div>
+
+            <div class="day-calendar">
+                @foreach (var employee in EmployeeBookingData)
+                {
+                    <div class="day-row">
+                        <div class="employee-name">
+                            <span>@employee.Name</span>
+                        </div>
+                        <div class="day-hours">
+                            @foreach (var hour in _hours)
+                            {
+                                <div class="day-hour"></div>
+                            }
+                            @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate.Date))
+                            {
+                                <div @onclick="@(() => HandleBookingClick(booking.Id))" class="appointment"
+                                     style="left: @(GetBookingStart(booking))rem; width: @(GetBookingWidth(booking))rem;"
+                                     title="@booking.StartDateTime.ToString("HH:mm") - @booking.EndDateTime.ToString("HH:mm")">
+                                    @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
-    </div>
+    }
 </div>
 
 @code {
