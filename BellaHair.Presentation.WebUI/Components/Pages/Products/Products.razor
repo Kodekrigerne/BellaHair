@@ -2,6 +2,7 @@
 
 @page "/produkter"
 
+@using BellaHair.Presentation.WebUI.Components.Pages.Products.CreateProductComponents
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject ISnackbar Snackbar
@@ -12,7 +13,7 @@
 <PageHeader HeaderText="Produktkatalog" HeaderSubText="Administrer og tilføj produkter" NewButtonText="Tilføj nyt produkt" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
 
 
-<!-- Modal overlay der viser 'Opret ny kunde'-formular -->
+<!-- Modal overlay der viser 'Tilføj nyt produkt'-formular -->
 <Modal IsVisible="@showCreateModal">
 	<CreateProductForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreateProductForm>
 </Modal>

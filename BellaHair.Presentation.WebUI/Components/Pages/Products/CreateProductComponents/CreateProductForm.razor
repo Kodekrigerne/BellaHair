@@ -1,0 +1,44 @@
+﻿<!-- Mikkel Dahlmann -->
+
+<h3 style="text-align: center; font-weight: bold">Tilføj produkt</h3>
+<p style="text-align: center">Indtast oplysningerne på det produkt,<br/> du ønsker at tilføje</p>
+
+<!-- Editform container -->
+<EditForm Model="@Product" OnValidSubmit="@HandleCreateProduct">
+        <DataAnnotationsValidator />
+
+        <div class="inputs-container">
+			
+	        <div class="inputs-items-container">
+
+		        <!-- Indeholdte inputs til formen -->
+		        <div>
+			        <CreateProductInputs Product="Product"/>
+		        </div>
+
+	        </div>
+
+        </div>
+
+        <div class="btn-wrapper">
+	        <button class="btn-add" type="submit">Opret</button>
+			<button class="btn-remove" type="reset" >Ryd indhold</button>				
+			<button class="btn-remove" type="button" onclick="@OnCancel">Annuller</button>
+        </div>
+
+</EditForm>
+
+@code {
+	[Parameter, EditorRequired]
+	public required EventCallback OnCreate { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCancel { get; set; }
+
+	public NewProductModel Product { get; set; } = new NewProductModel();
+
+	private async Task HandleCreateProduct()
+	{
+		
+	}
+}

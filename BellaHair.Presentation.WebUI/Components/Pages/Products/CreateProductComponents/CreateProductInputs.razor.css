@@ -1,0 +1,124 @@
+﻿/*Mikkel Dahlmann*/
+.product-grouped-inputs {
+    display: flex;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.product-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+    .product-input label {
+        width: 105px;
+        text-align: left;
+    }
+
+    .product-input ::deep input {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        -webkit-appearance: none;
+    }
+
+::deep .inputareabox {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px;
+    -webkit-appearance: none;
+}
+
+    .product-input input:focus {
+        outline: 1px solid #a91ce4;
+    }
+
+.required:after {
+    content: " *";
+    color: maroon;
+}
+
+
+.product-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*.product-modal-text {
+    padding: 20px;
+}
+
+.product-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+    .product-input label {
+        width: 100px;
+        text-align: left;
+        margin-right: 15px;
+        margin-bottom: 4px;
+    }
+
+    .product-input input {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        margin-right: 15px;
+    }
+
+        .product-input input:focus {
+            outline: 1px solid #a91ce4;
+        }
+
+
+.btn-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+.product-input input::placeholder {
+    color: #aaaaaa;
+    opacity: 1;
+    font-style: italic;
+}
+*/
