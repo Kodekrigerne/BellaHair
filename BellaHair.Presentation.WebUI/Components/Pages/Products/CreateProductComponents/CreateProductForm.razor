@@ -1,4 +1,10 @@
-﻿<!-- Mikkel Dahlmann -->
+﻿@using Domain
+@using BellaHair.Ports.Products
+@inject IProductCommand ProductCommand
+@inject ISnackbar Snackbar
+
+
+<!-- Mikkel Dahlmann -->
 
 <h3 style="text-align: center; font-weight: bold">Tilføj produkt</h3>
 <p style="text-align: center">Indtast oplysningerne på det produkt,<br/> du ønsker at tilføje</p>
@@ -39,6 +45,28 @@
 
 	private async Task HandleCreateProduct()
 	{
-		
+		try
+		{
+			var command = new CreateProductCommand(
+				Product.Name,
+				Product.Description,
+				Product.Price
+			);
+
+			await ProductCommand.CreateProductAsync(command);
+
+			Snackbar.Add($"Produktet '{command.Name} blev tilføjet", Severity.Success);
+
+			await OnCreate.InvokeAsync();
+
+		}
+		catch (DomainException e)
+		{
+			Snackbar.Add($"{e.Message}", Severity.Error);
+		}
+		catch (Exception e)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+		}
 	}
 }

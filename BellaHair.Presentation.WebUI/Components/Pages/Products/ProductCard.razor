@@ -1,0 +1,107 @@
+﻿@using BellaHair.Ports.Products
+@using BellaHair.Presentation.WebUI.Components.Shared
+@inject ISnackbar Snackbar
+<!-- Mikkel Klitgaard -->
+
+
+<div class="treatment-card">
+
+	<BinDeleteButton Class="bin-btn" OnClick="@(() => { _showConfirmDelete = true; })" />
+
+	<div class="treatment-avatar">
+		<TreatmentIcon Class="treatment-icon" />
+	</div>
+
+	<div class="treatment-details">
+
+		<h6>@Treatment.Name</h6>
+
+		<div class="offered-by-wrapper">
+
+			<button class="btn-offer" @onclick="@HandleOfferedByClick">
+				Udbydes af (@Treatment.EmployeeCount)
+			</button>
+
+		</div>
+
+		<hr class="treatment-line" />
+
+		<div class="price-duration-wrapper">
+
+			<div class="treatment-pd-details">
+
+				<PriceIcon Class="treatment-price-icon" />
+				@Treatment.Price.ToString("C")
+
+			</div>
+
+			<div class="treatment-pd-details">
+
+				<DurationIcon Class="treatment-duration-icon" />
+				@Treatment.DurationMinutes min
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<Modal @bind-IsVisible="@_showConfirmDelete">
+
+	<h3>Slet behandling</h3>
+	<hr class="treatment-line" />
+	<p>Ønsker du at slette denne behandling?</p>
+	Handlingen kan ikke fortrydes.
+
+	<div class="btn-wrapper">
+
+		<button class="btn-remove" @onclick="HandleOnDeleteClick">Slet</button>
+		<button class="btn-add" @onclick="@(() => { _showConfirmDelete = false; })">Annuller</button>
+
+	</div>
+
+</Modal>
+
+
+
+@code {
+	[Parameter, EditorRequired]
+	public required ProductDTO Product { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnDelete { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback<Guid> OnShowOfferedBy { get; set; }
+
+	private bool _showConfirmDelete;
+
+
+	private async Task HandleOnDeleteClick()
+	{
+		try
+		{
+			var command = new DeleteTreatmentCommand(Treatment.Id);
+			await _treatmentCommand.DeleteTreatmentAsync(command);
+
+			_showConfirmDelete = false;
+			await OnDelete.InvokeAsync();
+			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			_showConfirmDelete = false;
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+		catch (Exception)
+		{
+			_showConfirmDelete = false;
+			Snackbar.Add("Der skete en uventet fejl.", Severity.Error);
+		}
+	}
+
+	private async Task HandleOfferedByClick()
+	{
+		await OnShowOfferedBy.InvokeAsync(Treatment.Id);
+	}
+
+}

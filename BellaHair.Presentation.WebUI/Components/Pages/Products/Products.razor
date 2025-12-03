@@ -2,10 +2,13 @@
 
 @page "/produkter"
 
+@using Domain
+@using BellaHair.Ports.Products
 @using BellaHair.Presentation.WebUI.Components.Pages.Products.CreateProductComponents
 @using BellaHair.Presentation.WebUI.Components.Shared
 
 @inject ISnackbar Snackbar
+@inject IProductQuery ProductQuery
 
 @attribute [StreamRendering]
 @rendermode InteractiveServer
@@ -18,16 +21,88 @@
 	<CreateProductForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreateProductForm>
 </Modal>
 
+<!-- Container til product 'cards' -->
+<div class="kk-container product-container">
 
+    <!-- Search bar til at filtrere kunder samt vise antal kunder fundet -->
+	<div class="search-bar-container">
+		<h4>Produkter (@filteredProducts!.Count())</h4>
+		<input type="text" class="form-control product-search" placeholder="Søg efter produkter" 
+		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
+
+	</div>
+	
+	@if (filteredProducts is null)
+	{
+		<h1>Der kunne ikke findes nogen produkter i databasen.</h1>
+	}
+	else
+	{
+		foreach (var product in filteredProducts)
+		{
+			<!-- Card komponent der tager imod et produkt. OnChange er komponentens EventCallBack. -->
+			<ProductCard Product="@product" OnChange="@LoadProducts"></ProductCard>
+		}
+	}
+</div>
 
 
 @code {
 
 	private bool showCreateModal = false;
 
+	private IEnumerable<ProductDTO>? allProducts;
+	private IEnumerable<ProductDTO>? filteredProducts;
+
+	private string SearchTerm { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadProducts();
+	}
+
+	private async Task LoadProducts()
+	{
+		try
+		{
+			allProducts = await ProductQuery.GetAllAsync();
+			filteredProducts = allProducts;
+		}
+		catch(DomainException ex)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
+		}
+
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
+		}
+	}
+
+	private void ApplyFilter()
+	{
+		if (string.IsNullOrWhiteSpace(SearchTerm))
+		{
+			filteredProducts = allProducts;
+		}
+		else
+		{
+			filteredProducts = allProducts!
+			.Where(p => p.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			p.Description.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			p.Price.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+			.ToList();
+		}
+
+		StateHasChanged();
+	}
+
 	private async Task HandleCreate()
 	{
-
+		showCreateModal = false;
+		await LoadProducts();
 	}
 
 	private void HandleCancel()
