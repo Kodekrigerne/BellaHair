@@ -167,26 +167,22 @@
 			@if (_timeIsAvailable != null)
 			{
 				<div class="right-bottom">
-
-					@if (Mode == BookingMode.View && !_isPaid || Mode == BookingMode.New)
+					@if (_showBirthdayOption && Mode == BookingMode.View && !_isPaid)
 					{
-						@if (_showBirthdayOption)
-						{
-							<div class="kk-container">
-								<strong>@_customer?.FullName</strong> har fødselsdag i denne måned!
-								<div class="bday-selector">
-									<div class="bday-checkbox-div">
-										<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
-										@bind:after="GetBestDiscount"/>
-										<label class="bday-check-label" for="bdCheck">
-											<div class="bday-icon-txt-wrap">
-												<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
-											</div>
-										</label>
-									</div>
+						<div class="kk-container">
+							<strong>@_customer?.FullName</strong> har fødselsdag i denne måned!
+							<div class="bday-selector">
+								<div class="bday-checkbox-div">
+									<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
+									@bind:after="GetBestDiscount"/>
+									<label class="bday-check-label" for="bdCheck">
+										<div class="bday-icon-txt-wrap">
+											<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
+										</div>
+									</label>
 								</div>
 							</div>
-						}
+						</div>
 					}
 
 					<p class="availability-status">@_statusMessage</p>
