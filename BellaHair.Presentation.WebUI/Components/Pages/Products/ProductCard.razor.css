@@ -1,17 +1,18 @@
-﻿/* Mikkel Klitgaard */
+﻿/* Mikkel Dahlmann */
 
 .product-description {
     /* 1. Allows the text to flow */
     overflow: hidden;
-    overflow-wrap: anywhere;
     /* 2. Set the maximum number of lines you want */
-    display: -webkit-box;
-    line-height: 150%;
-    min-height: 63px;
     -webkit-line-clamp: 3; /* Example: limit to 3 lines */
     /* 3. Specifies the flow direction */
     -webkit-box-orient: vertical;
+    
+    overflow-wrap: anywhere;
+    display: -webkit-box;
     max-width: 90%;
+    line-height: 150%;
+    min-height: 63px;
 }
 
 ::deep .product-price-icon {
@@ -40,7 +41,7 @@
     background-color: #f9fafc;
     box-shadow: 0px 0px 1px rgba(0,0,0,0.50);
     padding: 15px;
-    flex: 0 0 calc((100% - 2rem) / 3); /* Her benyttes calc((100% - 2rem) / 3) for at få 3 behandlinger på række */
+    flex: 0 0 calc((100% - 2rem) / 3); /* Her benyttes calc((100% - 2rem) / 3) for at få 3 produkter på række */
     display: flex;
     gap: 1rem;
     position: relative;
@@ -94,10 +95,4 @@
     display: flex;
     gap: 10px;
     justify-content: center;
-}
-
-::deep .bin-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
 }

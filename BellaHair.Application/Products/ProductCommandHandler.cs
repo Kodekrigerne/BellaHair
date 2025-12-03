@@ -31,9 +31,13 @@ namespace BellaHair.Application.Products
             await _productRepository.SaveChangesAsync();
         }
 
-        Task IProductCommand.UpdateProductAsync(UpdateProductCommand command)
+        async Task IProductCommand.UpdateProductAsync(UpdateProductCommand command)
         {
-            throw new NotImplementedException();
+            var productToUpdate = await _productRepository.GetAsync(command.Id);
+            var updatedPrice = Price.FromDecimal(command.Price);
+            productToUpdate.Update(command.Name, command.Description, updatedPrice);
+
+            await _productRepository.SaveChangesAsync();
         }
     }
 }
