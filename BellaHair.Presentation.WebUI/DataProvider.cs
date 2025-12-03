@@ -157,46 +157,43 @@ namespace BellaHair.Presentation.WebUI
                 new DateTime(2026, 9, 10, 9, 0, 0),
                 new DateTime(2026, 9, 30, 18, 0, 0),
                 new List<Guid> {
-        _balayageUdenKlip.Id,
-        _balayageMedKlip.Id,
-        _staniolStriberIHalvkortHårMedKlip.Id,
-        _staniolStriberIHalvkortHårUdenKlip.Id,
-        _staniolStriberILangtHårMedKlip.Id,  // NY TILFØJELSE
-        _staniolStriberILangtHårUdenKlip.Id  // NY TILFØJELSE
+                    _balayageUdenKlip.Id,
+                    _balayageMedKlip.Id,
+                    _staniolStriberIHalvkortHårMedKlip.Id,
+                    _staniolStriberIHalvkortHårUdenKlip.Id,
+                    _staniolStriberILangtHårMedKlip.Id,  
+                    _staniolStriberILangtHårUdenKlip.Id  
                 }));
 
-            // --- 8. Hurtig Tilretning Tirsdag - Meget kort og billig kampagne ---
-            // Ingen ændringer nødvendige.
+            // Hurtig Tilretning Tirsdag
             _db.Add(CampaignDiscount.Create("Hurtig Tilretning Tirsdag",
-                DiscountPercent.FromDecimal(0.25m), // 25% rabat
-                new DateTime(2027, 2, 2, 10, 0, 0), // Kun en enkelt dag i fremtiden
+                DiscountPercent.FromDecimal(0.25m), 
+                new DateTime(2027, 2, 2, 10, 0, 0), 
                 new DateTime(2027, 2, 2, 16, 0, 0),
                 new List<Guid> {
         _lilleTilretning.Id
                 }));
 
-            // --- 9. Forkælelses Fredag (NY KAMPAGNE) ---
-            // Promoverer den nye Luksus Kur og andre små wellness-behandlinger.
-            _db.Add(CampaignDiscount.Create("Forkælelses Fredag",
-                DiscountPercent.FromDecimal(0.15m), // 15% rabat
-                new DateTime(2026, 12, 4, 10, 0, 0), // Første fredag i december
-                new DateTime(2026, 12, 18, 18, 0, 0), // Gælder tre fredage i træk
+            // Forkælelsestider 
+            _db.Add(CampaignDiscount.Create("Forkælelsestider",
+                DiscountPercent.FromDecimal(0.15m), 
+                new DateTime(2026, 12, 4, 10, 0, 0), 
+                new DateTime(2026, 12, 18, 18, 0, 0), 
                 new List<Guid> {
-        _luksusKur.Id,                     // BRUGER NY BEHANDLING
-        _retFarveBryn.Id,
-        _farveVipper.Id
+                    _luksusKur.Id,                     
+                    _retFarveBryn.Id,
+                    _farveVipper.Id
                 }));
 
-            // --- 10. Langt Hår Helfarve Tilbud (NY KAMPAGNE) ---
-            // Målrettet de dyreste helfarver for at fylde tider hos farvespecialister.
+            // Langt Hår Helfarve Tilbud
             _db.Add(CampaignDiscount.Create("Langt Hår Helfarve Tilbud",
                 DiscountPercent.FromDecimal(0.20m), // 20% rabat
                 new DateTime(2027, 1, 20, 9, 0, 0),
                 new DateTime(2027, 2, 15, 18, 0, 0),
                 new List<Guid> {
-        _helfarveLangtHårMedKlip.Id,       // BRUGER NY BEHANDLING
-        _helfarveLangtHårUdenKlip.Id,      // BRUGER NY BEHANDLING
-        _helfarveHalvKortHårMedKlip.Id
+                    _helfarveLangtHårMedKlip.Id,       
+                    _helfarveLangtHårUdenKlip.Id,      
+                    _helfarveHalvKortHårMedKlip.Id
                 }));
         }
 
@@ -210,7 +207,6 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddEmployees()
         {
-            // --- Employees and Treatments ---
 
             _idaChristensen = Employee.Create(
                 Name.FromStrings("Ida", "Christensen", "Marie"),
@@ -219,7 +215,6 @@ namespace BellaHair.Presentation.WebUI
                 Address.Create("Nørregade", "Vejle", "45", 7100, 9),
                 new List<Treatment>
                 {
-                    // Ida's ekspertise: Farver og Dameklip
                     _damefrisureInklVaskFøn,
                     _damefrisureBlæs,
                     _storKlipning,
@@ -232,11 +227,12 @@ namespace BellaHair.Presentation.WebUI
                     _staniolStriberIHalvkortHårMedKlip,
                     _staniolStriberILangtHårUdenKlip,
                     _staniolStriberILangtHårMedKlip,
-                    _hårOpsætningStruktur, // Kan lave de simple opsætninger
-                    _hårOpsætningElegance  // Kan lave mellemniveau opsætninger
-                    }
-                );
-                
+                    _hårOpsætningStruktur,
+                    _hårOpsætningElegance,
+                    _luksusKur
+                }
+            );
+             
             _db.Employees.Add(_idaChristensen);
 
 
@@ -248,13 +244,12 @@ namespace BellaHair.Presentation.WebUI
                 Address.Create("Fredericiavej", "Vejle", "112", 7100, 2),
                 new List<Treatment>
                 {
-                    // Jonas' ekspertise: Herreklip og Permanent til Herrer
                     _herreklipMedVaskFøn,
                     _herreklipUdenVaskFøn,
                     _herreKlipPermanent,
                     _lilleTilretning,
                     _storKlipning,
-                    _hårOpsætningStruktur // Fokuserer på de simple, kortere opsætninger
+                    _hårOpsætningStruktur
                 }
             );
 
@@ -269,7 +264,6 @@ namespace BellaHair.Presentation.WebUI
                 Address.Create("Søndertorv", "Vejle", "7", 7100),
                 new List<Treatment>
                 {
-                    // Sofie's ekspertise: Avancerede Farver og Langt Hår
                     _damefrisureInklVaskFøn,
                     _storKlipning,
                     _balayageUdenKlip,
@@ -279,7 +273,8 @@ namespace BellaHair.Presentation.WebUI
                     _staniolStriberIHalvkortHårMedKlip,
                     _staniolStriberIHalvkortHårUdenKlip,
                     _hårOpsætningElegance,
-                    _hårOpsætningKompleks // Komplekse galla/brude opsætninger
+                    _hårOpsætningKompleks,
+                    _luksusKur
                 }
             );
 
@@ -294,7 +289,7 @@ namespace BellaHair.Presentation.WebUI
                 Address.Create("Vestergade", "Vejle", "9", 7100, 1),
                 new List<Treatment>
                 {
-                    // Lars' ekspertise: Permanent og de hurtige, præcise klip
+                    _luksusKur,
                     _damefrisureInklVaskFøn,
                     _storKlipning,
                     _lilleTilretning,
@@ -302,9 +297,9 @@ namespace BellaHair.Presentation.WebUI
                     _permanentHalvkortHårUdenKlip,
                     _permanentLangtHårUdenKlip,
                     _permanentLangtHårMedKlip,
-                    _hætteStriberIHalvkortHårMedKlip, // Hætte er en hurtigere metode
+                    _hætteStriberIHalvkortHårMedKlip, 
                     _hætteStriberILangtHårMedKlip,
-                    _herreklipMedVaskFøn // Kan tage de simple herreklip
+                    _herreklipMedVaskFøn 
                 }
             );
             
@@ -342,7 +337,7 @@ namespace BellaHair.Presentation.WebUI
                 Address.Create("Skolegade", "Egtved", "5", 6040, 6),
                 new List<Treatment>
                 {
-                    // Mads' ekspertise: Har en bred dækning for at fylde huller
+                    _luksusKur,
                     _herreklipMedVaskFøn,
                     _herreklipUdenVaskFøn,
                     _damefrisureInklVaskFøn,
@@ -418,6 +413,7 @@ namespace BellaHair.Presentation.WebUI
             _hårOpsætningStruktur = Treatment.Create("Håropsætning - Struktur", Price.FromDecimal(250m), DurationMinutes.FromInt(30));
             _hårOpsætningElegance = Treatment.Create("Håropsætning - Elegance", Price.FromDecimal(450m), DurationMinutes.FromInt(60));
             _hårOpsætningKompleks = Treatment.Create("Håropsætning - Kompleks", Price.FromDecimal(800m), DurationMinutes.FromInt(120));
+            _luksusKur = Treatment.Create("Luksuskur til hår", Price.FromDecimal(1100m), DurationMinutes.FromInt(120));
 
             _db.Add(_herreklipMedVaskFøn);
             _db.Add(_herreklipUdenVaskFøn);
