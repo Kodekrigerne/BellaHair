@@ -170,7 +170,7 @@
 			{
 				<div class="right-bottom">
 
-					@if (Mode == BookingMode.View && !_isPaid)
+					@if (Mode == BookingMode.View && !_isPaid || Mode == BookingMode.New)
 					{
 						@if (_showBirthdayOption)
 						{
