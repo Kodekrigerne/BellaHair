@@ -8,7 +8,6 @@ using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Infrastructure;
 using Bogus;
-using Bogus.Extensions.Denmark;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -489,24 +488,118 @@ namespace BellaHair.Presentation.WebUI
 
             var customers = new List<PrivateCustomer>();
 
+            // Customers without middlename and floor
             for (int i = 0; i < 250; i++)
             {
+                try
+                {
+                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName());
 
-            var danishFaker = new Faker<PrivateCustomer>("nb_NO")
-                .CustomInstantiator(f => PrivateCustomer.Create(
-                                                                Name.FromStrings(f.Name.FirstName(), f.Name.LastName()),
-                                                                Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
-                                                                PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
-                                                                Email.FromString(f.Internet.Email()),
-                                                                f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
-                                                                _currentDateTimeProvider
-                                                                ));
-            var customer = danishFaker.Generate();
+                            return PrivateCustomer.Create(name,
+                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
+                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
+                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    _currentDateTimeProvider
+                                                    );
+                        });
+
+                    var customer = customerFaker.Generate();
 
 
-                customers.Add(customer);
-            _db.Add(customer);
+                    customers.Add(customer);
+                    _db.Add(customer);
+                }
+                catch (Exception) { }
             }
+
+            // Customers with middlename and without floor
+            for (int i = 0; i < 150; i++)
+            {
+                try
+                {
+                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName(), f.Name.FirstName());
+
+                            return PrivateCustomer.Create(name,
+                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
+                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
+                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    _currentDateTimeProvider
+                                                    );
+                        });
+
+                    var customer = customerFaker.Generate();
+
+
+                    customers.Add(customer);
+                    _db.Add(customer);
+                }
+                catch (Exception) { }
+            }
+
+            // Customers without middlename and with floor
+            for (int i = 0; i < 25; i++)
+            {
+                try
+                {
+                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName());
+
+                            return PrivateCustomer.Create(name,
+                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990), f.Random.Int(1, 100)),
+                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
+                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    _currentDateTimeProvider
+                                                    );
+                        });
+
+                    var customer = customerFaker.Generate();
+
+
+                    customers.Add(customer);
+                    _db.Add(customer);
+                }
+                catch (Exception) { }
+            }
+
+            // Customers with middlename and with floor
+            for (int i = 0; i < 25; i++)
+            {
+                try
+                {
+                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName(), f.Name.FirstName());
+
+                            return PrivateCustomer.Create(name,
+                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990), f.Random.Int(1, 100)),
+                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
+                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    _currentDateTimeProvider
+                                                    );
+                        });
+
+                    var customer = customerFaker.Generate();
+
+
+                    customers.Add(customer);
+                    _db.Add(customer);
+                }
+                catch (Exception) { }
+            }
+
 
             for (int i = 0; i < 20; i++)
             {
@@ -539,7 +632,6 @@ namespace BellaHair.Presentation.WebUI
 
                 }
             }
-
 
         }
 
