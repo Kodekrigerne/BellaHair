@@ -8,7 +8,7 @@ namespace BellaHair.Domain.Tests.Bookings
         [TestCase(5)]
         public void Create_Given_ValidInteger_Then_CreatesQuantity(int input)
         {
-            //Arrange & Act
+            //Act
             var quantity = Quantity.FromInt(input);
 
             //Assert

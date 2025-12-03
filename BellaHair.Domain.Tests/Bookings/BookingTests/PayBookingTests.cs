@@ -4,6 +4,7 @@ using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
 using FixtureBuilder;
 using Moq;
+using NUnit.Framework.Internal;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {
@@ -29,7 +30,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             booking.PayBooking(dateTimeProvider.Object);
 
             //Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(booking.IsPaid, Is.True);
                 Assert.That(booking.PaidDateTime, Is.EqualTo(dateTimeProvider.Object.GetCurrentDateTime()));
@@ -39,7 +40,58 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
                 Assert.That(booking.TreatmentSnapshot!.TreatmentId, Is.EqualTo(treatment.Id));
                 Assert.That(booking.CustomerSnapshot, Is.Not.Null);
                 Assert.That(booking.CustomerSnapshot!.CustomerId, Is.EqualTo(customer.Id));
-            });
+            }
+        }
+
+        [Test]
+        public void Given_UnpaidBooking_Then_ProductsSavedToSnapshots()
+        {
+            //Arrange
+            var name = "Test product name";
+            var productLine = Fixture.New<ProductLine>().With(pl => pl.Product.Name, name).Build();
+
+            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
+            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
+
+            var booking = Fixture.New<Booking>()
+                .With(b => b.Employee!.Id, Guid.NewGuid())
+                .With(b => b.Treatment!.Id, Guid.NewGuid())
+                .With(b => b.Customer!.Id, Guid.NewGuid())
+                .With(b => b.ProductLines, [productLine])
+                .With(b => b.IsPaid, false).Build();
+
+            //Act
+            booking.PayBooking(dateTimeProvider.Object);
+
+            //Assert
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(booking.ProductLineSnapshots, Is.Not.Null);
+                Assert.That(booking.ProductLineSnapshots![0].Name, Is.EqualTo("Test product name"));
+            }
+        }
+
+        [Test]
+        public void Given_UnpaidBooking_Then_ProductLinesCleared()
+        {
+            //Arrange
+            var productLine = Fixture.New<ProductLine>().Build();
+
+            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
+            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
+
+            var booking = Fixture.New<Booking>()
+                .With(b => b.Employee!.Id, Guid.NewGuid())
+                .With(b => b.Treatment!.Id, Guid.NewGuid())
+                .With(b => b.Customer!.Id, Guid.NewGuid())
+                .With(b => b.ProductLines, [productLine])
+                .With(b => b.IsPaid, false).Build();
+
+            //Act
+            booking.PayBooking(dateTimeProvider.Object);
+
+            //Assert
+            Assert.That(booking.ProductLines, Has.Count.Zero);
         }
 
         [Test]
