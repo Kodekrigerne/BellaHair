@@ -83,10 +83,9 @@
 					}
 				</div>
 				<div class="pick-container">
-					@if (_startDate == null && _startTime == null)
+					@if (_startDate == null && _startTime == null || _employee == null)
 					{
-						@* Hvis Employee er null: btn-pick.inactive, ellers btn-pick *@
-						<button class="btn-pick @(_employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
+						<button class="btn-pick" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
 					}
 					else
 					{
