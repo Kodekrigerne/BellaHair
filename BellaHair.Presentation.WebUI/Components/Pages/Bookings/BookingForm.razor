@@ -362,10 +362,10 @@
 			if (!_isPaid) await GetBestDiscount();
 		}
 		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
-		catch
+		catch (Exception ex)
 		{
-			Snackbar.Add("Noget gik galt", Severity.Error);
-			NavigationManager.NavigateTo("/bookings");
+			Snackbar.Add(ex.Message, Severity.Error);
+			// NavigationManager.NavigateTo("/bookings");
 		}
 	}
 

@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.Bookings;
+﻿using System.Reflection;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Treatments;
@@ -90,8 +91,10 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             //Act
             booking.PayBooking(dateTimeProvider.Object);
 
+            var productLines = (List<ProductLine>)booking.GetType().GetField("_productLines", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(booking)!;
+
             //Assert
-            Assert.That(booking.ProductLines, Has.Count.Zero);
+            Assert.That(productLines, Has.Count.Zero);
         }
 
         [Test]
