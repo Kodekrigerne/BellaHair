@@ -1,18 +1,14 @@
 ﻿/* Mikkel Dahlmann */
 
 .product-description {
-    /* 1. Allows the text to flow */
     overflow: hidden;
-    /* 2. Set the maximum number of lines you want */
-    -webkit-line-clamp: 3; /* Example: limit to 3 lines */
-    /* 3. Specifies the flow direction */
+    -webkit-line-clamp: 3; /* Maksimalt antal linjer der vises */
     -webkit-box-orient: vertical;
-    
     overflow-wrap: anywhere;
     display: -webkit-box;
     max-width: 90%;
     line-height: 150%;
-    min-height: 63px;
+    min-height: 63px; /* Sørger for, at der altid vises 3 linjer, selvom de er tomme (udregnet ud fra fontsize * line-height * antal linjer) */
 }
 
 ::deep .product-price-icon {

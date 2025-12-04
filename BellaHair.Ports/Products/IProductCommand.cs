@@ -1,5 +1,12 @@
-﻿namespace BellaHair.Ports.Products
+﻿// Dennis & Mikkel Dahlmann
+
+namespace BellaHair.Ports.Products
 {
+
+    /// <summary>
+    /// Defines methods for creating, updating, and deleting products asynchronously.
+    /// </summary>
+
     public interface IProductCommand
     {
         Task CreateProductAsync(CreateProductCommand command);

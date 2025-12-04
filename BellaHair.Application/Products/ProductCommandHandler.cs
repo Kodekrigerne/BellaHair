@@ -2,8 +2,14 @@
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.Products;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Application.Products
 {
+    /// <summary>
+    /// Handles commands related to creating, updating, and deleting product entities.
+    /// </summary>
+
     public class ProductCommandHandler : IProductCommand
     {
         private readonly IProductRepository _productRepository;

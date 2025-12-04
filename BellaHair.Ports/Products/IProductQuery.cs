@@ -1,5 +1,12 @@
-﻿namespace BellaHair.Ports.Products
+﻿// Dennis
+
+namespace BellaHair.Ports.Products
 {
+
+    /// <summary>
+    /// Represents a query service for retrieving product data.
+    /// </summary>
+
     public interface IProductQuery
     {
         Task<IEnumerable<ProductDTO>> GetAllAsync();

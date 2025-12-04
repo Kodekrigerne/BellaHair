@@ -1,7 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Presentation.WebUI.Components.Pages.Products.CreateProductComponents
 {
+
+    /// <summary>
+    /// Represents the data required to create a new product, including its identifier, name, description, and price.
+    /// </summary>
+
     public class NewProductModel
     {
         public Guid Id { get; set; }

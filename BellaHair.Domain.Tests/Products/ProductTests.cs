@@ -1,12 +1,14 @@
 ﻿using BellaHair.Domain.Products;
 using BellaHair.Domain.SharedValueObjects;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Domain.Tests.Products
 {
     internal sealed class ProductTests
     {
         [Test]
-        public void CreateProduct_Given_ValidInputs_Then_CreatesProduct()
+        public void Given_ValidInputs_Then_CreatesProduct()
         {
             // Arrange
             var name = "Shampoo";

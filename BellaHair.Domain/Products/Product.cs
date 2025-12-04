@@ -1,7 +1,14 @@
 ﻿using BellaHair.Domain.SharedValueObjects;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Domain.Products
 {
+
+    /// <summary>
+    /// Represents a product with name, description and price.
+    /// </summary>
+
     public class Product : EntityBase
     {
         public string Name { get; private set; }

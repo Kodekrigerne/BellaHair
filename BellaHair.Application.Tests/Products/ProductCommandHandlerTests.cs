@@ -1,12 +1,14 @@
 ﻿using BellaHair.Ports.Products;
 using Microsoft.Extensions.DependencyInjection;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Application.Tests.Products
 {
     internal sealed class ProductCommandHandlerTests : ApplicationTestBase
     {
         [Test]
-        public void CreateProduct_Given_ValidProductData_Then_CreatesAndAddsProductToDatabase()
+        public void Given_ValidProductData_Then_CreatesAndAddsProductToDatabase()
         {
             // Arrange
             var handler = ServiceProvider.GetRequiredService<IProductCommand>();

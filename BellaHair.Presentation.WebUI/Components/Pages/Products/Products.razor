@@ -13,6 +13,7 @@
 @attribute [StreamRendering]
 @rendermode InteractiveServer
 
+<!-- Header til siden -->
 <PageHeader HeaderText="Produktkatalog" HeaderSubText="Administrer og tilføj produkter" NewButtonText="Tilføj nyt produkt" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
 
 
@@ -20,6 +21,7 @@
 <Modal IsVisible="@showCreateModal">
 	<CreateProductForm OnCreate="@HandleCreate" OnCancel="@HandleCancel"></CreateProductForm>
 </Modal>
+
 
 <!-- Container til product 'cards' -->
 <div class="kk-container product-container">
@@ -29,9 +31,9 @@
 		<h4>Produkter (@filteredProducts!.Count())</h4>
 		<input type="text" class="form-control product-search" placeholder="Søg efter produkter" 
 		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
-
 	</div>
 	
+	<!-- Visning af cards med null-tjek på listen af produkter -->
 	@if (filteredProducts is null)
 	{
 		<h1>Der kunne ikke findes nogen produkter i databasen.</h1>
@@ -40,7 +42,7 @@
 	{
 		foreach (var product in filteredProducts)
 		{
-			<!-- Card komponent der tager imod et produkt. OnChange er komponentens EventCallBack. -->
+			<!-- Card komponent der tager imod et produkt fra listen af produkter. OnChange er komponentens EventCallBack. -->
 			<ProductCard Product="@product" OnChange="@LoadProducts"></ProductCard>
 		}
 	}
@@ -110,5 +112,4 @@
 		showCreateModal = false;
 		Snackbar.Add("Handlingen blev afbrudt", Severity.Info);
 	}
-
 }

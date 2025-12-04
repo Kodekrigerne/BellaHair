@@ -1,4 +1,6 @@
-﻿.btn-add:disabled {
+﻿/* Mikkel Dahlmann */
+
+.btn-add:disabled {
     /* 1. Visuel deaktivering: Gør baggrunden lysere/grå */
     background-color: #cccccc; /* Lys grå */
     /* 2. Tekstfarve: Gør teksten lysere/svagere */

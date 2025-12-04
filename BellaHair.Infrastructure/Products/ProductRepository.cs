@@ -1,7 +1,14 @@
 ﻿using BellaHair.Domain.Products;
 
+// Mikkel Dahlmann
+
 namespace BellaHair.Infrastructure.Products
 {
+
+    /// <summary>
+    /// Provides methods for managing products in the data store.
+    /// </summary>
+
     public class ProductRepository : IProductRepository
     {
         private readonly BellaHairContext _db;
