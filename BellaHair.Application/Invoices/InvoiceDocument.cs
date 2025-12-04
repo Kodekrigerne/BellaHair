@@ -167,7 +167,7 @@ public class InvoiceDocument : IDocument
 
             foreach (var product in Data.Products)
             {
-                table.Cell().Element(CellStyle2).Text((Data.Products));
+                table.Cell().Element(CellStyle2).Text((Data.Products.IndexOf(product) + 1).ToString());
                 table.Cell().Element(CellStyle2).Text(Data.Treatment.Name);
                 table.Cell().Element(CellStyle2).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m:N2}");
                 table.Cell().Element(CellStyle2).AlignRight().Text("1");
