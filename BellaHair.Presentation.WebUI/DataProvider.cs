@@ -326,22 +326,22 @@ namespace BellaHair.Presentation.WebUI
 
 
             // PETER PEDERSEN (_peter)
-        
+
             // Kunde: Peter Svendsen
-            var b3 = Booking.Create(_peterse, _peter, _herreklip,
+            var b8 = Booking.Create(_peterse, _peter, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-5), _mockPastDateTimeProvider, []);
-            b3.PayBooking(_currentDateTimeProvider);
-            _db.Add(b3);
+            b8.PayBooking(_currentDateTimeProvider);
+            _db.Add(b8);
 
             var b29 = Booking.Create(_peterse, _peter, _farvning,
                 new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(2), _mockPastDateTimeProvider, []);
             _db.Add(b29);
 
             // Kunde: Lars Christiansen
-            var b8 = Booking.Create(_larsc, _peter, _herreklip,
+            var b9 = Booking.Create(_larsc, _peter, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(-12), _mockPastDateTimeProvider, []);
-            b8.PayBooking(_currentDateTimeProvider);
-            _db.Add(b8);
+            b9.PayBooking(_currentDateTimeProvider);
+            _db.Add(b9);
 
             var b12 = Booking.Create(_larsc, _peter, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 8, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
@@ -403,34 +403,34 @@ namespace BellaHair.Presentation.WebUI
 
 
             // MARIA JENSEN (_maria)
-        
+
             // Kunde: Peter Svendsen
-            var b2 = Booking.Create(_peterse, _maria, _herreklip,
+            var b10 = Booking.Create(_peterse, _maria, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(-15), _mockPastDateTimeProvider, []);
-            b2.PayBooking(_currentDateTimeProvider);
-            _db.Add(b2);
+            b10.PayBooking(_currentDateTimeProvider);
+            _db.Add(b10);
 
             var b15 = Booking.Create(_peterse, _maria, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
             _db.Add(b15);
 
             // Kunde: Lis Mortensen
-            var b5 = Booking.Create(_lismk, _maria, _farvning,
+            var b11 = Booking.Create(_lismk, _maria, _farvning,
                 new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(-20), _mockPastDateTimeProvider, []);
-            b5.PayBooking(_currentDateTimeProvider);
-            _db.Add(b5);
+            b11.PayBooking(_currentDateTimeProvider);
+            _db.Add(b11);
 
             // Kunde: Lars Christiansen
-            var b9 = Booking.Create(_larsc, _maria, _herreklip,
+            var b13 = Booking.Create(_larsc, _maria, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 11, 30, 0).AddDays(-3), _mockPastDateTimeProvider, []);
-            b9.PayBooking(_currentDateTimeProvider);
-            _db.Add(b9);
+            b13.PayBooking(_currentDateTimeProvider);
+            _db.Add(b13);
 
             // Oskar Issaksen bookings
-            var b10 = Booking.Create(_oskarit, _henny, _herreklip,
+            var b16 = Booking.Create(_oskarit, _henny, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-22), _mockPastDateTimeProvider, []);
-            b10.PayBooking(_currentDateTimeProvider);
-            _db.Add(b10);
+            b16.PayBooking(_currentDateTimeProvider);
+            _db.Add(b16);
 
             var b82 = Booking.Create(_larsc, _maria, _dameklip,
                 new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(12), _mockPastDateTimeProvider, []);
@@ -456,16 +456,16 @@ namespace BellaHair.Presentation.WebUI
 
 
             // SØREN MIKKELSEN (_sorenM)
-          
-            // Kunde: Lars Christiansen
-            var b7 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(-28), _mockPastDateTimeProvider, []);
-            b7.PayBooking(_currentDateTimeProvider);
-            _db.Add(b7);
 
+            // Kunde: Lars Christiansen
             var b18 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
+                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(-28), _mockPastDateTimeProvider, []);
+            b18.PayBooking(_currentDateTimeProvider);
             _db.Add(b18);
+
+            var b21 = Booking.Create(_larsc, _sorenM, _herreklip,
+                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
+            _db.Add(b21);
 
             var b22 = Booking.Create(_larsc, _sorenM, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
@@ -476,10 +476,10 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(b27);
 
             // Kunde: Oskar Issaksen
-            var b11 = Booking.Create(_oskarit, _sorenM, _herreklip,
+            var b26 = Booking.Create(_oskarit, _sorenM, _herreklip,
                 new DateTime(now.Year, now.Month, now.Day, 12, 0, 0).AddDays(-10), _mockPastDateTimeProvider, []);
-            b11.PayBooking(_currentDateTimeProvider);
-            _db.Add(b11);
+            b26.PayBooking(_currentDateTimeProvider);
+            _db.Add(b26);
 
             // Future bookings (upcoming appointments)
 
