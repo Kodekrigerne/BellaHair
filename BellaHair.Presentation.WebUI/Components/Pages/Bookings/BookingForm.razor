@@ -106,11 +106,11 @@
 				<div class="pick-container">
 					@if (_productLines.Count == 0 && (Mode == BookingMode.Edit || Mode == BookingMode.New))
 					{
-						<button class="btn-pick">Vælg produkter</button>
+						<button class="btn-pick" @onclick="() => _activePicker = Picker.Products">Vælg produkter</button>
 					}
 					else
 					{
-						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double" @onclick="() => _activePicker = Picker.Products">
 							<p class="picked-label">Produkter</p>
 							<p class="picked-text">
 								<span>@_productLines.Count produkter</span>
@@ -156,9 +156,9 @@
 							}
 						}
 					}
-					<div class="date-picker-container">
-						@if (_activePicker == Picker.Time)
-						{
+					else if (_activePicker == Picker.Time)
+					{
+						<div class="date-picker-container">
 							<div class="date-picker-section">
 								<p class="date-picker-label">Vælg en dato</p>
 								<MudDatePicker @ref="_datePickerRef"
@@ -178,8 +178,12 @@
 								TimeChanged="HandleTimeChanged"
 								PickerVariant="PickerVariant.Dialog" />
 							</div>
-						}
-					</div>
+						</div>
+					}
+					else if (_activePicker == Picker.Products)
+					{
+						
+					}
 				}
 			</div>
 			@if (_timeIsAvailable != null)
@@ -288,7 +292,7 @@
 	private bool _isPaid;
 	private List<ProductLineModel> _productLines = [];
 
-	private enum Picker { None, Customers, Treatments, Employee, Time }
+	private enum Picker { None, Customers, Treatments, Employee, Time, Products }
 	private Picker _activePicker = Picker.None;
 
 	private bool _showDeleteModal = false;
