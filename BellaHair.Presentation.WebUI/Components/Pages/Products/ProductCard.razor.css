@@ -6,7 +6,7 @@
     -webkit-box-orient: vertical;
     overflow-wrap: anywhere;
     display: -webkit-box;
-    max-width: 90%;
+    max-width: 70%;
     line-height: 150%;
     min-height: 63px; /* Sørger for, at der altid vises 3 linjer, selvom de er tomme (udregnet ud fra fontsize * line-height * antal linjer) */
 }
