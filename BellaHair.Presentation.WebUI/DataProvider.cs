@@ -91,6 +91,35 @@ namespace BellaHair.Presentation.WebUI
         List<Employee> _employees = [];
         List<PrivateCustomer> _customers = [];
 
+        // Product fields
+        // --- 4. Product Fields ---
+        private Product _shampoo;
+        private Product _balsam;
+        private Product _hårvoks;
+        private Product _hårspray;
+        private Product _hårkur;
+        private Product _leaveinConditioner;
+        private Product _ansigtsrens;
+        private Product _dagcreme;
+        private Product _natcreme;
+        private Product _serum;
+        private Product _øjenceme;
+        private Product _bodylotion;
+        private Product _håndcreme;
+        private Product _bodyWash;
+        private Product _eksfoliering;
+        private Product _solcreme;
+        private Product _aftershave;
+        private Product _skægolie;
+        private Product _stylingmousse;
+        private Product _tørshampoo;
+        private Product _læbepomade;
+        private Product _fodcreme;
+        private Product _negleolie;
+        private Product _hårfarve;
+        private Product _makeupfjerner;
+        private Product _barberskum;
+
         public void AddData()
         {
             AddPrivateCustomersUsingBogus();
