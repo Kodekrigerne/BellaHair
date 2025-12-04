@@ -223,8 +223,8 @@ namespace BellaHair.Presentation.WebUI
             // Galla & Fest Klar
             _db.Add(CampaignDiscount.Create("Galla & Fest Klar",
                 DiscountPercent.FromDecimal(0.10m),
-                new DateTime(2027, 4, 1, 9, 0, 0),
-                new DateTime(2027, 5, 31, 18, 0, 0),
+                _currentDateTimeProvider.GetCurrentDateTime().AddMonths(2),
+                _currentDateTimeProvider.GetCurrentDateTime().AddMonths(3),
                 new List<Guid> {
                     _hårOpsætningElegance.Id,
                     _hårOpsætningKompleks.Id,
@@ -235,8 +235,8 @@ namespace BellaHair.Presentation.WebUI
             // Farve Fornyelse
             _db.Add(CampaignDiscount.Create("Farve Fornyelse",
                 DiscountPercent.FromDecimal(0.25m), 
-                new DateTime(2026, 3, 1, 9, 0, 0),
-                new DateTime(2026, 4, 15, 17, 0, 0),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(-12),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(18),
                 new List<Guid> {
                     _helfarveHalvKortHårMedKlip.Id,
                     _helfarveLangtHårMedKlip.Id,       
@@ -251,8 +251,8 @@ namespace BellaHair.Presentation.WebUI
             // Balayage Mesterværk
             _db.Add(CampaignDiscount.Create("Balayage Mesterværk",
                 DiscountPercent.FromDecimal(0.20m), 
-                new DateTime(2026, 9, 10, 9, 0, 0),
-                new DateTime(2026, 9, 30, 18, 0, 0),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(-3),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(11),
                 new List<Guid> {
                     _balayageUdenKlip.Id,
                     _balayageMedKlip.Id,
@@ -274,9 +274,10 @@ namespace BellaHair.Presentation.WebUI
             // Forkælelsestider 
             _db.Add(CampaignDiscount.Create("Forkælelsestider",
                 DiscountPercent.FromDecimal(0.15m), 
-                new DateTime(2026, 12, 4, 10, 0, 0), 
-                new DateTime(2026, 12, 18, 18, 0, 0), 
-                new List<Guid> {
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(-20),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(2),
+                new List<Guid>
+                {
                     _luksusKur.Id,                     
                     _retFarveBryn.Id,
                 }));
