@@ -50,5 +50,4 @@ namespace BellaHair.Domain.Discounts
             return BookingDiscount.Active(Name, discount, Type);
         }
     }
-    public class BirthdayDiscountException(string message) : DomainException(message);
 }
