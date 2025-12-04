@@ -45,7 +45,7 @@ namespace BellaHair.Presentation.WebUI
 
         private readonly IOptions<OpeningTimesSettings> OpeningTimes;
 
-        // --- 1. Treatment Fields ---
+        // Treatment Fields 
         private Treatment _herreklipUdenVaskFøn;
         private Treatment _herreklipMedVaskFøn;
         private Treatment _damefrisureInklVaskFøn;
@@ -93,15 +93,9 @@ namespace BellaHair.Presentation.WebUI
         public void AddData()
         {
             AddPrivateCustomersUsingBogus();
-            _db.SaveChanges();
-
             AddLoyaltyDiscounts();
             AddTreatment();
-            _db.SaveChanges();
-
             AddEmployees();
-            _db.SaveChanges();
-
             AddCampaignDiscounts();
             AddBirthdayDiscounts();
             AddBookingsUsingBogusAndHandler();
