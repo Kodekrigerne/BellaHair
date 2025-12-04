@@ -102,6 +102,22 @@
 					}
 				</div>
 			</div>
+			<div class="left-container">
+				<div class="pick-container">
+					@if (_productLines.Count == 0)
+					{
+						<button class="btn-pick">Vælg produkter</button>
+					}
+					else
+					{
+						<button class="btn-picked">
+							<p class="picked-label">Produkter</p>
+							<p>@_productLines.Count produkter</p>
+							<p>Samlet pris: @_productLines.Sum(pl => pl.Price)</p>
+						</button>
+					}
+				</div>
+			</div>
 		</div>
 		<div class="body-right">
 			<div class="right-picker">
@@ -350,6 +366,8 @@
 				booking.Employee.Name,
 				booking.Employee.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
+
+			_productLines = booking.Products.Select(p => new ProductLineModel(p.Id, p.Name, p.Price, p.Quantity)).ToList();
 
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
