@@ -98,10 +98,10 @@ namespace BellaHair.Domain.Bookings
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
-            _productLineSnapshots = [.. _productLines.Select(pl => ProductLineSnapshot.FromProductLine(pl))];
+            //_productLineSnapshots = [.. _productLines.Select(pl => ProductLineSnapshot.FromProductLine(pl))];
 
             //Vi rydder product lines da vi ikke længere skal bruge dem. Da de er owned af Booking bliver de slettet fra databasen.
-            _productLines = [];
+            //_productLines = [];
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
