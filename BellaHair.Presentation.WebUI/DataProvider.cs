@@ -7,6 +7,7 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Infrastructure;
+using BellaHair.Ports.Bookings;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -22,9 +23,16 @@ namespace BellaHair.Presentation.WebUI
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider = new CurrentDateTimeProvider();
         private readonly ICurrentDateTimeProvider _mockPastDateTimeProvider = new PastDateTimeProvider();
+        private readonly IBookingCommand _bookingCommandHandler;
+        private readonly IServiceProvider _serviceProvider;
 
 #pragma warning disable CS8618
-        public DataProvider(BellaHairContext db) => _db = db;
+        public DataProvider(BellaHairContext db, IBookingCommand bookingCommandHandler, IServiceProvider serviceProvider)
+        {
+            _db = db;
+            _bookingCommandHandler = bookingCommandHandler;
+            _serviceProvider = serviceProvider;
+        }
 #pragma warning restore CS8618
 
         public void ReinstateData()
@@ -80,26 +88,114 @@ namespace BellaHair.Presentation.WebUI
         private Employee _annaPetersen;
 
         List<Employee> _employees = [];
-
-        private static readonly int[] bookingStartMinutes = new[] { 0, 15, 30, 45 };
+        List<PrivateCustomer> _customers = [];
 
         public void AddData()
         {
+            AddPrivateCustomersUsingBogus();
+            _db.SaveChanges();
+
             AddLoyaltyDiscounts();
             AddTreatment();
+            _db.SaveChanges();
+
             AddEmployees();
-            AddPrivateCustomersAndBookingsUsingBogus();
+            _db.SaveChanges();
+
             AddCampaignDiscounts();
             AddBirthdayDiscounts();
+            AddBookingsUsingBogusAndHandler();
 
             _db.SaveChanges();
         }
+
+        private void AddBookingsUsingBogusAndHandler()
+        {
+
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            for (int i = 0; i < 2000; i++)
+            {
+                try
+                {
+
+                    using var scope = _serviceProvider.CreateScope();
+
+
+                    Random random = new Random();
+                    var employee = _employees[random.Next(0, 6)];
+                    var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
+                    var customer = _customers[random.Next(0, _customers.Count)];
+
+                    var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var bookingDate = f.Date.Between(now.AddDays(1), now.AddDays(30));
+                            var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
+                            var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
+                            bookingMinutes -= (bookingMinutes % 15);
+
+                            return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id);
+                        });
+
+
+
+                    var booking = bookingFaker.Generate();
+                    if (booking.StartDateTime.DayOfWeek == DayOfWeek.Saturday || booking.StartDateTime.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+
+                    var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+                    bookingCommandHandler.CreateBooking(booking).Wait();
+
+                    scope.Dispose();
+
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+        }
+
+        private void AddPrivateCustomersUsingBogus()
+        {
+            _customers = [];
+
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            for (int i = 0; i < 30; i++)
+            {
+                try
+                {
+                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName());
+
+                            return PrivateCustomer.Create(name,
+                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
+                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
+                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
+                                                    _mockPastDateTimeProvider
+                                                    );
+                        });
+
+                    var customer = customerFaker.Generate();
+
+
+                    _customers.Add(customer);
+                    _db.Add(customer);
+                }
+                catch (Exception) { }
+            }
+        }
+
 
         private void AddBirthdayDiscounts()
         {
             _db.Add(BirthdayDiscount.Create("Fødselsdagsrabat", DiscountPercent.FromDecimal(0.50m)));
         }
-
 
         private void AddCampaignDiscounts()
         {
@@ -154,6 +250,7 @@ namespace BellaHair.Presentation.WebUI
                     _staniolStriberIHalvkortHårMedKlip.Id,
                     _staniolStriberILangtHårMedKlip.Id, 
                     _hætteStriberIHalvkortHårMedKlip.Id,
+
                     _hætteStriberILangtHårMedKlip.Id    
                 }));
 
@@ -204,7 +301,6 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddLoyaltyDiscounts()
         {
-            _db.Add(LoyaltyDiscount.Create("Stamkunde Nikkel", 1, DiscountPercent.FromDecimal(0.01m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Guld", 15, DiscountPercent.FromDecimal(0.15m)));
@@ -392,7 +488,7 @@ namespace BellaHair.Presentation.WebUI
             );
             _db.Employees.Add(_annaPetersen);
             _employees.Add(_annaPetersen);
-
+            _db.SaveChanges();
         }
 
         private void AddTreatment()
@@ -481,172 +577,13 @@ namespace BellaHair.Presentation.WebUI
                     _hårOpsætningElegance,
                     _hårOpsætningKompleks
                 };
-        }
-
-        private void AddPrivateCustomersAndBookingsUsingBogus()
-        {
-
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-
-            var customers = new List<PrivateCustomer>();
-
-            // Customers without middlename and floor
-            for (int i = 0; i < 250; i++)
-            {
-                try
-                {
-                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
-                        .CustomInstantiator(f =>
-                        {
-                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName());
-
-                            return PrivateCustomer.Create(name,
-                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
-                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
-                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
-                                                    _currentDateTimeProvider
-                                                    );
-                        });
-
-                    var customer = customerFaker.Generate();
-
-
-                    customers.Add(customer);
-                    _db.Add(customer);
-                }
-                catch (Exception) { }
-            }
-
-            // Customers with middlename and without floor
-            for (int i = 0; i < 150; i++)
-            {
-                try
-                {
-                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
-                        .CustomInstantiator(f =>
-                        {
-                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName(), f.Name.FirstName());
-
-                            return PrivateCustomer.Create(name,
-                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
-                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
-                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
-                                                    _currentDateTimeProvider
-                                                    );
-                        });
-
-                    var customer = customerFaker.Generate();
-
-
-                    customers.Add(customer);
-                    _db.Add(customer);
-                }
-                catch (Exception) { }
-            }
-
-            // Customers without middlename and with floor
-            for (int i = 0; i < 25; i++)
-            {
-                try
-                {
-                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
-                        .CustomInstantiator(f =>
-                        {
-                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName());
-
-                            return PrivateCustomer.Create(name,
-                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990), f.Random.Int(1, 100)),
-                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
-                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
-                                                    _currentDateTimeProvider
-                                                    );
-                        });
-
-                    var customer = customerFaker.Generate();
-
-
-                    customers.Add(customer);
-                    _db.Add(customer);
-                }
-                catch (Exception) { }
-            }
-
-            // Customers with middlename and with floor
-            for (int i = 0; i < 25; i++)
-            {
-                try
-                {
-                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
-                        .CustomInstantiator(f =>
-                        {
-                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName(), f.Name.FirstName());
-
-                            return PrivateCustomer.Create(name,
-                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990), f.Random.Int(1, 100)),
-                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
-                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
-                                                    _currentDateTimeProvider
-                                                    );
-                        });
-
-                    var customer = customerFaker.Generate();
-
-
-                    customers.Add(customer);
-                    _db.Add(customer);
-                }
-                catch (Exception) { }
-            }
-
-
-            for (int i = 0; i < 1000; i++)
-            {
-                try
-                {
-
-                    Random random = new Random();
-                    var employee = _employees[random.Next(1, 6)];
-                    var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
-
-                    var bookingFaker = new Faker<Booking>("nb_NO")
-                        .CustomInstantiator(f =>
-                        {
-                            var bookingDate = f.Date.Soon(60, now);
-
-                            return Booking.Create(
-                                                        f.PickRandom<PrivateCustomer>(customers),
-                                                        employee,
-                                                        treatment,
-                                                    new DateTime(
-                                                            bookingDate.Year,
-                                                            bookingDate.Month,
-                                                            bookingDate.Day,
-                                                            f.Random.Int(10, 18 - treatment.DurationMinutes.Value),
-                                                            f.PickRandom(bookingStartMinutes), 
-                                                            0),
-                                                    _currentDateTimeProvider);
-                            });
-                    
-                    
-                    var booking = bookingFaker.Generate();
-                    _db.Add(booking);
-                }
-                catch (Exception)
-                {
-
-                }
-            }
-
+            _db.SaveChanges();
         }
 
         // Bruges da Bookings skal have en ICurrentDateTimeProvider som giver deres CreatedDate som skal være i fortiden i forhold til StartTime.
         internal class PastDateTimeProvider : ICurrentDateTimeProvider
         {
-            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-60);
+            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-100);
         }
     }
 
