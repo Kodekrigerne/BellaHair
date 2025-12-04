@@ -9,6 +9,7 @@ using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Infrastructure;
 using BellaHair.Ports.Bookings;
 using Bogus;
+using FixtureBuilder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,24 +24,22 @@ namespace BellaHair.Presentation.WebUI
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider = new CurrentDateTimeProvider();
         private readonly ICurrentDateTimeProvider _mockPastDateTimeProvider = new PastDateTimeProvider();
-        private readonly IBookingCommand _bookingCommandHandler;
         private readonly IServiceProvider _serviceProvider;
 
 #pragma warning disable CS8618
-        public DataProvider(BellaHairContext db, IBookingCommand bookingCommandHandler, IServiceProvider serviceProvider)
+        public DataProvider(BellaHairContext db, IServiceProvider serviceProvider)
         {
             _db = db;
-            _bookingCommandHandler = bookingCommandHandler;
             _serviceProvider = serviceProvider;
         }
 #pragma warning restore CS8618
 
-        public void ReinstateData()
+        public async Task ReinstateData()
         {
             _db.Database.EnsureDeleted();
             _db.Database.EnsureCreated();
             _db.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
-            AddData();
+            await AddData();
         }
 
         private readonly IOptions<OpeningTimesSettings> OpeningTimes;
@@ -121,7 +120,7 @@ namespace BellaHair.Presentation.WebUI
 
         List<Product> _products = [];
 
-        public void AddData()
+        public async Task AddData()
         {
             AddProducts();
             AddPrivateCustomersUsingBogus();
@@ -131,8 +130,32 @@ namespace BellaHair.Presentation.WebUI
             AddCampaignDiscounts();
             AddBirthdayDiscounts();
             AddBookingsUsingBogusAndHandler();
+            AddPastBookingsUsingBogusAndHandler();
+            await PayAndInvoicePastBookings();
 
             _db.SaveChanges();
+        }
+
+        private async Task PayAndInvoicePastBookings()
+        {
+            var queryHandler = _serviceProvider.GetRequiredService<IBookingQuery>();
+            var commandHandler = _serviceProvider.GetRequiredService<IBookingCommand>();
+            var pastBookings = await queryHandler.GetAllOldAsync();
+
+            foreach (var booking in pastBookings)
+            {
+                if (booking.Discount != null)
+                {
+                    var discountData = new DiscountData(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
+                    var command = new PayAndInvoiceBookingCommand(booking.Id, discountData);
+                    await commandHandler.PayAndInvoiceBooking(command);
+                }
+                else
+                {
+                    var command = new PayAndInvoiceBookingCommand(booking.Id, null);
+                    await commandHandler.PayAndInvoiceBooking(command);
+                }
+            }
         }
 
         private void AddBookingsUsingBogusAndHandler()
@@ -140,7 +163,7 @@ namespace BellaHair.Presentation.WebUI
 
             var now = _currentDateTimeProvider.GetCurrentDateTime();
 
-            for (int i = 0; i < 2000; i++)
+            for (int i = 0; i < 50; i++)
             {
                 try
                 {
@@ -175,6 +198,62 @@ namespace BellaHair.Presentation.WebUI
                     if (booking.StartDateTime.DayOfWeek == DayOfWeek.Saturday || booking.StartDateTime.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
 
                     var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+                    bookingCommandHandler.CreateBooking(booking).Wait();
+
+                    scope.Dispose();
+
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+        }
+
+
+        private void AddPastBookingsUsingBogusAndHandler()
+        {
+
+            var now = _mockPastDateTimeProvider.GetCurrentDateTime();
+
+            for (int i = 0; i < 50; i++)
+            {
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
+
+                    Random random = new Random();
+                    var employee = _employees[random.Next(0, 6)];
+                    var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
+                    List<CreateProductLine> productLines = [];
+                    for (int p = 0; p < random.Next(0, 2); p++)
+                    {
+                        var productToList = _products[random.Next(0, _products.Count - 1)];
+                        var productId = productToList.Id;
+                        var quantity = random.Next(1, 2);
+                        productLines.Add(new CreateProductLine(quantity, productId));
+                    }
+                    var product = _products[random.Next(0, _products.Count)];
+                    var customer = _customers[random.Next(0, _customers.Count)];
+
+                    var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var bookingDate = f.Date.Between(now.AddDays(1), now.AddDays(30));
+                            var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
+                            var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
+                            bookingMinutes -= (bookingMinutes % 15);
+
+                            return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
+                        });
+
+                    var booking = bookingFaker.Generate();
+                    if (booking.StartDateTime.DayOfWeek == DayOfWeek.Saturday || booking.StartDateTime.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+
+                    var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+                    Fixture.New(bookingCommandHandler).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
+
                     bookingCommandHandler.CreateBooking(booking).Wait();
 
                     scope.Dispose();
@@ -337,6 +416,42 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddCampaignDiscounts()
         {
+            _db.Add(CampaignDiscount.Create("Firesale",
+                DiscountPercent.FromDecimal(0.20m), // 20% rabat
+                new DateTime(2025, 06, 1, 12, 0, 0),
+                new DateTime(2025, 12, 30, 12, 0, 0),
+                new List<Guid> {
+                    _herreklipUdenVaskFøn.Id,
+                    _herreklipMedVaskFøn.Id,
+                    _damefrisureInklVaskFøn.Id,
+                    _damefrisureBlæs.Id,
+                    _lilleTilretning.Id,
+                    _storKlipning.Id,
+                    _luksusKur.Id,
+                    _retFarveBryn.Id,
+                    _ordneBrynVipper.Id,
+                    _herreKlipPermanent.Id,
+                    _helfarveHalvkortHårUdenKlip.Id,
+                    _helfarveHalvKortHårMedKlip.Id,
+                    _helfarveLangtHårUdenKlip.Id,
+                    _helfarveLangtHårMedKlip.Id,
+                    _hætteStriberIHalvkortHårMedKlip.Id,
+                    _hætteStriberILangtHårMedKlip.Id,
+                    _permanentHalvkortHårMedKlip.Id,
+                    _permanentHalvkortHårUdenKlip.Id,
+                    _permanentLangtHårUdenKlip.Id,
+                    _permanentLangtHårMedKlip.Id,
+                    _staniolStriberIHalvkortHårUdenKlip.Id,
+                    _staniolStriberIHalvkortHårMedKlip.Id,
+                    _staniolStriberILangtHårUdenKlip.Id,
+                    _staniolStriberILangtHårMedKlip.Id,
+                    _balayageUdenKlip.Id,
+                    _balayageMedKlip.Id,
+                    _hårOpsætningStruktur.Id,
+                    _hårOpsætningElegance.Id,
+                    _hårOpsætningKompleks.Id
+                }));
+
 
             // Sommerklip udsalg
             _db.Add(CampaignDiscount.Create("Sommerklip",
@@ -722,7 +837,7 @@ namespace BellaHair.Presentation.WebUI
         // Bruges da Bookings skal have en ICurrentDateTimeProvider som giver deres CreatedDate som skal være i fortiden i forhold til StartTime.
         internal class PastDateTimeProvider : ICurrentDateTimeProvider
         {
-            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-100);
+            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-31);
         }
     }
 

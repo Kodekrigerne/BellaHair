@@ -61,7 +61,7 @@ namespace BellaHair.Presentation.WebUI
 
                 context.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
 
-                var dataProvider = new DataProvider(context, commandHandler, scope.ServiceProvider);
+                var dataProvider = new DataProvider(context, scope.ServiceProvider);
                 dataProvider.AddData();
             }
 
