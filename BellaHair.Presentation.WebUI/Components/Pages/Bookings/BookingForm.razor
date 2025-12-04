@@ -33,7 +33,6 @@
 </Modal>
 
 <div class="kk-container">
-	<p>@_startDate</p>
 	<div class="body-container">
 		<div class="body-left">
 			<div class="left-container">
@@ -84,9 +83,8 @@
 					}
 				</div>
 				<div class="pick-container">
-					@if (_startDate == null && _startTime == null)
+					@if (_startDate == null && _startTime == null || _employee == null)
 					{
-						@* Hvis Employee er null: btn-pick.inactive, ellers btn-pick *@
 						<button class="btn-pick @(_employee == null ? "inactive" : "")" @onclick="HandlePickStartDateTimeClick">Vælg en tid</button>
 					}
 					else
@@ -169,26 +167,22 @@
 			@if (_timeIsAvailable != null)
 			{
 				<div class="right-bottom">
-
-					@if (Mode == BookingMode.View && !_isPaid)
+					@if (_showBirthdayOption && Mode == BookingMode.View && !_isPaid)
 					{
-						@if (_showBirthdayOption)
-						{
-							<div class="kk-container">
-								<strong>@_customer?.FullName</strong> har fødselsdag i denne måned!
-								<div class="bday-selector">
-									<div class="bday-checkbox-div">
-										<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
-										@bind:after="GetBestDiscount"/>
-										<label class="bday-check-label" for="bdCheck">
-											<div class="bday-icon-txt-wrap">
-												<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
-											</div>
-										</label>
-									</div>
+						<div class="kk-container">
+							<strong>@_customer?.FullName</strong> har fødselsdag i denne måned!
+							<div class="bday-selector">
+								<div class="bday-checkbox-div">
+									<input class="bday-check-input" type="checkbox" id="bdCheck" @bind="_useBirthdayDiscount"
+									@bind:after="GetBestDiscount"/>
+									<label class="bday-check-label" for="bdCheck">
+										<div class="bday-icon-txt-wrap">
+											<BirthdayIcon Class="bday-icon"/> Benyt fødselsdagsrabat (50%)
+										</div>
+									</label>
 								</div>
 							</div>
-						}
+						</div>
 					}
 
 					<p class="availability-status">@_statusMessage</p>
@@ -252,9 +246,16 @@
 			}
 		</div>
 	</div>
-	@if (_startDate != null && _employees != null && _employees.Count > 0 && (Mode == BookingMode.New || Mode == BookingMode.Edit))
+	@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
 	{
-		<EmployeeDailyCalendar EmployeeBookingData="_employees" CurrentDate="_startDate.Value" CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
+		<EmployeeDailyCalendar
+			EmployeeBookingData="_employees"
+			StartDate="_startDate"
+			StartTime="_startTime"
+			EndTime="_endTime"
+			Employee="_employee"
+			CurrentDate="_startDate.Value"
+			CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
 	} 
 </div>
 

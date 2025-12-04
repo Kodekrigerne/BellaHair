@@ -20,17 +20,17 @@ namespace BellaHair.Infrastructure.Bookings
             _customerVisitsService = customerVisitsService;
         }
 
-        public async Task AddAsync(Booking booking)
+        async Task IBookingRepository.AddAsync(Booking booking)
         {
             await _db.Bookings.AddAsync(booking);
         }
 
-        public void Delete(Booking booking)
+        void IBookingRepository.Delete(Booking booking)
         {
             _db.Bookings.Remove(booking);
         }
 
-        public async Task<Booking> GetAsync(Guid id)
+        async Task<Booking> IBookingRepository.GetAsync(Guid id)
         {
             var booking = await _db.Bookings
                 .Include(b => b.Customer)
@@ -48,7 +48,7 @@ namespace BellaHair.Infrastructure.Bookings
             return booking;
         }
 
-        public async Task SaveChangesAsync()
+        async Task IBookingRepository.SaveChangesAsync()
         {
             await _db.SaveChangesAsync();
         }
