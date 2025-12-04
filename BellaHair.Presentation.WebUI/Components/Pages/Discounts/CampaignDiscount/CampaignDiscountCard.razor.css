@@ -3,7 +3,7 @@
 .cdc-card {
     padding: 1rem;
     margin-bottom: 1rem;
-    background: linear-gradient(to right, #f3e8fc, #f3e6fc);
+    background: linear-gradient(to right, #f7f2fb, #f8efff);
     border-style: solid;
     border-width: 1px;
     border-color: #e4bdff;
@@ -100,26 +100,37 @@
 }
 
 
-.btn-active, .btn-inactive {
+.btn-active, .btn-inactive, .btn-expired {
     color: white;
     padding: 0px 10px 0px 10px;
     border-radius: 14px;
     font-size: 10px;
     cursor: default;
     height: 20px;
-    width: 50px;
+    width: 70px;
 }
 
 .btn-active {
-    background-color: #2ddd22;
+    background-color: #35cf2b;
 }
 
-.btn-inactive{
-    background-color: #fa4444
+.btn-inactive {
+    background-color: #f89903
+}
+
+.btn-expired {
+    background-color: #fa4444;
 }
 
 ::deep .bin-delete-btn{
     position: absolute;
     top: 1rem;
     right: 1rem;
+}
+
+.duration-date{
+    color: #7c42ab;
+    font-weight:500;
+    margin-left:2px;
+    margin-right:2px;
 }
