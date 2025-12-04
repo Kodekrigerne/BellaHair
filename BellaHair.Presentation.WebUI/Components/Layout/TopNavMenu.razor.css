@@ -91,3 +91,16 @@ main {
     object-fit:contain;
     margin-right:20px;
 }
+
+.navbar ::deep .nav-logo-link{
+    padding: 0;
+    gap:0;
+    text-decoration:none;
+    background-color:transparent;
+    justify-self:start;
+}
+
+    .navbar ::deep .nav-logo-link.active {
+        background: none !important;
+        border-radius: 0 !important;
+    }
