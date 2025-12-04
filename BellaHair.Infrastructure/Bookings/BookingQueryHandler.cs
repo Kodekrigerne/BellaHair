@@ -180,6 +180,9 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
+                .Include(b => b.ProductLines)
+                    .ThenInclude(bpl => bpl.Product)
+                .Include(b => b.ProductLineSnapshots)
                 .Where(b => b.Employee!.Id == employeeId
                     && b.StartDateTime < endDate
                     && b.EndDateTime > startDate)

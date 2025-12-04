@@ -1,5 +1,4 @@
 using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
@@ -120,8 +119,11 @@ namespace BellaHair.Presentation.WebUI
         private Product _makeupfjerner;
         private Product _barberskum;
 
+        List<Product> _products = [];
+
         public void AddData()
         {
+            AddProducts();
             AddPrivateCustomersUsingBogus();
             AddLoyaltyDiscounts();
             AddTreatment();
@@ -147,7 +149,15 @@ namespace BellaHair.Presentation.WebUI
                     Random random = new Random();
                     var employee = _employees[random.Next(0, 6)];
                     var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
-                    var product =
+                    List<CreateProductLine> productLines = [];
+                    for (int p = 0; p < random.Next(0, 2); p++)
+                    {
+                        var productToList = _products[random.Next(0, _products.Count - 1)];
+                        var productId = productToList.Id;
+                        var quantity = random.Next(1, 2);
+                        productLines.Add(new CreateProductLine(quantity, productId));
+                    }
+                    var product = _products[random.Next(0, _products.Count)];
                     var customer = _customers[random.Next(0, _customers.Count)];
 
                     var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
@@ -158,7 +168,7 @@ namespace BellaHair.Presentation.WebUI
                             var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
                             bookingMinutes -= (bookingMinutes % 15);
 
-                            return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id);
+                            return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
 
                     var booking = bookingFaker.Generate();
@@ -210,6 +220,113 @@ namespace BellaHair.Presentation.WebUI
                 }
                 catch (Exception) { }
             }
+        }
+
+        private void AddProducts()
+        {
+            _shampoo = Product.Create("Shampoo", "Mild shampoo for alle hårtyper", Price.FromDecimal(120m));
+            _db.Add(_shampoo);
+            _products.Add(_shampoo);
+
+            _balsam = Product.Create("Balsam", "Nærende balsam for glat og skinnende hår", Price.FromDecimal(150m));
+            _db.Add(_balsam);
+            _products.Add(_balsam);
+
+            _hårvoks = Product.Create("Hårvoks", "Fleksibel hårvoks for tekstur og hold", Price.FromDecimal(200m));
+            _db.Add(_hårvoks);
+            _products.Add(_hårvoks);
+
+            _hårspray = Product.Create("Hårspray", "Langtidsholdbar hårspray med let finish", Price.FromDecimal(180m));
+            _db.Add(_hårspray);
+            _products.Add(_hårspray);
+
+            _hårkur = Product.Create("Hårkur", "Intensiv hårkur til genopbygning af skadet hår", Price.FromDecimal(250m));
+            _db.Add(_hårkur);
+            _products.Add(_hårkur);
+
+            _leaveinConditioner = Product.Create("Leave-in Conditioner", "Let leave-in conditioner for nem styling", Price.FromDecimal(130m));
+            _db.Add(_leaveinConditioner);
+            _products.Add(_leaveinConditioner);
+
+            _ansigtsrens = Product.Create("Ansigtsrens", "Skånsom rens til daglig brug, fjerner urenheder og makeup", Price.FromDecimal(160m));
+            _db.Add(_ansigtsrens);
+            _products.Add(_ansigtsrens);
+
+            _dagcreme = Product.Create("Dagcreme", "Fugtgivende dagcreme med SPF 30, beskytter mod solen", Price.FromDecimal(280m));
+            _db.Add(_dagcreme);
+            _products.Add(_dagcreme);
+
+            _natcreme = Product.Create("Natcreme", "Rig natcreme, genopbygger huden mens du sover", Price.FromDecimal(300m));
+            _db.Add(_natcreme);
+            _products.Add(_natcreme);
+
+            _serum = Product.Create("Serum", "Anti-age serum med hyaluronsyre for dyb hydrering", Price.FromDecimal(350m));
+            _db.Add(_serum);
+            _products.Add(_serum);
+
+            _øjenceme = Product.Create("Øjencreme", "Let øjencreme reducerer poser og mørke rande", Price.FromDecimal(220m));
+            _db.Add(_øjenceme);
+            _products.Add(_øjenceme);
+
+            _bodylotion = Product.Create("Bodylotion", "Blødgørende bodylotion med naturlige olier", Price.FromDecimal(110m));
+            _db.Add(_bodylotion);
+            _products.Add(_bodylotion);
+
+            _håndcreme = Product.Create("Håndcreme", "Reparerende håndcreme, ideel til tørre hænder", Price.FromDecimal(85m));
+            _db.Add(_håndcreme);
+            _products.Add(_håndcreme);
+
+            _bodyWash = Product.Create("Body Wash", "Opfriskende kropsvask med citrusduft", Price.FromDecimal(95m));
+            _db.Add(_bodyWash);
+            _products.Add(_bodyWash);
+
+            _eksfoliering = Product.Create("Eksfoliering", "Kropsskrub med fine korn, fjerner døde hudceller", Price.FromDecimal(145m));
+            _db.Add(_eksfoliering);
+            _products.Add(_eksfoliering);
+
+            _solcreme = Product.Create("Solcreme", "Vandfast solcreme SPF 50 til hele kroppen", Price.FromDecimal(190m));
+            _db.Add(_solcreme);
+            _products.Add(_solcreme);
+
+            _aftershave = Product.Create("Aftershave", "Beroligende aftershave balm uden alkohol", Price.FromDecimal(175m));
+            _db.Add(_aftershave);
+            _products.Add(_aftershave);
+
+            _skægolie = Product.Create("Skægolie", "Blødgørende skægolie med cedertræ og patchouli", Price.FromDecimal(195m));
+            _db.Add(_skægolie);
+            _products.Add(_skægolie);
+
+            _stylingmousse = Product.Create("Stylingmousse", "Volumengivende mousse for let og luftig frisure", Price.FromDecimal(140m));
+            _db.Add(_stylingmousse);
+            _products.Add(_stylingmousse);
+
+            _tørshampoo = Product.Create("Tørshampoo", "Øjeblikkelig tørshampoo, giver volumen og friskhed", Price.FromDecimal(125m));
+            _db.Add(_tørshampoo);
+            _products.Add(_tørshampoo);
+
+            _læbepomade = Product.Create("Læbepomade", "Fugtgivende læbepomade med bivoks og mint", Price.FromDecimal(55m));
+            _db.Add(_læbepomade);
+            _products.Add(_læbepomade);
+
+            _fodcreme = Product.Create("Fodcreme", "Intensiv fodcreme mod tør og sprukken hud", Price.FromDecimal(105m));
+            _db.Add(_fodcreme);
+            _products.Add(_fodcreme);
+
+            _negleolie = Product.Create("Negleolie", "Plejende olie til negle og neglebånd", Price.FromDecimal(75m));
+            _db.Add(_negleolie);
+            _products.Add(_negleolie);
+
+            _hårfarve = Product.Create("Hårfarve", "Permanent hårfarve i medium brun", Price.FromDecimal(199m));
+            _db.Add(_hårfarve);
+            _products.Add(_hårfarve);
+
+            _makeupfjerner = Product.Create("Makeupfjerner", "Effektiv makeupfjerner, også til vandfast makeup", Price.FromDecimal(115m));
+            _db.Add(_makeupfjerner);
+            _products.Add(_makeupfjerner);
+
+            _barberskum = Product.Create("Barberskum", "Klassisk barberskum for tæt og glat barbering", Price.FromDecimal(80m));
+            _db.Add(_barberskum);
+            _products.Add(_barberskum);
         }
 
 
