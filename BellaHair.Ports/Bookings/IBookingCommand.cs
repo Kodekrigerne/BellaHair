@@ -14,12 +14,14 @@ namespace BellaHair.Ports.Bookings
         Task DeleteBooking(DeleteBookingCommand command);
     }
 
+    public record CreateProductLine(int Quantity, Guid ProductId);
     public record DiscountData(string Name, decimal Amount, DiscountTypeDTO Type);
+
     public record PayAndInvoiceBookingCommand(Guid Id, DiscountData? Discount);
 
-    public record UpdateBookingCommand(Guid Id, DateTime StartDateTime, Guid EmployeeId, Guid TreatmentId);
+    public record UpdateBookingCommand(Guid Id, DateTime StartDateTime, Guid EmployeeId, Guid TreatmentId, IEnumerable<CreateProductLine> ProductLines);
 
     public record DeleteBookingCommand(Guid Id);
 
-    public record CreateBookingCommand(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId);
+    public record CreateBookingCommand(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, IEnumerable<CreateProductLine> ProductLines);
 }

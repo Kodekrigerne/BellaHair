@@ -33,15 +33,20 @@ namespace BellaHair.Infrastructure.Bookings
 
             var booking = await _db.Bookings
                 .Include(b => b.Treatment)
-                .ThenInclude(bt => bt!.Employees)
+                    .ThenInclude(bt => bt!.Employees)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
-                .ThenInclude(be => be!.Bookings.Where(beb => beb.EndDateTime > now))
+                    .ThenInclude(be => be!.Bookings.Where(beb => beb.EndDateTime > now))
+                .Include(b => b.ProductLines)
+                .Include(b => b.ProductLineSnapshots)
                 .SingleOrDefaultAsync(b => b.Id == query.Id) ?? throw new Exception("");
 
             if (booking.Employee == null && booking.EmployeeSnapshot == null) throw new InvalidOperationException($"Booking {booking.Id} does not have an employee attached.");
             if (booking.Customer == null && booking.CustomerSnapshot == null) throw new InvalidOperationException($"Booking {booking.Id} does not have a customer attached.");
             if (booking.Treatment == null && booking.TreatmentSnapshot == null) throw new InvalidOperationException($"Booking {booking.Id} does not have a treatment attached.");
+
+            // Til medarbejder, behandling og kunder foretrækker vi at bruge deres relationer.
+            // Hvis relationen er slettet anvender vi snapshots med data fra behandlingsdata
 
             var employee = new EmployeeNameWithBookingsDTO(
                 booking.Employee?.Id ?? booking.EmployeeSnapshot!.EmployeeId,
@@ -66,19 +71,25 @@ namespace BellaHair.Infrastructure.Bookings
                 booking.Customer?.Address.FullAddress ?? booking.CustomerSnapshot!.FullAddress,
                 0);
 
+            var products = booking.IsPaid
+                ? booking.ProductLines.Select(pl => new ProductLineDTO(pl.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value))
+                : booking.ProductLineSnapshots?.Select(pls => new ProductLineDTO(pls.ProductId, pls.Name, pls.Description, pls.Price, pls.Quantity)) ?? [];
+
+            var discount = booking.Discount != null
+                ? new DiscountDTO(
+                    booking.Discount.Name,
+                    booking.Discount.Amount,
+                    (DiscountTypeDTO)booking.Discount.Type)
+                : null;
+
             return new BookingWithRelationsDTO(
                 booking.StartDateTime,
                 booking.IsPaid,
                 employee,
                 customer,
                 treatment,
-                booking.Discount != null
-                    ? new DiscountDTO(
-                        booking.Discount.Name,
-                        booking.Discount.Amount,
-                        (DiscountTypeDTO)booking.Discount.Type)
-                    : null
-                    );
+                products,
+                discount);
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()
@@ -145,6 +156,29 @@ namespace BellaHair.Infrastructure.Bookings
                 b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountTypeDTO)b.Discount.Type) : null
                 );
             });
+        }
+
+
+        /// <summary>
+        /// Returns all bookings on specific employee within a specific range of date.
+        /// Only used for booking calendar view to limit bookings loaded for effeciency.
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllWithinPeriodOnEmployee(DateTime startDate, DateTime endDate, Guid employeeId)
+        {
+            var bookings = await _db.Bookings.AsNoTracking()
+                .Include(b => b.Treatment)
+                .Include(b => b.Customer)
+                .Include(b => b.Employee)
+                .Where(b => b.Employee!.Id == employeeId
+                    && b.StartDateTime < endDate
+                    && b.EndDateTime > startDate)
+                .ToListAsync();
+
+            return MapToBookingDTOs(bookings);
         }
     }
 }

@@ -26,11 +26,16 @@ namespace BellaHair.Infrastructure.Tests
         public void OneTimeSetUp()
         {
             var services = new ServiceCollection();
+
+            var options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
+            services.AddSingleton(options);
+            services.AddDbContext<BellaHairContext>();
+
             services.AddInfrastructureServices();
+
             ServiceProvider = services.BuildServiceProvider();
 
-            _options = new DbContextOptionsBuilder<BellaHairContext>().UseSqlite($"Data Source={_dbPath}").Options;
-            _db = new BellaHairContext(_options);
+            _db = ServiceProvider.GetRequiredService<BellaHairContext>();
             _db.Database.EnsureCreated();
 
         }

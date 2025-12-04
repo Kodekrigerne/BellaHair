@@ -5,6 +5,7 @@ using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 using BellaHair.Ports.Bookings;
 using Microsoft.Extensions.Options;
@@ -25,6 +26,7 @@ namespace BellaHair.Application
         private readonly IBookingOverlapChecker _bookingOverlapChecker;
         private readonly IDiscountCalculatorService _discountCalculatorService;
         private readonly IInvoiceRepository _invoiceRepository;
+        private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly BusinessInfoSettings _businessInfoSettings;
 
@@ -38,7 +40,8 @@ namespace BellaHair.Application
             IDiscountCalculatorService discountCalculatorService,
             IInvoiceRepository invoiceRepository,
             IUnitOfWork unitOfWork,
-            IOptions<BusinessInfoSettings> businessInfoSettings)
+            IOptions<BusinessInfoSettings> businessInfoSettings,
+            IProductRepository productRepository)
         {
             _employeeRepository = employeeRepository;
             _privateCustomerRepository = privateCustomerRepository;
@@ -50,6 +53,7 @@ namespace BellaHair.Application
             _invoiceRepository = invoiceRepository;
             _unitOfWork = unitOfWork;
             _businessInfoSettings = businessInfoSettings.Value;
+            _productRepository = productRepository;
         }
 
         async Task IBookingCommand.CreateBooking(CreateBookingCommand command)
@@ -65,7 +69,9 @@ namespace BellaHair.Application
                 command.CustomerId))
                 throw new DomainException("Kan ikke oprette booking som overlapper med eksisterende booking.");
 
-            var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider);
+            var productLineDatas = await ConvertToProductLineData(command.ProductLines);
+
+            var booking = Booking.Create(customer, employee, treatment, command.StartDateTime, _currentDateTimeProvider, productLineDatas);
 
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking, includeBirthdayDiscount: true);
@@ -159,13 +165,27 @@ namespace BellaHair.Application
                 booking.Id))
                 throw new DomainException("Kan ikke ændre booking som overlapper med eksisterende booking.");
 
+            var productLineDatas = await ConvertToProductLineData(command.ProductLines);
+
             //Den bedste rabat findes og tilføjes til bookingen
             var discount = await _discountCalculatorService.GetBestDiscount(booking, includeBirthdayDiscount: true);
             if (discount != null) booking.SetDiscount(discount);
 
-            booking.Update(command.StartDateTime, employee, treatment, _currentDateTimeProvider);
+            booking.Update(command.StartDateTime, employee, treatment, productLineDatas, _currentDateTimeProvider);
 
             await _bookingRepository.SaveChangesAsync();
+        }
+
+        private async Task<IEnumerable<ProductLineData>> ConvertToProductLineData(IEnumerable<CreateProductLine> createProductLines)
+        {
+            var productLineDatas = await Task.WhenAll(
+                createProductLines.Select(async pl =>
+                {
+                    var quantity = Quantity.FromInt(pl.Quantity);
+                    var product = await _productRepository.GetAsync(pl.ProductId);
+                    return new ProductLineData(quantity, product);
+                }));
+            return productLineDatas;
         }
     }
 }

@@ -5,18 +5,21 @@ using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
 using BellaHair.Infrastructure.Invoices;
 using BellaHair.Infrastructure.PrivateCustomers;
+using BellaHair.Infrastructure.Products;
 using BellaHair.Infrastructure.Treatments;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using BellaHair.Ports.Employees;
 using BellaHair.Ports.Invoices;
 using BellaHair.Ports.PrivateCustomers;
+using BellaHair.Ports.Products;
 using BellaHair.Ports.Treatments;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -63,6 +66,9 @@ namespace BellaHair.Infrastructure
             serviceCollection.AddScoped<IEmailService, EmailService>();
 
             serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            serviceCollection.AddScoped<IProductQuery, ProductQueryHandler>();
+            serviceCollection.AddScoped<IProductRepository, ProductRepository>();
 
             return serviceCollection;
         }

@@ -1,0 +1,49 @@
+﻿using BellaHair.Domain.Products;
+using BellaHair.Domain.SharedValueObjects;
+using BellaHair.Ports.Products;
+
+// Mikkel Dahlmann
+
+namespace BellaHair.Application.Products
+{
+    /// <summary>
+    /// Handles commands related to creating, updating, and deleting product entities.
+    /// </summary>
+
+    public class ProductCommandHandler : IProductCommand
+    {
+        private readonly IProductRepository _productRepository;
+
+        public ProductCommandHandler(IProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
+
+        async Task IProductCommand.CreateProductAsync(CreateProductCommand command)
+        {
+            var price = Price.FromDecimal(command.Price);
+            var product = Product.Create(command.Name, command.Description, price);
+
+            await _productRepository.AddAsync(product);
+            await _productRepository.SaveChangesAsync();
+        }
+
+        async Task IProductCommand.DeleteProductAsync(DeleteProductCommand command)
+        {
+            var productToDelete = await _productRepository.GetAsync(command.Id);
+
+            _productRepository.Delete(productToDelete);
+
+            await _productRepository.SaveChangesAsync();
+        }
+
+        async Task IProductCommand.UpdateProductAsync(UpdateProductCommand command)
+        {
+            var productToUpdate = await _productRepository.GetAsync(command.Id);
+            var updatedPrice = Price.FromDecimal(command.Price);
+            productToUpdate.Update(command.Name, command.Description, updatedPrice);
+
+            await _productRepository.SaveChangesAsync();
+        }
+    }
+}

@@ -17,7 +17,7 @@ namespace BellaHair.Infrastructure.Discounts
             return await _db.Discounts
                 .AsNoTracking()
                 .OfType<LoyaltyDiscount>()
-                .Select(x => new LoyaltyDiscountDTO(x.Id, x.Name, x.MinimumVisits, x.DiscountPercent.Value))
+                .Select(x => new LoyaltyDiscountDTO(x.Id, x.Name, x.MinimumVisits, x.TreatmentDiscountPercent.Value))
                 .ToListAsync();
         }
 

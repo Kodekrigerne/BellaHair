@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Ports.Discounts
+﻿using BellaHair.Ports.Bookings;
+
+namespace BellaHair.Ports.Discounts
 {
     //Dennis
     /// <summary>
@@ -12,7 +14,7 @@
         Task<BookingDiscountDTO?> FindBestDiscount(FindBestDiscountQuery query);
     }
 
-    public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, bool IncludeBirthdayDiscount,Guid? BookingId = null);
+    public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, bool IncludeBirthdayDiscount, IEnumerable<CreateProductLine> ProductLines, Guid? BookingId = null);
 
     public record BookingDiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 }

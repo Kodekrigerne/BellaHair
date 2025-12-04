@@ -1,8 +1,8 @@
 ﻿using BellaHair.Domain;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
-using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Infrastructure;
+using BellaHair.Ports.PrivateCustomers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Application.Tests.PrivateCustomers
@@ -15,7 +15,7 @@ namespace BellaHair.Application.Tests.PrivateCustomers
         public void Given_PrivateCustomerData_Then_CreatesPrivateCustomerInDatabase()
         {
             // Arrange
-            
+
             // Castes til IPrivateCustomerRepository, fordi metodekaldene på repo er eksplicitte.
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
             var handler = ServiceProvider.GetRequiredService<IPrivateCustomerCommand>();
@@ -24,9 +24,9 @@ namespace BellaHair.Application.Tests.PrivateCustomers
 
             // Act
             handler.CreatePrivateCustomerAsync(command).GetAwaiter().GetResult();
-            var customerFromDb = _db.PrivateCustomers.FirstOrDefault();
 
             // Assert
+            var customerFromDb = _db.PrivateCustomers.FirstOrDefault();
             Assert.Multiple(() =>
             {
                 Assert.That(customerFromDb!.Name.FirstName, Is.EqualTo(command.FirstName));
@@ -64,7 +64,7 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             // Arrange
             var dateTimeProvider = (ICurrentDateTimeProvider)new CurrentDateTimeProvider();
             var handler = ServiceProvider.GetRequiredService<IPrivateCustomerCommand>();
-            
+
             //var handler = (IPrivateCustomerCommand)new PrivateCustomerCommandHandler(repo, dateTimeProvider, bookingChecker);
 
             var customer0 = PrivateCustomer.Create(Name.FromStrings("Mikkel", "Dahlmann"),

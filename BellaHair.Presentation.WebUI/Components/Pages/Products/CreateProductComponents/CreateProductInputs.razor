@@ -1,0 +1,57 @@
+﻿<!-- Mikkel Dahlmann -->
+
+<div class="kk-container">
+	<div class="product-grouped-inputs">
+		<div class="product-input">
+
+			<label for="name-input" class="required">Navn</label>
+			<InputText autocomplete="off" id="name-input" @ref="_nameInput" @bind-Value="Product.Name" />
+			<ValidationMessage For="@(() => Product.Name)" />
+
+		</div>
+	</div>
+	<br/>
+	<div class="product-grouped-inputs">
+		<div class="product-input">
+
+			<label for="price-input" class="required">Pris</label>
+			<InputNumber autocomplete="off" id="price-input" @bind-Value="Product.Price" />
+			<ValidationMessage For="@(() => Product.Price)" />
+
+		</div>
+	</div>	
+	<br />
+	<div class="product-grouped-inputs">
+		<div class="product-input">
+
+			<label for="description-input" class="required">Beskrivelse</label>
+			<InputTextArea class="inputareabox" id="description-input" rows="5" placeholder="Indtast beskrivelse af produktet..." @bind-Value="Product.Description" />
+			<ValidationMessage For="@(() => Product.Description)" />
+
+		</div>
+	</div>
+</div>
+
+@code
+{
+	[Parameter, EditorRequired]
+	public required NewProductModel Product { get; set; }
+
+	private InputText? _nameInput;
+
+	// Override af componentbase metode.
+	// Metoden kaldes automatisk efter hver render af komponenten.
+	// Hvis det er første render, så
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		// Hvis det er komponentens første render, så køres følgende.
+		if (firstRender)
+		{
+			// Sikrer at firstnameinput elementet er skabt og tilgængeligt, før der forsøges at sættes focus til det.
+			if (_nameInput?.Element.HasValue ?? false)
+			{
+				await _nameInput.Element.Value.FocusAsync();
+			}
+		}
+	}
+}

@@ -1,0 +1,105 @@
+﻿@using BellaHair.Domain
+@using BellaHair.Ports.Products
+@using BellaHair.Presentation.WebUI.Components.Pages.Products.CreateProductComponents
+@using BellaHair.Presentation.WebUI.Components.Shared
+@inject ISnackbar Snackbar
+@inject IProductCommand ProductCommand
+
+<!-- Mikkel Dahlmann -->
+
+
+<div class="product-card">
+	
+	<div class="product-avatar">
+		<TreatmentIcon Class="treatment-icon" />
+	</div>
+
+	<div class="product-details">
+
+		<h6>@Product.Name</h6>
+
+		<p class="product-description">@Product.Description</p>
+
+		<hr class="product-line" />
+
+		<div class="product-pd-details">
+
+			<PriceIcon Class="product-price-icon" />
+			@Product.Price.ToString("C")
+
+		</div>
+	</div>
+
+	<div class="action-button-group">
+			<EditButton onclick="@(() => showEditModal = true)" />
+			<BinDeleteButton OnClick="@(() => showConfirmDelete = true)" />
+	</div>
+
+</div>
+
+<!-- Modal til sletning -->
+<Modal @bind-IsVisible="@showConfirmDelete">
+	<h3>Slet '@Product.Name'</h3>
+	<hr class="product-line" />
+	<p>Ønsker du at slette dette produkt?</p>
+	Handlingen kan ikke fortrydes.
+
+	<div class="btn-wrapper">
+
+		<button class="btn-remove" @onclick="HandleOnDeleteClick">Slet</button>
+		<button class="btn-add" @onclick="@(() => { showConfirmDelete = false; })">Annuller</button>
+
+	</div>
+</Modal>
+
+<!-- Modal til redigering -->
+<Modal IsVisible="@showEditModal">
+	<UpdateProductForm OnUpdate="@HandleUpdate" OnCancel="@CloseModal" ProductToUpdate="Product"></UpdateProductForm>
+</Modal>
+
+
+
+@code {
+	[Parameter, EditorRequired]
+	public required ProductDTO Product { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnChange { get; set; }
+
+	private bool showConfirmDelete;
+	private bool showEditModal;
+
+	private async Task HandleUpdate()
+	{
+		showEditModal = false;
+		await OnChange.InvokeAsync();
+	}
+
+	private async Task HandleOnDeleteClick()
+	{
+		try
+		{
+			var command = new DeleteProductCommand(Product.Id);
+			await ProductCommand.DeleteProductAsync(command);
+
+			showConfirmDelete = false;
+			await OnChange.InvokeAsync();
+			Snackbar.Add($"Produktet '{Product.Name}' blev slettet.", Severity.Success);
+		}
+		catch (DomainException ex)
+		{
+			showConfirmDelete = false;
+			Snackbar.Add(ex.Message, Severity.Error);
+		}
+		catch (Exception)
+		{
+			showConfirmDelete = false;
+			Snackbar.Add("Der skete en uventet fejl.", Severity.Error);
+		}
+	}
+
+	private void CloseModal()
+	{
+		showEditModal = false;
+	}
+}

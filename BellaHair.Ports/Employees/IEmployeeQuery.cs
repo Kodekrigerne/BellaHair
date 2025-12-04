@@ -16,6 +16,7 @@ namespace BellaHair.Ports.Employees
         Task<EmployeeDTOFull> GetEmployeeAsync(GetEmployeeByIdQuery query);
         Task<List<EmployeeNameDTO>> GetEmployeesByTreatmentIdAsync(GetEmployeesByTreatmentIdQuery query);
         Task<bool> EmployeeHasFutureBookings(Guid id);
+        Task<List<EmployeeDTOSimple>> GetAllEmployeesSimpleAsync();
     }
 
     /// <summary>
@@ -35,6 +36,7 @@ namespace BellaHair.Ports.Employees
     public record GetWithFutureBookingsQuery(Guid Id);
 
     public record EmployeeNameDTO(string FullName);
+    public record EmployeeDTOSimple(Guid Id, string FullName);
 
     public record GetEmployeesByTreatmentIdQuery(Guid TreatmentId);
 
