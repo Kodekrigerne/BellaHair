@@ -14,16 +14,18 @@ namespace BellaHair.Domain.Invoices
         public int Id { get; set; }
         public DateTime IssueDate { get; set; }
         public CustomerSnapshot Customer { get; set; }
-        public List<TreatmentSnapshot> Treatments { get; set; } = [];
+        public TreatmentSnapshot Treatment { get; set; }
+        public IEnumerable<ProductLineSnapshot> Products { get; set; }
         public BookingDiscount? Discount { get; set; }
         public decimal Total { get; set; }
 
-        public InvoiceData(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, decimal total, BookingDiscount? discount)
+        public InvoiceData(int id, DateTime issueDate, CustomerSnapshot customer, TreatmentSnapshot treatment, IEnumerable<ProductLineSnapshot> products, decimal total, BookingDiscount? discount)
         {
             Id = id;
             IssueDate = issueDate;
             Customer = customer;
-            Treatments.Add(treatment);
+            Treatment = treatment;
+            Products = products;
             Total = total;
             Discount = discount;
         }

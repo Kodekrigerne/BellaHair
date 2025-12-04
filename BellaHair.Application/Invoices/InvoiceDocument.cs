@@ -154,15 +154,26 @@ public class InvoiceDocument : IDocument
                 }
             });
 
-            foreach (var treatment in Data.Treatments)
-            {
-                table.Cell().Element(CellStyle).Text((Data.Treatments.IndexOf(treatment) + 1).ToString());
-                table.Cell().Element(CellStyle).Text(treatment.Name);
-                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 0.8m:N2}");
-                table.Cell().Element(CellStyle).AlignRight().Text("1");
-                table.Cell().Element(CellStyle).AlignRight().Text($"kr {treatment.Price * 0.8m * 1:N2}");
+            table.Cell().Element(CellStyle).Text(("1"));
+            table.Cell().Element(CellStyle).Text(Data.Treatment.Name);
+            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m:N2}");
+            table.Cell().Element(CellStyle).AlignRight().Text("1");
+            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m * 1:N2}");
 
-                static IContainer CellStyle(IContainer container)
+            static IContainer CellStyle(IContainer container)
+            {
+                return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+            }
+
+            foreach (var product in Data.Products)
+            {
+                table.Cell().Element(CellStyle2).Text((Data.Products));
+                table.Cell().Element(CellStyle2).Text(Data.Treatment.Name);
+                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m:N2}");
+                table.Cell().Element(CellStyle2).AlignRight().Text("1");
+                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m * 1:N2}");
+
+                static IContainer CellStyle2(IContainer container)
                 {
                     return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
                 }
@@ -170,13 +181,13 @@ public class InvoiceDocument : IDocument
 
             if (Data.Discount != null)
             {
-                table.Cell().Element(CellStyle).Text("");
-                table.Cell().Element(CellStyle).Text($"Rabat: {Data.Discount.Name}");
-                table.Cell().Element(CellStyle).AlignRight().Text("");
-                table.Cell().Element(CellStyle).AlignRight().Text("");
-                table.Cell().Element(CellStyle).AlignRight().Text($"kr -{Data.Discount.Amount * 0.8m:N2}");
+                table.Cell().Element(CellStyle1).Text("");
+                table.Cell().Element(CellStyle1).Text($"Rabat: {Data.Discount.Name}");
+                table.Cell().Element(CellStyle1).AlignRight().Text("");
+                table.Cell().Element(CellStyle1).AlignRight().Text("");
+                table.Cell().Element(CellStyle1).AlignRight().Text($"kr -{Data.Discount.Amount * 0.8m:N2}");
 
-                static IContainer CellStyle(IContainer container)
+                static IContainer CellStyle1(IContainer container)
                 {
                     return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
                 }
