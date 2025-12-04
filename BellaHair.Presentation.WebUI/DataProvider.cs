@@ -113,13 +113,12 @@ namespace BellaHair.Presentation.WebUI
             {
                 try
                 {
-
                     using var scope = _serviceProvider.CreateScope();
-
 
                     Random random = new Random();
                     var employee = _employees[random.Next(0, 6)];
                     var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
+                    var product =
                     var customer = _customers[random.Next(0, _customers.Count)];
 
                     var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
@@ -132,8 +131,6 @@ namespace BellaHair.Presentation.WebUI
 
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id);
                         });
-
-
 
                     var booking = bookingFaker.Generate();
                     if (booking.StartDateTime.DayOfWeek == DayOfWeek.Saturday || booking.StartDateTime.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
@@ -211,13 +208,13 @@ namespace BellaHair.Presentation.WebUI
             // Vinter Permanent Udsalg (afsluttet)
             _db.Add(CampaignDiscount.Create("Vinter Permanent Udsalg",
                 DiscountPercent.FromDecimal(0.30m),
-                new DateTime(2025, 1, 15, 9, 0, 0), 
-                new DateTime(2025, 2, 28, 18, 0, 0), 
+                new DateTime(2025, 1, 15, 9, 0, 0),
+                new DateTime(2025, 2, 28, 18, 0, 0),
                 new List<Guid> {
                     _permanentHalvkortHårMedKlip.Id,
                     _permanentHalvkortHårUdenKlip.Id,
-                    _permanentLangtHårUdenKlip.Id,     
-                    _permanentLangtHårMedKlip.Id,     
+                    _permanentLangtHårUdenKlip.Id,
+                    _permanentLangtHårMedKlip.Id,
                     _herreKlipPermanent.Id
                 }));
 
@@ -235,23 +232,23 @@ namespace BellaHair.Presentation.WebUI
 
             // Farve Fornyelse
             _db.Add(CampaignDiscount.Create("Farve Fornyelse",
-                DiscountPercent.FromDecimal(0.25m), 
+                DiscountPercent.FromDecimal(0.25m),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(-12),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(18),
                 new List<Guid> {
                     _helfarveHalvKortHårMedKlip.Id,
-                    _helfarveLangtHårMedKlip.Id,       
+                    _helfarveLangtHårMedKlip.Id,
                     _balayageUdenKlip.Id,
                     _staniolStriberIHalvkortHårMedKlip.Id,
-                    _staniolStriberILangtHårMedKlip.Id, 
+                    _staniolStriberILangtHårMedKlip.Id,
                     _hætteStriberIHalvkortHårMedKlip.Id,
 
-                    _hætteStriberILangtHårMedKlip.Id    
+                    _hætteStriberILangtHårMedKlip.Id
                 }));
 
             // Balayage Mesterværk
             _db.Add(CampaignDiscount.Create("Balayage Mesterværk",
-                DiscountPercent.FromDecimal(0.20m), 
+                DiscountPercent.FromDecimal(0.20m),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(-3),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(11),
                 new List<Guid> {
@@ -259,14 +256,14 @@ namespace BellaHair.Presentation.WebUI
                     _balayageMedKlip.Id,
                     _staniolStriberIHalvkortHårMedKlip.Id,
                     _staniolStriberIHalvkortHårUdenKlip.Id,
-                    _staniolStriberILangtHårMedKlip.Id,  
-                    _staniolStriberILangtHårUdenKlip.Id  
+                    _staniolStriberILangtHårMedKlip.Id,
+                    _staniolStriberILangtHårUdenKlip.Id
                 }));
 
             // Hurtig Tilretning Tirsdag
             _db.Add(CampaignDiscount.Create("Hurtig Tilretning Tirsdag",
-                DiscountPercent.FromDecimal(0.25m), 
-                new DateTime(2027, 2, 2, 10, 0, 0), 
+                DiscountPercent.FromDecimal(0.25m),
+                new DateTime(2027, 2, 2, 10, 0, 0),
                 new DateTime(2027, 2, 2, 16, 0, 0),
                 new List<Guid> {
         _lilleTilretning.Id
@@ -274,12 +271,12 @@ namespace BellaHair.Presentation.WebUI
 
             // Forkælelsestider 
             _db.Add(CampaignDiscount.Create("Forkælelsestider",
-                DiscountPercent.FromDecimal(0.15m), 
+                DiscountPercent.FromDecimal(0.15m),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(-20),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(2),
                 new List<Guid>
                 {
-                    _luksusKur.Id,                     
+                    _luksusKur.Id,
                     _retFarveBryn.Id,
                 }));
 
@@ -289,8 +286,8 @@ namespace BellaHair.Presentation.WebUI
                 new DateTime(2027, 1, 20, 9, 0, 0),
                 new DateTime(2027, 2, 15, 18, 0, 0),
                 new List<Guid> {
-                    _helfarveLangtHårMedKlip.Id,       
-                    _helfarveLangtHårUdenKlip.Id,      
+                    _helfarveLangtHårMedKlip.Id,
+                    _helfarveLangtHårUdenKlip.Id,
                     _helfarveHalvKortHårMedKlip.Id
                 }));
         }
@@ -330,7 +327,7 @@ namespace BellaHair.Presentation.WebUI
                 }
             );
 
-             
+
             _db.Employees.Add(_idaChristensen);
             _employees.Add(_idaChristensen);
 
@@ -397,14 +394,14 @@ namespace BellaHair.Presentation.WebUI
                     _permanentHalvkortHårUdenKlip,
                     _permanentLangtHårUdenKlip,
                     _permanentLangtHårMedKlip,
-                    _hætteStriberIHalvkortHårMedKlip, 
+                    _hætteStriberIHalvkortHårMedKlip,
                     _hætteStriberILangtHårMedKlip,
-                    _herreklipMedVaskFøn 
+                    _herreklipMedVaskFøn
                 }
             );
-            
-                _db.Employees.Add(_larsMikkelsen);
-                _employees.Add(_larsMikkelsen);
+
+            _db.Employees.Add(_larsMikkelsen);
+            _employees.Add(_larsMikkelsen);
 
 
             // --- Signe Jørgensen: Bryn/Vipper & Dameklip ---
@@ -427,8 +424,8 @@ namespace BellaHair.Presentation.WebUI
                 }
             );
 
-                _db.Employees.Add(_signeJørgensen);
-                _employees.Add(_signeJørgensen);
+            _db.Employees.Add(_signeJørgensen);
+            _employees.Add(_signeJørgensen);
 
 
             // --- Mads Knudsen: Permanent, Farve & Herreklip (All-rounder) ---
