@@ -33,7 +33,7 @@ namespace BellaHair.Domain.Tests.Bookings
                 Assert.That(productLineSnapshot.Name, Is.EqualTo(name));
                 Assert.That(productLineSnapshot.Description, Is.EqualTo(description));
                 Assert.That(productLineSnapshot.Price, Is.EqualTo(price));
-                Assert.That(productLineSnapshot.ProductLineIdTest, Is.EqualTo(id));
+                Assert.That(productLineSnapshot.Id, Is.EqualTo(id));
             }
         }
     }
