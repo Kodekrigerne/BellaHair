@@ -81,6 +81,8 @@ namespace BellaHair.Presentation.WebUI
 
         List<Employee> _employees = [];
 
+        private static readonly int[] bookingStartMinutes = new[] { 0, 15, 30, 45 };
+
         public void AddData()
         {
             AddLoyaltyDiscounts();
@@ -502,7 +504,7 @@ namespace BellaHair.Presentation.WebUI
                                                     Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
                                                     PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
                                                     Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
                                                     _currentDateTimeProvider
                                                     );
                         });
@@ -530,7 +532,7 @@ namespace BellaHair.Presentation.WebUI
                                                     Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
                                                     PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
                                                     Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
                                                     _currentDateTimeProvider
                                                     );
                         });
@@ -558,7 +560,7 @@ namespace BellaHair.Presentation.WebUI
                                                     Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990), f.Random.Int(1, 100)),
                                                     PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
                                                     Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
                                                     _currentDateTimeProvider
                                                     );
                         });
@@ -586,7 +588,7 @@ namespace BellaHair.Presentation.WebUI
                                                     Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990), f.Random.Int(1, 100)),
                                                     PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
                                                     Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
-                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-110)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
                                                     _currentDateTimeProvider
                                                     );
                         });
@@ -611,21 +613,27 @@ namespace BellaHair.Presentation.WebUI
                     var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
 
                     var bookingFaker = new Faker<Booking>("nb_NO")
-                        .CustomInstantiator(f => Booking.Create(
+                        .CustomInstantiator(f =>
+                        {
+                            var bookingDate = f.Date.Soon(60, now);
+
+                            return Booking.Create(
                                                         f.PickRandom<PrivateCustomer>(customers),
                                                         employee,
                                                         treatment,
                                                     new DateTime(
-                                                            f.Date.Soon(60, DateTime.Now).Date.Year,
-                                                            f.Date.Soon(60, DateTime.Now).Date.Month,
-                                                            f.Date.Soon(60, DateTime.Now).Date.Day,
-                                                            f.Random.Int(OpeningTimes.Value.OpeningTime.Hour, OpeningTimes.Value.ClosingTime.Hour-treatment.DurationMinutes.Value),
-                                                            f.PickRandom(new[] { 0, 15, 30, 45 }), // Use PickRandom with an inline array
+                                                            bookingDate.Year,
+                                                            bookingDate.Month,
+                                                            bookingDate.Day,
+                                                            f.Random.Int(10, 18 - treatment.DurationMinutes.Value),
+                                                            f.PickRandom(bookingStartMinutes), 
                                                             0),
-                                                    _currentDateTimeProvider));
+                                                    _currentDateTimeProvider);
+                            });
                     
                     
                     var booking = bookingFaker.Generate();
+                    _db.Add(booking);
                 }
                 catch (Exception)
                 {
