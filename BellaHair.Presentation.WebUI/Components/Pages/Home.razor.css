@@ -1,0 +1,118 @@
+﻿.home-wrapper {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: 80vh;
+    text-align: center;
+    user-select: none;
+    gap: 80px; 
+    padding: 0 40px;
+}
+
+
+.bella-logo {
+    margin-top:40px;
+    height: 300px;
+    width: 420px;
+    max-width:100%;
+}
+
+.txt-booking {
+    margin-bottom: 40px;
+    margin-top: 10px;
+    font-size: 40px;
+    font-family: system-ui;
+    font-weight: bold;
+    font-variant: small-caps;
+    letter-spacing: 0.5rem;
+    color: #808080;
+}
+
+
+.div-dev {
+    display: flex;
+    margin-top: 30px;
+    align-items: center;
+    justify-content:center;
+}
+
+.div-kodekrigerne {
+    margin-left: 20px;
+    display: flex;
+}
+
+.txt-kodekrigerne {
+    font-weight: bold;
+}
+
+.kodekrigerne-logo{
+    width:25px;
+    height:25px;
+}
+
+.side-content {
+    display: flex;
+    flex-direction: column;
+    gap: 100px; 
+    justify-content: center;
+    height: 100%;
+}
+
+    .left-col{
+        align-items:flex-end;
+    }
+
+    .right-col{
+        align-items:flex-start;
+    }
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 10px;
+    color: #abaaaa;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    width: 400px;
+    height: 120px;
+}
+
+
+.card-header {
+    font-weight: 500;
+    text-align: left;
+    color: #505050;
+    font-family: system-ui;
+    margin-top: 0;
+    padding-left: 4px;
+}
+
+.card-txt {
+    display: block;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+
+.line {
+    width: 100%;
+    margin:0;
+    margin-top:4px;
+
+}
+
+strong{
+    margin-left:5px;
+    margin-right:5px;
+}
+
+
+.card-count {
+    color: #7e4d9f;
+    font-weight: 400;
+    margin-left:3px;
+    margin-right:3px;
+}

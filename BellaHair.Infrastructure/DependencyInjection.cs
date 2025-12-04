@@ -44,6 +44,7 @@ namespace BellaHair.Infrastructure
 
             serviceCollection.AddScoped<ITreatmentRepository, TreatmentRepository>();
             serviceCollection.AddScoped<ITreatmentQuery, TreatmentQueryHandler>();
+            serviceCollection.AddScoped<ITreatmentDuplicateChecker, TreatmentDuplicateChecker>();
 
             serviceCollection.AddScoped<IPrivateCustomerRepository, PrivateCustomerRepository>();
             serviceCollection.AddScoped<IPrivateCustomerQuery, PrivateCustomerQueryHandler>();

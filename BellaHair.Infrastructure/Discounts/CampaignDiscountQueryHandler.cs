@@ -1,4 +1,5 @@
 using System.Linq;
+using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,13 @@ namespace BellaHair.Infrastructure.Discounts
     public class CampaignDiscountQueryHandler : ICampaignDiscountQuery
     {
         private readonly BellaHairContext _db;
+        private readonly ICurrentDateTimeProvider _dateTimeProvider;
 
-        public CampaignDiscountQueryHandler(BellaHairContext db)
-            => _db = db;
+        public CampaignDiscountQueryHandler(BellaHairContext db, ICurrentDateTimeProvider dateTimeProvider)
+        {
+            _db = db;
+            _dateTimeProvider = dateTimeProvider;
+        }
 
         async Task<List<CampaignDiscountDTO>> ICampaignDiscountQuery.GetAllAsync()
         {
@@ -45,6 +50,17 @@ namespace BellaHair.Infrastructure.Discounts
         async Task<int> ICampaignDiscountQuery.GetCountAsync()
         {
             return await _db.Discounts.OfType<CampaignDiscount>().AsNoTracking().CountAsync();
+        }
+
+        public async Task<int> GetActiveCountAsync()
+        {
+            var now = _dateTimeProvider.GetCurrentDateTime().Date;
+
+            return await _db.Discounts
+                .AsNoTracking()
+                .OfType<CampaignDiscount>()
+                .Where(c => c.StartDate.Date <= now && c.EndDate.Date > now)
+                .CountAsync();
         }
     }
 }

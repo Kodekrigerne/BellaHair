@@ -6,7 +6,7 @@
 
 /* Navigationsbar */
 .navbar {
-    background-color: white;
+    background-color: #ffffff;
     font-family: system-ui;
     width: 100%;
     position: fixed;
@@ -17,28 +17,43 @@
     border-bottom-color: oklch(0.9249 0 0);
     border-bottom-style: solid;
     z-index: 999;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    padding: 0 40px;
+    overflow-x:auto;
 }
+
 
 /* Vi bruger ::deep til hvert element fordi vi bruger .css isolation (TopNavMenu.razor har sin egen .css klasse) 
     <NavLink> renderes som et a-tag
 */
     .navbar ::deep a {
-        color: #434141;
+        display: inline-flex;
+        color: #656565;
         text-align: center;
-        padding: 14px;
+        padding: 10px 18px;
         text-decoration: none;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
     }
         .navbar ::deep a:hover {
-            background: #fbf5ff;
-            border-radius: 20px;
+            background: #f6e9ff;
+            color: #920dfc;
+            border-radius: 12px;
             transition: background-color 0.5s;
         }
 
         .navbar ::deep a.active {
-            background: #fbf5ff;
+            background: #efdffa;
             color: #c216c2;
-            border-radius: 16px;
+            border-radius: 12px;
             transition: background-color 0.5s;
+            font-weight: 500;
         }
 
 /* Main content (padding-top for at kunne se indhold under navigationsbar) */
@@ -48,3 +63,44 @@ main {
 }
 
 
+::deep .nav-icon {
+    height: 20px;
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    fill: #59575aff !important;
+    vertical-align: middle;
+}
+
+::deep .nav-icon.active{
+    fill: purple;
+}
+
+
+.nav-links{
+    display:flex;
+    gap:15px;
+    align-items:center;
+    height:100%;
+}
+
+.bella-logo{
+    height:50px;
+    width:70px;
+    object-fit:contain;
+    margin-right:20px;
+}
+
+.navbar ::deep .nav-logo-link{
+    padding: 0;
+    gap:0;
+    text-decoration:none;
+    background-color:transparent;
+    justify-self:start;
+}
+
+    .navbar ::deep .nav-logo-link.active {
+        background: none !important;
+        border-radius: 0 !important;
+    }
