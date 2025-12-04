@@ -32,7 +32,11 @@
 	private async Task HandleChangeQuantity(Guid productId, int difference)
 	{
 		var productLine = ProductLines.Single(pl => pl.ProductId == productId);
-		productLine.SetQuantity(productLine.Quantity + difference);
+		var newQuantity = productLine.Quantity + difference;
+
+		if (newQuantity < 1) ProductLines.Remove(productLine);
+		else productLine.SetQuantity(newQuantity);
+
 		if (ProductLinesChanged.HasDelegate) await ProductLinesChanged.InvokeAsync();
 	}
 }
