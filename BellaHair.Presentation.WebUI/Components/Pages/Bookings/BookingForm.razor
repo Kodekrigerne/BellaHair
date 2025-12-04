@@ -104,16 +104,18 @@
 			</div>
 			<div class="left-container">
 				<div class="pick-container">
-					@if (_productLines.Count == 0)
+					@if (_productLines.Count == 0 && (Mode == BookingMode.Edit || Mode == BookingMode.New))
 					{
 						<button class="btn-pick">Vælg produkter</button>
 					}
 					else
 					{
-						<button class="btn-picked">
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double">
 							<p class="picked-label">Produkter</p>
-							<p>@_productLines.Count produkter</p>
-							<p>Samlet pris: @_productLines.Sum(pl => pl.Price)</p>
+							<p class="picked-text">
+								<span>@_productLines.Count produkter</span>
+								<span class="picked-to-from">Samlet pris: @_productLines.Sum(pl => pl.Price).ToString("C2")</span>
+							</p>
 						</button>
 					}
 				</div>
@@ -830,6 +832,7 @@
 		border-radius: 6px;
 		display: flex;
 		height: 4rem;
+		max-width: calc(50% - 5px);
 	}
 
 	.btn-pick {
