@@ -17,6 +17,8 @@ namespace BellaHair.Ports.Discounts
     {
         Task<List<CampaignDiscountDTO>> GetAllAsync();
         Task<int> GetCountAsync();
+
+        Task<int> GetActiveCountAsync();
     }
 
     public record CampaignDiscountDTO(
