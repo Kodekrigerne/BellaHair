@@ -23,8 +23,10 @@ namespace BellaHair.Ports.Bookings
         EmployeeNameWithBookingsDTO Employee,
         PrivateCustomerSimpleDTO Customer,
         TreatmentDTO Treatment,
+        IEnumerable<ProductLineDTO> Products,
         DiscountDTO? Discount);
 
+    public record ProductLineDTO(Guid Id, string Name, string Description, decimal Price, int Quantity);
     public record DiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 
     public record BookingDTO(

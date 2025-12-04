@@ -266,8 +266,8 @@
 
 	[Parameter]
 	public Guid? Id { get; set; }
-
 	private bool _isPaid;
+	private List<ProductLineModel> _productLines = [];
 
 	private enum Picker { None, Customers, Treatments, Employee, Time }
 	private Picker _activePicker = Picker.None;
@@ -602,7 +602,7 @@
 	private async Task HandleChangeTimeClick()
 	{
 		if (Mode == BookingMode.View) return;
-		
+
 		if (_activePicker != Picker.Time && (_startDate == null || _startTime == null)) SetNulls();
 
 		await HandlePickStartDateTimeClick();
@@ -615,7 +615,8 @@
 		try
 		{
 			var startDateTime = _startDate.Value.Add(_startTime.Value);
-			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, _useBirthdayDiscount, Id);
+			var createProductLines = _productLines.Select(pl => new CreateProductLine(pl.Quantity, pl.ProductId)).ToList();
+			var query = new FindBestDiscountQuery(startDateTime, _employee.Id, _customer.Id, _treatment.Id, _useBirthdayDiscount, createProductLines, Id);
 
 			var discountDTO = await DiscountQuery.FindBestDiscount(query);
 
@@ -648,7 +649,10 @@
 			_startTime == null || _treatment == null || _employee == null || _customer == null) return;
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id);
+
+		var createProductLines = _productLines.Select(pl => new CreateProductLine(pl.Quantity, pl.ProductId)).ToList();
+
+		var command = new CreateBookingCommand(startDateTime, _employee.Id, _customer.Id, _treatment.Id, createProductLines);
 
 		try
 		{
@@ -715,7 +719,10 @@
 			_startTime == null || _treatment == null || _employee == null || _customer == null || Id == null) return;
 
 		var startDateTime = _startDate.Value.Add(_startTime.Value);
-		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id);
+
+		var createProductLines = _productLines.Select(pl => new CreateProductLine(pl.Quantity, pl.ProductId)).ToList();
+
+		var command = new UpdateBookingCommand(Id.Value, startDateTime, _employee.Id, _treatment.Id, createProductLines);
 
 		try
 		{
