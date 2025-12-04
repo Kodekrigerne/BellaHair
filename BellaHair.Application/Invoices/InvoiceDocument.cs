@@ -110,9 +110,8 @@ public class InvoiceDocument : IDocument
                 var tax = totalWithDiscountNoTax * 0.25m;
                 var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
 
-                column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalWithDiscountNoTax:N2}").FontSize(12);
-                column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
-                column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold();
+                column.Item().PaddingTop(10).AlignRight().Text($"Heraf moms (25%): kr {tax:N2}").FontSize(12);
+                column.Item().AlignRight().Text($"I alt inkl. moms:  kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold().Underline();
             }
             else
             {
@@ -120,9 +119,8 @@ public class InvoiceDocument : IDocument
                 var tax = totalNoDiscountNoTax * 0.25m;
                 var totalWithTax = totalNoDiscountNoTax * 1.25m;
 
-                column.Item().PaddingTop(15).AlignRight().Text($"I alt ekskl. moms: kr {totalNoDiscountNoTax:N2}").FontSize(12);
-                column.Item().AlignRight().Text($"Moms (25%): kr {tax:N2}").FontSize(12);
-                column.Item().AlignRight().Text($"I alt inkl. moms: kr {totalWithTax:N2}").FontSize(15).SemiBold();
+                column.Item().PaddingTop(10).AlignRight().Text($"Heraf moms (25%): kr {tax:N2}").FontSize(12);
+                column.Item().AlignRight().Text($"I alt inkl. moms:  kr {totalWithTax:N2}").FontSize(15).SemiBold().Underline();
             }
         });
     }
@@ -156,9 +154,9 @@ public class InvoiceDocument : IDocument
 
             table.Cell().Element(CellStyle).Text(("1"));
             table.Cell().Element(CellStyle).Text(Data.Treatment.Name);
-            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m:N2}");
+            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price:N2}");
             table.Cell().Element(CellStyle).AlignRight().Text("1");
-            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m * 1:N2}");
+            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price:N2}");
 
             static IContainer CellStyle(IContainer container)
             {
@@ -167,11 +165,11 @@ public class InvoiceDocument : IDocument
 
             foreach (var product in Data.Products)
             {
-                table.Cell().Element(CellStyle2).Text((Data.Products.IndexOf(product) + 1).ToString());
-                table.Cell().Element(CellStyle2).Text(Data.Treatment.Name);
-                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m:N2}");
-                table.Cell().Element(CellStyle2).AlignRight().Text("1");
-                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {Data.Treatment.Price * 0.8m * 1:N2}");
+                table.Cell().Element(CellStyle2).Text((Data.Products.ToList().IndexOf(product) + 2).ToString());
+                table.Cell().Element(CellStyle2).Text(product.Name);
+                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {product.Price:N2}");
+                table.Cell().Element(CellStyle2).AlignRight().Text($"{product.Quantity}");
+                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {product.Price * product.Quantity:N2}");
 
                 static IContainer CellStyle2(IContainer container)
                 {
@@ -185,7 +183,7 @@ public class InvoiceDocument : IDocument
                 table.Cell().Element(CellStyle1).Text($"Rabat: {Data.Discount.Name}");
                 table.Cell().Element(CellStyle1).AlignRight().Text("");
                 table.Cell().Element(CellStyle1).AlignRight().Text("");
-                table.Cell().Element(CellStyle1).AlignRight().Text($"kr -{Data.Discount.Amount * 0.8m:N2}");
+                table.Cell().Element(CellStyle1).AlignRight().Text($"kr -{Data.Discount.Amount:N2}");
 
                 static IContainer CellStyle1(IContainer container)
                 {
