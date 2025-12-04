@@ -36,6 +36,8 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
                 .Include(b => b.Treatment)
+                .Include(b => b.ProductLines)
+                    .ThenInclude(bpl => bpl.Product)
                 .SingleOrDefaultAsync(b => b.Id == id) ??
                 throw new KeyNotFoundException($"Booking with id {id} is not found.");
 

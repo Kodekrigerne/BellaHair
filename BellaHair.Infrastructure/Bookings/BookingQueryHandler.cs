@@ -38,6 +38,7 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Employee)
                     .ThenInclude(be => be!.Bookings.Where(beb => beb.EndDateTime > now))
                 .Include(b => b.ProductLines)
+                    .ThenInclude(bpl => bpl.Product)
                 .Include(b => b.ProductLineSnapshots)
                 .SingleOrDefaultAsync(b => b.Id == query.Id) ?? throw new Exception("");
 

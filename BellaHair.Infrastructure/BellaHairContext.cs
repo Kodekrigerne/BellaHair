@@ -80,8 +80,11 @@ namespace BellaHair.Infrastructure
             modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLines)
                 .OwnsOne(pl => pl.Quantity);
 
-            modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLineSnapshots)
-                .HasKey(pls => pls.ProductLineIdTest);
+            modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLineSnapshots, pls =>
+            {
+                pls.HasKey(s => s.Id);
+                pls.Property(s => s.Id).ValueGeneratedNever();
+            });
 
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
