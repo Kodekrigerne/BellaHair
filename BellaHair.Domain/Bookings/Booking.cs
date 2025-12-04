@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using BellaHair.Domain.Discounts;
+﻿using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
@@ -34,9 +33,10 @@ namespace BellaHair.Domain.Bookings
         public Invoice? Invoice { get; private set; }
 
         private List<ProductLine> _productLines;
-        public IReadOnlyList<ProductLine> ProductLines => _productLines.AsReadOnly();
+        public IReadOnlyList<ProductLine> ProductLines => !IsPaid ? _productLines.AsReadOnly() : throw new InvalidOperationException("Cannot access product lines on a paid booking");
 
-        public ImmutableList<ProductLineSnapshot>? ProductLineSnapshots { get; private set; }
+        private List<ProductLineSnapshot> _productLineSnapshots;
+        public IReadOnlyList<ProductLineSnapshot> ProductLineSnapshots => IsPaid ? _productLineSnapshots.AsReadOnly() : throw new InvalidOperationException("Cannot access product line snapshots on an unpaid booking");
 
         public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored
@@ -98,10 +98,10 @@ namespace BellaHair.Domain.Bookings
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
-            ProductLineSnapshots = _productLines.Select(pl => ProductLineSnapshot.FromProductLine(pl)).ToImmutableList();
+            //_productLineSnapshots = [.. _productLines.Select(pl => ProductLineSnapshot.FromProductLine(pl))];
 
             //Vi rydder product lines da vi ikke længere skal bruge dem. Da de er owned af Booking bliver de slettet fra databasen.
-            _productLines = [];
+            //_productLines = [];
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking

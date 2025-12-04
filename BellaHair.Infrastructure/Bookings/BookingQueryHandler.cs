@@ -72,8 +72,8 @@ namespace BellaHair.Infrastructure.Bookings
                 0);
 
             var products = booking.IsPaid
-                ? booking.ProductLines.Select(pl => new ProductLineDTO(pl.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value))
-                : booking.ProductLineSnapshots?.Select(pls => new ProductLineDTO(pls.ProductId, pls.Name, pls.Description, pls.Price, pls.Quantity)) ?? [];
+                ? booking.ProductLineSnapshots.Select(pls => new ProductLineDTO(pls.ProductId, pls.Name, pls.Description, pls.Price, pls.Quantity))
+                : booking.ProductLines.Select(pl => new ProductLineDTO(pl.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value));
 
             var discount = booking.Discount != null
                 ? new DiscountDTO(
@@ -100,6 +100,9 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
+                .Include(b => b.ProductLines)
+                    .ThenInclude(bpl => bpl.Product)
+                .Include(b => b.ProductLineSnapshots)
                 .ToListAsync();
 
             return MapToBookingDTOs(bookings);
@@ -113,6 +116,9 @@ namespace BellaHair.Infrastructure.Bookings
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
+                .Include(b => b.ProductLines)
+                    .ThenInclude(bpl => bpl.Product)
+                .Include(b => b.ProductLineSnapshots)
                 .ToListAsync();
 
             return MapToBookingDTOs(bookings);
