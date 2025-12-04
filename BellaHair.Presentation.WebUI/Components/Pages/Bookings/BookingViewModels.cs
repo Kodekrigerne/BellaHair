@@ -22,6 +22,21 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
         string? DiscountName,
         decimal? DiscountAmount);
 
+     // Bruges til booking-kalender siden
+    public record BookingCalendarViewModel(
+        Guid Id,
+        DateTime StartDateTime,
+        DateTime EndDateTime,
+        DateOnly Date,
+        TimeOnly StartTime,
+        TimeOnly EndTime,
+        string EmployeeFullName,
+        string CustomerFullName,
+        string TreatmentName,
+        int DurationMinutes,
+        string AllBookingInfo
+        );
+        
     public record BookingTimesOnlyViewModel(Guid Id, DateTime StartDateTime, DateTime EndDateTime);
 
     public record BookingDiscountViewModel(string Name, decimal Amount, DiscountTypeDTO Type);

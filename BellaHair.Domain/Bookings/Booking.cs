@@ -2,6 +2,7 @@
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 
 namespace BellaHair.Domain.Bookings
@@ -31,6 +32,12 @@ namespace BellaHair.Domain.Bookings
         public DateTime? PaidDateTime { get; private set; }
         public Invoice? Invoice { get; private set; }
 
+        private List<ProductLine> _productLines;
+        public IReadOnlyList<ProductLine> ProductLines => !IsPaid ? _productLines.AsReadOnly() : throw new InvalidOperationException("Cannot access product lines on a paid booking");
+
+        private List<ProductLineSnapshot> _productLineSnapshots;
+        public IReadOnlyList<ProductLineSnapshot> ProductLineSnapshots => IsPaid ? _productLineSnapshots.AsReadOnly() : throw new InvalidOperationException("Cannot access product line snapshots on an unpaid booking");
+
         public bool IsPaid { get; private set; }
         //_total is stored in the database, Total is ignored
         //_total is only set (and saved in the database) after booking is paid, and is therefore nullable
@@ -40,9 +47,11 @@ namespace BellaHair.Domain.Bookings
         private decimal? _totalWithDiscount;
         public decimal TotalWithDiscount => IsPaid ? _totalWithDiscount!.Value : CalculateTotalWithDiscount();
 
+#pragma warning disable CS8618
         private Booking() { }
+#pragma warning restore CS8618
 
-        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime)
+        private Booking(PrivateCustomer customer, Employee employee, Treatment treatment, DateTime startDateTime, DateTime currentDateTime, IEnumerable<ProductLine> productLines)
         {
             Customer = customer;
             Employee = employee;
@@ -50,6 +59,7 @@ namespace BellaHair.Domain.Bookings
             StartDateTime = startDateTime;
             CreatedDateTime = currentDateTime;
             IsPaid = false;
+            _productLines = [.. productLines];
             UpdateEndDateTime();
         }
 
@@ -58,7 +68,8 @@ namespace BellaHair.Domain.Bookings
             Employee employee,
             Treatment treatment,
             DateTime startDateTime,
-            ICurrentDateTimeProvider currentDateTimeProvider)
+            ICurrentDateTimeProvider currentDateTimeProvider,
+             IEnumerable<ProductLineData> productLineDatas)
         {
             var currentDateTime = currentDateTimeProvider.GetCurrentDateTime();
 
@@ -67,12 +78,14 @@ namespace BellaHair.Domain.Bookings
 
             ValidateEmployeeTreatment(employee, treatment);
 
-            return new(customer, employee, treatment, startDateTime, currentDateTime);
+            List<ProductLine> productLines = productLineDatas.Select(pld => ProductLine.Create(pld.Quantity, pld.Product)).ToList();
+
+            return new(customer, employee, treatment, startDateTime, currentDateTime, productLines);
         }
 
         public void PayBooking(ICurrentDateTimeProvider currentDateTimeProvider)
         {
-            if (Employee == null || Customer == null || Treatment == null)
+            if (Employee == null || Customer == null || Treatment == null || _productLines == null)
                 throw new InvalidOperationException("all booking relations must be populated when calling PayBooking.");
 
             if (IsPaid == true) throw new BookingException("Kan ikke betale en booking som allerede er betalt.");
@@ -84,22 +97,30 @@ namespace BellaHair.Domain.Bookings
             _totalWithDiscount = CalculateTotalWithDiscount();
             IsPaid = true;
             PaidDateTime = currentDateTimeProvider.GetCurrentDateTime();
+
+            _productLineSnapshots = [.. _productLines.Select(pl => ProductLineSnapshot.FromProductLine(pl))];
+
+            //Vi rydder product lines da vi ikke længere skal bruge dem. Da de er owned af Booking bliver de slettet fra databasen.
+            _productLines = [];
         }
 
         //Denne metode kaldes hvis Total efterspørges på en ikke-betalt booking
         private decimal CalculateTotalBase()
         {
             if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
-            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
+            if (Treatment == null || _productLines == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
 
-            return Treatment.Price.Value;
+            var price = 0m;
+            price += Treatment.Price.Value;
+            foreach (var productLine in _productLines)
+            {
+                price += productLine.Quantity.Value * productLine.Product.Price.Value;
+            }
+            return price;
         }
 
         private decimal CalculateTotalWithDiscount()
         {
-            if (IsPaid) throw new InvalidOperationException("Do not use this method to calculate total after booking has been paid.");
-            if (Treatment == null) throw new InvalidOperationException($"Booking must be loaded with all relations included {Id}");
-
             var discountAmount = Discount?.Amount ?? 0;
             return CalculateTotalBase() - discountAmount;
         }
@@ -129,7 +150,7 @@ namespace BellaHair.Domain.Bookings
                 throw new BookingException("Afviklede bookinger kan først slettes dagen efter hvis ikke betalt.");
         }
 
-        public void Update(DateTime startDateTime, Employee employee, Treatment treatment, ICurrentDateTimeProvider currentDateTimeProvider)
+        public void Update(DateTime startDateTime, Employee employee, Treatment treatment, IEnumerable<ProductLineData> productLineDatas, ICurrentDateTimeProvider currentDateTimeProvider)
         {
             var now = currentDateTimeProvider.GetCurrentDateTime();
 
@@ -142,6 +163,10 @@ namespace BellaHair.Domain.Bookings
             StartDateTime = startDateTime;
             Employee = employee;
             Treatment = treatment;
+
+            List<ProductLine> productLines = productLineDatas.Select(pld => ProductLine.Create(pld.Quantity, pld.Product)).ToList();
+
+            _productLines = productLines;
 
             UpdateEndDateTime();
         }
@@ -156,5 +181,6 @@ namespace BellaHair.Domain.Bookings
         }
     }
 
+    public record ProductLineData(Quantity Quantity, Product Product);
     public class BookingException(string message) : Exception(message);
 }

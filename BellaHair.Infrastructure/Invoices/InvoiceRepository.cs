@@ -47,6 +47,7 @@ namespace BellaHair.Infrastructure.Invoices
         {
             var booking = await _db.Bookings
                 .AsNoTracking()
+                .Include(b => b.ProductLineSnapshots)
                 .FirstOrDefaultAsync(b => b.Id == Id)
                 ?? throw new DomainException("Booking not found");
 
@@ -63,6 +64,7 @@ namespace BellaHair.Infrastructure.Invoices
                 currentDate,
                 booking.CustomerSnapshot!,
                 booking.TreatmentSnapshot!,
+                booking.ProductLineSnapshots,
                 total,
                 discount);
         }

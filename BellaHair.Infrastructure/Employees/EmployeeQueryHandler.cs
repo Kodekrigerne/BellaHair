@@ -35,7 +35,18 @@ namespace BellaHair.Infrastructure.Employees
                 .ToListAsync();
         }
 
-        // Henter alle medarbejdere med færre detaljer til overblikket
+        // Henter alle medarbejdere med færre detaljer til kalenderen
+        async Task<List<EmployeeDTOSimple>> IEmployeeQuery.GetAllEmployeesSimpleAsync()
+        {
+            var emp = await _db.Employees
+                .AsNoTracking()
+                .Select(x => new EmployeeDTOSimple(x.Id, x.Name.FullName))
+                .ToListAsync();
+
+            return emp;
+        }
+
+        // Henter alle medarbejdere med alle detaljer til overblikket
         async Task<List<EmployeeDTOFull>> IEmployeeQuery.GetAllEmployeesAsync()
         {
             var emp = await _db.Employees

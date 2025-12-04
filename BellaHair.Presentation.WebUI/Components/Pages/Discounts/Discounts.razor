@@ -125,10 +125,15 @@ else if (_activeTab == DiscountTab.Campaign)
 		{
 			var discounts = await CampaignDiscountQuery.GetAllAsync();
 
-			var now = CurrentDateTimeProvider.GetCurrentDateTime();
+			var now = CurrentDateTimeProvider.GetCurrentDateTime().Date;
 
 			_discounts = discounts
-				.OrderByDescending(d => d.StartDate <= now && d.EndDate >= now)
+				.OrderByDescending(d =>
+				{
+					if (d.StartDate.Date <= now && d.EndDate.Date >= now) return 2; 
+					if (d.StartDate.Date > now) return 1; 
+					return 0; 
+				})
 				.ThenBy(d => d.StartDate)
 				.Select(d => (IDiscountViewModel)new CampaignDiscountViewModel(
 					d.Id, d.Name, d.DiscountPercent, d.StartDate, d.EndDate, d.Treatments.ToList()

@@ -24,7 +24,7 @@ namespace BellaHair.Infrastructure.Tests.Discounts
                 Assert.That(discountFromDb!.Id, Is.EqualTo(discount.Id));
                 Assert.That(discountFromDb!.Name, Is.EqualTo(discount.Name));
                 Assert.That(discountFromDb!.MinimumVisits, Is.EqualTo(discount.MinimumVisits));
-                Assert.That(discountFromDb!.DiscountPercent.Value, Is.EqualTo(discount.DiscountPercent.Value));
+                Assert.That(discountFromDb!.TreatmentDiscountPercent.Value, Is.EqualTo(discount.TreatmentDiscountPercent.Value));
             });
         }
 
@@ -67,7 +67,7 @@ namespace BellaHair.Infrastructure.Tests.Discounts
                 Assert.That(discountFromRepo.Id, Is.EqualTo(discount.Id));
                 Assert.That(discountFromRepo.Name, Is.EqualTo(discount.Name));
                 Assert.That(discountFromRepo.MinimumVisits, Is.EqualTo(discount.MinimumVisits));
-                Assert.That(discountFromRepo.DiscountPercent.Value, Is.EqualTo(discount.DiscountPercent.Value));
+                Assert.That(discountFromRepo.TreatmentDiscountPercent.Value, Is.EqualTo(discount.TreatmentDiscountPercent.Value));
             });
         }
 

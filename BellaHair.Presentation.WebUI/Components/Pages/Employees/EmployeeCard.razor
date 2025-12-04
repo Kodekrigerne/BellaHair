@@ -1,9 +1,13 @@
-﻿@using BellaHair.Ports.Employees
+﻿@using BellaHair.Domain
+@using BellaHair.Infrastructure
+@using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Shared;
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents;
 @inject IEmployeeCommand EmployeeCommand
 @inject IEmployeeQuery EmployeeQuery
+@inject NavigationManager NavigationManager
 @inject ISnackbar SnackBar
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 	<Modal @bind-IsVisible="@_showDeleteModal">
 		<div class="modal-centered-content">
@@ -45,7 +49,7 @@
 		@*Contains the avatar with intials*@
 		@GetEmployeeInitials(@Employee.FullName)
 	</div>
-	<div>
+	<div class="employee-content">
 		@*Positions other info to position next to avatar*@
 		<h3>@Employee.FullName</h3>
 
@@ -67,6 +71,9 @@
 			</div>
 		<button class="btn-add" @onclick="HandleOnViewTreatmentsClick"> Se behandlinger </button>
 </div>
+
+
+					</div>
 
 	<div class="delete-edit-buttons d-flex gap-2" style="width: 0%;">
 		<EditButton onclick="@(() => showEditModal = true)" />
@@ -144,5 +151,12 @@
 	private void CloseDeleteModal() => _showDeleteModal = false;
 	private void CloseTreatmentsModal() => _showTreatmentsModal = false;
 	private void HandleOnViewTreatmentsClick() => _showTreatmentsModal = true;
+
+
+	// Navigerer til kalenderen for den medarbejder, der trykkes på
+	private void NavigateToCalendar()
+	{
+		NavigationManager.NavigateTo($"/kalender?date={CurrentDateTimeProvider.GetCurrentDateTime().ToString("yyyy-MM-dd")}&employeeId={Employee.Id}");
+	}
 
 }

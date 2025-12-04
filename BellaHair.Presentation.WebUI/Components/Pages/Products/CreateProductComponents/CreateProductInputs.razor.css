@@ -1,0 +1,47 @@
+﻿/*Mikkel Dahlmann*/
+.product-grouped-inputs {
+    display: flex;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.product-input {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+    .product-input label {
+        width: 105px;
+        text-align: left;
+    }
+
+    .product-input ::deep input {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 4px;
+        -webkit-appearance: none;
+    }
+
+::deep .inputareabox {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px;
+    -webkit-appearance: none;
+}
+
+    .product-input input:focus {
+        outline: 1px solid #a91ce4;
+    }
+
+.required:after {
+    content: " *";
+    color: maroon;
+}
+
+
+.product-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

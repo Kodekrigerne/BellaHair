@@ -16,11 +16,20 @@ namespace BellaHair.Domain.Tests.Invoices
             var issueDate = DateTime.Now;
             var customerSnapshot = Fixture.New<CustomerSnapshot>().Build();
             var treatmentSnapshot = Fixture.New<TreatmentSnapshot>().Build();
+            var productSnapshot1 = Fixture.New<ProductLineSnapshot>().Build();
+            var productSnapshot2 = Fixture.New<ProductLineSnapshot>().Build();
+            var productSnapshot3 = Fixture.New<ProductLineSnapshot>().Build();
+            var productSnapshots = new List<ProductLineSnapshot>
+            {
+                productSnapshot1,
+                productSnapshot2,
+                productSnapshot3
+            };
             var discount = Fixture.New<BookingDiscount>().Build();
             decimal total = 100;
 
             // Act
-            var model = new InvoiceData(id, issueDate, customerSnapshot, treatmentSnapshot, total, discount);
+            var model = new InvoiceData(id, issueDate, customerSnapshot, treatmentSnapshot, productSnapshots, total, discount);
 
             // Assert
             Assert.Multiple(() =>
@@ -28,7 +37,8 @@ namespace BellaHair.Domain.Tests.Invoices
                 Assert.That(model.Id, Is.EqualTo(id));
                 Assert.That(model.IssueDate, Is.EqualTo(issueDate));
                 Assert.That(model.Customer, Is.EqualTo(customerSnapshot));
-                Assert.That(model.Treatments[0], Is.EqualTo(treatmentSnapshot));
+                Assert.That(model.Treatment, Is.EqualTo(treatmentSnapshot));
+                Assert.That(model.Products, Is.EqualTo(productSnapshots));
                 Assert.That(model.Discount, Is.EqualTo(discount));
                 Assert.That(model.Total, Is.EqualTo(total));
             });

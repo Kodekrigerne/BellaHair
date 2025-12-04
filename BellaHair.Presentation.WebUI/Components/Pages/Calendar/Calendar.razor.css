@@ -1,0 +1,17 @@
+﻿
+.header-and-employee {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+employee-picker {
+    display: flex;
+    flex-direction: column;
+    float: right;
+    
+}
+
+.header-and-employee p {
+    margin-bottom: 0;
+}

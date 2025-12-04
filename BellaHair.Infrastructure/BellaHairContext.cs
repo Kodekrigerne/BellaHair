@@ -3,6 +3,7 @@ using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,7 @@ namespace BellaHair.Infrastructure
         public DbSet<Treatment> Treatments { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<Product> Products { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +77,15 @@ namespace BellaHair.Infrastructure
                 .HasColumnName("TotalWithDiscount")
                 .IsRequired(false);
 
+            modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLines)
+                .OwnsOne(pl => pl.Quantity);
+
+            modelBuilder.Entity<Booking>().OwnsMany(b => b.ProductLineSnapshots, pls =>
+            {
+                pls.HasKey(s => s.Id);
+                pls.Property(s => s.Id).ValueGeneratedNever();
+            });
+
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.Price);
             modelBuilder.Entity<Treatment>().ComplexProperty(t => t.DurationMinutes);
 
@@ -97,7 +108,8 @@ namespace BellaHair.Infrastructure
                 .Property<List<int>>("_birthdayDiscountUsedYears")
                 .HasColumnName("BirthdayDiscountUsedYears");
 
-            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.DiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.TreatmentDiscountPercent);
+            modelBuilder.Entity<LoyaltyDiscount>().OwnsOne(l => l.ProductDiscountPercent);
             modelBuilder.Entity<CampaignDiscount>().OwnsOne(c => c.DiscountPercent);
             modelBuilder.Entity<BirthdayDiscount>().OwnsOne(b => b.DiscountPercent);
 
@@ -107,6 +119,8 @@ namespace BellaHair.Infrastructure
                 entity.HasKey(i => i.Id);
                 entity.Property(i => i.Id).ValueGeneratedNever();
             });
+
+            modelBuilder.Entity<Product>().ComplexProperty(p => p.Price);
         }
     }
 }

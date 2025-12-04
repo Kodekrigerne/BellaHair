@@ -9,48 +9,58 @@
 @inject IOptions<OpeningTimesSettings> OpeningTimes
 
 <div class="day-container">
-    <div class="day-header">
-        <button @onclick="HandlePreviousDateClick" class="nav-button">&lt;</button>
-        <span class="current-date">@CurrentDate.ToString("dddd, dd. MMMM yyyy", new CultureInfo("da-DK"))</span>
-        <button @onclick="HandleNextDateClick" class="nav-button">&gt;</button>
-    </div>
-
-    <div class="calendar-wrapper">
-        <div class="day-calendar-header">
-            <div class="header-spacer"></div>
-            @foreach (var hour in _hours)
-            {
-                <div class="hour-marker">
-                    <span class="hour-label">@hour:00</span>
-                </div>
-            }
+    @if (EmployeeBookingData.Count == 0) { <p>Ingen medarbejdere fundet med den valgte behandling</p> }
+    else {
+        <div class="day-header">
+            <button @onclick="HandlePreviousDateClick" class="nav-button">&lt;</button>
+            <span class="current-date">@CurrentDate.ToString("dddd, dd. MMMM yyyy", new CultureInfo("da-DK"))</span>
+            <button @onclick="HandleNextDateClick" class="nav-button">&gt;</button>
         </div>
 
-        <div class="day-calendar">
-            @foreach (var employee in EmployeeBookingData)
-            {
-                <div class="day-row">
-                    <div class="employee-name">
-                        <span>@employee.Name</span>
+        <div class="calendar-wrapper">
+            <div class="day-calendar-header">
+                <div class="header-spacer"></div>
+                @foreach (var hour in _hours)
+                {
+                    <div class="hour-marker">
+                        <span class="hour-label">@hour:00</span>
                     </div>
-                    <div class="day-hours">
-                        @foreach (var hour in _hours)
-                        {
-                            <div class="day-hour"></div>
-                        }
-                        @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate.Date))
-                        {
-                            <div @onclick="@(() => HandleBookingClick(booking.Id))" class="appointment"
-                                 style="left: @(GetBookingStart(booking))rem; width: @(GetBookingWidth(booking))rem;"
-                                 title="@booking.StartDateTime.ToString("HH:mm") - @booking.EndDateTime.ToString("HH:mm")">
-                                @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
-                            </div>
-                        }
+                }
+            </div>
+
+            <div class="day-calendar">
+                @foreach (var employee in EmployeeBookingData)
+                {
+                    <div class="day-row">
+                        <div class="employee-name">
+                            <span>@employee.Name</span>
+                        </div>
+                        <div class="day-hours">
+                            @foreach (var hour in _hours)
+                            {
+                                <div class="day-hour"></div>
+                            }
+                            @foreach (var booking in employee.Bookings.Where(b => b.StartDateTime.Date == CurrentDate.Date))
+                            {
+                                <div @onclick="@(() => HandleBookingClick(booking.Id))" class="appointment"
+                                     style="left: @(GetBookingStart(booking))rem; width: @(GetBookingWidth(booking))rem;"
+                                     title="@booking.StartDateTime.ToString("HH:mm") - @booking.EndDateTime.ToString("HH:mm")">
+                                    @* <span class="appointment-time">@booking.StartDateTime.ToString("HH:mm")</span> *@
+                                </div>
+                            }
+                            @if (StartDate != null && StartDate == CurrentDate.Date && StartTime != null && EndTime != null && Employee != null && employee.Id == Employee.Id)
+                            {
+                                <div
+                                    class="current-selection"
+                                    style="left: @(GetSelectionStart(StartTime.Value, EndTime.Value))rem; width: @(GetSelectionWidth(StartTime.Value, EndTime.Value))rem">
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
-    </div>
+    }
 </div>
 
 @code {
@@ -62,6 +72,18 @@
 
     [Parameter]
     public EventCallback<DateTime> CurrentDateChanged { get; set; }
+
+    [Parameter]
+    public DateTime? StartDate { get; set; }
+
+    [Parameter]
+    public TimeSpan? StartTime { get; set; }
+
+    [Parameter]
+    public TimeSpan? EndTime { get; set; }
+
+    [Parameter]
+    public EmployeeNameWithBookingsViewModel? Employee { get; set; }
 
     private int[] _hours = [];
     private const int HourWidthRem = 4;
@@ -76,17 +98,30 @@
         _openingHour = OpeningTimes.Value.OpeningTime.Hour;
     }
 
-    private double GetBookingStart(BookingTimesOnlyViewModel booking)
+    private string GetBookingStart(BookingTimesOnlyViewModel booking)
     {
         var openingTime = booking.StartDateTime.Date.AddHours(_openingHour);
         var minutesSinceOpeningTime = (booking.StartDateTime - openingTime).TotalMinutes;
-        return (minutesSinceOpeningTime / MinutesPerHour) * HourWidthRem;
+        return ((minutesSinceOpeningTime / MinutesPerHour) * HourWidthRem).ToString("F2", CultureInfo.InvariantCulture);
     }
 
-    private double GetBookingWidth(BookingTimesOnlyViewModel booking)
+    private string GetBookingWidth(BookingTimesOnlyViewModel booking)
     {
         var durationMinutes = (booking.EndDateTime - booking.StartDateTime).TotalMinutes;
-        return (durationMinutes / MinutesPerHour) * HourWidthRem;
+        return ((durationMinutes / MinutesPerHour) * HourWidthRem).ToString("F2", CultureInfo.InvariantCulture);
+    }
+
+    private string GetSelectionStart(TimeSpan startTime, TimeSpan endTime)
+    {
+        var openingTime = TimeSpan.FromHours(_openingHour);
+        var minutesSinceOpeningTime = (startTime - openingTime).TotalMinutes;
+        return ((minutesSinceOpeningTime / MinutesPerHour) * HourWidthRem).ToString("F2", CultureInfo.InvariantCulture);
+    }
+
+    private string GetSelectionWidth(TimeSpan startTime, TimeSpan endTime)
+    {
+        var durationMinutes = (endTime - startTime).TotalMinutes;
+        return ((durationMinutes / MinutesPerHour) * HourWidthRem).ToString("F2", CultureInfo.InvariantCulture);
     }
 
     private async Task HandleBookingClick(Guid id)
@@ -97,12 +132,18 @@
 
     private async Task HandlePreviousDateClick()
     {
-        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(-1));
+        int daysToMove;
+        if (CurrentDate.DayOfWeek == DayOfWeek.Monday) daysToMove = -3;
+        else daysToMove = -1;
+        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(daysToMove));
     }
 
     private async Task HandleNextDateClick()
     {
-        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(1));
+        int daysToMove;
+        if (CurrentDate.DayOfWeek == DayOfWeek.Friday) daysToMove = 3;
+        else daysToMove = 1;
+        await CurrentDateChanged.InvokeAsync(CurrentDate.AddDays(daysToMove));
     }
 }
 
@@ -259,6 +300,15 @@
         padding: 0 0.5rem;
         overflow: hidden;
         z-index: 5;
+    }
+
+    .current-selection {
+        position: absolute;
+        height: calc(var(--hour-height) - 8px);
+        top: 4px;
+        border: solid 2px #00BFFF;
+        border-radius: 4px;
+        z-index: 7;
     }
 
         .appointment:hover {

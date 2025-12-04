@@ -6,6 +6,7 @@ using BellaHair.Presentation.WebUI.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using Radzen;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -43,8 +44,10 @@ namespace BellaHair.Presentation.WebUI
                 config.SnackbarConfiguration.VisibleStateDuration = 10000;
                 config.SnackbarConfiguration.HideTransitionDuration = 500;
                 config.SnackbarConfiguration.ShowTransitionDuration = 500;
-                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+                config.SnackbarConfiguration.SnackbarVariant = MudBlazor.Variant.Filled;
             });
+
+            builder.Services.AddRadzenComponents();
 
             var app = builder.Build();
 

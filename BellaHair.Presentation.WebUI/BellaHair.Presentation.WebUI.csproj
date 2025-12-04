@@ -8,7 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="wwwroot\images\BellaHairLogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="wwwroot\GlobalStyles.css" />
+    <None Include="wwwroot\images\BellaHairLogo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +22,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.11" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.11" />
     <PackageReference Include="MudBlazor" Version="8.15.0" />
+    <PackageReference Include="Radzen.Blazor" Version="8.3.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,192 @@
+﻿@page "/kalender"
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
+@using BellaHair.Ports.Employees
+@using BellaHair.Presentation.WebUI.Components.Pages.Bookings
+@using BellaHair.Presentation.WebUI.Components.Pages.Employees
+@using BellaHair.Infrastructure
+@using Microsoft.Extensions.Options
+@using Radzen
+@rendermode InteractiveServer
+@inject IBookingQuery BookingQuery
+@inject IEmployeeQuery EmployeeQuery
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IOptions<OpeningTimesSettings> OpeningTimes
+@inject ICurrentDateTimeProvider CurrentDateTime
+
+
+<div class="header-and-employee">
+    <div>
+        <h3>Kalender</h3>
+        <p>Vælg den medarbejder, du vil se kalenderen for.</p>
+    </div>
+    <div class="top-page-item">
+        <RadzenDropDown TValue="Guid" Data="@_employees" TextProperty="Fullname" ValueProperty="Id" @bind-Value="@(_pickedEmployeeId)" Change="@HandlePickedEmployee" />
+    </div>
+</div>
+
+<Radzen.Blazor.RadzenScheduler @ref="scheduler"
+                               Data="@_bookings"
+                               TItem="BookingCalendarViewModel"
+                               StartProperty="StartDateTime"
+                               EndProperty="EndDateTime"
+                               @bind-CurrentDate="@currentDate"
+                               Style="height: 33rem;"
+                               TextProperty="AllBookingInfo"
+                               AppointmentRender="@OnAppointmentRender"
+                               AppointmentSelect="@OnAppointmentSelect"
+                               NextText="Næste"
+                               PrevText="Tilbage"
+                               LoadData="@OnLoadData"
+                               Culture="@dkCulture">
+    <br />
+
+    <RadzenWeekView StartTime="@(TimeSpan.FromHours(OpeningTimes.Value.OpeningTime.Hour))"
+                    EndTime="@(TimeSpan.FromHours(OpeningTimes.Value.ClosingTime.Hour))"
+                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
+
+    <RadzenMonthView />
+
+</Radzen.Blazor.RadzenScheduler>
+
+@code
+{
+    System.Globalization.CultureInfo dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
+    RadzenScheduler<BookingCalendarViewModel> scheduler;
+
+    public List<BookingCalendarViewModel> _bookings { get; set; } = new List<BookingCalendarViewModel>();
+    public List<EmployeeNameViewModel> _employees { get; set; } = new List<EmployeeNameViewModel>();
+
+    public DateTime currentDate { get; set; }
+    public Guid _pickedEmployeeId { get; set; }
+
+    private bool _checkForInitialLoad = false;
+
+    [SupplyParameterFromQuery(Name = "date")]
+    public DateTime? UrlDate { get; set; }
+    [SupplyParameterFromQuery(Name = "employeeId")]
+    public Guid? UrlEmployeeId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await LoadEmployees();
+
+        if (UrlDate != null) currentDate = UrlDate.Value;
+        else currentDate = CurrentDateTime.GetCurrentDateTime();
+
+        // Vi sætter denne til sand så vi kan følge i OnLoadData() om data loades ifbm initialisering eller om det er til når vi ændrer på dato
+        _checkForInitialLoad = true;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Henter medarbejder fra URLen
+        if (UrlEmployeeId.HasValue && _employees.Any(e => e.Id == UrlEmployeeId.Value))
+        {
+            _pickedEmployeeId = UrlEmployeeId.Value;
+        }
+
+        // Vælger første medarbejder på listen hvis URL ikke indeholder medarbejder
+        else if (_pickedEmployeeId == Guid.Empty && _employees.Any())
+        {
+            _pickedEmployeeId = _employees.First().Id;
+        }
+
+        // Justerer datoen så den bliver sat til denne uges mandag (nødvendigt for at alt indlæses rigtigt)
+        UrlDate = DateToThisWeeksMonday(currentDate);
+
+        // Henter datoen fra URLen
+        if (UrlDate.HasValue && UrlDate.Value.Date != currentDate.Date)
+        {
+            currentDate = UrlDate.Value;
+        }
+    }
+
+    private async Task OnLoadData(SchedulerLoadDataEventArgs args)
+    {
+        if (_checkForInitialLoad) { args.Start = currentDate; args.End = currentDate.AddDays(7); scheduler.CurrentDate = args.Start; }
+        _checkForInitialLoad = false;
+
+
+        if (_pickedEmployeeId != Guid.Empty)
+        {
+            await LoadBookings(args.Start, args.End, _pickedEmployeeId);
+        }
+
+        // Opdaterer URL'en
+        var dateStr = args.Start.ToString("yyyy-MM-dd");
+        var newUrl = $"/kalender?date={dateStr}&employeeId={_pickedEmployeeId}";
+
+
+        try
+        {
+            // Opdaterer adressen
+            await JSRuntime.InvokeVoidAsync("window.history.replaceState", null, "", newUrl);
+        }
+        catch { /* Ignorerer exceptions fra Javascript */ }
+    }
+
+    private async Task HandlePickedEmployee(object value)
+    {
+        if (scheduler != null) await scheduler.Reload();
+    }
+
+    private async Task LoadEmployees()
+    {
+        try
+        {
+            var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
+            _employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.FullName)).OrderBy(e => e.FullName).ToList();
+        }
+        catch (Exception e) { Snackbar.Add($"Fejl: {e.Message}", Severity.Error); }
+    }
+
+    private async Task LoadBookings(DateTime start, DateTime end, Guid empId)
+    {
+        try
+        {
+            var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(start, end, empId);
+
+            _bookings = bookings.Select(b => new BookingCalendarViewModel(
+                b.Id, b.StartDateTime, b.EndDateTime,
+                DateOnly.FromDateTime(b.StartDateTime), TimeOnly.FromDateTime(b.StartDateTime), TimeOnly.FromDateTime(b.EndDateTime),
+                b.EmployeeFullName, b.CustomerFullName, b.TreatmentName, b.DurationMinutes,
+                $"{b.CustomerFullName}\n{b.TreatmentName}\n({b.EmployeeFullName})"
+            )).OrderBy(b => b.StartDateTime).ToList();
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Der skete en fejl ved indlæsning af bookings: {e.Message}", Severity.Error);
+        }
+    }
+
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<BookingCalendarViewModel> args)
+    {
+        args.Attributes["style"] = "background-color: #eb8ac7; border-color: #eb8ac7; color: white; border-radius: 4px; white-space: pre-wrap;";
+    }
+
+    private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<BookingCalendarViewModel> args)
+    {
+        NavigationManager.NavigateTo($"/booking/{args.Data.Id}");
+    }
+
+    private DateTime DateToThisWeeksMonday(DateTime dateToChange)
+    {
+        if (dateToChange.DayOfWeek != DayOfWeek.Monday)
+        {
+            // DayOfWeek enum: Sunday=0, Monday=1, ..., Saturday=6
+            int daysUntilTargetDay = (int)dateToChange.DayOfWeek;
+
+            // Udregner antal dage der skal trækkes fra til at gå til mandag.
+            // "+ 6) % 7" justerer for søndag (0 i enum) 
+            int daysToSubtract = (daysUntilTargetDay + 6) % 7;
+
+            // Use AddDays() with a negative value to go backwards.
+            return dateToChange.Date.AddDays(-daysToSubtract);
+        }
+
+        return dateToChange;
+    }
+}

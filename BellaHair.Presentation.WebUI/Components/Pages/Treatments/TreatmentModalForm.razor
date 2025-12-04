@@ -43,6 +43,7 @@
 
 		<div class="btn-wrapper">
 			<button class="btn-add" type="submit">Opret</button>
+			<button class="btn-remove" type="button" @onclick="HandleCancel">Annuller</button>
 		</div>
 
 	</EditForm>
@@ -53,7 +54,10 @@
 
 	[Parameter, EditorRequired]
 	public required EventCallback OnCreate { get; set; }
-	
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCancel { get; set; }
+
 
 	private async Task HandleCreateTreatment()
 	{
@@ -78,5 +82,10 @@
 			Snackbar.Add($"Der skete en fejl under oprettelse af behandling: {ex.Message}", Severity.Error);
 		}
 
+	}
+
+	private async Task HandleCancel()
+	{
+		await OnCancel.InvokeAsync();
 	}
 }

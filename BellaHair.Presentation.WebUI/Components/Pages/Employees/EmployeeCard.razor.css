@@ -117,3 +117,42 @@
     top: 1rem;
     right: 5rem;
 }
+
+.btn-add {
+    height: 1rem;
+    width: 6rem;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 8px;
+    margin-top: 4px;
+    vertical-align: top;
+    border-radius: 8px;
+    font-size: 12px;
+    display: flex;
+    color: #8200db;
+    background-color: #c084fc26;
+    border: 2px, solid;
+    border-color: mediumpurple;
+    font-weight: 500;
+}
+
+.btn-add:hover {
+    color: white;
+    fill: white;
+}
+
+.treatment-calendar-button-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-button {
+    align-self: end
+
+}
+
+.employee-content {
+    flex-grow: 1;
+}

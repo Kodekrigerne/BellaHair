@@ -1,42 +1,59 @@
 ﻿<!-- Mikkel Klitgaard -->
 
+@using System.Globalization
 @using BellaHair.Domain
 @using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Shared;
 
 @inject ICampaignDiscountCommand CampaignDiscountCommand
 @inject ISnackbar Snackbar;
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 <div class="cdc-card">
+
 	<div class="header-wrapper">
 		<p class="p-header">@CampaignDiscount.Name</p>
+
 		<div class="percent-wrapper">
 			<div class="icon-wrap">
 				<PercentIcon/> |
 			</div>
 			@((CampaignDiscount.DiscountPercent * 100).ToString("0"))%
 		</div>
+
 	</div>
-	<p class="discount-duration">Periode for kampagne: @CampaignDiscount.StartDate.ToString("d/M/yy") - @CampaignDiscount.EndDate.ToString("d/M/yy")</p>
+	
+	<div class="div-duration">
+		<p class="discount-duration">
+			Periode for kampagne: 
+		
+			<span class="duration-date">@CampaignDiscount.StartDate.ToString("d MMM yyyy", new CultureInfo("da-DK"))</span> til
+			<span class="duration-date">@CampaignDiscount.EndDate.ToString("d MMM yyyy", new CultureInfo("da-DK"))</span>
+		</p>
+	</div>
 	<hr/>
+
 	<p class="p-txt">Gælder for behandlinger:</p>
+
 	<div class="t-wrapper">
+
 		@foreach (var campaign in CampaignDiscount.Treatments)
 		{
 			<button class="btn-offer">
 				@campaign.Name
 			</button>
 		}
+
 		<div class="active-wrapper">
-			
-			@if (CampaignDiscount.StartDate < DateTime.Now && CampaignDiscount.EndDate > DateTime.Now) _isActive = true;
-			else _isActive = false;
-			<button class="@(_isActive ? "btn-active" : "btn-inactive")">
-				@(_isActive ? "Aktiv" : "Inaktiv")
+
+			<button class="@GetStatusClass()">
+				@GetStatusText()
 			</button>
+
 		</div>
 	</div>
-	<BinDeleteButton Class="bin-delete-btn" OnClick="@(() => { _showConfirmDelete = true; })" />
+
+	<BinDeleteButton Class="bin-delete-btn" OnClick="@(() => { _showConfirmDelete = true; })"/>
 
 </div>
 
@@ -66,7 +83,6 @@
 	public required EventCallback<Guid> OnDelete { get; set; }
 
 	private bool _showConfirmDelete = false;
-	private bool _isActive;
 
 	private async Task HandleOnDeleteClick()
 	{
@@ -87,5 +103,23 @@
 		{
 			Snackbar.Add("Noget gik galt.", Severity.Error);
 		}
+	}
+
+	private string GetStatusText()
+	{
+		var today = CurrentDateTimeProvider.GetCurrentDateTime().Date;
+
+		if (CampaignDiscount.EndDate.Date < today) return "Udløbet";
+		if (CampaignDiscount.StartDate.Date > today) return "Kommende";
+		return "Aktiv";
+	}
+
+	private string GetStatusClass()
+	{
+		var today = CurrentDateTimeProvider.GetCurrentDateTime().Date;
+
+		if (CampaignDiscount.EndDate.Date < today) return "btn-expired";
+		if (CampaignDiscount.StartDate.Date > today) return "btn-inactive";
+		return "btn-active";
 	}
 }

@@ -1,24 +1,153 @@
 ﻿@page "/"
+@using BellaHair.Domain
+@using BellaHair.Ports.Bookings
+@using BellaHair.Ports.Discounts
+@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Ports.Treatments
 
-<PageTitle>Home</PageTitle>
-<body style="flex: 1;">
+@inject ICampaignDiscountQuery CampaignDiscountQuery
+@inject IPrivateCustomerQuery CustomerQuery
+@inject IBookingQuery BookingQuery
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
+@inject ITreatmentQuery TreatmentQuery
+@inject ISnackbar Snackbar
 
+<div class="home-wrapper">
+	
+	<div class="side-content left-col">
+		<div class="stat-card">
+			<div class="card-header">
+				Kampagner
+			</div>
+			<hr class="line"/>
+			<div class="card-txt">
+				Salonen har lige nu 
+				<span class="card-count">
+					@_campaignCount @(_campaignCount == 1 ? "aktiv" : "aktive")
+				</span> 
+				@(_campaignCount == 1 ? "kampagne" : "kampagner")
+			</div>
+			
+		</div>
+		<div class="stat-card">
+			<div class="card-header">
+				Kunder
+			</div>
+			<hr class="line" />
+			<div class="card-txt">
+				Salonen har registreret
+				<span class="card-count">
+					@_customerCount @(_customerCount == 1 ? "kunde" : "kunder")
+				</span>
+				i alt
+			</div>
+		</div>
+	</div>
+	
 
-<h1>Hello, world!</h1>
+	<div class="center-content">
 
+		<div class="nav-bellahair">
+			<img src="images/BellaHairLogo.png" class="bella-logo"/>
+		</div>
 
-<button class="btn-add">Ny kunde</button>
-<button class="btn-remove">Slet</button>
+		<p class="txt-booking">Bookingsystem</p>
 
-<div class="kk-container">
-	<p>Text</p>
-	<p>Text</p>
-	<button class="btn-select">James Smith</button>
+		<div class="div-dev">
+			Udviklet af
 
-	<div class="kk-container-nested">
-		<p>Text</p>
+			<div class="div-kodekrigerne">
+				<img src="images/KodekrigerneLogo.png" class="kodekrigerne-logo"/>
+			</div>
+
+			<span class="txt-kodekrigerne">Kodekrigerne</span>
+
+		</div>
+
+	</div>
+	
+	<div class="side-content right-col">
+
+		<div class="stat-card">
+			
+			<div class="card-header">
+				Bookings
+			</div>
+			<hr class="line" />
+			<div class="card-txt">
+				Salonen har 
+				<span class="card-count">
+					@_bookingCount
+				</span>
+				kommende @(_bookingCount == 1 ? "booking" : "bookings")
+			</div>
+			<div class="card-txt">
+				Idag er der i alt <span class="card-count"> @_bookingsToday </span> @(_bookingCount == 1 ? "booking" : "bookings")
+			</div>
+
+		</div>
+
+		<div class="stat-card">
+
+			<div class="card-header">
+				Behandlinger
+			</div>
+			<hr class="line" />
+			<div class="card-txt">
+				Vi tilbyder i alt
+				<span class="card-count">
+					@_treatmentCount @(_treatmentCount == 1 ? "behandling" : "behandlinger")
+				</span>
+				i salonen	
+			</div>
+			
+		</div>
+
 	</div>
 
 </div>
 
-</body>
+@code{
+
+	private int _campaignCount;
+	private int _customerCount;
+	private int _bookingCount;
+	private int _bookingsToday;
+	private int _treatmentCount;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadDataAsync();
+	}
+
+	private async Task LoadDataAsync()
+	{
+		var today = CurrentDateTimeProvider.GetCurrentDateTime().Date;
+
+		try
+		{
+			_campaignCount = await CampaignDiscountQuery.GetActiveCountAsync();
+
+			var customer = await CustomerQuery.GetPrivateCustomersAsync();
+			_customerCount = customer.Count;
+
+			var bookings = await BookingQuery.GetAllNewAsync();
+			_bookingCount = bookings.Count();
+
+			_bookingsToday = bookings.Where(b => b.StartDateTime.Date == today).Count();
+
+			var treatments = await TreatmentQuery.GetAllAsync();
+			_treatmentCount = treatments.Count();
+
+		}
+		catch (DomainException dex)
+		{
+			Snackbar.Add(dex.Message, Severity.Error);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Der skete en fejl under indlæsningen af statistikkerne.", Severity.Error);
+		}
+	}
+
+}
