@@ -113,8 +113,8 @@
 						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double" @onclick="() => _activePicker = Picker.Products">
 							<p class="picked-label">Produkter</p>
 							<p class="picked-text">
-								<span>@_productLines.Count produkter</span>
-								<span class="picked-to-from">Samlet pris: @_productLines.Sum(pl => pl.Price).ToString("C2")</span>
+								<span>@_productLines.Sum(pl => pl.Quantity) produkter</span>
+								<span class="picked-to-from">Samlet pris: @_productLines.Sum(pl => pl.Price * pl.Quantity).ToString("C2")</span>
 							</p>
 						</button>
 					}
@@ -182,7 +182,7 @@
 					}
 					else if (_activePicker == Picker.Products)
 					{
-						
+						<ProductsDisplay ProductLines="@_productLines" ProductLinesChanged="StateHasChanged"/>
 					}
 				}
 			</div>
@@ -405,7 +405,7 @@
 	{
 		var totalBase = 0m;
 		totalBase += _treatment?.Price ?? 0m;
-		totalBase += _productLines.Sum(pl => pl.Price);
+		totalBase += _productLines.Sum(pl => pl.Price * pl.Quantity);
 
 		return totalBase;
 	}

@@ -1,0 +1,38 @@
+﻿@using BellaHair.Presentation.WebUI.Components.Shared
+
+<Modal @bind-IsVisible="_showAddProductModal">
+
+</Modal>
+
+<div class="products-display-container">
+	@foreach (var productLine in ProductLines)
+	{
+		<div class="product-line">
+			<p>
+				<span>@productLine.ProductName</span>
+				<span>@productLine.Price</span>
+				<span @onclick="() => HandleChangeQuantity(productLine.ProductId, -1)">&lt;</span>
+				<span>@productLine.Quantity</span>
+				<span @onclick="() => HandleChangeQuantity(productLine.ProductId, 1)">&gt;</span>
+			</p>
+		</div>
+	}
+	<button @onclick="() => _showAddProductModal = true">Tilføj produkt</button>
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required List<ProductLineModel> ProductLines { get; set; }
+
+	[Parameter]
+	public EventCallback ProductLinesChanged { get; set; }
+
+	private bool _showAddProductModal = false;
+
+	private async Task HandleChangeQuantity(Guid productId, int difference)
+	{
+		var productLine = ProductLines.Single(pl => pl.ProductId == productId);
+		productLine.SetQuantity(productLine.Quantity + difference);
+		if (ProductLinesChanged.HasDelegate) await ProductLinesChanged.InvokeAsync();
+	}
+}
