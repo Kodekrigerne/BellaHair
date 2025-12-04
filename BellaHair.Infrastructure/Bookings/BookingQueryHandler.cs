@@ -74,7 +74,7 @@ namespace BellaHair.Infrastructure.Bookings
 
             var products = booking.IsPaid
                 ? booking.ProductLineSnapshots.Select(pls => new ProductLineDTO(pls.ProductId, pls.Name, pls.Description, pls.Price, pls.Quantity))
-                : booking.ProductLines.Select(pl => new ProductLineDTO(pl.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value));
+                : booking.ProductLines.Select(pl => new ProductLineDTO(pl.Product.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value));
 
             var discount = booking.Discount != null
                 ? new DiscountDTO(

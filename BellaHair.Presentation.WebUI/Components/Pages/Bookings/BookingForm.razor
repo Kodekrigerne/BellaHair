@@ -215,10 +215,10 @@
 						</div>
 
 						<div class="price-section">
-							<p class="price-without-discount">Pris uden rabat: @_treatment?.Price.ToString("F2") dkk</p>
+							<p class="price-without-discount">Pris uden rabat: @GetTotalBase().ToString("C2")</p>
 							@if (_discount != null && _treatment != null)
 							{
-								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
+								<p class="price-with-discount">Pris med rabat: @GetTotalWithDiscount().ToString("C2")</p>
 							}
 						</div>
 
@@ -367,7 +367,7 @@
 				booking.Employee.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
 
-			_productLines = booking.Products.Select(p => new ProductLineModel(p.Id, p.Name, p.Price, p.Quantity)).ToList();
+			_productLines = booking.Products.Select(p => new ProductLineModel(p.ProductId, p.Name, p.Price, p.Quantity)).ToList();
 
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
@@ -393,6 +393,20 @@
 		if (_isPaid) return false;
 		if (_startDate.Value.Add(_startTime.Value) < _now) return false;
 		return true;
+	}
+
+	private decimal GetTotalBase()
+	{
+		var totalBase = 0m;
+		totalBase += _treatment?.Price ?? 0m;
+		totalBase += _productLines.Sum(pl => pl.Price);
+
+		return totalBase;
+	}
+
+	private decimal GetTotalWithDiscount()
+	{
+		return GetTotalBase() - _discount?.Amount ?? 0;
 	}
 
 	private void SetNulls()
@@ -650,16 +664,12 @@
 			if (discountDTO.Type == DiscountTypeDTO.BirthdayDiscount)
 			{
 				_showBirthdayOption = true;
-				_useBirthdayDiscount = true; 
+				_useBirthdayDiscount = true;
 			}
 
 			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount, discountDTO.Type);
 		}
-		catch
-		{
-			Snackbar.Add("Der opstod en fejl ved hentning af rabat", Severity.Error);
-
-		}
+		catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
 	}
 
 	private async Task HandleCreateBookingClick()
