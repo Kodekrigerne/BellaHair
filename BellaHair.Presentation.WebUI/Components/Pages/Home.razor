@@ -142,11 +142,11 @@
 		}
 		catch (DomainException dex)
 		{
-			
+			Snackbar.Add(dex.Message, Severity.Error);
 		}
 		catch (Exception ex)
 		{
-
+			Snackbar.Add($"Der skete en fejl under indlæsningen af statistikkerne.", Severity.Error);
 		}
 	}
 
