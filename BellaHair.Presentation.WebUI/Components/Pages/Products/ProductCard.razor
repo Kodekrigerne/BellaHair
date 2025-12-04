@@ -32,7 +32,7 @@
 
 	<div class="action-button-group">
 			<EditButton onclick="@(() => showEditModal = true)" />
-			<BinDeleteButton OnClick="@HandleOnDeleteClick" />
+			<BinDeleteButton OnClick="@(() => showConfirmDelete = true)" />
 	</div>
 
 </div>
@@ -84,7 +84,7 @@
 
 			showConfirmDelete = false;
 			await OnChange.InvokeAsync();
-			Snackbar.Add("Behandlingen blev slettet med succes", Severity.Success);
+			Snackbar.Add($"Produktet '{Product.Name}' blev slettet.", Severity.Success);
 		}
 		catch (DomainException ex)
 		{

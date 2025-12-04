@@ -9,9 +9,6 @@
 @inject NavigationManager NavigationManager
 
 <!-- Mikkel Dahlmann -->
-<!-- TODO Når 'slet booking' er implementeret, tilføj slet bookinger til sletning af kunde -->
-<!-- TODO Bedre styling -->
-
 
 <!-- Modal til sletning -->
 <Modal @bind-IsVisible="@showDeleteModal">
@@ -85,7 +82,7 @@
 
 			<div class="privatecustomer-contact-details">
 				<VisitsIcon Class="privatecustomer-icons" />
-				<button class="btn-add" @onclick="NavigateToNewCustomerBookings">Kommende bookinger</button>
+				<button class="btn-add bookings" @onclick="NavigateToNewCustomerBookings">Kommende bookinger</button>
 			</div>
 			
 			<div class="privatecustomer-contact-details">
