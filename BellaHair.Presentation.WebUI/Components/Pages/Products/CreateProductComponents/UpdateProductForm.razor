@@ -1,0 +1,144 @@
+﻿@using Domain
+@using BellaHair.Ports.Products
+@inject IProductCommand ProductCommand
+@inject ISnackbar Snackbar
+
+
+<!-- Mikkel Dahlmann -->
+
+<h3 style="text-align: center; font-weight: bold">Rediger produkt</h3>
+<p style="text-align: center">Rediger produktets oplysninger</p>
+
+<!-- Editform container -->
+<EditForm EditContext="@editContext" OnValidSubmit="@UpdateProduct">
+	<DataAnnotationsValidator />
+
+	<div class="inputs-container">
+
+		<div class="inputs-items-container">
+
+			<!-- Indeholdte inputs til formen -->
+			<div>
+				<CreateProductInputs Product="ProductInForm" />
+			</div>
+
+		</div>
+
+	</div>
+
+	<div class="btn-wrapper">
+		<button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
+		<button class="btn-remove" type="button" @onclick="@HandleReset">Nulstil ændringer</button>
+		<button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
+	</div>
+
+</EditForm>
+
+@code {
+	[Parameter, EditorRequired]
+	public required EventCallback OnUpdate { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback OnCancel { get; set; }
+
+	// Produkt der modtages til opdatering
+	[Parameter, EditorRequired]
+	public ProductDTO ProductToUpdate { get; set; }
+
+	// Afspejler produktets nuværende data i redigeringsformen
+	public NewProductModel ProductInForm { get; set; } = new NewProductModel();
+
+	private EditContext? editContext { get; set; }
+
+	private bool InputHasChanged;
+
+	protected override void OnInitialized()
+	{
+		if (ProductToUpdate != null)
+		{
+			InitializeProductInForm();
+		}
+
+		else
+		{
+			Snackbar.Add("Noget gik galt.", Severity.Error);
+		}
+	}
+
+	// Sætter editcontext med modellen som reference.
+	// Der abonneres på feltændringer for at tracke input-ændringer.
+	// Feltændringer medfører kald af HandleFieldChanged-metoden.
+	private void InitializeProductInForm()
+	{
+		MapProductToForm();
+		editContext = new EditContext(ProductInForm);
+		editContext.OnFieldChanged += HandleFieldChanged!;
+		InputHasChanged = false;
+	}
+
+    // Håndterer feltændringer i formen.
+    // Kaldes når et felt i formen ændres.
+	private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+	{
+		InputHasChanged = editContext!.IsModified();
+
+		StateHasChanged();
+	}
+
+	private void HandleReset()
+	{
+		InitializeProductInForm();
+		StateHasChanged();
+	}
+
+	private async Task HandleCancel()
+	{
+		Snackbar.Add("Redigering blev afbrudt.", Severity.Warning);
+		await OnCancel.InvokeAsync();
+	}
+
+	private async Task UpdateProduct()
+	{
+		try
+		{
+			var command = new UpdateProductCommand(
+				ProductInForm.Id,
+				ProductInForm.Name,
+				ProductInForm.Description,
+				ProductInForm.Price
+			);
+
+			await ProductCommand.UpdateProductAsync(command);
+
+			Snackbar.Add($"Produktet '{command.Name}' blev opdateret", Severity.Success);
+
+			await OnUpdate.InvokeAsync();
+
+		}
+		catch (DomainException e)
+		{
+			Snackbar.Add($"{e.Message}", Severity.Error);
+		}
+		catch (Exception e)
+		{
+			Snackbar.Add($"Noget gik galt. Fejlbesked: {e.Message}", Severity.Error);
+		}
+	}
+
+	private void MapProductToForm()
+	{
+		ProductInForm.Id = ProductToUpdate.Id;
+		ProductInForm.Name = ProductToUpdate.Name;
+        ProductInForm.Description = ProductToUpdate.Description;
+        ProductInForm.Price = ProductToUpdate.Price;
+	}
+
+    // Rydder op ved at afmelde event handleren for feltændringer.
+	private void Dispose()
+	{
+		if (editContext != null)
+		{
+			editContext.OnFieldChanged -= HandleFieldChanged!;
+		}
+	}
+}

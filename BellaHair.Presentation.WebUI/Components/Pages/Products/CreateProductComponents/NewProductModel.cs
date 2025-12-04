@@ -1,0 +1,34 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+// Mikkel Dahlmann
+
+namespace BellaHair.Presentation.WebUI.Components.Pages.Products.CreateProductComponents
+{
+
+    /// <summary>
+    /// Represents the data required to create a new product, including its identifier, name, description, and price.
+    /// </summary>
+
+    public class NewProductModel
+    {
+        public Guid Id { get; set; }
+
+        private string _name = string.Empty;
+
+        private string _description = string.Empty;
+
+        private decimal _price;
+
+        [Required(ErrorMessage = "Navn er påkrævet")]
+        [StringLength(100, ErrorMessage = "Navn kan ikke være længere end 100 tegn")]
+        public string Name { get => _name; set => _name = value.Trim(); }
+
+        [Required(ErrorMessage = "Beskrivelse er påkrævet")]
+        [StringLength(500, ErrorMessage = "Beskrivelse kan ikke være længere end 500 tegn")]
+        public string Description { get => _description; set => _description = value.Trim(); }
+
+        [Required(ErrorMessage = "Pris er påkrævet")]
+        [Range(0.01, 100000.00, ErrorMessage = "Prisen skal være mellem 0,01 og 100.000,00 kr.")]
+        public decimal Price { get => _price; set => _price = value; }
+    }
+}
