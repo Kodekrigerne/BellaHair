@@ -14,7 +14,7 @@
 
 <Modal @bind-IsVisible="@_showNewModal">
 
-	<TreatmentModalForm OnCreate="@LoadTreatments"/>
+	<TreatmentModalForm OnCreate="@LoadTreatments" OnCancel="@CloseModal"/>
 
 </Modal>
 
@@ -80,6 +80,12 @@
         }
     }
 
+
+    private void CloseModal()
+    {
+	    _showNewModal = false;
+	    Snackbar.Add("Handlingen blev annulleret.", Severity.Info);
+    }
 
 }
 

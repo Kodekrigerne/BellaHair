@@ -28,12 +28,17 @@
             outline: 1px solid #a91ce4;
         }
 
+.btn-add{
+    padding-left: 20px;
+    padding-right: 20px;
+}
 
 .btn-wrapper {
     display: flex;
     justify-content: flex-end;
     margin-top: 20px;
     margin-bottom: 8px;
+    gap:16px;
 }
 
 .treatment-input input::placeholder {
