@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Invoices\BellaHairLogo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Invoices\BellaHairLogo.png" />
   </ItemGroup>
 

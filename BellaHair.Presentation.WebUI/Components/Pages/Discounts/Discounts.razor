@@ -38,7 +38,7 @@ else if (_activeTab == DiscountTab.General)
 	<div class="kk-container">
 		@foreach (var loyaltyDiscount in _discounts.OfType<LoyaltyDiscountViewModel>())
 		{
-			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount" OnDelete="@HandleOnDeleteLoyaltyClick"/>
+			<LoyaltyDiscountCard LoyaltyDiscount="loyaltyDiscount"/>
 		}
 	</div>
 

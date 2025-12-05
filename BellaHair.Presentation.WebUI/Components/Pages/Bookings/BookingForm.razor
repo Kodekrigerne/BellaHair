@@ -102,6 +102,27 @@
 					}
 				</div>
 			</div>
+			<div class="left-container">
+				<div class="pick-container">
+					@if (_productLines.Count == 0 && (Mode == BookingMode.Edit || Mode == BookingMode.New))
+					{
+						<button class="btn-pick" @onclick="() => _activePicker = Picker.Products">Vælg produkter</button>
+					}
+					else
+					{
+						<button class="btn-picked @(Mode == BookingMode.View ? "inactive" : "") btn-picked-double" @onclick="() => _activePicker = Picker.Products">
+							<p class="picked-label">Produkter</p>
+							<p class="picked-text">
+								<span>@_productLines.Sum(pl => pl.Quantity) produkter</span>
+								@if (_productLines.Count != 0)
+								{
+									<span class="picked-to-from">Samlet pris: @_productLines.Sum(pl => pl.Price * pl.Quantity).ToString("C2")</span>
+								}
+							</p>
+						</button>
+					}
+				</div>
+			</div>
 		</div>
 		<div class="body-right">
 			<div class="right-picker">
@@ -123,7 +144,7 @@
 						@foreach (var treatment in _treatments)
 						{
 							<button class="picker-btn" @onclick="() => HandleTreatmentPickerClick(treatment.Id)">
-								<span class="treatment-name">@treatment.Name</span>
+								<span>@treatment.Name</span>
 								<span class="treatment-duration">@treatment.DurationMinutes min</span>
 							</button>
 						}
@@ -138,9 +159,9 @@
 							}
 						}
 					}
-					<div class="date-picker-container">
-						@if (_activePicker == Picker.Time)
-						{
+					else if (_activePicker == Picker.Time)
+					{
+						<div class="date-picker-container">
 							<div class="date-picker-section">
 								<p class="date-picker-label">Vælg en dato</p>
 								<MudDatePicker @ref="_datePickerRef"
@@ -160,8 +181,12 @@
 								TimeChanged="HandleTimeChanged"
 								PickerVariant="PickerVariant.Dialog" />
 							</div>
-						}
-					</div>
+						</div>
+					}
+					else if (_activePicker == Picker.Products)
+					{
+						<ProductsDisplay ProductLines="@_productLines" ProductLinesChanged="StateHasChanged"/>
+					}
 				}
 			</div>
 			@if (_timeIsAvailable != null)
@@ -199,10 +224,10 @@
 						</div>
 
 						<div class="price-section">
-							<p class="price-without-discount">Pris uden rabat: @_treatment?.Price.ToString("F2") dkk</p>
+							<p class="price-without-discount">Pris uden rabat: @GetTotalBase().ToString("C2")</p>
 							@if (_discount != null && _treatment != null)
 							{
-								<p class="price-with-discount">Pris med rabat: @((_treatment.Price - _discount.Amount).ToString("F2")) dkk</p>
+								<p class="price-with-discount">Pris med rabat: @GetTotalWithDiscount().ToString("C2")</p>
 							}
 						</div>
 
@@ -270,7 +295,7 @@
 	private bool _isPaid;
 	private List<ProductLineModel> _productLines = [];
 
-	private enum Picker { None, Customers, Treatments, Employee, Time }
+	private enum Picker { None, Customers, Treatments, Employee, Time, Products }
 	private Picker _activePicker = Picker.None;
 
 	private bool _showDeleteModal = false;
@@ -351,6 +376,8 @@
 				booking.Employee.Bookings
 					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
 
+			_productLines = booking.Products.Select(p => new ProductLineModel(p.ProductId, p.Name, p.Price, p.Quantity)).ToList();
+
 			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
 			_timeIsAvailable = true;
 
@@ -373,8 +400,23 @@
 	{
 		if (_startDate == null || _startTime == null) return false;
 		if (_isPaid) return false;
-		if (_startDate.Value.Add(_startTime.Value) < _now) return false;
+		var endTime = _startDate.Value.Add(_endTime!.Value);
+		if (endTime < _now.AddHours(-2)) return false;
 		return true;
+	}
+
+	private decimal GetTotalBase()
+	{
+		var totalBase = 0m;
+		totalBase += _treatment?.Price ?? 0m;
+		totalBase += _productLines.Sum(pl => pl.Price * pl.Quantity);
+
+		return totalBase;
+	}
+
+	private decimal GetTotalWithDiscount()
+	{
+		return GetTotalBase() - _discount?.Amount ?? 0;
 	}
 
 	private void SetNulls()
@@ -624,24 +666,18 @@
 			if (discountDTO == null)
 			{
 				_showBirthdayOption = false;
-
-				Snackbar.Add("Fandt ingen rabat", Severity.Warning);
 				return;
 			}
 
 			if (discountDTO.Type == DiscountTypeDTO.BirthdayDiscount)
 			{
 				_showBirthdayOption = true;
-				_useBirthdayDiscount = true; 
+				_useBirthdayDiscount = true;
 			}
 
 			_discount = discountDTO == null ? null : new BookingDiscountViewModel(discountDTO.Name, discountDTO.Amount, discountDTO.Type);
 		}
-		catch
-		{
-			Snackbar.Add("Der opstod en fejl ved hentning af rabat", Severity.Error);
-
-		}
+		catch (Exception ex) { Snackbar.Add(ex.Message, Severity.Error); }
 	}
 
 	private async Task HandleCreateBookingClick()
@@ -763,6 +799,7 @@
 
 	private async Task HandleResetChangesClick()
 	{
+		_activePicker = Picker.None;
 		await LoadBooking();
 		Mode = BookingMode.View;
 	}
@@ -802,6 +839,7 @@
 		border-radius: 6px;
 		display: flex;
 		height: 4rem;
+		max-width: calc(50% - 5px);
 	}
 
 	.btn-pick {

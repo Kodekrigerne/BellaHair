@@ -12,10 +12,27 @@
     position: relative;
 }
 
+.bronze {
+    background: linear-gradient(to right, #fbe2d7, #facab3);
+    border-color: #f8b586;
+
+}
+
+.silver {
+    background: linear-gradient(to right, #f8f8f8, #dcd9d9);
+    border-color: #a8a8a8;
+}
+
+.gold {
+    background: linear-gradient(to right, #fff8b4, #fbd791);
+    border-color: #fded57;
+}
+
+
 .ldc-visits {
     margin: 0px;
     font-size: 12px;
-    color: grey;
+    color: #0e0000;
     margin-bottom: 2px;
 }
 
@@ -57,4 +74,17 @@ hr{
 .icon-wrap {
     margin-right: 6px;
     font-weight: normal;
+}
+
+.ldc-highlight{
+    font-weight:600;
+}
+
+.ldc-text-perk{
+    margin-bottom:10px;
+    margin-left:15px;
+}
+
+.ldc-perks{
+    font-weight:700;
 }

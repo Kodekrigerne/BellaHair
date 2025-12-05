@@ -59,7 +59,7 @@ namespace BellaHair.Infrastructure.Bookings
                 booking.Treatment?.Name ?? booking.TreatmentSnapshot!.Name,
                 booking.Treatment?.Price.Value ?? booking.TreatmentSnapshot!.Price,
                 booking.Treatment?.DurationMinutes.Value ?? booking.TreatmentSnapshot!.DurationMinutes,
-                booking.Treatment?.Employees.Count ?? 0);
+                0);
 
             var visits = await _customerVisitsService.GetCustomerVisitsAsync(booking.Customer?.Id ?? booking.CustomerSnapshot!.CustomerId);
 
@@ -70,11 +70,11 @@ namespace BellaHair.Infrastructure.Bookings
                 booking.Customer?.Email.Value ?? booking.CustomerSnapshot!.Email,
                 booking.Customer?.PhoneNumber.Value ?? booking.CustomerSnapshot!.PhoneNumber,
                 booking.Customer?.Address.FullAddress ?? booking.CustomerSnapshot!.FullAddress,
-                0);
+                visits);
 
             var products = booking.IsPaid
                 ? booking.ProductLineSnapshots.Select(pls => new ProductLineDTO(pls.ProductId, pls.Name, pls.Description, pls.Price, pls.Quantity))
-                : booking.ProductLines.Select(pl => new ProductLineDTO(pl.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value));
+                : booking.ProductLines.Select(pl => new ProductLineDTO(pl.Product.Id, pl.Product.Name, pl.Product.Description, pl.Product.Price.Value, pl.Quantity.Value));
 
             var discount = booking.Discount != null
                 ? new DiscountDTO(
@@ -174,21 +174,10 @@ namespace BellaHair.Infrastructure.Bookings
         /// <param name="endDate"></param>
         /// <param name="employeeId"></param>
         /// <returns></returns>
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllWithinPeriodOnEmployee(DateTime startDate, DateTime endDate, Guid employeeId)
+        async Task<IEnumerable<BookingCalendarDTO>> IBookingQuery.GetAllWithinPeriodOnEmployee(DateTime startDate, DateTime endDate, Guid employeeId)
         {
-            var bookings = await _db.Bookings.AsNoTracking()
-                .Include(b => b.Treatment)
-                .Include(b => b.Customer)
-                .Include(b => b.Employee)
-                .Include(b => b.ProductLines)
-                    .ThenInclude(bpl => bpl.Product)
-                .Include(b => b.ProductLineSnapshots)
-                .Where(b => b.Employee!.Id == employeeId
-                    && b.StartDateTime < endDate
-                    && b.EndDateTime > startDate)
-                .ToListAsync();
-
-            return MapToBookingDTOs(bookings);
+            return await _db.Bookings.AsNoTracking().Where(b => b.Customer != null && b.Treatment != null && b.Employee != null && employeeId == b.Employee.Id && b.StartDateTime > startDate && b.EndDateTime < endDate)
+                .Select(b => new BookingCalendarDTO(b.Id, b.StartDateTime, b.EndDateTime, b.Employee!.Name.FullName, b.Customer!.Name.FullName, b.Treatment!.Name)).ToListAsync();
         }
     }
 }

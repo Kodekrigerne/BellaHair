@@ -1,5 +1,8 @@
-﻿@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
+﻿<!-- Dennis -->
+
+@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Shared
+@using System.Globalization
 <div class="customer-info">
 	<h3>@Customer.FullName</h3>
 	<div class="info-list">
@@ -15,7 +18,7 @@
 
 		<div class="info-item">
 			<span class="label">Fødselsdag:</span>
-			<span class="value"><BirthdayIcon Class="customer-icon" /> @Customer.Birthday.ToString("MMMM dd, yyyy")</span>
+			<span class="value"><BirthdayIcon Class="customer-icon" /> @Customer.Birthday.ToString("dd. MMMM yyyy", new CultureInfo("da-DK"))</span>
 		</div>
 
 		<div class="info-item">
