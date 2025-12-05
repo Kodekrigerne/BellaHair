@@ -118,7 +118,7 @@
     right: 5rem;
 }
 
-.btn-add {
+::deep .btn-add {
     height: 1rem;
     width: 6rem;
     padding-left: 6px;
@@ -146,6 +146,7 @@
     width: 100%;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 .calendar-button {

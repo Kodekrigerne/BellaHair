@@ -76,8 +76,8 @@ namespace BellaHair.Presentation.WebUI
         private Employee? _annaPetersen;
 
         // Settings
-        private int _noOfPastBookings = 50;
-        private int _noOfFutureBookings = 50;
+        private int _noOfPastBookings = 0;
+        private int _noOfFutureBookings = 0;
 
         public async Task AddData()
         {
