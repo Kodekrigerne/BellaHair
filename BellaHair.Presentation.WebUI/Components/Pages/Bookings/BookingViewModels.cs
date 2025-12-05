@@ -27,13 +27,9 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
         Guid Id,
         DateTime StartDateTime,
         DateTime EndDateTime,
-        DateOnly Date,
-        TimeOnly StartTime,
-        TimeOnly EndTime,
         string EmployeeFullName,
         string CustomerFullName,
         string TreatmentName,
-        int DurationMinutes,
         string AllBookingInfo
         );
         
