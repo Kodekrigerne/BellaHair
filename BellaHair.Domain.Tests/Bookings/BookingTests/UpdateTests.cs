@@ -18,6 +18,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var booking = Fixture.New<Booking>()
                 .With(b => b.IsPaid, false)
                 .With(b => b.StartDateTime, DateTime.Now.AddHours(5))
+                .With(b => b.EndDateTime, DateTime.Now.AddHours(6))
                 .Build();
 
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
@@ -43,6 +44,60 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         }
 
         [Test]
+        public void Given_BookingWithinGracePeriod_Then_UpdatesBooking()
+        {
+            var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
+            var startDateTime = DateTime.Now.AddMinutes(5);
+
+            var booking = Fixture.New<Booking>()
+                .With(b => b.IsPaid, false)
+                .With(b => b.StartDateTime, DateTime.Now.AddHours(-2))
+                .With(b => b.EndDateTime, DateTime.Now.AddHours(-1))
+                .Build();
+
+            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
+            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
+
+            booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object);
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(booking.Employee, Is.Not.Null);
+                Assert.That(booking.Employee!.Id, Is.EqualTo(employee.Id));
+                Assert.That(booking.Treatment, Is.Not.Null);
+                Assert.That(booking.Treatment!.Id, Is.EqualTo(treatment.Id));
+                Assert.That(booking.IsPaid, Is.False);
+                Assert.That(booking.StartDateTime, Is.EqualTo(startDateTime));
+                Assert.That(booking.PaidDateTime, Is.Null);
+                Assert.That(booking.CustomerSnapshot, Is.Null);
+                Assert.That(booking.TreatmentSnapshot, Is.Null);
+                Assert.That(booking.EmployeeSnapshot, Is.Null);
+                Assert.That(booking.EndDateTime, Is.EqualTo(startDateTime.AddMinutes(treatment.DurationMinutes.Value)));
+                Assert.That(booking.TotalBase, Is.EqualTo(treatment.Price.Value));
+            }
+        }
+
+        [Test]
+        public void Given_BookingOutsideGracePeriod_Then_ThrowsException()
+        {
+            var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
+            var startDateTime = DateTime.Now.AddMinutes(5);
+
+            var booking = Fixture.New<Booking>()
+                .With(b => b.IsPaid, false)
+                .With(b => b.StartDateTime, DateTime.Now.AddHours(-3))
+                .With(b => b.EndDateTime, DateTime.Now.AddHours(-2).AddMinutes(-5))
+                .Build();
+
+            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
+            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
+
+            Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
+        }
+
+        [Test]
         public void Given_BookingValidForUpdate_Then_UpdatesBookingWithProducts()
         {
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
@@ -52,6 +107,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var booking = Fixture.New<Booking>()
                 .With(b => b.IsPaid, false)
                 .With(b => b.StartDateTime, DateTime.Now.AddHours(5))
+                .With(b => b.EndDateTime, DateTime.Now.AddHours(6))
                 .Build();
 
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
@@ -116,7 +172,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         }
 
         [Test]
-        public void Given_UnpaidFutureBooking_Then_ThrowsException()
+        public void Given_PaidFutureBooking_Then_ThrowsException()
         {
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();

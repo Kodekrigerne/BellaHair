@@ -155,7 +155,7 @@ namespace BellaHair.Domain.Bookings
             var now = currentDateTimeProvider.GetCurrentDateTime();
 
             if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
-            if (StartDateTime < now) throw new BookingException("Kan ikke opdatere en booking som allerede er startet.");
+            if (EndDateTime < now.AddHours(-2)) throw new BookingException("Kan ikke opdatere en booking mere end 2 timer efter den er slut");
             if (startDateTime < now) throw new BookingException("Kan ikke opdatere en booking med en starttid i fortiden");
 
             ValidateEmployeeTreatment(employee, treatment);
