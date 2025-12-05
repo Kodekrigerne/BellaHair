@@ -32,9 +32,9 @@ namespace BellaHair.Presentation.WebUI
         }
 
         // Settings
-        private int _noOfPastBookings = 100;
-        private int _noOfFutureBookings = 0;
-        private int _noOfCustomers = 30;
+        private int _noOfPastBookings = 10;
+        private int _noOfFutureBookings = 10;
+        private int _noOfCustomers = 10;
 
         // Lists
         List<Employee> _employees = [];
