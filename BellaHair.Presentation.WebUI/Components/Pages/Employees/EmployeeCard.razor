@@ -19,15 +19,22 @@
 				<p style="max-width: 24rem; text-align: center;"> Medarbejderen @Employee.FullName har fremtidige bookinger.
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
-			<button class="btn-add" onclick="@CloseDeleteModal">Annuller</button>
+			<button class="btn-add" @onclick="@(() => CloseDeleteModal())">Annuller</button>
 			}
 
 			@* Hvis medarbejderen ikke har fremtidige bookinger, vises dette. *@
 			else
 			{
-			<DeleteComponent EntityName="@Employee.FullName" OnCancel="@CloseDeleteModal" OnDeleteConfirm="@HandleOnDeleteConfirm" EntityTypeName="medarbejder"/>
-			}
+<DeleteComponent EntityName="@Employee.FullName" 
+                 OnCancel="@(() => CloseDeleteModal())" 
+                 OnDeleteConfirm="@(() => HandleOnDeleteConfirm())" 
+                 EntityTypeName="medarbejder"/>			}
 		</div>
+	</Modal>
+			
+	<Modal @bind-IsVisible="@_showTreatmentsModal">
+		<EmployeeTreatmentsModal _treatments="Employee.Treatments" />
+		<button class="btn-add" @onclick="@(() => CloseTreatmentsModal())">Luk</button>
 	</Modal>
 
 	<Modal @bind-IsVisible="@showEditModal">
@@ -83,19 +90,18 @@
 		<EditButton onclick="@(() => showEditModal = true)" />
 			<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 	</div>
-	</div>
-
+</div>
 
 @code
 {
 
+	public bool _showTreatmentsModal = false;
 	private bool _showDeleteModal = false;
 	public bool showEditModal = false;
 	private bool _futureBookings = false;
 
 	[Parameter, EditorRequired]
 	public required EventCallback OnChange { get; set; }
-
 
 	[Parameter, EditorRequired]
 	public required EmployeeViewModel Employee { get; set; }
@@ -113,7 +119,6 @@
 	{
 		var parts = name.Split(' ');
 		return string.Concat(parts.Select(p => p.FirstOrDefault()));
-
 	}
 
 	private async Task HandleUpdate()
@@ -154,6 +159,8 @@
 
 	// Lukker modalen
 	private void CloseDeleteModal() => _showDeleteModal = false;
+	private void CloseTreatmentsModal() => _showTreatmentsModal = false;
+	private void HandleOnViewTreatmentsClick() => _showTreatmentsModal = true;
 
 
 	// Navigerer til kalenderen for den medarbejder, der trykkes på

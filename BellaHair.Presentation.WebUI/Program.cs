@@ -1,6 +1,7 @@
 using BellaHair.Application;
 using BellaHair.Application.Invoices;
 using BellaHair.Infrastructure;
+using BellaHair.Ports.Bookings;
 using BellaHair.Presentation.WebUI.Components;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
@@ -56,9 +57,11 @@ namespace BellaHair.Presentation.WebUI
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
+                var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+
                 context.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
 
-                var dataProvider = new DataProvider(context);
+                var dataProvider = new DataProvider(context, scope.ServiceProvider);
                 dataProvider.AddData();
             }
 

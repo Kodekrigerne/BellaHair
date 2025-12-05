@@ -8,11 +8,13 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Infrastructure;
-using Microsoft.EntityFrameworkCore;
+using BellaHair.Ports.Bookings;
+using Bogus;
+using FixtureBuilder;
 
 namespace BellaHair.Presentation.WebUI
 {
-    //Dennis
+    // Dennis, Linnea, Mikkel Dahlmann
     /// <summary>
     /// Provides a method for adding hardcoded example data to BellaHairContext.
     /// </summary>
@@ -21,82 +23,303 @@ namespace BellaHair.Presentation.WebUI
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider = new CurrentDateTimeProvider();
         private readonly ICurrentDateTimeProvider _mockPastDateTimeProvider = new PastDateTimeProvider();
+        private readonly IServiceProvider _serviceProvider;
 
-#pragma warning disable CS8618
-        public DataProvider(BellaHairContext db) => _db = db;
-#pragma warning restore CS8618
-
-        public void ReinstateData()
+        public DataProvider(BellaHairContext db, IServiceProvider serviceProvider)
         {
-            _db.Database.EnsureDeleted();
-            _db.Database.EnsureCreated();
-            _db.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
-            AddData();
+            _db = db;
+            _serviceProvider = serviceProvider;
         }
 
-        // --- 1. Treatment Fields ---
-        private Treatment _herreklip;
-        private Treatment _dameklip;
-        private Treatment _farvning;
-        private Treatment _barbering;
-        private Treatment _børneklip;
-        private Treatment _permanent;
+        // Settings
+        private int _noOfPastBookings = 10;
+        private int _noOfFutureBookings = 10;
+        private int _noOfCustomers = 10;
+
+        // Lists
+        List<Employee> _employees = [];
+        List<PrivateCustomer> _customers = [];
+        List<Product> Products = [];
+
+        // Treatment Fields 
+        private Treatment? _herreklipUdenVaskFøn;
+        private Treatment? _herreklipMedVaskFøn;
+        private Treatment? _damefrisureInklVaskFøn;
+        private Treatment? _damefrisureBlæs;
+        private Treatment? _lilleTilretning;
+        private Treatment? _storKlipning;
+        private Treatment? _luksusKur;
+        private Treatment? _retFarveBryn;
+        private Treatment? _ordneBrynVipper;
+        private Treatment? _herreKlipPermanent;
+        private Treatment? _helfarveHalvkortHårUdenKlip;
+        private Treatment? _helfarveHalvKortHårMedKlip;
+        private Treatment? _helfarveLangtHårUdenKlip;
+        private Treatment? _helfarveLangtHårMedKlip;
+        private Treatment? _hætteStriberIHalvkortHårMedKlip;
+        private Treatment? _hætteStriberILangtHårMedKlip;
+        private Treatment? _permanentHalvkortHårMedKlip;
+        private Treatment? _permanentHalvkortHårUdenKlip;
+        private Treatment? _permanentLangtHårUdenKlip;
+        private Treatment? _permanentLangtHårMedKlip;
+        private Treatment? _staniolStriberIHalvkortHårUdenKlip;
+        private Treatment? _staniolStriberIHalvkortHårMedKlip;
+        private Treatment? _staniolStriberILangtHårUdenKlip;
+        private Treatment? _staniolStriberILangtHårMedKlip;
+        private Treatment? _balayageUdenKlip;
+        private Treatment? _balayageMedKlip;
+        private Treatment? _hårOpsætningStruktur;
+        private Treatment? _hårOpsætningElegance;
+        private Treatment? _hårOpsætningKompleks;
+
+        // Employee fields
+        private Employee? _idaChristensen;
+        private Employee? _jonasHansen;
+        private Employee? _sofieNielsen;
+        private Employee? _larsMikkelsen;
+        private Employee? _signeJørgensen;
+        private Employee? _madsKnudsen;
+        private Employee? _annaPetersen;
 
 
-        // --- 2. Employee Fields ---
-        private Employee _henny;
-        private Employee _peter;
-        private Employee _maria;
-        private Employee _sorenM;
-        private Employee _sorenJ;
-
-        // --- 3. Private Customer Fields ---
-        private PrivateCustomer _peterse;
-        private PrivateCustomer _lismk;
-        private PrivateCustomer _larsc;
-        private PrivateCustomer _oskarit;
-        private PrivateCustomer _simonehs;
-
-        // --- 4. Product Fields ---
-        private Product _shampoo;
-        private Product _balsam;
-        private Product _hårvoks;
-        private Product _hårspray;
-        private Product _hårkur;
-        private Product _leaveinConditioner;
-        private Product _ansigtsrens;
-        private Product _dagcreme;
-        private Product _natcreme;
-        private Product _serum;
-        private Product _øjenceme;
-        private Product _bodylotion;
-        private Product _håndcreme;
-        private Product _bodyWash;
-        private Product _eksfoliering;
-        private Product _solcreme;
-        private Product _aftershave;
-        private Product _skægolie;
-        private Product _stylingmousse;
-        private Product _tørshampoo;
-        private Product _læbepomade;
-        private Product _fodcreme;
-        private Product _negleolie;
-        private Product _hårfarve;
-        private Product _makeupfjerner;
-        private Product _barberskum;
-
-        public void AddData()
+        public async Task AddData()
         {
             AddProducts();
+            AddPrivateCustomersUsingBogus();
             AddLoyaltyDiscounts();
             AddTreatment();
-            AddPrivateCustomers();
             AddEmployees();
-            AddBookings();
             AddCampaignDiscounts();
             AddBirthdayDiscounts();
+            AddBookingsUsingBogusAndHandler();
+            AddPastBookingsUsingBogusAndHandler();
+            await PayAndInvoicePastBookings();
 
             _db.SaveChanges();
+        }
+
+        private async Task PayAndInvoicePastBookings()
+        {
+            var queryHandler = _serviceProvider.GetRequiredService<IBookingQuery>();
+
+            var commandHandler = _serviceProvider.GetRequiredService<IBookingCommand>();
+
+            var pastBookings = await queryHandler.GetAllOldAsync();
+            pastBookings.OrderBy(b => b.StartDateTime);
+
+            foreach (var booking in pastBookings)
+            {
+                if (booking.Discount != null)
+                {
+                    var discountData = new DiscountData(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
+                    var command = new PayAndInvoiceBookingCommand(booking.Id, discountData);
+                    await commandHandler.PayAndInvoiceBooking(command);
+                }
+                else
+                {
+                    var command = new PayAndInvoiceBookingCommand(booking.Id, null);
+                    await commandHandler.PayAndInvoiceBooking(command);
+                }
+                _db.SaveChanges();
+            }
+        }
+
+        private void AddBookingsUsingBogusAndHandler()
+        {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            for (int i = 0; i < _noOfFutureBookings; i++)
+            {
+                try
+                {
+                    Random random = new Random();
+
+                    using var scope = _serviceProvider.CreateScope();
+
+                    var employee = _employees[random.Next(0, 7)];
+                    var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
+
+                    List<CreateProductLine> productLines = [];
+
+                    for (int p = 0; p < random.Next(0, 2); p++)
+                    {
+                        var productToList = Products[random.Next(0, Products.Count)];
+                        var productId = productToList.Id;
+                        var quantity = random.Next(1, 1);
+                        productLines.Add(new CreateProductLine(quantity, productId));
+                    }
+
+                    var product = Products[random.Next(0, Products.Count)];
+                    var customer = _customers[random.Next(0, _customers.Count)];
+
+                    var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var bookingDate = f.Date.Between(now.AddDays(1), now.AddDays(30));
+                            var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
+                            var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
+                            bookingMinutes -= (bookingMinutes % 15);
+
+                            if (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+
+                            return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
+                        });
+
+                    var booking = bookingFaker.Generate();
+
+                    var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+                    bookingCommandHandler.CreateBooking(booking).Wait();
+
+                    scope.Dispose();
+                }
+                catch (Exception) { }
+            }
+        }
+
+        private void AddPastBookingsUsingBogusAndHandler()
+        {
+            var now = _mockPastDateTimeProvider.GetCurrentDateTime();
+
+            List<CreateBookingCommand> createBookingCommands = [];
+
+            for (int i = 0; i < _noOfPastBookings; i++)
+            {
+                try
+                {
+                    Random random = new Random();
+                    var employee = _employees[random.Next(0, 7)];
+                    var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
+                    List<CreateProductLine> productLines = [];
+                    for (int p = 0; p < random.Next(0, 2); p++)
+                    {
+                        var productToList = Products[random.Next(0, Products.Count)];
+                        var productId = productToList.Id;
+                        var quantity = random.Next(1, 1);
+                        productLines.Add(new CreateProductLine(quantity, productId));
+                    }
+                    var product = Products[random.Next(0, Products.Count)];
+                    var customer = _customers[random.Next(0, _customers.Count)];
+
+                    var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var bookingDate = f.Date.Between(now.AddDays(1), now.AddDays(30));
+                            var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
+                            var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
+                            bookingMinutes -= (bookingMinutes % 15);
+
+                            if (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+
+                            return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
+                        });
+
+                    createBookingCommands.Add(bookingFaker.Generate());
+                }
+
+                catch (Exception) { }
+            }
+
+            createBookingCommands.OrderBy(c => c.StartDateTime);
+
+            foreach (var command in createBookingCommands)
+            {
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
+
+                    var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+                    Fixture.New(bookingCommandHandler).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
+
+                    var overlapChecker = _serviceProvider.GetRequiredService<IBookingOverlapChecker>();
+                    Fixture.New(overlapChecker).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
+
+                    bookingCommandHandler.CreateBooking(command).Wait();
+
+                    scope.Dispose();
+                }
+                catch (Exception) { }
+            }
+        }
+
+        private void AddPrivateCustomersUsingBogus()
+        {
+            var now = _currentDateTimeProvider.GetCurrentDateTime();
+
+            for (int i = 0; i < _noOfCustomers; i++)
+            {
+                try
+                {
+                    var customerFaker = new Faker<PrivateCustomer>("nb_NO")
+                        .CustomInstantiator(f =>
+                        {
+                            var name = Name.FromStrings(f.Name.FirstName(), f.Name.LastName());
+
+                            return PrivateCustomer.Create(name,
+                                                    Address.Create(f.Address.StreetName().Replace(".", ""), f.Address.City(), f.Random.Int(min: 1, max: 200).ToString(), f.Random.Int(min: 1000, max: 9990)),
+                                                    PhoneNumber.FromString(f.Phone.PhoneNumber("########")),
+                                                    Email.FromString(f.Internet.Email(name.FirstName, name.LastName)),
+                                                    f.Date.Between(now.AddYears(-18), now.AddYears(-80)),
+                                                    _mockPastDateTimeProvider
+                                                    );
+                        });
+
+                    var customer = customerFaker.Generate();
+
+                    _customers.Add(customer);
+                    _db.Add(customer);
+                }
+                catch (Exception) { }
+            }
+        }
+
+        private void AddProducts()
+        {
+            var productData = new[]
+            {
+                ("Shampoo", "Mild shampoo for alle hårtyper", 120m),
+                ("Balsam", "Nærende balsam for glat og skinnende hår", 150m),
+                ("Hårvoks", "Fleksibel hårvoks for tekstur og hold", 200m),
+                ("Hårspray", "Langtidsholdbar hårspray med let finish", 180m),
+                ("Hårkur", "Intensiv hårkur til genopbygning af skadet hår", 250m),
+                ("Leave-in Conditioner", "Let leave-in conditioner for nem styling", 130m),
+                ("Ansigtsrens", "Skånsom rens til daglig brug, fjerner urenheder og makeup", 160m),
+                ("Dagcreme", "Fugtgivende dagcreme med SPF 30, beskytter mod solen", 280m),
+                ("Natcreme", "Rig natcreme, genopbygger huden mens du sover", 300m),
+                ("Serum", "Anti-age serum med hyaluronsyre for dyb hydrering", 350m),
+                ("Ã˜jencreme", "Let øjencreme reducerer poser og mørke rande", 220m),
+                ("Bodylotion", "Blødgørende bodylotion med naturlige olier", 110m),
+                ("Håndcreme", "Reparerende håndcreme, ideel til tørre hænder", 85m),
+                ("Body Wash", "Opfriskende kropsvask med citrusduft", 95m),
+                ("Eksfoliering", "Kropsskrub med fine korn, fjerner døde hudceller", 145m),
+                ("Solcreme", "Vandfast solcreme SPF 50 til hele kroppen", 190m),
+                ("Aftershave", "Beroligende aftershave balm uden alkohol", 175m),
+                ("Skægolie", "Blødgørende skægolie med cedertræ og patchouli", 195m),
+                ("Stylingmousse", "Volumengivende mousse for let og luftig frisure", 140m),
+                ("Tørshampoo", "Ã˜jeblikkelig tørshampoo, giver volumen og friskhed", 125m),
+                ("Læbepomade", "Fugtgivende læbepomade med bivoks og mint", 55m),
+                ("Fodcreme", "Intensiv fodcreme mod tør og sprukken hud", 105m),
+                ("Negleolie", "Plejende olie til negle og neglebånd", 75m),
+                ("Hårfarve", "Permanent hårfarve i medium brun", 199m),
+                ("Makeupfjerner", "Effektiv makeupfjerner, også til vandfast makeup", 115m),
+                ("Barberskum", "Klassisk barberskum for tæt og glat barbering", 80m)
+            };
+
+            foreach (var (name, description, priceValue) in productData)
+            {
+                var price = Price.FromDecimal(priceValue);
+                var product = Product.Create(name, description, price);
+
+                _db.Add(product);
+                Products.Add(product);
+            }
+        }
+
+        private void AddLoyaltyDiscounts()
+        {
+            _db.Add(LoyaltyDiscount.Create("Loyalty test", 1, DiscountPercent.FromDecimal(0.50m)));
+            _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
+            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
+            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 20, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
         }
 
         private void AddBirthdayDiscounts()
@@ -104,533 +327,374 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(BirthdayDiscount.Create("Fødselsdagsrabat", DiscountPercent.FromDecimal(0.50m)));
         }
 
-
         private void AddCampaignDiscounts()
         {
+            // Test Campaign
+            _db.Add(CampaignDiscount.Create("Firesale",
+                DiscountPercent.FromDecimal(0.20m),
+                new DateTime(2025, 06, 1, 12, 0, 0),
+                new DateTime(2025, 12, 30, 12, 0, 0),
+                new List<Guid> {
+                    _herreklipUdenVaskFøn!.Id,
+                    _herreklipMedVaskFøn!.Id,
+                    _damefrisureInklVaskFøn!.Id,
+                    _damefrisureBlæs!.Id,
+                    _lilleTilretning!.Id,
+                    _storKlipning!.Id,
+                    _luksusKur!.Id,
+                    _retFarveBryn!.Id,
+                    _ordneBrynVipper!.Id,
+                    _herreKlipPermanent!.Id,
+                    _helfarveHalvkortHårUdenKlip!.Id,
+                    _helfarveHalvKortHårMedKlip!.Id,
+                    _helfarveLangtHårUdenKlip!.Id,
+                    _helfarveLangtHårMedKlip!.Id,
+                    _hætteStriberIHalvkortHårMedKlip!.Id,
+                    _hætteStriberILangtHårMedKlip!.Id,
+                    _permanentHalvkortHårMedKlip!.Id,
+                    _permanentHalvkortHårUdenKlip!.Id,
+                    _permanentLangtHårUdenKlip!.Id,
+                    _permanentLangtHårMedKlip!.Id,
+                    _staniolStriberIHalvkortHårUdenKlip!.Id,
+                    _staniolStriberIHalvkortHårMedKlip!.Id,
+                    _staniolStriberILangtHårUdenKlip!.Id,
+                    _staniolStriberILangtHårMedKlip!.Id,
+                    _balayageUdenKlip!.Id,
+                    _balayageMedKlip!.Id,
+                    _hårOpsætningStruktur!.Id,
+                    _hårOpsætningElegance!.Id,
+                    _hårOpsætningKompleks!.Id
+                }));
+
+
+            // Sommerklip udsalg
             _db.Add(CampaignDiscount.Create("Sommerklip",
                 DiscountPercent.FromDecimal(0.20m),
                 new DateTime(2026, 6, 1, 12, 0, 0),
                 new DateTime(2026, 8, 1, 12, 0, 0),
-                new List<Guid> { _herreklip.Id, _dameklip.Id }));
+                new List<Guid> {
+                    _damefrisureInklVaskFøn.Id,
+                    _damefrisureBlæs.Id,
+                    _storKlipning.Id,
+                    _herreklipMedVaskFøn.Id,
+                    _herreklipUdenVaskFøn.Id
+                }));
 
-            _db.Add(CampaignDiscount.Create("Februar Farve Flash",
-                DiscountPercent.FromDecimal(0.10m),
-                new DateTime(2026, 2, 1, 12, 0, 0),
-                new DateTime(2026, 3, 1, 0, 0, 0),
-                new List<Guid> { _farvning.Id }));
-
-            _db.Add(CampaignDiscount.Create("Back-to-School Børneklip",
-                DiscountPercent.FromDecimal(0.10m),
-                new DateTime(2026, 8, 1, 12, 0, 0),
-                new DateTime(2026, 9, 1, 0, 0, 0),
-                new List<Guid> { _børneklip.Id }));
-
-            _db.Add(CampaignDiscount.Create("Juletilbud",
-                DiscountPercent.FromDecimal(0.12m),
-                new DateTime(2025, 12, 1),
-                new DateTime(2025, 12, 24),
-                new List<Guid>
-                    { _herreklip.Id, _dameklip.Id, _barbering.Id, _farvning.Id, _børneklip.Id, _permanent.Id }));
-
-            _db.Add(CampaignDiscount.Create("Movember shave",
+            // Vinter Permanent Udsalg (afsluttet)
+            _db.Add(CampaignDiscount.Create("Vinter Permanent Udsalg",
                 DiscountPercent.FromDecimal(0.30m),
-                new DateTime(2025, 11, 1),
-                new DateTime(2025, 12, 1),
+                new DateTime(2025, 1, 15, 9, 0, 0),
+                new DateTime(2025, 2, 28, 18, 0, 0),
+                new List<Guid> {
+                    _permanentHalvkortHårMedKlip.Id,
+                    _permanentHalvkortHårUdenKlip.Id,
+                    _permanentLangtHårUdenKlip.Id,
+                    _permanentLangtHårMedKlip.Id,
+                    _herreKlipPermanent.Id
+                }));
+
+            // Galla & Fest Klar
+            _db.Add(CampaignDiscount.Create("Galla & Fest Klar",
+                DiscountPercent.FromDecimal(0.10m),
+                _currentDateTimeProvider.GetCurrentDateTime().AddMonths(2),
+                _currentDateTimeProvider.GetCurrentDateTime().AddMonths(3),
+                new List<Guid> {
+                    _hårOpsætningElegance.Id,
+                    _hårOpsætningKompleks.Id,
+                    _ordneBrynVipper.Id,
+                    _damefrisureBlæs.Id
+                }));
+
+            // Farve Fornyelse
+            _db.Add(CampaignDiscount.Create("Farve Fornyelse",
+                DiscountPercent.FromDecimal(0.25m),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(-12),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(18),
+                new List<Guid> {
+                    _helfarveHalvKortHårMedKlip.Id,
+                    _helfarveLangtHårMedKlip.Id,
+                    _balayageUdenKlip.Id,
+                    _staniolStriberIHalvkortHårMedKlip.Id,
+                    _staniolStriberILangtHårMedKlip.Id,
+                    _hætteStriberIHalvkortHårMedKlip.Id,
+                    _hætteStriberILangtHårMedKlip.Id
+                }));
+
+            // Balayage Mesterværk
+            _db.Add(CampaignDiscount.Create("Balayage Mesterværk",
+                DiscountPercent.FromDecimal(0.20m),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(-3),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(11),
+                new List<Guid> {
+                    _balayageUdenKlip.Id,
+                    _balayageMedKlip.Id,
+                    _staniolStriberIHalvkortHårMedKlip.Id,
+                    _staniolStriberIHalvkortHårUdenKlip.Id,
+                    _staniolStriberILangtHårMedKlip.Id,
+                    _staniolStriberILangtHårUdenKlip.Id
+                }));
+
+            // Hurtig Tilretning Tirsdag
+            _db.Add(CampaignDiscount.Create("Hurtig Tilretning Tirsdag",
+                DiscountPercent.FromDecimal(0.25m),
+                new DateTime(2027, 2, 2, 10, 0, 0),
+                new DateTime(2027, 2, 2, 16, 0, 0),
+                new List<Guid> {
+                    _lilleTilretning.Id
+                }));
+
+            // Forkælelsestider 
+            _db.Add(CampaignDiscount.Create("Forkælelsestider",
+                DiscountPercent.FromDecimal(0.15m),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(-20),
+                _currentDateTimeProvider.GetCurrentDateTime().AddDays(2),
                 new List<Guid>
-                    { _barbering.Id }));
-        }
+                {
+                    _luksusKur.Id,
+                    _retFarveBryn.Id,
+                }));
 
-        private void AddLoyaltyDiscounts()
-        {
-            _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
-            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
-            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 20, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
-        }
-
-        private void AddProducts()
-        {
-            _shampoo = Product.Create("Shampoo", "Mild shampoo for alle hårtyper", Price.FromDecimal(120m));
-            _db.Add(_shampoo);
-
-            _balsam = Product.Create("Balsam", "Nærende balsam for glat og skinnende hår", Price.FromDecimal(150m));
-            _db.Add(_balsam);
-
-            _hårvoks = Product.Create("Hårvoks", "Fleksibel hårvoks for tekstur og hold", Price.FromDecimal(200m));
-            _db.Add(_hårvoks);
-
-            _hårspray = Product.Create("Hårspray", "Langtidsholdbar hårspray med let finish", Price.FromDecimal(180m));
-            _db.Add(_hårspray);
-
-            _hårkur = Product.Create("Hårkur", "Intensiv hårkur til genopbygning af skadet hår", Price.FromDecimal(250m));
-            _db.Add(_hårkur);
-
-            _leaveinConditioner = Product.Create("Leave-in Conditioner", "Let leave-in conditioner for nem styling", Price.FromDecimal(130m));
-            _db.Add(_leaveinConditioner);
-
-            _ansigtsrens = Product.Create("Ansigtsrens", "Skånsom rens til daglig brug, fjerner urenheder og makeup", Price.FromDecimal(160m));
-            _db.Add(_ansigtsrens);
-
-            _dagcreme = Product.Create("Dagcreme", "Fugtgivende dagcreme med SPF 30, beskytter mod solen", Price.FromDecimal(280m));
-            _db.Add(_dagcreme);
-
-            _natcreme = Product.Create("Natcreme", "Rig natcreme, genopbygger huden mens du sover", Price.FromDecimal(300m));
-            _db.Add(_natcreme);
-
-            _serum = Product.Create("Serum", "Anti-age serum med hyaluronsyre for dyb hydrering", Price.FromDecimal(350m));
-            _db.Add(_serum);
-
-            _øjenceme = Product.Create("Øjencreme", "Let øjencreme reducerer poser og mørke rande", Price.FromDecimal(220m));
-            _db.Add(_øjenceme);
-
-            _bodylotion = Product.Create("Bodylotion", "Blødgørende bodylotion med naturlige olier", Price.FromDecimal(110m));
-            _db.Add(_bodylotion);
-
-            _håndcreme = Product.Create("Håndcreme", "Reparerende håndcreme, ideel til tørre hænder", Price.FromDecimal(85m));
-            _db.Add(_håndcreme);
-
-            _bodyWash = Product.Create("Body Wash", "Opfriskende kropsvask med citrusduft", Price.FromDecimal(95m));
-            _db.Add(_bodyWash);
-
-            _eksfoliering = Product.Create("Eksfoliering", "Kropsskrub med fine korn, fjerner døde hudceller", Price.FromDecimal(145m));
-            _db.Add(_eksfoliering);
-
-            _solcreme = Product.Create("Solcreme", "Vandfast solcreme SPF 50 til hele kroppen", Price.FromDecimal(190m));
-            _db.Add(_solcreme);
-
-            _aftershave = Product.Create("Aftershave", "Beroligende aftershave balm uden alkohol", Price.FromDecimal(175m));
-            _db.Add(_aftershave);
-
-            _skægolie = Product.Create("Skægolie", "Blødgørende skægolie med cedertræ og patchouli", Price.FromDecimal(195m));
-            _db.Add(_skægolie);
-
-            _stylingmousse = Product.Create("Stylingmousse", "Volumengivende mousse for let og luftig frisure", Price.FromDecimal(140m));
-            _db.Add(_stylingmousse);
-
-            _tørshampoo = Product.Create("Tørshampoo", "Øjeblikkelig tørshampoo, giver volumen og friskhed", Price.FromDecimal(125m));
-            _db.Add(_tørshampoo);
-
-            _læbepomade = Product.Create("Læbepomade", "Fugtgivende læbepomade med bivoks og mint", Price.FromDecimal(55m));
-            _db.Add(_læbepomade);
-
-            _fodcreme = Product.Create("Fodcreme", "Intensiv fodcreme mod tør og sprukken hud", Price.FromDecimal(105m));
-            _db.Add(_fodcreme);
-
-            _negleolie = Product.Create("Negleolie", "Plejende olie til negle og neglebånd", Price.FromDecimal(75m));
-            _db.Add(_negleolie);
-
-            _hårfarve = Product.Create("Hårfarve", "Permanent hårfarve i medium brun", Price.FromDecimal(199m));
-            _db.Add(_hårfarve);
-
-            _makeupfjerner = Product.Create("Makeupfjerner", "Effektiv makeupfjerner, også til vandfast makeup", Price.FromDecimal(115m));
-            _db.Add(_makeupfjerner);
-
-            _barberskum = Product.Create("Barberskum", "Klassisk barberskum for tæt og glat barbering", Price.FromDecimal(80m));
-            _db.Add(_barberskum);
+            // Langt Hår Helfarve Tilbud
+            _db.Add(CampaignDiscount.Create("Langt Hår Helfarve Tilbud",
+                DiscountPercent.FromDecimal(0.20m),
+                new DateTime(2027, 1, 20, 9, 0, 0),
+                new DateTime(2027, 2, 15, 18, 0, 0),
+                new List<Guid> {
+                    _helfarveLangtHårMedKlip.Id,
+                    _helfarveLangtHårUdenKlip.Id,
+                    _helfarveHalvKortHårMedKlip.Id
+                }));
         }
 
         private void AddEmployees()
         {
-            // --- Employees and Treatments ---
-
-            // Henny Hansen: Herreklip, Dameklip
-            _henny = Employee.Create(
-                Name.FromStrings("Henny", "Hansen"),
-                Email.FromString("hennyh@frisor.dk"),
-                PhoneNumber.FromString("42501113"),
-                Address.Create("Nørrebro", "København H", "47", 2000),
-                new List<Treatment> { _herreklip, _dameklip }
+            // Ida Christensen
+            _idaChristensen = Employee.Create(
+                Name.FromStrings("Ida", "Christensen", "Marie"),
+                Email.FromString("ida@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70801234"),
+                Address.Create("Nørregade", "Vejle", "45", 7100, 9),
+                new List<Treatment>
+                {
+                    _damefrisureInklVaskFøn!,
+                    _damefrisureBlæs!,
+                    _storKlipning!,
+                    _lilleTilretning!,
+                    _helfarveHalvkortHårUdenKlip!,
+                    _helfarveHalvKortHårMedKlip!,
+                    _helfarveLangtHårUdenKlip!,
+                    _helfarveLangtHårMedKlip!,
+                    _staniolStriberIHalvkortHårUdenKlip!,
+                    _staniolStriberIHalvkortHårMedKlip!,
+                    _staniolStriberILangtHårUdenKlip!,
+                    _staniolStriberILangtHårMedKlip!,
+                    _hårOpsætningStruktur!,
+                    _hårOpsætningElegance!,
+                    _luksusKur!
+                }
             );
-            _db.Employees.Add(_henny);
 
-            // Peter Pedersen: Herreklip, Dame Hårfarvning
-            _peter = Employee.Create(
-                Name.FromStrings("Peter", "Pedersen"),
-                Email.FromString("peterp@frisor.dk"),
-                PhoneNumber.FromString("20456789"),
-                Address.Create("Vestergade", "Aarhus C", "10", 8000),
-                new List<Treatment> { _herreklip, _farvning }
-            );
-            _db.Add(_peter);
+            _db.Employees.Add(_idaChristensen);
+            _employees.Add(_idaChristensen);
 
-            // Søren Mikkelsen: Herreklip only
-            _sorenM = Employee.Create(
-                Name.FromStrings("Søren", "Mikkelsen"),
-                Email.FromString("sorenm@frisor.dk"),
-                PhoneNumber.FromString("77889900"),
-                Address.Create("Industrivej", "Odense M", "5", 5260),
-                new List<Treatment> { _herreklip }
+            // Jonas Hansen
+            _jonasHansen = Employee.Create(
+                Name.FromStrings("Jonas", "Hansen"),
+                Email.FromString("jonas@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70805678"),
+                Address.Create("Fredericiavej", "Vejle", "112", 7100, 2),
+                new List<Treatment>
+                {
+                    _herreklipMedVaskFøn!,
+                    _herreklipUdenVaskFøn!,
+                    _herreKlipPermanent!,
+                    _lilleTilretning!,
+                    _storKlipning!,
+                    _hårOpsætningStruktur!
+                }
             );
-            _db.Add(_sorenM);
 
-            // Søren Jensen: Dameklip and Dame Hårfarvning
-            _sorenJ = Employee.Create(
-                Name.FromStrings("Søren", "Jensen"),
-                Email.FromString("sorenj@frisor.dk"),
-                PhoneNumber.FromString("23132322"),
-                Address.Create("Industrigade", "Vejle", "12", 7100),
-                new List<Treatment> { _dameklip, _farvning }
-            );
-            _db.Add(_sorenJ);
+            _db.Employees.Add(_jonasHansen);
+            _employees.Add(_jonasHansen);
 
-            // Maria Jensen: All three treatments
-            _maria = Employee.Create(
-                Name.FromStrings("Maria", "Jensen"),
-                Email.FromString("mariaj@frisor.dk"),
-                PhoneNumber.FromString("55123456"),
-                Address.Create("Østerbrogade", "København Ø", "15B", 2100),
-                new List<Treatment> { _herreklip, _dameklip, _farvning }
+            // Sofie Nielsen
+            _sofieNielsen = Employee.Create(
+                Name.FromStrings("Sofie", "Nielsen", "Hansen"),
+                Email.FromString("sofie@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70809012"),
+                Address.Create("Søndertorv", "Vejle", "7", 7100),
+                new List<Treatment>
+                {
+                    _damefrisureInklVaskFøn!,
+                    _storKlipning!,
+                    _balayageUdenKlip!,
+                    _balayageMedKlip!,
+                    _staniolStriberILangtHårMedKlip!,
+                    _staniolStriberILangtHårUdenKlip!,
+                    _staniolStriberIHalvkortHårMedKlip!,
+                    _staniolStriberIHalvkortHårUdenKlip!,
+                    _hårOpsætningElegance!,
+                    _hårOpsætningKompleks!,
+                    _luksusKur!
+                }
             );
-            _db.Add(_maria);
 
-            // Dennis: No bookings
-            var kennet = Employee.Create(
-                Name.FromStrings("Kennet", "Hansen"),
-                Email.FromString("kennet@frisor.dk"),
-                PhoneNumber.FromString("38238289"),
-                Address.Create("Vesterbro", "Byby", "11A", 1100),
-                new List<Treatment> { _dameklip }
+            _db.Employees.Add(_sofieNielsen);
+            _employees.Add(_sofieNielsen);
+
+            // Lars Mikkelsen
+            _larsMikkelsen = Employee.Create(
+                Name.FromStrings("Lars", "Mikkelsen"),
+                Email.FromString("lars@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70803456"),
+                Address.Create("Vestergade", "Vejle", "9", 7100, 1),
+                new List<Treatment>
+                {
+                    _luksusKur!,
+                    _damefrisureInklVaskFøn!,
+                    _storKlipning!,
+                    _lilleTilretning!,
+                    _permanentHalvkortHårMedKlip!,
+                    _permanentHalvkortHårUdenKlip!,
+                    _permanentLangtHårUdenKlip!,
+                    _permanentLangtHårMedKlip!,
+                    _hætteStriberIHalvkortHårMedKlip!,
+                    _hætteStriberILangtHårMedKlip!,
+                    _herreklipMedVaskFøn!
+                }
             );
-            _db.Add(kennet);
+
+            _db.Employees.Add(_larsMikkelsen);
+            _employees.Add(_larsMikkelsen);
+
+            // Signe Jørgensen
+            _signeJørgensen = Employee.Create(
+                Name.FromStrings("Signe", "Jørgensen", "Aia"),
+                Email.FromString("signe@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70807890"),
+                Address.Create("Gl Landevej", "Børkop", "22", 7080, 2),
+                new List<Treatment>
+                {
+                    _damefrisureInklVaskFøn!,
+                    _damefrisureBlæs!,
+                    _lilleTilretning!,
+                    _retFarveBryn!,
+                    _ordneBrynVipper!,
+                    _helfarveHalvKortHårMedKlip!,
+                    _helfarveLangtHårMedKlip!,
+                    _hårOpsætningElegance!
+                }
+            );
+
+            _db.Employees.Add(_signeJørgensen);
+            _employees.Add(_signeJørgensen);
+
+            // Mads Knudsen
+            _madsKnudsen = Employee.Create(
+                Name.FromStrings("Mads", "Knudsen"),
+                Email.FromString("mads@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70802345"),
+                Address.Create("Skolegade", "Egtved", "5", 6040, 6),
+                new List<Treatment>
+                {
+                    _luksusKur!,
+                    _herreklipMedVaskFøn!,
+                    _herreklipUdenVaskFøn!,
+                    _damefrisureInklVaskFøn!,
+                    _storKlipning!,
+                    _herreKlipPermanent!,
+                    _permanentHalvkortHårMedKlip!,
+                    _permanentLangtHårMedKlip!,
+                    _herreKlipPermanent!,
+                    _helfarveHalvkortHårUdenKlip!,
+                    _helfarveHalvKortHårMedKlip!,
+                    _helfarveLangtHårMedKlip!,
+                    _helfarveLangtHårUdenKlip!,
+                    _hætteStriberIHalvkortHårMedKlip!,
+                    _hætteStriberILangtHårMedKlip!,
+                    _hårOpsætningStruktur!
+                }
+            );
+
+            _db.Employees.Add(_madsKnudsen);
+            _employees.Add(_madsKnudsen);
+
+            // Anna Petersen
+            _annaPetersen = Employee.Create(
+                Name.FromStrings("Anna", "Petersen"),
+                Email.FromString("anna@bellahairfrisor.dk"),
+                PhoneNumber.FromString("70806789"),
+                Address.Create("Fjordgade", "Brejning", "88", 7080),
+                new List<Treatment>
+                {
+                    _damefrisureInklVaskFøn!,
+                    _storKlipning!,
+                    _balayageUdenKlip!,
+                    _balayageMedKlip!,
+                    _staniolStriberIHalvkortHårMedKlip!,
+                    _staniolStriberILangtHårMedKlip!,
+                    _helfarveHalvKortHårMedKlip!,
+                    _hårOpsætningElegance!,
+                    _hårOpsætningKompleks!
+                }
+            );
+            _db.Employees.Add(_annaPetersen);
+            _employees.Add(_annaPetersen);
+
+            _db.SaveChanges();
         }
 
         private void AddTreatment()
         {
-            _herreklip = Treatment.Create("Herreklip", Price.FromDecimal(450m), DurationMinutes.FromInt(30));
-            _dameklip = Treatment.Create("Dameklip", Price.FromDecimal(600m), DurationMinutes.FromInt(60));
-            _farvning = Treatment.Create("Dame Hårfarvning", Price.FromDecimal(400m), DurationMinutes.FromInt(90));
-            _barbering = Treatment.Create("Barbering", Price.FromDecimal(150m), DurationMinutes.FromInt(20));
-            _børneklip = Treatment.Create("Børneklip", Price.FromDecimal(250m), DurationMinutes.FromInt(30));
-            _permanent = Treatment.Create("Permanent", Price.FromDecimal(770m), DurationMinutes.FromInt(120));
+            _herreklipMedVaskFøn = CreateAndAddTreatment("Herreklip inkl vask og føn", 350m, 30);
+            _herreklipUdenVaskFøn = CreateAndAddTreatment("Herreklip", 300m, 30);
+            _damefrisureInklVaskFøn = CreateAndAddTreatment("Damefrisure inkl vask og føn", 445m, 45);
+            _damefrisureBlæs = CreateAndAddTreatment("Damefrisure og blæs", 400m, 45);
+            _lilleTilretning = CreateAndAddTreatment("Lille tilretning ved øre og nakke", 200m, 30);
+            _storKlipning = CreateAndAddTreatment("Stor klipning", 495m, 60);
+            _retFarveBryn = CreateAndAddTreatment("Ret og farve bryn", 110m, 30);
+            _ordneBrynVipper = CreateAndAddTreatment("Ordnet bryn og vipper", 330m, 45);
+            _herreKlipPermanent = CreateAndAddTreatment("Herreklip med permanent", 875m, 90);
+            _helfarveHalvkortHårUdenKlip = CreateAndAddTreatment("Helfarve halvkort hår uden klip", 575m, 120);
+            _helfarveHalvKortHårMedKlip = CreateAndAddTreatment("Helfarve halvkort hår med klip", 1020m, 150);
+            _helfarveLangtHårMedKlip = CreateAndAddTreatment("Helfarve langt hår med klip", 1300m, 165);
+            _helfarveLangtHårUdenKlip = CreateAndAddTreatment("Helfarve langt hår uden klip", 925m, 135);
+            _hætteStriberIHalvkortHårMedKlip = CreateAndAddTreatment("Hætte striber i halvkort hår med klip", 505m, 120);
+            _hætteStriberILangtHårMedKlip = CreateAndAddTreatment("Hætte striber i langth hår med klip", 725m, 165);
+            _permanentHalvkortHårMedKlip = CreateAndAddTreatment("Permanent i halvkort hår med klip", 1045m, 180);
+            _permanentHalvkortHårUdenKlip = CreateAndAddTreatment("Permanent i halvkort hår uden klip", 600m, 120);
+            _permanentLangtHårMedKlip = CreateAndAddTreatment("Permanent i langt hår med klip", 1400m, 225);
+            _permanentLangtHårUdenKlip = CreateAndAddTreatment("Permanent i langt hår uden klip", 1150m, 210);
+            _staniolStriberIHalvkortHårUdenKlip = CreateAndAddTreatment("Staniol striber i halvkort hår uden klip", 590m, 165);
+            _staniolStriberIHalvkortHårMedKlip = CreateAndAddTreatment("Staniol striber i halvkort hår med klip", 1035m, 195);
+            _staniolStriberILangtHårUdenKlip = CreateAndAddTreatment("Staniol striber i langt hår uden klip", 725m, 195);
+            _staniolStriberILangtHårMedKlip = CreateAndAddTreatment("Staniol striber i langt hår med klip", 500m, 150);
+            _balayageUdenKlip = CreateAndAddTreatment("Balayage uden klip", 950m, 195);
+            _balayageMedKlip = CreateAndAddTreatment("Balyage med klip", 1300m, 180);
+            _hårOpsætningStruktur = CreateAndAddTreatment("Håropsætning Struktur", 250m, 30);
+            _hårOpsætningElegance = CreateAndAddTreatment("Håropsætning Elegance", 450m, 60);
+            _hårOpsætningKompleks = CreateAndAddTreatment("Håropsætning Kompleks", 800m, 120);
+            _luksusKur = CreateAndAddTreatment("Luksuskur til hår", 1100m, 120);
 
-            _db.Add(_herreklip);
-            _db.Add(_dameklip);
-            _db.Add(_farvning);
-            _db.Add(_barbering);
-            _db.Add(_børneklip);
-            _db.Add(_permanent);
+            _db.SaveChanges();
         }
 
-        private void AddPrivateCustomers()
+        private Treatment CreateAndAddTreatment(string name, decimal priceValue, int durationMinutes)
         {
-            _peterse = PrivateCustomer.Create(Name.FromStrings("Peter", "Svendsen", "Emil"), Address.Create("Søndergade", "Vejle", "15A", 7100, 3), PhoneNumber.FromString("12345678"), Email.FromString("peteres@gmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-42), _currentDateTimeProvider);
-            _lismk = PrivateCustomer.Create(Name.FromStrings("Lis", "Mortensen", "Karin"), Address.Create("Vestergade", "Vejle", "2", 7100), PhoneNumber.FromString("87654321"), Email.FromString("lis@gmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-68), _currentDateTimeProvider);
-            _larsc = PrivateCustomer.Create(Name.FromStrings("Lars", "Christiansen"), Address.Create("Østergade", "Vejle", "342", 7100, 9), PhoneNumber.FromString("43215678"), Email.FromString("Lars@hotmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-38), _currentDateTimeProvider);
-            _oskarit = PrivateCustomer.Create(Name.FromStrings("Oskar", "Issaksen", "Theodor"), Address.Create("Nygade", "Vejle", "6", 7100), PhoneNumber.FromString("56784321"), Email.FromString("oskartheshit@hotmail.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-20), _currentDateTimeProvider);
-            _simonehs = PrivateCustomer.Create(Name.FromStrings("Simone", "Sørensen", "Henriette"), Address.Create("Allégade", "Vejle", "55", 7100), PhoneNumber.FromString("67891234"), Email.FromString("henry@live.com"), _currentDateTimeProvider.GetCurrentDateTime().AddYears(-32), _currentDateTimeProvider);
+            var price = Price.FromDecimal(priceValue);
+            var duration = DurationMinutes.FromInt(durationMinutes);
+            var treatment = Treatment.Create(name, price, duration);
 
-            _db.Add(_peterse);
-            _db.Add(_lismk);
-            _db.Add(_larsc);
-            _db.Add(_oskarit);
-            _db.Add(_simonehs);
+            _db.Add(treatment);
+
+            return treatment;
         }
 
-        private void AddBookings()
-        {
-            var quantity1 = Quantity.FromInt(1);
-            var quantity2 = Quantity.FromInt(2);
-            var quantity3 = Quantity.FromInt(3);
-            var productLine1 = new ProductLineData(quantity1, _fodcreme);
-            var productLine2 = new ProductLineData(quantity2, _hårspray);
-            var productLine3 = new ProductLineData(quantity3, _bodyWash);
-
-            var now = _currentDateTimeProvider.GetCurrentDateTime();
-
-            // HENNY HANSEN (_henny)
-
-            // Kunde: Peter Svendsen
-            var b1 = Booking.Create(_peterse, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(-30), _mockPastDateTimeProvider, []);
-            b1.PayBooking(_currentDateTimeProvider);
-            _db.Add(b1);
-
-            var b2 = Booking.Create(_peterse, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(-15), _mockPastDateTimeProvider, []);
-            b2.PayBooking(_currentDateTimeProvider);
-            _db.Add(b2);
-
-            var b3 = Booking.Create(_peterse, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-5), _mockPastDateTimeProvider, []);
-            b3.PayBooking(_currentDateTimeProvider);
-            _db.Add(b3);
-
-            // Lis Mortensen bookings
-            var b4 = Booking.Create(_lismk, _sorenJ, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(-25), _mockPastDateTimeProvider, []);
-            b4.PayBooking(_currentDateTimeProvider);
-            _db.Add(b4);
-
-            var b5 = Booking.Create(_lismk, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(-20), _mockPastDateTimeProvider, []);
-            b5.PayBooking(_currentDateTimeProvider);
-            _db.Add(b5);
-
-            var b64 = Booking.Create(_peterse, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(5), _mockPastDateTimeProvider, [productLine1, productLine2, productLine3]);
-            _db.Add(b64);
-
-            var b69 = Booking.Create(_peterse, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(7), _mockPastDateTimeProvider, []);
-            _db.Add(b69);
-
-            var b74 = Booking.Create(_peterse, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 30, 0).AddDays(8), _mockPastDateTimeProvider, []);
-            _db.Add(b74);
-
-            var b79 = Booking.Create(_peterse, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(10), _mockPastDateTimeProvider, []);
-            _db.Add(b79);
-
-            var b84 = Booking.Create(_peterse, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(13), _mockPastDateTimeProvider, []);
-            _db.Add(b84);
-
-            // Kunde: Lis Mortensen
-            var b6 = Booking.Create(_lismk, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(-8), _mockPastDateTimeProvider, []);
-            b6.PayBooking(_currentDateTimeProvider);
-            _db.Add(b6);
-
-            // Lars Christiansen bookings
-            var b7 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(-28), _mockPastDateTimeProvider, []);
-            b7.PayBooking(_currentDateTimeProvider);
-            _db.Add(b7);
-
-            var b25 = Booking.Create(_oskarit, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b25);
-
-            // Kunde: Simone Sørensen
-            var b14 = Booking.Create(_simonehs, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b14);
-
-            var b19 = Booking.Create(_simonehs, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b19);
-
-
-            // PETER PEDERSEN (_peter)
-
-            // Kunde: Peter Svendsen
-            var b8 = Booking.Create(_peterse, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-5), _mockPastDateTimeProvider, []);
-            b8.PayBooking(_currentDateTimeProvider);
-            _db.Add(b8);
-
-            var b29 = Booking.Create(_peterse, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(2), _mockPastDateTimeProvider, []);
-            _db.Add(b29);
-
-            // Kunde: Lars Christiansen
-            var b9 = Booking.Create(_larsc, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(-12), _mockPastDateTimeProvider, []);
-            b9.PayBooking(_currentDateTimeProvider);
-            _db.Add(b9);
-
-            var b12 = Booking.Create(_larsc, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 8, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b12);
-
-            // Kunde: Lis Mortensen
-            var b17 = Booking.Create(_lismk, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b17);
-
-            var b23 = Booking.Create(_lismk, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b23);
-
-            // Kunde: Simone Sørensen 
-            var b35 = Booking.Create(_simonehs, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(2), _mockPastDateTimeProvider, []);
-            _db.Add(b35);
-
-            var b40 = Booking.Create(_simonehs, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(2), _mockPastDateTimeProvider, []);
-            _db.Add(b40);
-
-            var b45 = Booking.Create(_simonehs, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(3), _mockPastDateTimeProvider, []);
-            _db.Add(b45);
-
-            var b50 = Booking.Create(_simonehs, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 8, 30, 0).AddDays(4), _mockPastDateTimeProvider, []);
-            _db.Add(b50);
-
-            var b55 = Booking.Create(_simonehs, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(4), _mockPastDateTimeProvider, []);
-            _db.Add(b55);
-
-            var b60 = Booking.Create(_simonehs, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(5), _mockPastDateTimeProvider, []);
-            _db.Add(b60);
-
-            var b65 = Booking.Create(_simonehs, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(6), _mockPastDateTimeProvider, []);
-            _db.Add(b65);
-
-            var b70 = Booking.Create(_simonehs, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(7), _mockPastDateTimeProvider, []);
-            _db.Add(b70);
-
-            var b75 = Booking.Create(_simonehs, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(9), _mockPastDateTimeProvider, []);
-            _db.Add(b75);
-
-            var b80 = Booking.Create(_simonehs, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 30, 0).AddDays(11), _mockPastDateTimeProvider, []);
-            _db.Add(b80);
-
-            var b85 = Booking.Create(_simonehs, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(14), _mockPastDateTimeProvider, []);
-            _db.Add(b85);
-
-
-            // MARIA JENSEN (_maria)
-
-            // Kunde: Peter Svendsen
-            var b10 = Booking.Create(_peterse, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(-15), _mockPastDateTimeProvider, []);
-            b10.PayBooking(_currentDateTimeProvider);
-            _db.Add(b10);
-
-            var b15 = Booking.Create(_peterse, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b15);
-
-            // Kunde: Lis Mortensen
-            var b11 = Booking.Create(_lismk, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(-20), _mockPastDateTimeProvider, []);
-            b11.PayBooking(_currentDateTimeProvider);
-            _db.Add(b11);
-
-            // Kunde: Lars Christiansen
-            var b13 = Booking.Create(_larsc, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 30, 0).AddDays(-3), _mockPastDateTimeProvider, []);
-            b13.PayBooking(_currentDateTimeProvider);
-            _db.Add(b13);
-
-            // Oskar Issaksen bookings
-            var b16 = Booking.Create(_oskarit, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-22), _mockPastDateTimeProvider, []);
-            b16.PayBooking(_currentDateTimeProvider);
-            _db.Add(b16);
-
-            var b82 = Booking.Create(_larsc, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(12), _mockPastDateTimeProvider, []);
-            _db.Add(b82);
-
-            // Kunde: Oskar Issaksen
-            var b20 = Booking.Create(_oskarit, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b20);
-
-            var b31 = Booking.Create(_oskarit, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(2), _mockPastDateTimeProvider, []);
-            _db.Add(b31);
-
-            var b36 = Booking.Create(_oskarit, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(2), _mockPastDateTimeProvider, []);
-            _db.Add(b36);
-
-            // Kunde: Simone Sørensen
-            var b24 = Booking.Create(_simonehs, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b24);
-
-
-            // SØREN MIKKELSEN (_sorenM)
-
-            // Kunde: Lars Christiansen
-            var b18 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(-28), _mockPastDateTimeProvider, []);
-            b18.PayBooking(_currentDateTimeProvider);
-            _db.Add(b18);
-
-            var b21 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b21);
-
-            var b22 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b22);
-
-            var b27 = Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 30, 0).AddDays(1), _mockPastDateTimeProvider, []);
-            _db.Add(b27);
-
-            // Kunde: Oskar Issaksen
-            var b26 = Booking.Create(_oskarit, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 0, 0).AddDays(-10), _mockPastDateTimeProvider, []);
-            b26.PayBooking(_currentDateTimeProvider);
-            _db.Add(b26);
-
-            // Future bookings (upcoming appointments)
-
-            // Peter Svendsen bookings
-            _db.Add(Booking.Create(_peterse, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(3), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_peterse, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(10), _mockPastDateTimeProvider, []));
-
-            // Lis Mortensen bookings
-            _db.Add(Booking.Create(_lismk, _sorenJ, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 9, 30, 0).AddDays(5), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_lismk, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(14), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_lismk, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 15, 30, 0).AddDays(21), _mockPastDateTimeProvider, []));
-
-            // Lars Christiansen bookings
-            _db.Add(Booking.Create(_larsc, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 0, 0).AddDays(7), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 16, 30, 0).AddDays(18), _mockPastDateTimeProvider, []));
-
-            // Oskar Issaksen bookings
-            _db.Add(Booking.Create(_oskarit, _maria, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 12, 30, 0).AddDays(2), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_oskarit, _henny, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 10, 30, 0).AddDays(12), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_oskarit, _peter, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 30, 0).AddDays(25), _mockPastDateTimeProvider, []));
-
-            // Additional bookings for variety - mixing treatments and employees
-
-            // More Henny bookings (past)
-            _db.Add(Booking.Create(_peterse, _henny, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(-18), _mockPastDateTimeProvider, []));
-
-            // More Peter bookings (future)
-            _db.Add(Booking.Create(_lismk, _peter, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 10, 0, 0).AddDays(8), _mockPastDateTimeProvider, []));
-
-            // More Maria bookings (past and future)
-            _db.Add(Booking.Create(_larsc, _maria, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 9, 0, 0).AddDays(-7), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_oskarit, _maria, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 15, 0, 0).AddDays(15), _mockPastDateTimeProvider, []));
-
-            // More Søren M bookings
-            _db.Add(Booking.Create(_peterse, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 13, 30, 0).AddDays(-14), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_larsc, _sorenM, _herreklip,
-                new DateTime(now.Year, now.Month, now.Day, 11, 0, 0).AddDays(20), _mockPastDateTimeProvider, []));
-
-            // More Søren J bookings
-            _db.Add(Booking.Create(_lismk, _sorenJ, _dameklip,
-                new DateTime(now.Year, now.Month, now.Day, 14, 0, 0).AddDays(-6), _mockPastDateTimeProvider, []));
-            _db.Add(Booking.Create(_oskarit, _sorenJ, _farvning,
-                new DateTime(now.Year, now.Month, now.Day, 16, 0, 0).AddDays(28), _mockPastDateTimeProvider, []));
-        }
-
-        // Bruges da Bookings skal have en ICurrentDateTimeProvider som giver deres CreatedDate som skal være i fortiden i forhold til StartTime.
+        // Gives til BookingCommandHandler i metoden der opretter tidligere bookinger,
+        // så commandhandleren tror, at den befinder sig 31 dage tilbage i tiden.
         internal class PastDateTimeProvider : ICurrentDateTimeProvider
         {
-            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-60);
+            DateTime ICurrentDateTimeProvider.GetCurrentDateTime() => DateTime.Now.AddDays(-31);
         }
     }
-
 }

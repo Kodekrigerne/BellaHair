@@ -56,20 +56,24 @@
 }
 
 /* Contains all treatments to apply correct formatting */
-.treatments-employees-container {
+::deep .treatments-employees-container {
     display: flex;
     gap: 0.3rem;
     padding-bottom: 10px;
     padding-top: 5px;
+    max-width: 95%;
+    flex-wrap: wrap;
 }
 
 /* Contains singular treatment and its formatting */
 .treatment-employee-card {
-    font-size: 10px;
+    font-size: 8px;
     font-weight: 500;
     padding-inline: 5px;
     background-color: lightgrey;
     border-radius: 5px;
+    max-width: 5rem;
+
 }
 
 

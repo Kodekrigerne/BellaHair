@@ -1,0 +1,20 @@
+﻿
+@using BellaHair.Presentation.WebUI.Components.Pages.Treatments
+
+
+<div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
+						@foreach (var treatment in _treatments)
+							{															
+								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
+							}
+						</div>
+
+
+@code {
+	[Parameter, EditorRequired]
+	public required List<EmployeeTreatmentViewModel> _treatments { get; set; }
+
+
+
+
+}
