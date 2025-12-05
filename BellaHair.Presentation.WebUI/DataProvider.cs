@@ -160,12 +160,8 @@ namespace BellaHair.Presentation.WebUI
                     bookingCommandHandler.CreateBooking(booking).Wait();
 
                     scope.Dispose();
-
                 }
-                catch (Exception)
-                {
-
-                }
+                catch (Exception) { }
             }
         }
 
