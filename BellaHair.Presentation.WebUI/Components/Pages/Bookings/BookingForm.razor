@@ -114,7 +114,10 @@
 							<p class="picked-label">Produkter</p>
 							<p class="picked-text">
 								<span>@_productLines.Sum(pl => pl.Quantity) produkter</span>
-								<span class="picked-to-from">Samlet pris: @_productLines.Sum(pl => pl.Price * pl.Quantity).ToString("C2")</span>
+								@if (_productLines.Count != 0)
+								{
+									<span class="picked-to-from">Samlet pris: @_productLines.Sum(pl => pl.Price * pl.Quantity).ToString("C2")</span>
+								}
 							</p>
 						</button>
 					}
