@@ -13,7 +13,7 @@ using FixtureBuilder;
 
 namespace BellaHair.Presentation.WebUI
 {
-    //Dennis
+    // Dennis, Linnea, Mikkel Dahlmann
     /// <summary>
     /// Provides a method for adding hardcoded example data to BellaHairContext.
     /// </summary>
@@ -29,6 +29,11 @@ namespace BellaHair.Presentation.WebUI
             _db = db;
             _serviceProvider = serviceProvider;
         }
+
+        // Settings
+        private int _noOfPastBookings = 500;
+        private int _noOfFutureBookings = 0;
+        private int _noOfCustomers = 500;
 
         // Lists
         List<Employee> _employees = [];
@@ -75,9 +80,6 @@ namespace BellaHair.Presentation.WebUI
         private Employee? _madsKnudsen;
         private Employee? _annaPetersen;
 
-        // Settings
-        private int _noOfPastBookings = 50;
-        private int _noOfFutureBookings = 50;
 
         public async Task AddData()
         {
@@ -100,6 +102,7 @@ namespace BellaHair.Presentation.WebUI
             var queryHandler = _serviceProvider.GetRequiredService<IBookingQuery>();
             var commandHandler = _serviceProvider.GetRequiredService<IBookingCommand>();
             var pastBookings = await queryHandler.GetAllOldAsync();
+            pastBookings.OrderBy(b => b.StartDateTime);
 
             foreach (var booking in pastBookings)
             {
@@ -129,14 +132,14 @@ namespace BellaHair.Presentation.WebUI
                     using var scope = _serviceProvider.CreateScope();
 
                     Random random = new Random();
-                    var employee = _employees[random.Next(0, 6)];
-                    var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
+                    var employee = _employees[random.Next(0, 7)];
+                    var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
                     List<CreateProductLine> productLines = [];
                     for (int p = 0; p < random.Next(0, 2); p++)
                     {
-                        var productToList = Products[random.Next(0, Products.Count - 1)];
+                        var productToList = Products[random.Next(0, Products.Count)];
                         var productId = productToList.Id;
-                        var quantity = random.Next(1, 2);
+                        var quantity = random.Next(1, 1);
                         productLines.Add(new CreateProductLine(quantity, productId));
                     }
                     var product = Products[random.Next(0, Products.Count)];
@@ -150,11 +153,12 @@ namespace BellaHair.Presentation.WebUI
                             var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
                             bookingMinutes -= (bookingMinutes % 15);
 
+                            if (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
 
                     var booking = bookingFaker.Generate();
-                    if (booking.StartDateTime.DayOfWeek == DayOfWeek.Saturday || booking.StartDateTime.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
 
                     var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
                     bookingCommandHandler.CreateBooking(booking).Wait();
@@ -169,21 +173,21 @@ namespace BellaHair.Presentation.WebUI
         {
             var now = _mockPastDateTimeProvider.GetCurrentDateTime();
 
+            List<CreateBookingCommand> createBookingCommands = [];
+
             for (int i = 0; i < _noOfPastBookings; i++)
             {
                 try
                 {
-                    using var scope = _serviceProvider.CreateScope();
-
                     Random random = new Random();
-                    var employee = _employees[random.Next(0, 6)];
-                    var treatment = employee.Treatments[random.Next(1, employee.Treatments.Count)];
+                    var employee = _employees[random.Next(0, 7)];
+                    var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
                     List<CreateProductLine> productLines = [];
                     for (int p = 0; p < random.Next(0, 2); p++)
                     {
-                        var productToList = Products[random.Next(0, Products.Count - 1)];
+                        var productToList = Products[random.Next(0, Products.Count)];
                         var productId = productToList.Id;
-                        var quantity = random.Next(1, 2);
+                        var quantity = random.Next(1, 1);
                         productLines.Add(new CreateProductLine(quantity, productId));
                     }
                     var product = Products[random.Next(0, Products.Count)];
@@ -197,24 +201,33 @@ namespace BellaHair.Presentation.WebUI
                             var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
                             bookingMinutes -= (bookingMinutes % 15);
 
+                            if (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
 
-                    var booking = bookingFaker.Generate();
-                    if (booking.StartDateTime.DayOfWeek == DayOfWeek.Saturday || booking.StartDateTime.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
+                    createBookingCommands.Add(bookingFaker.Generate());
+                }
+
+                catch (Exception) { }
+            }
+
+            createBookingCommands.OrderBy(c => c.StartDateTime);
+
+            foreach (var command in createBookingCommands)
+            {
+                try
+                {
+                    using var scope = _serviceProvider.CreateScope();
 
                     var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
                     Fixture.New(bookingCommandHandler).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
 
-                    bookingCommandHandler.CreateBooking(booking).Wait();
+                    bookingCommandHandler.CreateBooking(command).Wait();
 
                     scope.Dispose();
-
                 }
-                catch (Exception)
-                {
-
-                }
+                catch (Exception) { }
             }
         }
 
@@ -222,7 +235,7 @@ namespace BellaHair.Presentation.WebUI
         {
             var now = _currentDateTimeProvider.GetCurrentDateTime();
 
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < _noOfCustomers; i++)
             {
                 try
                 {
