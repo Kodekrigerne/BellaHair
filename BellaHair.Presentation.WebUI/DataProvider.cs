@@ -89,10 +89,10 @@ namespace BellaHair.Presentation.WebUI
             AddEmployees();
             AddLoyaltyDiscounts();
             AddCampaignDiscounts();
-            AddBirthdayDiscounts();
             AddPastBookingsUsingBogusAndHandler();
             await PayAndInvoicePastBookings();
             AddBookingsUsingBogusAndHandler();
+            AddBirthdayDiscounts();
 
             _db.SaveChanges();
         }
@@ -119,8 +119,8 @@ namespace BellaHair.Presentation.WebUI
                     var command = new PayAndInvoiceBookingCommand(booking.Id, null);
                     await commandHandler.PayAndInvoiceBooking(command);
                 }
-                _db.SaveChanges();
             }
+            _db.SaveChanges();
         }
 
         private void AddBookingsUsingBogusAndHandler()
