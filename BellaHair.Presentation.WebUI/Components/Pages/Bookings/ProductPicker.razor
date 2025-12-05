@@ -1,0 +1,44 @@
+﻿@using BellaHair.Ports.Products
+
+@inject IProductQuery ProductQuery
+@inject ISnackbar Snackbar
+
+<div class="product-picker-container">
+	@* TODO: Tilføj søgning *@
+	@foreach (var product in _products)
+	{
+		<button class="product" @onclick="() => HandleProductClick(product)">
+			<p>
+				<span>@product.Name</span>
+				<span>@product.Price</span>
+			</p>
+		</button>
+	}
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required EventCallback<ProductLineModel> OnProductAdded { get; set; }
+
+	private List<ProductDTO> _products = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		await LoadProducts();
+	}
+
+	private async Task LoadProducts()
+	{
+		try { _products = (await ProductQuery.GetAllAsync()).ToList(); }
+		catch { Snackbar.Add("Noget gik galt ved hentning af produkter.", Severity.Error); }
+		Console.WriteLine($"TEST {_products.Count}");
+	}
+
+	private async Task HandleProductClick(ProductDTO product)
+	{
+		var productLine = new ProductLineModel(product.Id, product.Name, product.Price, 1);
+		await OnProductAdded.InvokeAsync(productLine);
+	}
+}

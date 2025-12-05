@@ -1,7 +1,7 @@
 ﻿@using BellaHair.Presentation.WebUI.Components.Shared
 
 <Modal @bind-IsVisible="_showAddProductModal">
-
+	<ProductPicker OnProductAdded="HandleProductAdded" />
 </Modal>
 
 <div class="products-display-container">
@@ -24,8 +24,8 @@
 	[Parameter, EditorRequired]
 	public required List<ProductLineModel> ProductLines { get; set; }
 
-	[Parameter]
-	public EventCallback ProductLinesChanged { get; set; }
+	[Parameter, EditorRequired]
+	public required EventCallback ProductLinesChanged { get; set; }
 
 	private bool _showAddProductModal = false;
 
@@ -37,6 +37,13 @@
 		if (newQuantity < 1) ProductLines.Remove(productLine);
 		else productLine.SetQuantity(newQuantity);
 
-		if (ProductLinesChanged.HasDelegate) await ProductLinesChanged.InvokeAsync();
+		await ProductLinesChanged.InvokeAsync();
+	}
+
+	private async Task HandleProductAdded(ProductLineModel args)
+	{
+		_showAddProductModal = false;
+		ProductLines.Add(args);
+		await ProductLinesChanged.InvokeAsync();
 	}
 }
