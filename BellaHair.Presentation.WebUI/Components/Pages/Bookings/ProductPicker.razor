@@ -1,5 +1,4 @@
 ﻿<!-- Dennis -->
-
 @using BellaHair.Ports.Products
 
 @inject IProductQuery ProductQuery
@@ -7,14 +6,21 @@
 
 <div class="product-picker-container">
 	@* TODO: Tilføj søgning *@
-	@foreach (var product in _products)
+	@if (_products.Count == 0)
 	{
-		<button class="product" @onclick="() => HandleProductClick(product)">
-			<p>
-				<span>@product.Name</span>
-				<span>@product.Price</span>
-			</p>
-		</button>
+		<div class="product-picker-empty">
+			<span>Ingen produkter fundet</span>
+		</div>
+	}
+	else
+	{
+		@foreach (var product in _products)
+		{
+			<button class="product-picker-item" @onclick="() => HandleProductClick(product)">
+				<span class="product-picker-name">@product.Name</span>
+				<span class="product-picker-price">@product.Price</span>
+			</button>
+		}
 	}
 </div>
 
@@ -44,3 +50,71 @@
 		await OnProductAdded.InvokeAsync(productLine);
 	}
 }
+
+<style>
+	.product-picker-container {
+		width: 100%;
+		max-height: 400px;
+		overflow-y: auto;
+	}
+
+	.product-picker-item {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		padding: 14px 20px;
+		margin: 0;
+		border: none;
+		border-bottom: 1px solid #eee;
+		background: white;
+		text-align: left;
+		cursor: pointer;
+		transition: background 0.1s, color 0.1s;
+	}
+
+		.product-picker-item:last-child {
+			border-bottom: none;
+		}
+
+		.product-picker-item:hover,
+		.product-picker-item:focus {
+			background: #e3eafb;
+			outline: none;
+		}
+
+		.product-picker-item:active {
+			background: #dbeafe;
+		}
+
+	.product-picker-name {
+		font-size: 1rem;
+		color: #222;
+		font-weight: 400;
+	}
+
+	.product-picker-item:hover .product-picker-name,
+	.product-picker-item:focus .product-picker-name {
+		color: #1d4ed8;
+	}
+
+	.product-picker-price {
+		font-size: 0.95rem;
+		color: #666;
+		font-weight: 500;
+		margin-left: 16px;
+	}
+
+	.product-picker-item:hover .product-picker-price,
+	.product-picker-item:focus .product-picker-price {
+		color: #1d4ed8;
+	}
+
+	.product-picker-empty {
+		padding: 40px 20px;
+		text-align: center;
+		color: #999;
+		font-size: 0.95rem;
+	}
+</style>
