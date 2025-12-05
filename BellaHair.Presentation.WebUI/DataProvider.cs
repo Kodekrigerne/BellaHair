@@ -1,4 +1,5 @@
 using BellaHair.Domain;
+using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
 using BellaHair.Domain.PrivateCustomers;
@@ -31,9 +32,9 @@ namespace BellaHair.Presentation.WebUI
         }
 
         // Settings
-        private int _noOfPastBookings = 500;
+        private int _noOfPastBookings = 100;
         private int _noOfFutureBookings = 0;
-        private int _noOfCustomers = 500;
+        private int _noOfCustomers = 30;
 
         // Lists
         List<Employee> _employees = [];
@@ -100,7 +101,9 @@ namespace BellaHair.Presentation.WebUI
         private async Task PayAndInvoicePastBookings()
         {
             var queryHandler = _serviceProvider.GetRequiredService<IBookingQuery>();
+
             var commandHandler = _serviceProvider.GetRequiredService<IBookingCommand>();
+
             var pastBookings = await queryHandler.GetAllOldAsync();
             pastBookings.OrderBy(b => b.StartDateTime);
 
@@ -117,24 +120,27 @@ namespace BellaHair.Presentation.WebUI
                     var command = new PayAndInvoiceBookingCommand(booking.Id, null);
                     await commandHandler.PayAndInvoiceBooking(command);
                 }
+                _db.SaveChanges();
             }
         }
 
         private void AddBookingsUsingBogusAndHandler()
         {
-
             var now = _currentDateTimeProvider.GetCurrentDateTime();
 
             for (int i = 0; i < _noOfFutureBookings; i++)
             {
                 try
                 {
+                    Random random = new Random();
+
                     using var scope = _serviceProvider.CreateScope();
 
-                    Random random = new Random();
                     var employee = _employees[random.Next(0, 7)];
                     var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
+
                     List<CreateProductLine> productLines = [];
+
                     for (int p = 0; p < random.Next(0, 2); p++)
                     {
                         var productToList = Products[random.Next(0, Products.Count)];
@@ -142,6 +148,7 @@ namespace BellaHair.Presentation.WebUI
                         var quantity = random.Next(1, 1);
                         productLines.Add(new CreateProductLine(quantity, productId));
                     }
+
                     var product = Products[random.Next(0, Products.Count)];
                     var customer = _customers[random.Next(0, _customers.Count)];
 
@@ -180,7 +187,8 @@ namespace BellaHair.Presentation.WebUI
                 try
                 {
                     Random random = new Random();
-                    var employee = _employees[random.Next(0, 7)];
+                    //var employee = _employees[random.Next(0, 7)];
+                    var employee = _employees[1];
                     var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
                     List<CreateProductLine> productLines = [];
                     for (int p = 0; p < random.Next(0, 2); p++)
@@ -222,6 +230,9 @@ namespace BellaHair.Presentation.WebUI
 
                     var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
                     Fixture.New(bookingCommandHandler).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
+
+                    var overlapChecker = _serviceProvider.GetRequiredService<IBookingOverlapChecker>();
+                    Fixture.New(overlapChecker).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
 
                     bookingCommandHandler.CreateBooking(command).Wait();
 
@@ -306,6 +317,7 @@ namespace BellaHair.Presentation.WebUI
 
         private void AddLoyaltyDiscounts()
         {
+            _db.Add(LoyaltyDiscount.Create("Loyalty test", 1, DiscountPercent.FromDecimal(0.50m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 15, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
