@@ -800,6 +800,7 @@
 
 	private async Task HandleResetChangesClick()
 	{
+		_activePicker = Picker.None;
 		await LoadBooking();
 		Mode = BookingMode.View;
 	}
