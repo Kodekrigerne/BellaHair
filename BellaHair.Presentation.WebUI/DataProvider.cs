@@ -32,9 +32,9 @@ namespace BellaHair.Presentation.WebUI
         }
 
         // Settings
-        private int _noOfPastBookings = 10;
-        private int _noOfFutureBookings = 10;
-        private int _noOfCustomers = 10;
+        private int _noOfPastBookings = 100;
+        private int _noOfFutureBookings = 100;
+        private int _noOfCustomers = 50;
 
         // Lists
         List<Employee> _employees = [];
@@ -234,14 +234,14 @@ namespace BellaHair.Presentation.WebUI
                     var bookingCommandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
                     Fixture.New(bookingCommandHandler).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
 
-                    var overlapChecker = _serviceProvider.GetRequiredService<IBookingOverlapChecker>();
+                    var overlapChecker = scope.ServiceProvider.GetRequiredService<IBookingOverlapChecker>();
                     Fixture.New(overlapChecker).WithField("_currentDateTimeProvider", _mockPastDateTimeProvider).Build();
 
                     bookingCommandHandler.CreateBooking(command).Wait();
 
                     scope.Dispose();
                 }
-                catch (Exception) { }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
         }
 
