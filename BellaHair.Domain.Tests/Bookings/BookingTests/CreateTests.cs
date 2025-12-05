@@ -77,6 +77,28 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         }
 
         [Test]
+        public void Given_DuplicateProducts_Then_ThrowsException()
+        {
+            //Arrange
+            var customer = Fixture.New<PrivateCustomer>().Build();
+            var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
+            var startDateTime = DateTime.Now.AddMinutes(5);
+            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
+            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
+            var productLineData = Fixture.New<ProductLineData>()
+                .With(pld => pld.Product.Id, Guid.NewGuid())
+                .With(pld => pld.Product.Name, "Test product name")
+                .With(pld => pld.Product.Description, "Test product description")
+                .With(pld => pld.Product.Price.Value, 200m)
+                .With(pld => pld.Quantity.Value, 3)
+                .Build();
+
+            //Act & Assert
+            Assert.Throws<InvalidOperationException>(() => Booking.Create(customer, employee, treatment, startDateTime, dateTimeProvider.Object, [productLineData, productLineData]));
+        }
+
+        [Test]
         public void Given_EmployeeNotHasTreatment_Then_ThrowsException()
         {
             //Arrange

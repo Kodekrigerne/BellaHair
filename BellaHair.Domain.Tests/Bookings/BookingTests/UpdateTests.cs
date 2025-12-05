@@ -11,6 +11,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         [Test]
         public void Given_BookingValidForUpdate_Then_UpdatesBooking()
         {
+            //Assert
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
@@ -24,8 +25,10 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act
             booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object);
 
+            //Assert
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(booking.Employee, Is.Not.Null);
@@ -46,6 +49,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         [Test]
         public void Given_BookingWithinGracePeriod_Then_UpdatesBooking()
         {
+            //Arrange
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
@@ -59,8 +63,10 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act
             booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object);
 
+            //Assert
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(booking.Employee, Is.Not.Null);
@@ -81,6 +87,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         [Test]
         public void Given_BookingOutsideGracePeriod_Then_ThrowsException()
         {
+            //Arrange
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
@@ -94,6 +101,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act & Assert
             Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
@@ -136,8 +144,38 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
         }
 
         [Test]
+        public void Given_DuplicateProducts_Then_ThrowsException()
+        {
+            //Arrange
+            var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
+            var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
+            var startDateTime = DateTime.Now.AddMinutes(5);
+
+            var booking = Fixture.New<Booking>()
+                .With(b => b.IsPaid, false)
+                .With(b => b.StartDateTime, DateTime.Now.AddHours(5))
+                .With(b => b.EndDateTime, DateTime.Now.AddHours(6))
+                .Build();
+
+            var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
+            dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
+
+            var productLineData = Fixture.New<ProductLineData>()
+                .With(pld => pld.Product.Id, Guid.NewGuid())
+                .With(pld => pld.Product.Name, "Test product name")
+                .With(pld => pld.Product.Description, "Test product description")
+                .With(pld => pld.Product.Price.Value, 200m)
+                .With(pld => pld.Quantity.Value, 3)
+                .Build();
+
+            //Act & Assert
+            Assert.Throws<InvalidOperationException>(() => booking.Update(startDateTime, employee, treatment, [productLineData, productLineData], dateTimeProvider.Object));
+        }
+
+        [Test]
         public void Given_EmployeeNotHasTreatment_Then_ThrowsException()
         {
+            //Arrange
             var treatment = Fixture.New<Treatment>().Build();
             var employee = Fixture.New<Employee>().Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
@@ -150,12 +188,14 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act & Assert
             Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
         [Test]
         public void Given_UnpaidPastBooking_Then_ThrowsException()
         {
+            //Arrange
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
@@ -168,12 +208,14 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act & Assert
             Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
         [Test]
         public void Given_PaidFutureBooking_Then_ThrowsException()
         {
+            //Arrange
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(5);
@@ -186,12 +228,14 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act & Assert
             Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
 
         [Test]
         public void Given_StartBeforeNow_Then_ThrowsException()
         {
+            //Arrange
             var treatment = Fixture.New<Treatment>().With(t => t.Id, Guid.NewGuid()).Build();
             var employee = Fixture.New<Employee>().With(e => e.Id, Guid.NewGuid()).WithField("_treatments", [treatment]).Build();
             var startDateTime = DateTime.Now.AddMinutes(-5);
@@ -204,6 +248,7 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             var dateTimeProvider = new Mock<ICurrentDateTimeProvider>();
             dateTimeProvider.Setup(d => d.GetCurrentDateTime()).Returns(DateTime.Now);
 
+            //Act & Assert
             Assert.Throws<BookingException>(() => booking.Update(startDateTime, employee, treatment, [], dateTimeProvider.Object));
         }
     }

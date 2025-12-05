@@ -77,6 +77,7 @@ namespace BellaHair.Domain.Bookings
                 throw new BookingException($"Kan ikke oprette booking med fortidig startdato og tidspunkt {startDateTime}.");
 
             ValidateEmployeeTreatment(employee, treatment);
+            ValidateUniqueProductLines(productLineDatas);
 
             List<ProductLine> productLines = productLineDatas.Select(pld => ProductLine.Create(pld.Quantity, pld.Product)).ToList();
 
@@ -159,6 +160,7 @@ namespace BellaHair.Domain.Bookings
             if (startDateTime < now) throw new BookingException("Kan ikke opdatere en booking med en starttid i fortiden");
 
             ValidateEmployeeTreatment(employee, treatment);
+            ValidateUniqueProductLines(productLineDatas);
 
             StartDateTime = startDateTime;
             Employee = employee;
@@ -178,6 +180,12 @@ namespace BellaHair.Domain.Bookings
 
             if (!employee.Treatments.Any(t => t.Id == treatment.Id))
                 throw new BookingException($"Medarbejder {employee.Name.FullName} udbyder ikke behandling {treatment.Name}.");
+        }
+
+        private static void ValidateUniqueProductLines(IEnumerable<ProductLineData> productLines)
+        {
+            if (productLines.Count() != productLines.DistinctBy(pl => pl.Product.Id).Count())
+                throw new InvalidOperationException("All product lines must have unique products when creating or updating booking.");
         }
     }
 
