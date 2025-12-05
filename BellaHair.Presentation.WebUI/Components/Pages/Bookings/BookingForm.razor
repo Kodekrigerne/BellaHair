@@ -400,7 +400,7 @@
 	{
 		if (_startDate == null || _startTime == null) return false;
 		if (_isPaid) return false;
-		var endTime = _startDate.Value.Add(_startTime.Value).Add(_endTime!.Value);
+		var endTime = _startDate.Value.Add(_endTime!.Value);
 		if (endTime < _now.AddHours(-2)) return false;
 		return true;
 	}
