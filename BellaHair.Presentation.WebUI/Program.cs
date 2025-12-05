@@ -24,6 +24,10 @@ namespace BellaHair.Presentation.WebUI
                 options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext"))
             );
 
+            // Dette fjerner væggen af sql i konsollen så vi kan se vores consone writelines
+            // Kommenter den ud hvis du skal se den sql der bliver kørt
+            builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
+
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
 
