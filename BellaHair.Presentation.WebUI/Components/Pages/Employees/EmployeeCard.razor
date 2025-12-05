@@ -69,8 +69,19 @@
 					@Employee.FullAddress
 				</div>
 			</div>
-		<button class="btn-add" @onclick="HandleOnViewTreatmentsClick"> Se behandlinger </button>
-</div>
+		<div class="treatment-calendar-button-container">
+			<div class="treatments-employees-container">
+				@*Contains all treatments and makes it possible to position them together*@
+						@foreach (var treatment in Employee.Treatments)
+							{															
+								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
+							}
+						</div>
+
+						<div class="calendar-button">
+							<button class="btn-add calender" @onclick="NavigateToCalendar"> <VisitsIcon Class="employee-icons" /> Se kalender</button>
+						</div>
+		</div>
 
 
 					</div>
