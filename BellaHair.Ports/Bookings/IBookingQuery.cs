@@ -14,7 +14,7 @@ namespace BellaHair.Ports.Bookings
         Task<BookingWithRelationsDTO> GetWithRelationsAsync(GetWithRelationsQuery query);
         Task<IEnumerable<BookingDTO>> GetAllNewAsync();
         Task<IEnumerable<BookingDTO>> GetAllOldAsync();
-        Task<IEnumerable<BookingDTO>> GetAllWithinPeriodOnEmployee(DateTime startDateTime, DateTime endDateTime, Guid employeeId);
+        Task<IEnumerable<BookingCalendarDTO>> GetAllWithinPeriodOnEmployee(DateTime startDateTime, DateTime endDateTime, Guid employeeId);
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
 
@@ -27,7 +27,7 @@ namespace BellaHair.Ports.Bookings
         IEnumerable<ProductLineDTO> Products,
         DiscountDTO? Discount);
 
-    public record ProductLineDTO(Guid Id, string Name, string Description, decimal Price, int Quantity);
+    public record ProductLineDTO(Guid ProductId, string Name, string Description, decimal Price, int Quantity);
     public record DiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
 
     public record BookingDTO(
@@ -45,6 +45,8 @@ namespace BellaHair.Ports.Bookings
         string TreatmentName,
         int DurationMinutes,
         DiscountDTO? Discount);
+
+    public record BookingCalendarDTO(Guid Id, DateTime StartDateTime, DateTime EndDateTime, string EmployeeFullName, string CustomerFullName, string TreatmentName);
 
     public record GetWithRelationsQuery(Guid Id);
 
