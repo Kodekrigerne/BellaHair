@@ -214,8 +214,6 @@ namespace BellaHair.Presentation.WebUI
                             var bookingMinutes = f.Random.Int(0, Math.Max(0, 60 - treatment.DurationMinutes.Value));
                             bookingMinutes -= (bookingMinutes % 15);
 
-                            if (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
-
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
 
@@ -318,6 +316,8 @@ namespace BellaHair.Presentation.WebUI
                 _db.Add(product);
                 Products.Add(product);
             }
+
+            _db.SaveChanges();
         }
 
         private void AddLoyaltyDiscounts()
@@ -326,11 +326,15 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 20, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
+
+            _db.SaveChanges();
         }
 
         private void AddBirthdayDiscounts()
         {
             _db.Add(BirthdayDiscount.Create("Fødselsdagsrabat", DiscountPercent.FromDecimal(0.50m)));
+
+            _db.SaveChanges();
         }
 
         private void AddCampaignDiscounts()
@@ -470,6 +474,8 @@ namespace BellaHair.Presentation.WebUI
                     _helfarveLangtHårUdenKlip.Id,
                     _helfarveHalvKortHårMedKlip.Id
                 }));
+
+            _db.SaveChanges();
         }
 
         private void AddEmployees()
