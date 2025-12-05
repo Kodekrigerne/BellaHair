@@ -36,18 +36,20 @@
 	<p class="p-txt">Gælder for behandlinger:</p>
 
 	<div class="t-wrapper">
-
+		
+		<div class="treatment-wrapper">
 		@foreach (var campaign in CampaignDiscount.Treatments)
 		{
 			<button class="btn-offer">
 				@campaign.Name
 			</button>
 		}
+		</div>
 
 		<div class="active-wrapper">
 
 			<button class="@GetStatusClass()">
-				@GetStatusText()
+				<span class="active-text"> @GetStatusText() </span>
 			</button>
 
 		</div>

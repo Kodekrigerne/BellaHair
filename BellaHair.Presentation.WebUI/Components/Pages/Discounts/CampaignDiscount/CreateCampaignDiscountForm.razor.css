@@ -26,6 +26,7 @@
     flex-direction: row;
     border-radius: 0.5rem;
     padding: 10px 10px 10px 10px;
+    height:70px;
 }
 
 .treatments-container {
@@ -35,6 +36,8 @@
     max-width: 600px;
     border: 5px;
     gap: 0.5rem;
+    height:250px;
+    overflow:auto;
 }
 
 .t-name {
