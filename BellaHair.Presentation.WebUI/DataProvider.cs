@@ -32,14 +32,14 @@ namespace BellaHair.Presentation.WebUI
         }
 
         // Settings
-        private int _noOfPastBookings = 100;
-        private int _noOfFutureBookings = 100;
-        private int _noOfCustomers = 50;
+        private const int NoOfPastBookings = 100;
+        private const int NoOfFutureBookings = 100;
+        private const int NoOfCustomers = 50;
 
         // Lists
-        List<Employee> _employees = [];
-        List<PrivateCustomer> _customers = [];
-        List<Product> Products = [];
+        private readonly List<Employee> _employees = [];
+        private readonly List<PrivateCustomer> _customers = [];
+        private readonly List<Product> _products = [];
 
         // Treatment Fields 
         private Treatment? _herreklipUdenVaskFøn;
@@ -81,7 +81,6 @@ namespace BellaHair.Presentation.WebUI
         private Employee? _madsKnudsen;
         private Employee? _annaPetersen;
 
-
         public async Task AddData()
         {
             AddProducts();
@@ -105,7 +104,7 @@ namespace BellaHair.Presentation.WebUI
             var commandHandler = _serviceProvider.GetRequiredService<IBookingCommand>();
 
             var pastBookings = await queryHandler.GetAllOldAsync();
-            pastBookings.OrderBy(b => b.StartDateTime);
+            pastBookings = pastBookings.OrderBy(b => b.StartDateTime);
 
             foreach (var booking in pastBookings)
             {
@@ -128,11 +127,11 @@ namespace BellaHair.Presentation.WebUI
         {
             var now = _currentDateTimeProvider.GetCurrentDateTime();
 
-            for (int i = 0; i < _noOfFutureBookings; i++)
+            for (int i = 0; i < NoOfFutureBookings; i++)
             {
                 try
                 {
-                    Random random = new Random();
+                    var random = new Random();
 
                     using var scope = _serviceProvider.CreateScope();
 
@@ -143,13 +142,13 @@ namespace BellaHair.Presentation.WebUI
 
                     for (int p = 0; p < random.Next(0, 2); p++)
                     {
-                        var productToList = Products[random.Next(0, Products.Count)];
+                        var productToList = _products[random.Next(0, _products.Count)];
                         var productId = productToList.Id;
                         var quantity = random.Next(1, 1);
                         productLines.Add(new CreateProductLine(quantity, productId));
                     }
 
-                    var product = Products[random.Next(0, Products.Count)];
+                    var product = _products[random.Next(0, _products.Count)];
                     var customer = _customers[random.Next(0, _customers.Count)];
 
                     var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
@@ -184,22 +183,22 @@ namespace BellaHair.Presentation.WebUI
 
             List<CreateBookingCommand> createBookingCommands = [];
 
-            for (int i = 0; i < _noOfPastBookings; i++)
+            for (int i = 0; i < NoOfPastBookings; i++)
             {
                 try
                 {
-                    Random random = new Random();
+                    var random = new Random();
                     var employee = _employees[random.Next(0, 7)];
                     var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
                     List<CreateProductLine> productLines = [];
                     for (int p = 0; p < random.Next(0, 2); p++)
                     {
-                        var productToList = Products[random.Next(0, Products.Count)];
+                        var productToList = _products[random.Next(0, _products.Count)];
                         var productId = productToList.Id;
                         var quantity = random.Next(1, 1);
                         productLines.Add(new CreateProductLine(quantity, productId));
                     }
-                    var product = Products[random.Next(0, Products.Count)];
+                    var product = _products[random.Next(0, _products.Count)];
                     var customer = _customers[random.Next(0, _customers.Count)];
 
                     var bookingFaker = new Faker<CreateBookingCommand>("nb_NO")
@@ -223,7 +222,7 @@ namespace BellaHair.Presentation.WebUI
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
 
-            createBookingCommands.OrderBy(c => c.StartDateTime);
+            createBookingCommands = createBookingCommands.OrderBy(c => c.StartDateTime).ToList();
 
             foreach (var command in createBookingCommands)
             {
@@ -249,7 +248,7 @@ namespace BellaHair.Presentation.WebUI
         {
             var now = _currentDateTimeProvider.GetCurrentDateTime();
 
-            for (int i = 0; i < _noOfCustomers; i++)
+            for (int i = 0; i < NoOfCustomers; i++)
             {
                 try
                 {
@@ -314,7 +313,7 @@ namespace BellaHair.Presentation.WebUI
                 var product = Product.Create(name, description, price);
 
                 _db.Add(product);
-                Products.Add(product);
+                _products.Add(product);
             }
 
             _db.SaveChanges();
