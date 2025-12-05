@@ -1,0 +1,172 @@
+﻿<!-- Dennis -->
+
+@using BellaHair.Presentation.WebUI.Components.Shared
+
+<Modal @bind-IsVisible="_showAddProductModal">
+	<ProductPicker OnProductAdded="HandleProductAdded" />
+</Modal>
+
+<div class="products-display-container">
+	@foreach (var productLine in ProductLines)
+	{
+		<div class="product-line">
+			<div class="product-line-content">
+				<span class="product-name">@productLine.ProductName</span>
+				<div class="product-controls">
+					<span class="product-price">@productLine.Price.ToString("C2") stk.</span>
+					<div class="quantity-controls">
+						<button class="quantity-btn" @onclick="() => HandleChangeQuantity(productLine.ProductId, -1)">−</button>
+						<span class="quantity-display">@productLine.Quantity</span>
+						<button class="quantity-btn" @onclick="() => HandleChangeQuantity(productLine.ProductId, 1)">+</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+	<button class="add-product-btn" @onclick="() => _showAddProductModal = true">Tilføj produkt</button>
+</div>
+
+@code {
+	[Parameter, EditorRequired]
+	public required List<ProductLineModel> ProductLines { get; set; }
+
+	[Parameter, EditorRequired]
+	public required EventCallback ProductLinesChanged { get; set; }
+
+	private bool _showAddProductModal = false;
+
+	private async Task HandleChangeQuantity(Guid productId, int difference)
+	{
+		var productLine = ProductLines.Single(pl => pl.ProductId == productId);
+		var newQuantity = productLine.Quantity + difference;
+
+		if (newQuantity < 1) ProductLines.Remove(productLine);
+		else productLine.SetQuantity(newQuantity);
+
+		await ProductLinesChanged.InvokeAsync();
+	}
+
+	private async Task HandleProductAdded(ProductLineModel args)
+	{
+		_showAddProductModal = false;
+		ProductLines.Add(args);
+		await ProductLinesChanged.InvokeAsync();
+	}
+}
+
+<style>
+	.products-display-container {
+		width: 100%;
+	}
+
+	.product-line {
+		position: relative;
+		border-bottom: 1px solid #eee;
+	}
+
+		.product-line:last-of-type {
+			border-bottom: none;
+		}
+
+	.product-line-content {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 12px 2.5rem;
+		transition: background 0.1s;
+	}
+
+	.product-line:hover .product-line-content {
+		background: #f9fafb;
+	}
+
+	.product-name {
+		font-size: 1.05rem;
+		font-weight: 525;
+		color: #222;
+		flex: 1;
+	}
+
+	.product-controls {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.product-price {
+		font-size: 1.05rem;
+		color: #222;
+		min-width: 60px;
+		font-weight: 525;
+		text-align: right;
+	}
+
+	.quantity-controls {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.quantity-btn {
+		width: 28px;
+		height: 28px;
+		padding: 0;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		background: white;
+		font-size: 1.1rem;
+		color: #222;
+		cursor: pointer;
+		transition: all 0.1s;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+		.quantity-btn:hover,
+		.quantity-btn:focus {
+			background: #e3eafb;
+			color: #1d4ed8;
+			border-color: #1d4ed8;
+			outline: none;
+		}
+
+		.quantity-btn:active {
+			background: #dbeafe;
+		}
+
+	.quantity-display {
+		min-width: 24px;
+		text-align: center;
+		font-size: 1rem;
+		color: #222;
+		font-weight: 500;
+	}
+
+	.add-product-btn {
+		position: relative;
+		display: block;
+		width: 100%;
+		padding: 12px 20px;
+		margin: 0;
+		border: none;
+		border-top: 1px solid #eee;
+		background: none;
+		text-align: center;
+		font-size: 1.05rem;
+		color: #222;
+		cursor: pointer;
+		transition: background 0.1s, color 0.1s;
+	}
+
+		.add-product-btn:hover,
+		.add-product-btn:focus {
+			background: #e3eafb;
+			color: #1d4ed8;
+			outline: none;
+		}
+
+		.add-product-btn:active {
+			background: #dbeafe;
+		}
+</style>
