@@ -144,7 +144,7 @@
 						@foreach (var treatment in _treatments)
 						{
 							<button class="picker-btn" @onclick="() => HandleTreatmentPickerClick(treatment.Id)">
-								<span class="treatment-name">@treatment.Name</span>
+								<span>@treatment.Name</span>
 								<span class="treatment-duration">@treatment.DurationMinutes min</span>
 							</button>
 						}
