@@ -206,8 +206,12 @@ namespace BellaHair.Presentation.WebUI
                         .CustomInstantiator(f =>
                         {
                             var bookingDate = f.Date.Between(now.AddDays(1), now.AddDays(30));
+                            while (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday)
+                            {
+                                bookingDate = f.Date.Between(now.AddDays(1), now.AddDays(30));
+                            }
                             var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
-                            var bookingMinutes = f.Random.Int(0, 60 - treatment.DurationMinutes.Value);
+                            var bookingMinutes = f.Random.Int(0, Math.Max(0, 60 - treatment.DurationMinutes.Value));
                             bookingMinutes -= (bookingMinutes % 15);
 
                             if (bookingDate.DayOfWeek == DayOfWeek.Saturday || bookingDate.DayOfWeek == DayOfWeek.Sunday) throw new Exception();
@@ -218,7 +222,7 @@ namespace BellaHair.Presentation.WebUI
                     createBookingCommands.Add(bookingFaker.Generate());
                 }
 
-                catch (Exception) { }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
 
             createBookingCommands.OrderBy(c => c.StartDateTime);
