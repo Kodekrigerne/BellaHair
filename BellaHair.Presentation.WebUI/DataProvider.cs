@@ -187,7 +187,6 @@ namespace BellaHair.Presentation.WebUI
                 try
                 {
                     Random random = new Random();
-                    //var employee = _employees[random.Next(0, 7)];
                     var employee = _employees[random.Next(0, 7)];
                     var treatment = employee.Treatments[random.Next(0, employee.Treatments.Count)];
                     List<CreateProductLine> productLines = [];
@@ -320,7 +319,7 @@ namespace BellaHair.Presentation.WebUI
             _db.Add(LoyaltyDiscount.Create("Loyalty test", 1, DiscountPercent.FromDecimal(0.50m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
-            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 15, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
+            _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 20, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
         }
 
         private void AddBirthdayDiscounts()
