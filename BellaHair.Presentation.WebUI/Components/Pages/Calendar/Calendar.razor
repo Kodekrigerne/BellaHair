@@ -40,7 +40,8 @@
                                NextText="Næste"
                                PrevText="Tilbage"
                                LoadData="@OnLoadData"
-                               Culture="@dkCulture">
+                               Culture="@dkCulture"
+                               TodayText="I dag">
     <br />
 
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(OpeningTimes.Value.OpeningTime.Hour))"
@@ -149,10 +150,7 @@
         {
             var bookings = await BookingQuery.GetAllWithinPeriodOnEmployee(start, end, empId);
 
-            _bookings = bookings.Select(b => new BookingCalendarViewModel(
-                b.Id, b.StartDateTime, b.EndDateTime,
-                DateOnly.FromDateTime(b.StartDateTime), TimeOnly.FromDateTime(b.StartDateTime), TimeOnly.FromDateTime(b.EndDateTime),
-                b.EmployeeFullName, b.CustomerFullName, b.TreatmentName, b.DurationMinutes,
+            _bookings = bookings.Select(b => new BookingCalendarViewModel(b.Id, b.StartDateTime, b.EndDateTime, b.EmployeeFullName, b.CustomerFullName, b.TreatmentName, 
                 $"{b.CustomerFullName}\n{b.TreatmentName}\n({b.EmployeeFullName})"
             )).OrderBy(b => b.StartDateTime).ToList();
         }
