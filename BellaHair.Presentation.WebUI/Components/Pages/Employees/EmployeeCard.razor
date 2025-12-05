@@ -33,7 +33,7 @@
 	</Modal>
 			
 	<Modal @bind-IsVisible="@_showTreatmentsModal">
-		<EmployeeTreatmentsModal _treatments="Employee.Treatments" />
+		<EmployeeTreatmentsModal EmployeeName="@Employee.FullName" Treatments="Employee.Treatments" />
 		<button class="btn-add" @onclick="@(() => CloseTreatmentsModal())">Luk</button>
 	</Modal>
 
