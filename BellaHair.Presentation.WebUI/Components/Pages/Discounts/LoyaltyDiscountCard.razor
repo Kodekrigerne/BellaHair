@@ -4,38 +4,59 @@
 @using BellaHair.Ports.Discounts
 @using BellaHair.Presentation.WebUI.Components.Shared;
 
-@inject ILoyaltyDiscountCommand LoyaltyDiscountCommand
-@inject ISnackbar Snackbar;
 
-<div class="ldc-card">
+<div class="ldc-card @CalculateLoyaltyClass()">
 	<div class="header-wrapper">
 		<p class="p-header">@LoyaltyDiscount.Name</p>
 	</div>
 	<p class="ldc-visits">Minimum besøg: @LoyaltyDiscount.MinimumVisits</p>
 	<hr>
-	Fordele:
-	<BinDeleteButton Class="delete-btn" OnClick="@HandleOnDeleteClick"/>
+	<p class="ldc-perks">Fordele:</p>
+
+	@if (LoyaltyDiscount.MinimumVisits >= 20)
+	{
+		<div class="ldc-text-perk">
+			<span class="ldc-highlight">15% rabat</span> på alle behandlinger
+		</div>
+		<div class="ldc-text-perk">
+			<span class="ldc-highlight">10% rabat</span> på alle produkter
+		</div>
+	}
+	else if (LoyaltyDiscount.MinimumVisits >= 10)
+	{
+		<div class="ldc-text-perk">
+			<span class="ldc-highlight">10% rabat</span> på alle behandlinger
+		</div>
+		<div class="ldc-text-perk">
+			<span class="ldc-highlight">5% rabat</span> på alle produkter
+		</div>
+	}
+	else
+	{
+		<div class="ldc-text-perk">
+			<span class="ldc-highlight">5% rabat</span> på alle behandlinger
+		</div>
+	}
+
+
 </div>
 
 @code {
-	[Parameter, EditorRequired]
-	public required LoyaltyDiscountViewModel LoyaltyDiscount { get; set; }
+		[Parameter, EditorRequired]
+		public required LoyaltyDiscountViewModel LoyaltyDiscount { get; set; }
 
-	// Guid type så ID'et af den slettede rabat kan sendes tilbage til Discounts siden, så denne automatisk kan opdatere.
-	[Parameter, EditorRequired]
-	public required EventCallback<Guid> OnDelete { get; set; }
-
-	private async Task HandleOnDeleteClick()
-	{
-		try
+		private string CalculateLoyaltyClass()
 		{
-			var command = new DeleteLoyaltyDiscountCommand(LoyaltyDiscount.Id);
-			await LoyaltyDiscountCommand.DeleteLoyaltyDiscountAsync(command);
-			await OnDelete.InvokeAsync(LoyaltyDiscount.Id);
-			Snackbar.Add("Stamkunderabat slettet.", Severity.Success);
+			if (LoyaltyDiscount.MinimumVisits >= 20)
+			{
+				return "gold";
+			} 
+			if (LoyaltyDiscount.MinimumVisits >= 10)
+			{
+				return "silver";
+			}
+
+				return "bronze";
 		}
-		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
-		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
-	}
 }
 
