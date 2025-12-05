@@ -64,6 +64,7 @@ namespace BellaHair.Infrastructure.Invoices
                 currentDate,
                 booking.CustomerSnapshot!,
                 booking.TreatmentSnapshot!,
+                booking.ProductLineSnapshots,
                 total,
                 discount);
         }
