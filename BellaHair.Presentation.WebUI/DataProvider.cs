@@ -86,14 +86,14 @@ namespace BellaHair.Presentation.WebUI
         {
             AddProducts();
             AddPrivateCustomersUsingBogus();
-            AddLoyaltyDiscounts();
             AddTreatment();
             AddEmployees();
+            AddLoyaltyDiscounts();
             AddCampaignDiscounts();
             AddBirthdayDiscounts();
-            AddBookingsUsingBogusAndHandler();
             AddPastBookingsUsingBogusAndHandler();
             await PayAndInvoicePastBookings();
+            AddBookingsUsingBogusAndHandler();
 
             _db.SaveChanges();
         }
