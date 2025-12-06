@@ -144,10 +144,9 @@
 		{
 			Snackbar.Add(dex.Message, Severity.Error);
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			Snackbar.Add($"Der skete en fejl under indlæsningen af statistikkerne.", Severity.Error);
 		}
 	}
-
 }
