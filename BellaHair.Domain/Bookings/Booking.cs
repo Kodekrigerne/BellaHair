@@ -60,6 +60,7 @@ namespace BellaHair.Domain.Bookings
             CreatedDateTime = currentDateTime;
             IsPaid = false;
             _productLines = [.. productLines];
+            _productLineSnapshots = [];
             UpdateEndDateTime();
         }
 

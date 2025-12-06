@@ -19,7 +19,7 @@
             Value = value;
         }
 
-        public static DurationMinutes FromInt(int duration) => new DurationMinutes(duration);
+        public static DurationMinutes FromInt(int duration) => new(duration);
 
         public static void ValidateDuration(int value)
         {
