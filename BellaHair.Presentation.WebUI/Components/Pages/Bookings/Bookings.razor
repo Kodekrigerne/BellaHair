@@ -149,8 +149,6 @@
 
 	private void ApplyFilter()
 	{
-		Console.WriteLine(_bookings[0].StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")));
-
 		_filteredBookings = _bookings.Where(b => 
 			b.CustomerFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.EmployeeFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||

@@ -173,7 +173,7 @@ namespace BellaHair.Presentation.WebUI
 
                     scope.Dispose();
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                catch { }
             }
         }
 
@@ -219,7 +219,7 @@ namespace BellaHair.Presentation.WebUI
                     createBookingCommands.Add(bookingFaker.Generate());
                 }
 
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                catch { }
             }
 
             createBookingCommands = createBookingCommands.OrderBy(c => c.StartDateTime).ToList();
@@ -240,7 +240,7 @@ namespace BellaHair.Presentation.WebUI
 
                     scope.Dispose();
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                catch { }
             }
         }
 
@@ -271,7 +271,7 @@ namespace BellaHair.Presentation.WebUI
                     _customers.Add(customer);
                     _db.Add(customer);
                 }
-                catch (Exception) { }
+                catch { }
             }
         }
 
