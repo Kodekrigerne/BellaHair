@@ -38,12 +38,12 @@ namespace BellaHair.Domain.Tests.Treatments
             var treatment = Treatment.Create(validName, validPrice, validDuration);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(treatment.Name, Is.EqualTo(validName));
                 Assert.That(treatment.Price.Value, Is.EqualTo(validPrice.Value));
                 Assert.That(treatment.DurationMinutes.Value, Is.EqualTo(validDuration.Value));
-            });
+            }
         }
     }
 }

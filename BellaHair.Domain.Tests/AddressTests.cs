@@ -18,14 +18,14 @@
             var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(testAddress.StreetName, Is.EqualTo(streetName));
                 Assert.That(testAddress.City, Is.EqualTo(city));
                 Assert.That(testAddress.StreetNumber, Is.EqualTo(streetNumber));
                 Assert.That(testAddress.Floor, Is.EqualTo(floor));
                 Assert.That(testAddress.ZipCode, Is.EqualTo(zipCode));
-            });
+            }
         }
 
         [Test]
@@ -41,14 +41,14 @@
             var testAddress = Address.Create(streetName, city, streetNumber, zipCode);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(testAddress.StreetName, Is.EqualTo(streetName));
                 Assert.That(testAddress.City, Is.EqualTo(city));
                 Assert.That(testAddress.StreetNumber, Is.EqualTo(streetNumber));
                 Assert.That(testAddress.Floor, Is.Null);
                 Assert.That(testAddress.ZipCode, Is.EqualTo(zipCode));
-            });
+            }
         }
 
         [Test]
@@ -65,14 +65,14 @@
             var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(testAddress.StreetName, Is.EqualTo(streetName));
                 Assert.That(testAddress.City, Is.EqualTo(city));
                 Assert.That(testAddress.StreetNumber, Is.EqualTo(streetNumber));
                 Assert.That(testAddress.Floor, Is.EqualTo(floor));
                 Assert.That(testAddress.ZipCode, Is.EqualTo(zipCode));
-            });
+            }
         }
 
         [Test]
@@ -89,14 +89,14 @@
             var testAddress = Address.Create(streetName, city, streetNumber, zipCode, floor);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(testAddress.StreetName, Is.EqualTo(streetName));
                 Assert.That(testAddress.City, Is.EqualTo(city));
                 Assert.That(testAddress.StreetNumber, Is.EqualTo(streetNumber));
                 Assert.That(testAddress.Floor, Is.EqualTo(floor));
                 Assert.That(testAddress.ZipCode, Is.EqualTo(zipCode));
-            });
+            }
         }
 
         [Test]

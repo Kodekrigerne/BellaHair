@@ -32,7 +32,7 @@ namespace BellaHair.Domain.Tests.Invoices
             var model = new InvoiceData(id, issueDate, customerSnapshot, treatmentSnapshot, productSnapshots, total, discount);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(model.Id, Is.EqualTo(id));
                 Assert.That(model.IssueDate, Is.EqualTo(issueDate));
@@ -41,7 +41,7 @@ namespace BellaHair.Domain.Tests.Invoices
                 Assert.That(model.Products, Is.EqualTo(productSnapshots));
                 Assert.That(model.Discount, Is.EqualTo(discount));
                 Assert.That(model.Total, Is.EqualTo(total));
-            });
+            }
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace BellaHair.Domain.Tests.Invoices
             var invoice = Invoice.Create(id, booking, pdf);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(invoice.Id, Is.EqualTo(id));
                 Assert.That(invoice.Booking, Is.EqualTo(booking));
@@ -64,7 +64,7 @@ namespace BellaHair.Domain.Tests.Invoices
                 Assert.That(invoice.InvoicePdf[1], Is.EqualTo(pdf[1]));
                 Assert.That(invoice.InvoicePdf[2], Is.EqualTo(pdf[2]));
                 Assert.That(invoice.BookingId, Is.EqualTo(booking.Id));
-            });
+            }
         }
     }
 }

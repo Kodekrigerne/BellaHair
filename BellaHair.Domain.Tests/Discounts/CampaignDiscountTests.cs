@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
@@ -36,14 +30,14 @@ namespace BellaHair.Domain.Tests.Discounts
 
             // Assert
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(campaignDiscount.Name, Is.EqualTo(name));
                 Assert.That(campaignDiscount.DiscountPercent, Is.EqualTo(discountPercent));
                 Assert.That(campaignDiscount.StartDate, Is.EqualTo(startDate));
                 Assert.That(campaignDiscount.EndDate, Is.EqualTo(endDate));
-                Assert.That(campaignDiscount.TreatmentIds, Is.EqualTo(treatmentIds));   
-            });
+                Assert.That(campaignDiscount.TreatmentIds, Is.EqualTo(treatmentIds));
+            }
 
         }
 
@@ -61,7 +55,7 @@ namespace BellaHair.Domain.Tests.Discounts
 
             // Act & Assert
 
-            Assert.Throws<CampaignDiscountException>(() => 
+            Assert.Throws<CampaignDiscountException>(() =>
                 CampaignDiscount.Create(name, discountPercent, startDate, invalidEndDate, treatmentIds));
 
         }
@@ -77,7 +71,7 @@ namespace BellaHair.Domain.Tests.Discounts
             var endDate = new DateTime(2025, 6, 1);
 
             var treatmentIds = new List<Guid>([]);
-            
+
             // Act & Assert
 
             Assert.Throws<CampaignDiscountException>(() =>
@@ -141,7 +135,7 @@ namespace BellaHair.Domain.Tests.Discounts
                 .UseConstructor()
                 .WithSetter(b => b.Treatment, treatment)
                 .WithSetter(b => b.StartDateTime, dateOutOfRange)
-                .WithSetter(b=>b.EndDateTime, dateOutOfRange.AddMinutes(60))
+                .WithSetter(b => b.EndDateTime, dateOutOfRange.AddMinutes(60))
                 .Build();
 
             // Act
@@ -159,7 +153,7 @@ namespace BellaHair.Domain.Tests.Discounts
             // Arrange
 
             var treatmentCampaign = Treatment.Create("Herreklip", Price.FromDecimal(400), DurationMinutes.FromInt(30));
-            var treatmentWrong = Treatment.Create("Dameklip",Price.FromDecimal(500m),DurationMinutes.FromInt(60));
+            var treatmentWrong = Treatment.Create("Dameklip", Price.FromDecimal(500m), DurationMinutes.FromInt(60));
 
             var name = "Kampagne";
             var discountPercent = DiscountPercent.FromDecimal(0.20m);

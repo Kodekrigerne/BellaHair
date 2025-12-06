@@ -24,14 +24,14 @@ namespace BellaHair.Domain.Tests.PrivateCustomers
             var privateCustomer = PrivateCustomer.Create(name, address, phoneNumber, email, birthday, dateTimeProvider);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(privateCustomer.Name.FullName, Is.EqualTo(name.FullName));
                 Assert.That(privateCustomer.Address.FullAddress, Is.EqualTo(address.FullAddress));
                 Assert.That(privateCustomer.PhoneNumber.Value, Is.EqualTo(phoneNumber.Value));
                 Assert.That(privateCustomer.Email.Value, Is.EqualTo(email.Value));
                 Assert.That(privateCustomer.Birthday, Is.EqualTo(birthday));
-            });
+            }
         }
 
         [Test]
