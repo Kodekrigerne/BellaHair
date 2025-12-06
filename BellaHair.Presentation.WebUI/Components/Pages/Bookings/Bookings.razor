@@ -29,7 +29,7 @@
 <div class="kk-container bookings-container">
 	<div class="search-bar-container">
 		<h6>Bookings (@_filteredBookings.Count)</h6>
-		<input type="text" class="form-control booking-search" placeholder="Søg efter booking"
+		<input type="search" class="form-control booking-search" placeholder="Søg efter booking"
 			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
 
 	</div>
