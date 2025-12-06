@@ -36,12 +36,12 @@ namespace BellaHair.Application.Tests.Treatments
 
             // Assert
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(treatmentFromDb!.Name, Is.EqualTo(command.Name));
                 Assert.That(treatmentFromDb!.Price.Value, Is.EqualTo(command.Price));
                 Assert.That(treatmentFromDb!.DurationMinutes.Value, Is.EqualTo(command.DurationMinutes));
-            });
+            }
         }
 
         [Test]
