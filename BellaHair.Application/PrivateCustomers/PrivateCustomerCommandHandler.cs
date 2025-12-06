@@ -2,6 +2,7 @@
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.PrivateCustomers;
+using SharedKernel;
 
 namespace BellaHair.Application.PrivateCustomers
 {

@@ -1,5 +1,10 @@
 ﻿using BellaHair.Application;
-using BellaHair.Domain;
+using BellaHair.Application.Discounts;
+using BellaHair.Application.Employees;
+using BellaHair.Application.Invoices;
+using BellaHair.Application.PrivateCustomers;
+using BellaHair.Application.Products;
+using BellaHair.Application.Treatments;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
@@ -7,6 +12,7 @@ using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
+using BellaHair.Infrastructure;
 using BellaHair.Infrastructure.Bookings;
 using BellaHair.Infrastructure.Discounts;
 using BellaHair.Infrastructure.Employees;
@@ -21,12 +27,53 @@ using BellaHair.Ports.Invoices;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Products;
 using BellaHair.Ports.Treatments;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
-namespace BellaHair.Infrastructure
+namespace CrossCut
 {
     public static class DependencyInjection
     {
+        public static IServiceCollection AddBellaHairContext(this IServiceCollection serviceCollection, string connectionString)
+        {
+            serviceCollection.AddDbContext<BellaHairContext>(options =>
+                options.UseSqlite(connectionString));
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddDbConfigure(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped<DbConfigure>();
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddDataProvider(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped<DataProvider>();
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddApplicationServices(this IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped<ILoyaltyDiscountCommand, LoyaltyDiscountCommandHandler>();
+            serviceCollection.AddScoped<ITreatmentCommand, TreatmentCommandHandler>();
+            serviceCollection.AddScoped<IEmployeeCommand, EmployeeCommandHandler>();
+            serviceCollection.AddScoped<IBookingCommand, BookingCommandHandler>();
+            serviceCollection.AddScoped<ICampaignDiscountCommand, CampaignDiscountCommandHandler>();
+
+            serviceCollection.AddScoped<IPrivateCustomerCommand, PrivateCustomerCommandHandler>();
+
+            serviceCollection.AddScoped<IInvoiceCommand, InvoiceCommandHandler>();
+
+            serviceCollection.AddScoped<IProductCommand, ProductCommandHandler>();
+
+            return serviceCollection;
+        }
+
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IDiscountQuery, DiscountQueryHandler>();

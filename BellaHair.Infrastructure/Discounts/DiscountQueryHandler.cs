@@ -1,9 +1,9 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Discounts
 {

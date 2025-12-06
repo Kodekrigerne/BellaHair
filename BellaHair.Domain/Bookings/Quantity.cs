@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Domain.Bookings
+﻿using SharedKernel;
+
+namespace BellaHair.Domain.Bookings
 {
     //Dennis
     /// <summary>

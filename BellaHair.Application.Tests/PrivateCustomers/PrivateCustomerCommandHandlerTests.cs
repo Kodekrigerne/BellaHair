@@ -4,6 +4,7 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
 namespace BellaHair.Application.Tests.PrivateCustomers
 {

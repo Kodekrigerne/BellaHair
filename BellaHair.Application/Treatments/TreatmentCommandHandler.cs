@@ -1,9 +1,9 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Ports.Treatments;
+using SharedKernel;
 
 namespace BellaHair.Application.Treatments
 {

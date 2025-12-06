@@ -2,6 +2,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using SharedKernel;
 using System.Reflection;
 
 namespace BellaHair.Application.Invoices

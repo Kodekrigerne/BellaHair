@@ -1,6 +1,6 @@
 ﻿// Mikkel Dahlmann
 
-namespace BellaHair.Application.Invoices
+namespace SharedKernel
 {
 
     /// <summary>

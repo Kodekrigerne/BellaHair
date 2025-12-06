@@ -3,6 +3,7 @@ using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.PrivateCustomers;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Tests.PrivateCustomers
 {

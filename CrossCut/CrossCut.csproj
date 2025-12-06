@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.6.5" />
+    <PackageReference Include="FixtureBuilder" Version="1.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BellaHair.Application\BellaHair.Application.csproj" />
+    <ProjectReference Include="..\BellaHair.Domain\BellaHair.Domain.csproj" />
+    <ProjectReference Include="..\BellaHair.Infrastructure\BellaHair.Infrastructure.csproj" />
+    <ProjectReference Include="..\BellaHair.Ports\BellaHair.Ports.csproj" />
+  </ItemGroup>
+
+</Project>

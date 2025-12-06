@@ -1,5 +1,4 @@
 ﻿using BellaHair.Application.Invoices;
-using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.Discounts;
 using BellaHair.Domain.Employees;
@@ -11,6 +10,7 @@ using BellaHair.Ports.Bookings;
 using Microsoft.Extensions.Options;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
+using SharedKernel;
 
 namespace BellaHair.Application
 {

@@ -1,8 +1,8 @@
 using System.Linq;
-using BellaHair.Domain;
 using BellaHair.Domain.Discounts;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Discounts
 {

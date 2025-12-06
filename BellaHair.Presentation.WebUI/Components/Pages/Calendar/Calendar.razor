@@ -1,12 +1,11 @@
 ﻿@page "/kalender"
-@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
-@using BellaHair.Infrastructure
 @using Microsoft.Extensions.Options
 @using Radzen
+@using SharedKernel
 @rendermode InteractiveServer
 @inject IBookingQuery BookingQuery
 @inject IEmployeeQuery EmployeeQuery

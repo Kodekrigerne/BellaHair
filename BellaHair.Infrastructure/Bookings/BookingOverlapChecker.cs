@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Bookings
 {
