@@ -51,27 +51,27 @@ namespace BellaHair.Infrastructure.Employees
         {
             var emp = await _db.Employees
                 .AsNoTracking()
-                .Select(employee => new EmployeeDTOFull(employee.Id,
-                                                        employee.Name.FirstName,
-                                                        employee.Name.MiddleName ?? "",
-                                                        employee.Name.LastName,
-                                                        employee.Name.FullName,
-                                                        employee.Email.Value,
-                                                        employee.PhoneNumber.Value,
-                                                        employee.Address.StreetName,
-                                                        employee.Address.City,
-                                                        employee.Address.StreetNumber,
-                                                        employee.Address.ZipCode,
-                                                        employee.Address.FullAddress,
-                                                            employee.Treatments.Select(e => new TreatmentDTO(
-                                                                e.Id,
-                                                                e.Name,
-                                                                e.Price.Value,
-                                                                e.DurationMinutes.Value,
-                                                                e.Employees.Count)).ToList(),
-
-                                                        employee.Address.Floor))
-                                                        .ToListAsync();
+                .Select(employee => new EmployeeDTOFull(
+                    employee.Id,
+                    employee.Name.FirstName,
+                    employee.Name.MiddleName ?? "",
+                    employee.Name.LastName,
+                    employee.Name.FullName,
+                    employee.Email.Value,
+                    employee.PhoneNumber.Value,
+                    employee.Address.StreetName,
+                    employee.Address.City,
+                    employee.Address.StreetNumber,
+                    employee.Address.ZipCode,
+                    employee.Address.FullAddress,
+                    employee.Treatments.Select(t => new TreatmentDTO(
+                        t.Id,
+                        t.Name,
+                        t.Price.Value,
+                        t.DurationMinutes.Value,
+                        t.Employees.Count)).ToList(),
+                    employee.Address.Floor))
+                    .ToListAsync();
 
             return emp;
         }

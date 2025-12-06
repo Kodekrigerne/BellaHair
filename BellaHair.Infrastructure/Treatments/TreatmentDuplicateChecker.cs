@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Treatments;
+﻿using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Treatments
@@ -19,7 +14,7 @@ namespace BellaHair.Infrastructure.Treatments
         {
             return await _db.Treatments
                 .AsNoTracking()
-                .AnyAsync(t => t.Name.ToLower() == name.ToLower()
+                .AnyAsync(t => t.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)
                                && t.DurationMinutes.Value == duration);
         }
     }
