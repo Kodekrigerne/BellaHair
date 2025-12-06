@@ -149,6 +149,8 @@
 
 	private void ApplyFilter()
 	{
+		Console.WriteLine(_bookings[0].StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")));
+
 		_filteredBookings = _bookings.Where(b => 
 			b.CustomerFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.EmployeeFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
@@ -156,8 +158,9 @@
 			b.CustomerPhone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.CustomerEmail.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.TreatmentName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			(b.DiscountName?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
 			b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+			b.StartDateTime.ToString("dd/MM").Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
 		).ToList();
 	}
 }
