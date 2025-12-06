@@ -22,12 +22,12 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             var discounts = handler.GetAllAsync().GetAwaiter().GetResult();
 
             //Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(discounts, Has.Count.EqualTo(2));
                 Assert.That(discounts.Any(l => l.Id == discount1.Id), Is.True);
                 Assert.That(discounts.Any(l => l.Id == discount2.Id), Is.True);
-            });
+            }
         }
 
         [Test]

@@ -32,12 +32,12 @@ namespace BellaHair.Infrastructure.Tests.PrivateCustomers
             var privateCustomersList = handler.GetPrivateCustomersAsync().GetAwaiter().GetResult();
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(privateCustomersList, Has.Count.EqualTo(2));
                 Assert.That(privateCustomersList.Any(p => p.Id == customer0.Id), Is.True);
                 Assert.That(privateCustomersList.Any(p => p.Id == customer1.Id), Is.True);
-            });
+            }
         }
     }
 }

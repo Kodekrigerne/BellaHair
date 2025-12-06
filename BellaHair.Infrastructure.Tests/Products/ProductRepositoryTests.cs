@@ -22,12 +22,12 @@ namespace BellaHair.Infrastructure.Tests.Products
             // Assert
             repo.SaveChangesAsync().GetAwaiter().GetResult();
             var addedProduct = _db.Products.FirstOrDefault();
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(addedProduct!.Name, Is.EqualTo(name));
                 Assert.That(addedProduct.Description, Is.EqualTo(description));
                 Assert.That(addedProduct.Price.Value, Is.EqualTo(price.Value));
-            });
+            }
         }
     }
 }
