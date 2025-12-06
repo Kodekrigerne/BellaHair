@@ -127,7 +127,7 @@ namespace BellaHair.Infrastructure.Bookings
 
         async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
         {
-            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.bookingId);
+            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.BookingId);
         }
 
         private static IEnumerable<BookingDTO> MapToBookingDTOs(IEnumerable<Booking> bookings)

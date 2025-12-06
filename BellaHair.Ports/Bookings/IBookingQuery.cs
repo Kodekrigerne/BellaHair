@@ -50,5 +50,5 @@ namespace BellaHair.Ports.Bookings
 
     public record GetWithRelationsQuery(Guid Id);
 
-    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId, Guid? bookingId = null);
+    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId, Guid? BookingId = null);
 }
