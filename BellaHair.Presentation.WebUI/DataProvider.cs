@@ -32,8 +32,8 @@ namespace BellaHair.Presentation.WebUI
         }
 
         // Settings
-        private const int NoOfPastBookings = 100;
-        private const int NoOfFutureBookings = 100;
+        private const int NoOfPastBookings = 10;
+        private const int NoOfFutureBookings = 10;
         private const int NoOfCustomers = 50;
 
         // Lists
