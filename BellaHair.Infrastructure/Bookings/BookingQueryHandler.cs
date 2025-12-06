@@ -80,7 +80,7 @@ namespace BellaHair.Infrastructure.Bookings
                 ? new DiscountDTO(
                     booking.Discount.Name,
                     booking.Discount.Amount,
-                    (DiscountTypeDTO)booking.Discount.Type)
+                    (DiscountType)booking.Discount.Type)
                 : null;
 
             return new BookingWithRelationsDTO(
@@ -160,7 +160,7 @@ namespace BellaHair.Infrastructure.Bookings
                 // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
                 b.IsPaid ? b.TreatmentSnapshot!.DurationMinutes : b.Treatment!.DurationMinutes.Value,
 
-                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountTypeDTO)b.Discount.Type) : null
+                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountType)b.Discount.Type) : null
                 );
             });
         }

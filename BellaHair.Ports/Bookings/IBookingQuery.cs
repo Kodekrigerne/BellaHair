@@ -28,7 +28,7 @@ namespace BellaHair.Ports.Bookings
         DiscountDTO? Discount);
 
     public record ProductLineDTO(Guid ProductId, string Name, string Description, decimal Price, int Quantity);
-    public record DiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
+    public record DiscountDTO(string Name, decimal Amount, DiscountType Type);
 
     public record BookingDTO(
         Guid Id,

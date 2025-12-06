@@ -15,7 +15,7 @@ namespace BellaHair.Ports.Bookings
     }
 
     public record CreateProductLine(int Quantity, Guid ProductId);
-    public record DiscountData(string Name, decimal Amount, DiscountTypeDTO Type);
+    public record DiscountData(string Name, decimal Amount, DiscountType Type);
 
     public record PayAndInvoiceBookingCommand(Guid Id, DiscountData? Discount);
 
