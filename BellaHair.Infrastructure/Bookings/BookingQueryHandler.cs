@@ -93,11 +93,33 @@ namespace BellaHair.Infrastructure.Bookings
                 discount);
         }
 
+        async Task<int> IBookingQuery.GetNewCountAsync()
+        {
+            return await _db.Bookings
+                .AsNoTracking()
+                .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
+                .CountAsync();
+        }
+
+        async Task<int> IBookingQuery.GetOldCountAsync()
+        {
+            return await _db.Bookings
+                .AsNoTracking()
+                .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
+                .CountAsync();
+        }
+
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()
+            => await ((IBookingQuery)this).GetAllNewAsync(0, int.MaxValue);
+
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync(int skip, int take)
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
+                .OrderBy(b => b.EndDateTime)
+                .Skip(skip)
+                .Take(take)
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
@@ -110,10 +132,16 @@ namespace BellaHair.Infrastructure.Bookings
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync()
+    => await ((IBookingQuery)this).GetAllOldAsync(0, int.MaxValue);
+
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync(int skip, int take)
         {
             var bookings = await _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
+                .OrderByDescending(b => b.EndDateTime)
+                .Skip(skip)
+                .Take(take)
                 .Include(b => b.Treatment)
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
