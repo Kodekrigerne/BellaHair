@@ -9,7 +9,6 @@
 
 @rendermode InteractiveServer
 
-@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 @inject IBookingQuery BookingQuery
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar;
@@ -46,7 +45,6 @@
 
 	private bool _showDeleteModal = false;
 	private Guid _bookingToDelete;
-	private DateTime _now;
 	private List<BookingViewModel> _bookings = [];
 	private List<BookingViewModel> _filteredBookings = [];
 	private int _count;
@@ -153,7 +151,6 @@
 	private async Task HandleSelectorChanged()
 	{
 		SearchTerm = string.Empty;
-		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 		_count = _activeTab == BookingTab.New ? await BookingQuery.GetNewCountAsync() : await BookingQuery.GetOldCountAsync();
 		_bookings.Clear();
 		_skip = 0;
