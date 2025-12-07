@@ -29,7 +29,7 @@
 
 <div class="kk-container bookings-container" @ref="_scrollDiv">
 	<div class="search-bar-container">
-		<h6>Bookings (@_filteredBookings.Count)</h6>
+		<h6>Bookings (@_count)</h6>
 		<input type="search" class="form-control booking-search" placeholder="Søg efter booking"
 			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
 
@@ -49,6 +49,7 @@
 	private DateTime _now;
 	private List<BookingViewModel> _bookings = [];
 	private List<BookingViewModel> _filteredBookings = [];
+	private int _count;
 
 	private ElementReference _scrollDiv;
 	private bool _busy = false;
@@ -142,6 +143,7 @@
 		SearchTerm = string.Empty;
 		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 		_activeTab = BookingTab.New;
+		_count = await BookingQuery.GetNewCountAsync();
 		await LoadMoreAsync();
 	}
 
@@ -150,6 +152,7 @@
 		SearchTerm = string.Empty;
 		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 		_activeTab = BookingTab.Old;
+		_count = await BookingQuery.GetOldCountAsync();
 		await LoadMoreAsync();
 	}
 
