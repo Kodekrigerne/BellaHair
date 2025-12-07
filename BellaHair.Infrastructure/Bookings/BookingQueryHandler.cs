@@ -7,7 +7,6 @@ using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace BellaHair.Infrastructure.Bookings
 {
@@ -94,33 +93,41 @@ namespace BellaHair.Infrastructure.Bookings
                 discount);
         }
 
-        async Task<int> IBookingQuery.GetNewCountAsync()
+        async Task<int> IBookingQuery.GetNewCountAsync(string? search)
         {
-            return await _db.Bookings
+            var query = _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
-                .CountAsync();
+                .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime());
+
+            var searched = search != null ? ApplySearchFilter(query, search) : query;
+
+            return await searched.CountAsync();
         }
 
-        async Task<int> IBookingQuery.GetOldCountAsync()
+        async Task<int> IBookingQuery.GetOldCountAsync(string? search)
         {
-            return await _db.Bookings
+            var query = _db.Bookings
                 .AsNoTracking()
-                .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
-                .CountAsync();
+                .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime());
+
+            var searched = search != null ? ApplySearchFilter(query, search) : query;
+
+            return await searched.CountAsync();
         }
 
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()
-            => await ((IBookingQuery)this).GetNewPaginatedAsync(0, int.MaxValue);
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync(string? search)
+            => await ((IBookingQuery)this).GetNewPaginatedAsync(0, int.MaxValue, search);
 
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetNewPaginatedAsync(int skip, int take)
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetNewPaginatedAsync(int skip, int take, string? search)
         {
             var ordered = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
                 .OrderBy(b => b.EndDateTime);
 
-            var filtered = FilterNullBookings(ordered)
+            var filtered = FilterNullBookings(ordered);
+            var searched = search != null ? ApplySearchFilter(filtered, search) : filtered;
+            var paginated = searched
                 .Skip(skip)
                 .Take(take)
                 .Include(b => b.Treatment)
@@ -128,20 +135,22 @@ namespace BellaHair.Infrastructure.Bookings
                     .ThenInclude(bpl => bpl.Product)
                 .Include(b => b.ProductLineSnapshots);
 
-            return await MapToBookingDTOs(filtered);
+            return await MapToBookingDTOs(paginated);
         }
 
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync()
-            => await ((IBookingQuery)this).GetOldPaginatedAsync(0, int.MaxValue);
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync(string? search)
+            => await ((IBookingQuery)this).GetOldPaginatedAsync(0, int.MaxValue, search);
 
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetOldPaginatedAsync(int skip, int take)
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetOldPaginatedAsync(int skip, int take, string? search)
         {
             var ordered = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
                 .OrderByDescending(b => b.EndDateTime);
 
-            var filtered = FilterNullBookings(ordered)
+            var filtered = FilterNullBookings(ordered);
+            var searched = search != null ? ApplySearchFilter(filtered, search) : filtered;
+            var paginated = searched
                 .Skip(skip)
                 .Take(take)
                 .Include(b => b.Treatment)
@@ -149,7 +158,7 @@ namespace BellaHair.Infrastructure.Bookings
                     .ThenInclude(bpl => bpl.Product)
                 .Include(b => b.ProductLineSnapshots);
 
-            return await MapToBookingDTOs(filtered);
+            return await MapToBookingDTOs(paginated);
         }
 
         async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
@@ -184,34 +193,29 @@ namespace BellaHair.Infrastructure.Bookings
         private static IQueryable<Booking> ApplySearchFilter(IQueryable<Booking> query, string search)
         {
             if (search == null || search == string.Empty) return query;
+            search = search.ToLower();
 
             return query.Where(b =>
-                (b.Customer != null ? b.Customer.Name.FullName : b.CustomerSnapshot!.FullName)
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (b.Customer != null ? b.Customer.Name.FullName.ToLower() : b.CustomerSnapshot!.FullName.ToLower())
+                    .Contains(search) ||
 
-                (b.Employee != null ? b.Employee.Name.FullName : b.EmployeeSnapshot!.FullName)
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (b.Employee != null ? b.Employee.Name.FullName.ToLower() : b.EmployeeSnapshot!.FullName.ToLower())
+                    .Contains(search) ||
 
-                (b.Customer != null ? b.Customer.Address.FullAddress : b.CustomerSnapshot!.FullAddress)
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (b.Customer != null ? b.Customer.Address.FullAddress.ToLower() : b.CustomerSnapshot!.FullAddress.ToLower())
+                    .Contains(search) ||
 
-                (b.Customer != null ? b.Customer.PhoneNumber.Value : b.CustomerSnapshot!.PhoneNumber)
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (b.Customer != null ? b.Customer.PhoneNumber.Value.ToLower() : b.CustomerSnapshot!.PhoneNumber.ToLower())
+                    .Contains(search) ||
 
-                (b.Customer != null ? b.Customer.Email.Value : b.CustomerSnapshot!.Email)
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (b.Customer != null ? b.Customer.Email.Value.ToLower() : b.CustomerSnapshot!.Email.ToLower())
+                    .Contains(search) ||
 
-                (b.Treatment != null ? b.Treatment.Name : b.TreatmentSnapshot!.Name)
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (b.Treatment != null ? b.Treatment.Name.ToLower() : b.TreatmentSnapshot!.Name.ToLower())
+                    .Contains(search) ||
 
-                (b.Discount != null ? b.Discount.Name : "")
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
-
-                b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK"))
-                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
-
-                b.StartDateTime.ToString("dd/MM")
-                    .Contains(search, StringComparison.OrdinalIgnoreCase)
+                (b.Discount != null ? b.Discount.Name.ToLower() : "")
+                    .Contains(search)
             );
         }
 

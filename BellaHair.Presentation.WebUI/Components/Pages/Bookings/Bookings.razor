@@ -77,7 +77,7 @@
 		if (searchedTerm != null)
 		{
 			SearchTerm = searchedTerm;
-			ApplyFilter();
+			await ApplyFilter();
 		}
 	}
 
@@ -104,7 +104,9 @@
 
 	private async Task LoadMoreAsync()
 	{
-		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize);
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+
+		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
 
 		var newBookings = more.Select(b => new BookingViewModel(
 				b.Id,
@@ -174,26 +176,18 @@
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 
 		_showDeleteModal = false;
-		
+
 		_bookings = _bookings.Where(b => b.Id != _bookingToDelete).ToList();
 		_bookingToDelete = default;
-		ApplyFilter();
 		Snackbar.Add("Bookingen blev slettet.", Severity.Success);
 	}
 
-	private void ApplyFilter()
+	private async Task ApplyFilter()
 	{
-		_filteredBookings = _bookings.Where(b => 
-			b.CustomerFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.EmployeeFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.CustomerAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.CustomerPhone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.CustomerEmail.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.TreatmentName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			(b.DiscountName?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
-			b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("dd/MM").Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
-		).ToList();
+		_bookings.Clear();
+		_skip = 0;
+		_allLoaded = false;
+		await LoadMoreAsync();
 	}
 }
 
