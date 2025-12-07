@@ -154,6 +154,7 @@
 		_count = _activeTab == BookingTab.New ? await BookingQuery.GetNewCountAsync() : await BookingQuery.GetOldCountAsync();
 		_bookings.Clear();
 		_skip = 0;
+		_allLoaded = false;
 		await LoadMoreAsync();
 	}
 
