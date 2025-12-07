@@ -49,6 +49,17 @@
 					}, 100);
 				}
 			</script>
+
+			<script>
+				window.attachDotNetScrollHandler = (element, dotnetHelper) => {
+					element.addEventListener('scroll', function() {
+						if (element.scrollTop + element.clientHeight >= element.scrollHeight - 10) {
+							dotnetHelper.invokeMethodAsync('OnScrollToBottom');
+						}
+					});
+				};
+			</script>
+
 			<RadzenComponents @rendermode="InteractiveServer" />
 		</article>
 	</main>
