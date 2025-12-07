@@ -46,7 +46,6 @@
 	private bool _showDeleteModal = false;
 	private Guid _bookingToDelete;
 	private List<BookingViewModel> _bookings = [];
-	private List<BookingViewModel> _filteredBookings = [];
 	private int _count;
 
 	private ElementReference _scrollDiv;
@@ -71,7 +70,7 @@
 
 		if (SearchTerm != null) searchedTerm = SearchTerm;
 
-		if(Tab == "old") await HandleOldSelectorClick();
+		if (Tab == "old") await HandleOldSelectorClick();
 		else await HandleNewSelectorClick();
 
 		if (searchedTerm != null)
@@ -153,11 +152,7 @@
 	private async Task HandleSelectorChanged()
 	{
 		SearchTerm = string.Empty;
-		_count = _activeTab == BookingTab.New ? await BookingQuery.GetNewCountAsync() : await BookingQuery.GetOldCountAsync();
-		_bookings.Clear();
-		_skip = 0;
-		_allLoaded = false;
-		await LoadMoreAsync();
+		await ApplyFilter();
 	}
 
 	private void HandleDeleteClick(Guid id)
@@ -179,6 +174,11 @@
 
 		_bookings = _bookings.Where(b => b.Id != _bookingToDelete).ToList();
 		_bookingToDelete = default;
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+		_count = _activeTab == BookingTab.New
+			? await BookingQuery.GetNewCountAsync(search)
+			: await BookingQuery.GetOldCountAsync(search);
+		_skip -= 1;
 		Snackbar.Add("Bookingen blev slettet.", Severity.Success);
 	}
 
