@@ -115,10 +115,12 @@ namespace BellaHair.Infrastructure.Bookings
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetNewPaginatedAsync(int skip, int take)
         {
-            var bookings = _db.Bookings
+            var ordered = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
-                .OrderBy(b => b.EndDateTime)
+                .OrderBy(b => b.EndDateTime);
+
+            var filtered = FilterNullBookings(ordered)
                 .Skip(skip)
                 .Take(take)
                 .Include(b => b.Treatment)
@@ -126,7 +128,7 @@ namespace BellaHair.Infrastructure.Bookings
                     .ThenInclude(bpl => bpl.Product)
                 .Include(b => b.ProductLineSnapshots);
 
-            return await MapToBookingDTOs(bookings);
+            return await MapToBookingDTOs(filtered);
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync()
@@ -134,10 +136,12 @@ namespace BellaHair.Infrastructure.Bookings
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetOldPaginatedAsync(int skip, int take)
         {
-            var bookings = _db.Bookings
+            var ordered = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
-                .OrderByDescending(b => b.EndDateTime)
+                .OrderByDescending(b => b.EndDateTime);
+
+            var filtered = FilterNullBookings(ordered)
                 .Skip(skip)
                 .Take(take)
                 .Include(b => b.Treatment)
@@ -145,7 +149,7 @@ namespace BellaHair.Infrastructure.Bookings
                     .ThenInclude(bpl => bpl.Product)
                 .Include(b => b.ProductLineSnapshots);
 
-            return await MapToBookingDTOs(bookings);
+            return await MapToBookingDTOs(filtered);
         }
 
         async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
