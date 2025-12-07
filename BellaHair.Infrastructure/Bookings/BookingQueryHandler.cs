@@ -7,6 +7,7 @@ using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace BellaHair.Infrastructure.Bookings
 {
@@ -110,89 +111,47 @@ namespace BellaHair.Infrastructure.Bookings
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync()
-            => await ((IBookingQuery)this).GetAllNewAsync(0, int.MaxValue);
+            => await ((IBookingQuery)this).GetNewPaginatedAsync(0, int.MaxValue);
 
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllNewAsync(int skip, int take)
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetNewPaginatedAsync(int skip, int take)
         {
-            var bookings = await _db.Bookings
+            var bookings = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
                 .OrderBy(b => b.EndDateTime)
                 .Skip(skip)
                 .Take(take)
                 .Include(b => b.Treatment)
-                .Include(b => b.Customer)
-                .Include(b => b.Employee)
                 .Include(b => b.ProductLines)
                     .ThenInclude(bpl => bpl.Product)
-                .Include(b => b.ProductLineSnapshots)
-                .ToListAsync();
+                .Include(b => b.ProductLineSnapshots);
 
-            return MapToBookingDTOs(bookings);
+            return await MapToBookingDTOs(bookings);
         }
 
         async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync()
-    => await ((IBookingQuery)this).GetAllOldAsync(0, int.MaxValue);
+            => await ((IBookingQuery)this).GetOldPaginatedAsync(0, int.MaxValue);
 
-        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetAllOldAsync(int skip, int take)
+        async Task<IEnumerable<BookingDTO>> IBookingQuery.GetOldPaginatedAsync(int skip, int take)
         {
-            var bookings = await _db.Bookings
+            var bookings = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
                 .OrderByDescending(b => b.EndDateTime)
                 .Skip(skip)
                 .Take(take)
                 .Include(b => b.Treatment)
-                .Include(b => b.Customer)
-                .Include(b => b.Employee)
                 .Include(b => b.ProductLines)
                     .ThenInclude(bpl => bpl.Product)
-                .Include(b => b.ProductLineSnapshots)
-                .ToListAsync();
+                .Include(b => b.ProductLineSnapshots);
 
-            return MapToBookingDTOs(bookings);
+            return await MapToBookingDTOs(bookings);
         }
 
         async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
         {
             return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.BookingId);
         }
-
-        private static IEnumerable<BookingDTO> MapToBookingDTOs(IEnumerable<Booking> bookings)
-        {
-            // Meget verbos, men nødvendigt da relationer kan være slettet for gamle bookings
-            // Exceptions kastes kun hvis relationen er slettet OG der ikke er sat snapshots (hvilket der skal være, dermed fejl)
-            return bookings.Select(b =>
-            {
-                if (b.Employee == null && b.EmployeeSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} does not have an employee attached.");
-                if (b.Customer == null && b.CustomerSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} does not have a customer attached.");
-                if (b.Treatment == null && b.TreatmentSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} does not have a treatment attached.");
-                if (b.IsPaid && b.TreatmentSnapshot == null) throw new InvalidOperationException($"Booking {b.Id} is paid but missing a TreatmentSnapshot.");
-                if (!b.IsPaid && b.Treatment == null) throw new InvalidOperationException($"Booking {b.Id} is unpaid but missing a treatment.");
-
-                return new BookingDTO(
-                b.Id,
-                b.StartDateTime,
-                b.EndDateTime,
-                b.IsPaid,
-                b.TotalBase,
-                b.TotalWithDiscount,
-                b.Employee?.Name.FullName ?? b.EmployeeSnapshot!.FullName,
-                b.Customer?.Name.FullName ?? b.CustomerSnapshot!.FullName,
-                b.Customer?.Address.FullAddress ?? b.CustomerSnapshot!.FullAddress,
-                b.Customer?.PhoneNumber.Value ?? b.CustomerSnapshot!.PhoneNumber,
-                b.Customer?.Email.Value ?? b.CustomerSnapshot!.Email,
-                b.Treatment?.Name ?? b.TreatmentSnapshot!.Name,
-
-                // Hvis bookingen er betalt (?) bruger vi den snapshottede treatment tid da dennes historiske værdi er mest relevant
-                // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
-                b.IsPaid ? b.TreatmentSnapshot!.DurationMinutes : b.Treatment!.DurationMinutes.Value,
-
-                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountType)b.Discount.Type) : null
-                );
-            });
-        }
-
 
         /// <summary>
         /// Returns all bookings on specific employee within a specific range of date.
@@ -206,6 +165,76 @@ namespace BellaHair.Infrastructure.Bookings
         {
             return await _db.Bookings.AsNoTracking().Where(b => b.Customer != null && b.Treatment != null && b.Employee != null && employeeId == b.Employee.Id && b.StartDateTime > startDate && b.EndDateTime < endDate)
                 .Select(b => new BookingCalendarDTO(b.Id, b.StartDateTime, b.EndDateTime, b.Employee!.Name.FullName, b.Customer!.Name.FullName, b.Treatment!.Name)).ToListAsync();
+        }
+
+        private static IQueryable<Booking> FilterNullBookings(IQueryable<Booking> query)
+        {
+            return query.Where(b =>
+                (b.Employee != null || b.EmployeeSnapshot != null) &&
+                (b.Customer != null || b.CustomerSnapshot != null) &&
+                (b.Treatment != null || b.TreatmentSnapshot != null) &&
+                ((b.IsPaid && b.TreatmentSnapshot != null) ||
+                (!b.IsPaid && b.Treatment != null)));
+        }
+
+        private static IQueryable<Booking> ApplySearchFilter(IQueryable<Booking> query, string search)
+        {
+            if (search == null || search == string.Empty) return query;
+
+            return query.Where(b =>
+                (b.Customer != null ? b.Customer.Name.FullName : b.CustomerSnapshot!.FullName)
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                (b.Employee != null ? b.Employee.Name.FullName : b.EmployeeSnapshot!.FullName)
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                (b.Customer != null ? b.Customer.Address.FullAddress : b.CustomerSnapshot!.FullAddress)
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                (b.Customer != null ? b.Customer.PhoneNumber.Value : b.CustomerSnapshot!.PhoneNumber)
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                (b.Customer != null ? b.Customer.Email.Value : b.CustomerSnapshot!.Email)
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                (b.Treatment != null ? b.Treatment.Name : b.TreatmentSnapshot!.Name)
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                (b.Discount != null ? b.Discount.Name : "")
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK"))
+                    .Contains(search, StringComparison.OrdinalIgnoreCase) ||
+
+                b.StartDateTime.ToString("dd/MM")
+                    .Contains(search, StringComparison.OrdinalIgnoreCase)
+            );
+        }
+
+        private static async Task<IEnumerable<BookingDTO>> MapToBookingDTOs(IQueryable<Booking> query)
+        {
+            return await query
+            .Select(b => new BookingDTO(
+                b.Id,
+                b.StartDateTime,
+                b.EndDateTime,
+                b.IsPaid,
+                b.TotalBase,
+                b.TotalWithDiscount,
+                b.Employee != null ? b.Employee.Name.FullName : b.EmployeeSnapshot!.FullName,
+                b.Customer != null ? b.Customer.Name.FullName : b.CustomerSnapshot!.FullName,
+                b.Customer != null ? b.Customer.Address.FullAddress : b.CustomerSnapshot!.FullAddress,
+                b.Customer != null ? b.Customer.PhoneNumber.Value : b.CustomerSnapshot!.PhoneNumber,
+                b.Customer != null ? b.Customer.Email.Value : b.CustomerSnapshot!.Email,
+                b.Treatment != null ? b.Treatment.Name : b.TreatmentSnapshot!.Name,
+
+                // Hvis bookingen er betalt (?) bruger vi den snapshottede treatment tid da dennes historiske værdi er mest relevant
+                // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
+                b.IsPaid ? b.TreatmentSnapshot!.DurationMinutes : b.Treatment!.DurationMinutes.Value,
+
+                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountType)b.Discount.Type) : null
+                ))
+            .ToListAsync();
         }
     }
 }
