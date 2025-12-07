@@ -184,9 +184,15 @@
 
 	private async Task ApplyFilter()
 	{
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+
 		_bookings.Clear();
 		_skip = 0;
 		_allLoaded = false;
+		_count = _activeTab == BookingTab.New
+			? await BookingQuery.GetNewCountAsync(search)
+			: await BookingQuery.GetOldCountAsync(search);
+		
 		await LoadMoreAsync();
 	}
 }
