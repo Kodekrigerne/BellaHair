@@ -666,10 +666,8 @@
             if (discountDTO == null)
             {
                 _showBirthdayOption = false;
-                return;
-            }
-
-            if (discountDTO.Type == DiscountType.BirthdayDiscount)
+			}
+            else if (discountDTO.Type == DiscountType.BirthdayDiscount)
             {
                 _showBirthdayOption = true;
                 _useBirthdayDiscount = true;
