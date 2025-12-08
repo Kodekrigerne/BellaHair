@@ -118,7 +118,7 @@
     right: 5rem;
 }
 
-::deep .btn-add {
+::deep .bookings {
     height: 1rem;
     width: 6rem;
     padding-left: 6px;
@@ -135,6 +135,9 @@
     border-color: mediumpurple;
     font-weight: 500;
 }
+.bookings:hover {
+    color: white;
+}
 
 .calender:hover {
     color: white;
@@ -144,7 +147,8 @@
 .treatment-calendar-button-container {
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 0.5rem;
     align-items: center;
     margin-bottom: 10px;
 }
