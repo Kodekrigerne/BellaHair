@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments.ValueObjects;
+using SharedKernel;
 
 namespace BellaHair.Domain.Treatments
 {

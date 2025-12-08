@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Domain.Treatments.ValueObjects
+﻿using SharedKernel;
+
+namespace BellaHair.Domain.Treatments.ValueObjects
 {
     //Mikkel Klitgaard
 

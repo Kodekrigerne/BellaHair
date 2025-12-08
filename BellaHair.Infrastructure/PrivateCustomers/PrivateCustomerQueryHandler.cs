@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain;
-using BellaHair.Ports.PrivateCustomers;
+﻿using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {

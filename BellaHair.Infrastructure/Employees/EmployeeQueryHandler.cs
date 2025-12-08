@@ -1,7 +1,7 @@
-﻿using BellaHair.Domain;
-using BellaHair.Ports.Employees;
+﻿using BellaHair.Ports.Employees;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Employees
 {

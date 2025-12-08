@@ -1,4 +1,4 @@
-﻿using BellaHair.Domain;
+﻿using SharedKernel;
 
 namespace BellaHair.Infrastructure
 {

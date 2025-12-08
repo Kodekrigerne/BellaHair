@@ -1,12 +1,11 @@
 ﻿@page "/kalender"
-@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
-@using BellaHair.Infrastructure
 @using Microsoft.Extensions.Options
 @using Radzen
+@using SharedKernel
 @rendermode InteractiveServer
 @inject IBookingQuery BookingQuery
 @inject IEmployeeQuery EmployeeQuery
@@ -46,9 +45,11 @@
 
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(OpeningTimes.Value.OpeningTime.Hour))"
                     EndTime="@(TimeSpan.FromHours(OpeningTimes.Value.ClosingTime.Hour))"
-                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
+                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" 
+                    Text="Uge"/>
 
-    <RadzenMonthView />
+    <RadzenMonthView 
+        Text="Måned"/>
 
 </Radzen.Blazor.RadzenScheduler>
 

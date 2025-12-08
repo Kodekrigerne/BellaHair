@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Employees;
+﻿using BellaHair.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 // Linnea
 

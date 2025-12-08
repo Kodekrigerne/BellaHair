@@ -1,4 +1,6 @@
 ﻿
+using SharedKernel;
+
 namespace BellaHair.Domain.Discounts
 {
     //Dennis

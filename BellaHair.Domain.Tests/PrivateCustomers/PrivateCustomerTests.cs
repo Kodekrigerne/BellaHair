@@ -2,6 +2,7 @@
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure;
 using FixtureBuilder;
+using SharedKernel;
 
 namespace BellaHair.Domain.Tests.PrivateCustomers
 {

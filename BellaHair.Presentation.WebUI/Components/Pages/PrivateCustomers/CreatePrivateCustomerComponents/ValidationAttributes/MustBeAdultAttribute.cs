@@ -1,7 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using BellaHair.Domain;
-using BellaHair.Infrastructure;
+﻿using SharedKernel;
+using System.ComponentModel.DataAnnotations;
 
 namespace BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers.CreatePrivateCustomerComponents.ValidationAttributes;
 
@@ -23,13 +21,7 @@ public class MustBeAdultAttribute : ValidationAttribute
     {
         if (input is DateTime dateTimeValue)
         {
-            var dateTimeProvider =
-                validationContext.GetService(typeof(ICurrentDateTimeProvider)) as ICurrentDateTimeProvider;
-
-            if (dateTimeProvider == null)
-            {
-                return new ValidationResult("Internal validation error: Date Time Provider not found.");
-            }
+            var dateTimeProvider = validationContext.GetRequiredService<ICurrentDateTimeProvider>();
 
             var currentDateTime = dateTimeProvider.GetCurrentDateTime();
 

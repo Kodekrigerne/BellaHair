@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
@@ -7,12 +6,13 @@ using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Bookings
 {
     //Dennis
     /// <inheritdoc cref="IBookingQuery"/>
-    internal class BookingQueryHandler : IBookingQuery
+    public class BookingQueryHandler : IBookingQuery
     {
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;

@@ -2,6 +2,7 @@
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.PrivateCustomers;
+using SharedKernel;
 
 namespace BellaHair.Application.PrivateCustomers
 {
@@ -109,7 +110,7 @@ namespace BellaHair.Application.PrivateCustomers
 
         private static string FormatName(string? input)
         {
-            if (string.IsNullOrEmpty(input)) return string.Empty;
+            if (string.IsNullOrEmpty(input)) return input!;
 
             string firstChar = input[0].ToString().ToUpperInvariant();
             string restOfString = input[1..].ToLowerInvariant();

@@ -1,8 +1,8 @@
-﻿@using BellaHair.Domain
-@using BellaHair.Infrastructure
+﻿@using BellaHair.Infrastructure
 @using BellaHair.Ports.Employees
-@using BellaHair.Presentation.WebUI.Components.Shared;
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents;
+@using BellaHair.Presentation.WebUI.Components.Shared;
+@using SharedKernel
 @inject IEmployeeCommand EmployeeCommand
 @inject IEmployeeQuery EmployeeQuery
 @inject NavigationManager NavigationManager
@@ -20,8 +20,8 @@
 					Disse skal slettes før medarbejderen kan slettes.
 				</p>
 			<button class="btn-add" @onclick="@(() => CloseDeleteModal())">Annuller</button>
-			}
-
+			} 
+			 
 			@* Hvis medarbejderen ikke har fremtidige bookinger, vises dette. *@
 			else
 			{
@@ -33,7 +33,7 @@
 	</Modal>
 			
 	<Modal @bind-IsVisible="@_showTreatmentsModal">
-		<EmployeeTreatmentsModal _treatments="Employee.Treatments" />
+		<EmployeeTreatmentsModal EmployeeName="@Employee.FullName" Treatments="Employee.Treatments" />
 		<button class="btn-add" @onclick="@(() => CloseTreatmentsModal())">Luk</button>
 	</Modal>
 
@@ -69,28 +69,21 @@
 					@Employee.FullAddress
 				</div>
 			</div>
-		<div class="treatment-calendar-button-container">
-			<div class="treatments-employees-container">
-				@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in Employee.Treatments)
-							{															
-								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
-							}
-						</div>
-
-						<div class="calendar-button">
-							<button class="btn-add calender" @onclick="NavigateToCalendar"> <VisitsIcon Class="employee-icons" /> Se kalender</button>
-						</div>
-		</div>
-
-
-					</div>
+			</div>
+			<div class="buttons-container">
+			<div class="treatment-calendar-button-container">
+		<button class="btn-add bookings" style="width: 7rem;" @onclick="HandleOnViewTreatmentsClick"> Se behandlinger </button>
+		<button class="btn-add bookings" @onclick="NavigateToCalendar">Se kalender</button>
+			</div>
+</div>
 
 	<div class="delete-edit-buttons d-flex gap-2" style="width: 0%;">
 		<EditButton onclick="@(() => showEditModal = true)" />
 			<BinDeleteButton OnClick="@HandleOnDeleteClick" />
 	</div>
-</div>
+					</div>
+					
+
 
 @code
 {

@@ -11,8 +11,10 @@ using BellaHair.Infrastructure;
 using BellaHair.Ports.Bookings;
 using Bogus;
 using FixtureBuilder;
+using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
-namespace BellaHair.Presentation.WebUI
+namespace CrossCut
 {
     // Dennis, Linnea, Mikkel Dahlmann
     /// <summary>
@@ -161,7 +163,7 @@ namespace BellaHair.Presentation.WebUI
                             }
                             var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
                             var bookingMinutes = f.Random.Int(0, Math.Max(0, 60 - treatment.DurationMinutes.Value));
-                            bookingMinutes -= (bookingMinutes % 15);
+                            bookingMinutes -= bookingMinutes % 15;
 
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
@@ -211,7 +213,7 @@ namespace BellaHair.Presentation.WebUI
                             }
                             var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
                             var bookingMinutes = f.Random.Int(0, Math.Max(0, 60 - treatment.DurationMinutes.Value));
-                            bookingMinutes -= (bookingMinutes % 15);
+                            bookingMinutes -= bookingMinutes % 15;
 
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
