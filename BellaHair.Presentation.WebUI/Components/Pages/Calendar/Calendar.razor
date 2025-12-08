@@ -1,12 +1,11 @@
 ﻿@page "/kalender"
-@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Employees
 @using BellaHair.Presentation.WebUI.Components.Pages.Bookings
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
-@using BellaHair.Infrastructure
 @using Microsoft.Extensions.Options
 @using Radzen
+@using SharedKernel
 @rendermode InteractiveServer
 @inject IBookingQuery BookingQuery
 @inject IEmployeeQuery EmployeeQuery
@@ -23,16 +22,16 @@
         <p>Vælg den medarbejder, du vil se kalenderen for.</p>
     </div>
     <div class="top-page-item">
-        <RadzenDropDown TValue="Guid" Data="@_employees" TextProperty="Fullname" ValueProperty="Id" @bind-Value="@(_pickedEmployeeId)" Change="@HandlePickedEmployee" />
+        <RadzenDropDown TValue="Guid" Data="@_employees" TextProperty="Fullname" ValueProperty="Id" @bind-Value="@(_pickedEmployeeId)" Change="@HandlePickedEmployee" Style="user-select: none;" />
     </div>
 </div>
 
-<Radzen.Blazor.RadzenScheduler @ref="scheduler"
+<Radzen.Blazor.RadzenScheduler @ref="_scheduler"
                                Data="@_bookings"
                                TItem="BookingCalendarViewModel"
                                StartProperty="StartDateTime"
                                EndProperty="EndDateTime"
-                               @bind-CurrentDate="@currentDate"
+                               @bind-CurrentDate="@_currentDate"
                                Style="height: 33rem;"
                                TextProperty="AllBookingInfo"
                                AppointmentRender="@OnAppointmentRender"
@@ -40,28 +39,30 @@
                                NextText="Næste"
                                PrevText="Tilbage"
                                LoadData="@OnLoadData"
-                               Culture="@dkCulture"
+                               Culture="@_dkCulture"
                                TodayText="I dag">
     <br />
 
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(OpeningTimes.Value.OpeningTime.Hour))"
                     EndTime="@(TimeSpan.FromHours(OpeningTimes.Value.ClosingTime.Hour))"
-                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
+                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" 
+                    Text="Uge"/>
 
-    <RadzenMonthView />
+    <RadzenMonthView 
+        Text="Måned"/>
 
 </Radzen.Blazor.RadzenScheduler>
 
 @code
 {
-    System.Globalization.CultureInfo dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
-    RadzenScheduler<BookingCalendarViewModel> scheduler;
+    private System.Globalization.CultureInfo _dkCulture = new System.Globalization.CultureInfo("da-DK") { DateTimeFormat = { ShortDatePattern = "d. MMMM yyyy" } };
+    private RadzenScheduler<BookingCalendarViewModel>? _scheduler;
 
-    public List<BookingCalendarViewModel> _bookings { get; set; } = new List<BookingCalendarViewModel>();
-    public List<EmployeeNameViewModel> _employees { get; set; } = new List<EmployeeNameViewModel>();
+    private List<BookingCalendarViewModel> _bookings = new List<BookingCalendarViewModel>();
+    private List<EmployeeNameViewModel> _employees = new List<EmployeeNameViewModel>();
 
-    public DateTime currentDate { get; set; }
-    public Guid _pickedEmployeeId { get; set; }
+    private DateTime _currentDate;
+    private Guid _pickedEmployeeId;
 
     private bool _checkForInitialLoad = false;
 
@@ -74,14 +75,14 @@
     {
         await LoadEmployees();
 
-        if (UrlDate != null) currentDate = UrlDate.Value;
-        else currentDate = CurrentDateTime.GetCurrentDateTime();
+        if (UrlDate != null) _currentDate = UrlDate.Value;
+        else _currentDate = CurrentDateTime.GetCurrentDateTime();
 
         // Vi sætter denne til sand så vi kan følge i OnLoadData() om data loades ifbm initialisering eller om det er til når vi ændrer på dato
         _checkForInitialLoad = true;
     }
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         // Henter medarbejder fra URLen
         if (UrlEmployeeId.HasValue && _employees.Any(e => e.Id == UrlEmployeeId.Value))
@@ -96,18 +97,18 @@
         }
 
         // Justerer datoen så den bliver sat til denne uges mandag (nødvendigt for at alt indlæses rigtigt)
-        UrlDate = DateToThisWeeksMonday(currentDate);
+        UrlDate = DateToThisWeeksMonday(_currentDate);
 
         // Henter datoen fra URLen
-        if (UrlDate.HasValue && UrlDate.Value.Date != currentDate.Date)
+        if (UrlDate.HasValue && UrlDate.Value.Date != _currentDate.Date)
         {
-            currentDate = UrlDate.Value;
+            _currentDate = UrlDate.Value;
         }
     }
 
     private async Task OnLoadData(SchedulerLoadDataEventArgs args)
     {
-        if (_checkForInitialLoad) { args.Start = currentDate; args.End = currentDate.AddDays(7); scheduler.CurrentDate = args.Start; }
+        if (_checkForInitialLoad && _scheduler != null) { args.Start = _currentDate; args.End = _currentDate.AddDays(7); _scheduler.CurrentDate = args.Start; }
         _checkForInitialLoad = false;
 
 
@@ -131,7 +132,7 @@
 
     private async Task HandlePickedEmployee(object value)
     {
-        if (scheduler != null) await scheduler.Reload();
+        if (_scheduler != null) await _scheduler.Reload();
     }
 
     private async Task LoadEmployees()

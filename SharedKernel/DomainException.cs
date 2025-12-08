@@ -1,4 +1,4 @@
-﻿namespace BellaHair.Domain
+﻿namespace SharedKernel
 {
     public class DomainException : Exception
     {

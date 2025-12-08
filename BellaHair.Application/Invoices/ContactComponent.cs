@@ -1,45 +1,49 @@
 ﻿using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-// Mikkel Dahlmann
-
-/// <summary>
-/// Represents a component that displays customer contact information in a formatted layout.
-/// </summary>
-
-public class ContactComponent : IComponent
+namespace BellaHair.Application.Invoices
 {
-    private string Address { get; }
-    private string Name { get; }
-    private string Email { get; }
-    private string PhoneNumber { get; }
-    private string Title { get; }
-    private string CvrNumber { get; }
 
+    // Mikkel Dahlmann
 
-    public ContactComponent(string title, string address, string name, string email, string phoneNumber, string? cvrNumber = null)
+    /// <summary>
+    /// Represents a component that displays customer contact information in a formatted layout.
+    /// </summary>
+
+    public class ContactComponent : IComponent
     {
-        Title = title;
-        Address = address;
-        Name = name;
-        Email = email;
-        PhoneNumber = phoneNumber;
-        CvrNumber = cvrNumber ?? "";
-    }
+        private string Address { get; }
+        private string Name { get; }
+        private string Email { get; }
+        private string PhoneNumber { get; }
+        private string Title { get; }
+        private string CvrNumber { get; }
 
-    public void Compose(IContainer container)
-    {
-        container.Column(column =>
+
+        public ContactComponent(string title, string address, string name, string email, string phoneNumber, string? cvrNumber = null)
         {
-            column.Spacing(2);
+            Title = title;
+            Address = address;
+            Name = name;
+            Email = email;
+            PhoneNumber = phoneNumber;
+            CvrNumber = cvrNumber ?? "";
+        }
 
-            column.Item().BorderBottom(1).PaddingBottom(5).Text(Title).SemiBold();
+        public void Compose(IContainer container)
+        {
+            container.Column(column =>
+            {
+                column.Spacing(2);
 
-            column.Item().Text(Name);
-            column.Item().Text(Address);
-            column.Item().Text($"Telefon: {PhoneNumber}");
-            column.Item().Text($"Email: {Email}");
-            if (CvrNumber != "") column.Item().Text($"CVR: {CvrNumber}");
-        });
+                column.Item().BorderBottom(1).PaddingBottom(5).Text(Title).SemiBold();
+
+                column.Item().Text(Name);
+                column.Item().Text(Address);
+                column.Item().Text($"Telefon: {PhoneNumber}");
+                column.Item().Text($"Email: {Email}");
+                if (CvrNumber != "") column.Item().Text($"CVR: {CvrNumber}");
+            });
+        }
     }
 }

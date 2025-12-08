@@ -1,11 +1,14 @@
 using BellaHair.Application;
 using BellaHair.Application.Invoices;
 using BellaHair.Infrastructure;
+using BellaHair.Ports.Bookings;
 using BellaHair.Presentation.WebUI.Components;
+using CrossCut;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
 using Radzen;
+using SharedKernel;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -20,15 +23,17 @@ namespace BellaHair.Presentation.WebUI
                 .AddInteractiveServerComponents();
 
             builder.Services.AddDbContext<BellaHairContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SimplyConnectionString"))
+                options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext"))
             );
 
-            // Dette fjerner væggen af sql i konsollen så vi kan se vores consone writelines
+            // Dette fjerner væggen af sql i konsollen så vi kan se vores console writelines
             // Kommenter den ud hvis du skal se den sql der bliver kørt
             builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
+            builder.Services.AddDbConfigure();
+            builder.Services.AddDataProvider();
 
             builder.Services.AddScoped<DataProvider>();
 
@@ -54,19 +59,19 @@ namespace BellaHair.Presentation.WebUI
 
             var app = builder.Build();
 
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
-            //    context.Database.EnsureDeleted();
-            //    context.Database.EnsureCreated();
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
 
-            //    var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+                var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
 
-            //    context.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
+                context.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
 
-            //    var dataProvider = new DataProvider(context, scope.ServiceProvider);
-            //    dataProvider.AddData().Wait();
-            //}
+                var dataProvider = new DataProvider(context, scope.ServiceProvider);
+                dataProvider.AddData().Wait();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

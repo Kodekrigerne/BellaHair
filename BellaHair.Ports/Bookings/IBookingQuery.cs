@@ -12,8 +12,12 @@ namespace BellaHair.Ports.Bookings
     public interface IBookingQuery
     {
         Task<BookingWithRelationsDTO> GetWithRelationsAsync(GetWithRelationsQuery query);
-        Task<IEnumerable<BookingDTO>> GetAllNewAsync();
-        Task<IEnumerable<BookingDTO>> GetAllOldAsync();
+        Task<int> GetNewCountAsync(string? search = null);
+        Task<int> GetOldCountAsync(string? search = null);
+        Task<IEnumerable<BookingDTO>> GetAllNewAsync(string? search = null);
+        Task<IEnumerable<BookingDTO>> GetNewPaginatedAsync(int skip, int take, string? search = null);
+        Task<IEnumerable<BookingDTO>> GetAllOldAsync(string? search = null);
+        Task<IEnumerable<BookingDTO>> GetOldPaginatedAsync(int skip, int take, string? search = null);
         Task<IEnumerable<BookingCalendarDTO>> GetAllWithinPeriodOnEmployee(DateTime startDateTime, DateTime endDateTime, Guid employeeId);
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
@@ -28,7 +32,7 @@ namespace BellaHair.Ports.Bookings
         DiscountDTO? Discount);
 
     public record ProductLineDTO(Guid ProductId, string Name, string Description, decimal Price, int Quantity);
-    public record DiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
+    public record DiscountDTO(string Name, decimal Amount, DiscountType Type);
 
     public record BookingDTO(
         Guid Id,
@@ -50,5 +54,5 @@ namespace BellaHair.Ports.Bookings
 
     public record GetWithRelationsQuery(Guid Id);
 
-    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId, Guid? bookingId = null);
+    public record BookingIsAvailableQuery(DateTime StartDateTime, int DurationMinutes, Guid EmployeeId, Guid CustomerId, Guid? BookingId = null);
 }

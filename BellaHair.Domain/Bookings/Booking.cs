@@ -4,6 +4,7 @@ using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
+using SharedKernel;
 
 namespace BellaHair.Domain.Bookings
 {
@@ -60,6 +61,7 @@ namespace BellaHair.Domain.Bookings
             CreatedDateTime = currentDateTime;
             IsPaid = false;
             _productLines = [.. productLines];
+            _productLineSnapshots = [];
             UpdateEndDateTime();
         }
 
@@ -135,7 +137,7 @@ namespace BellaHair.Domain.Bookings
             EndDateTime = StartDateTime.AddMinutes(Treatment.DurationMinutes.Value);
         }
 
-        public void SetDiscount(BookingDiscount discount)
+        public void SetDiscount(BookingDiscount? discount)
         {
             if (IsPaid) throw new BookingException("Kan ikke opdatere en betalt booking.");
 

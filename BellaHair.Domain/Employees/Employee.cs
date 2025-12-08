@@ -3,6 +3,7 @@ using BellaHair.Domain;
 using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
+using SharedKernel;
 
 // Linnea
 

@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain.Employees;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments.ValueObjects;
+using SharedKernel;
 
 namespace BellaHair.Domain.Treatments
 {
@@ -17,7 +18,8 @@ namespace BellaHair.Domain.Treatments
         public string Name { get; private set; }
         public Price Price { get; private set; }
         public DurationMinutes DurationMinutes { get; private set; }
-        public IReadOnlyList<Employee>? Employees;
+        private readonly List<Employee> _employees;
+        public IReadOnlyList<Employee> Employees => _employees.AsReadOnly();
 
 #pragma warning disable CS8618
         public Treatment() { }
@@ -32,6 +34,7 @@ namespace BellaHair.Domain.Treatments
             Name = treatmentName;
             Price = price;
             DurationMinutes = durationMinutes;
+            _employees = [];
         }
 
         public static Treatment Create(string treatmentName, Price price, DurationMinutes durationMinutes)

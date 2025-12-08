@@ -4,6 +4,7 @@ using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Infrastructure;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
 namespace BellaHair.Application.Tests.PrivateCustomers
 {
@@ -27,12 +28,12 @@ namespace BellaHair.Application.Tests.PrivateCustomers
 
             // Assert
             var customerFromDb = _db.PrivateCustomers.FirstOrDefault();
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(customerFromDb!.Name.FirstName, Is.EqualTo(command.FirstName));
                 Assert.That(customerFromDb!.PhoneNumber.Value, Is.EqualTo(command.PhoneNumber));
                 Assert.That(customerFromDb!.Birthday, Is.EqualTo(command.Birthday));
-            });
+            }
         }
 
         [Test]
@@ -81,7 +82,7 @@ namespace BellaHair.Application.Tests.PrivateCustomers
             handler.UpdatePrivateCustomerAsync(command);
 
             // Assert
-            Assert.That(() => _db.PrivateCustomers.FirstOrDefault()!.Email.Value, Is.EqualTo(command.Email));
+            Assert.That(_db.PrivateCustomers.FirstOrDefault()!.Email.Value, Is.EqualTo(command.Email));
         }
     }
 }

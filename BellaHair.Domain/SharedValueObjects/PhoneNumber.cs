@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Domain.SharedValueObjects
+﻿using SharedKernel;
+
+namespace BellaHair.Domain.SharedValueObjects
 {
     /// <summary>
     /// Phone number value object with validation logic.

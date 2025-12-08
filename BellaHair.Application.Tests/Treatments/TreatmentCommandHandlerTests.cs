@@ -1,11 +1,11 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Domain.Treatments;
 using BellaHair.Domain.Treatments.ValueObjects;
 using BellaHair.Ports.Treatments;
 using FixtureBuilder;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
 namespace BellaHair.Application.Tests.Treatments
 {
@@ -36,12 +36,12 @@ namespace BellaHair.Application.Tests.Treatments
 
             // Assert
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(treatmentFromDb!.Name, Is.EqualTo(command.Name));
                 Assert.That(treatmentFromDb!.Price.Value, Is.EqualTo(command.Price));
                 Assert.That(treatmentFromDb!.DurationMinutes.Value, Is.EqualTo(command.DurationMinutes));
-            });
+            }
         }
 
         [Test]

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.SharedValueObjects;
+﻿using BellaHair.Domain.SharedValueObjects;
 
 namespace BellaHair.Domain.Tests.SharedValueObjects
 {
@@ -38,7 +33,7 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             Name nameWithoutMiddleName = Name.FromStrings(firstName, lastName);
 
             //Assert
-            Assert.That(nameWithoutMiddleName.MiddleName, Is.EqualTo(null));
+            Assert.That(nameWithoutMiddleName.MiddleName, Is.Null);
         }
 
         [TestCase("Bo", "Jensen", "Børge")]
@@ -53,12 +48,12 @@ namespace BellaHair.Domain.Tests.SharedValueObjects
             Name createdName = Name.FromStrings(firstName, lastName, middleName);
 
             //Act & Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(createdName.FirstName, Is.EqualTo(firstName));
                 Assert.That(createdName.LastName, Is.EqualTo(lastName));
                 Assert.That(createdName.MiddleName, Is.EqualTo(middleName));
-            });
+            }
         }
     }
 }

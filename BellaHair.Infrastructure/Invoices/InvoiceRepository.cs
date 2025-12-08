@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Invoices;
+﻿using BellaHair.Domain.Invoices;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 // Mikkel Dahlmann
 

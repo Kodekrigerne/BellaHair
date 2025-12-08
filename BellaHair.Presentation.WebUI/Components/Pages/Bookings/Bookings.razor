@@ -1,19 +1,19 @@
 ﻿<!-- Dennis -->
 @page "/bookings"
 
-@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using Microsoft.AspNetCore.WebUtilities
 @using System.Globalization
+@using SharedKernel
 
 @rendermode InteractiveServer
 
-@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 @inject IBookingQuery BookingQuery
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar;
 @inject IBookingCommand BookingCommand
+@inject IJSRuntime JSRuntime
 
 <Modal @bind-IsVisible="_showDeleteModal">
 	<DeleteComponent EntityTypeName="Booking" EntityName="Booking" OnCancel="@(() => { _showDeleteModal = false; })" OnDeleteConfirm="HandleConfirmDelete" />
@@ -26,14 +26,14 @@
 	<button @onclick="HandleOldSelectorClick" class="@(_activeTab == BookingTab.Old ? "btn-select-active" : "btn-select")">Gamle bookinger</button>
 </div>
 
-<div class="kk-container bookings-container">
+<div class="kk-container bookings-container" @ref="_scrollDiv">
 	<div class="search-bar-container">
-		<h6>Bookings (@_filteredBookings.Count)</h6>
-		<input type="text" class="form-control booking-search" placeholder="Søg efter booking"
+		<h6>Bookings (@_count)</h6>
+		<input type="search" class="form-control booking-search" placeholder="Søg efter booking"
 			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
 
 	</div>
-	@foreach (var booking in _filteredBookings)
+	@foreach (var booking in _bookings)
 	{
 		<BookingCard Booking="@booking" OnClickDelete="HandleDeleteClick" />
 	}
@@ -45,9 +45,14 @@
 
 	private bool _showDeleteModal = false;
 	private Guid _bookingToDelete;
-	private DateTime _now;
 	private List<BookingViewModel> _bookings = [];
-	private List<BookingViewModel> _filteredBookings = [];
+	private int _count;
+
+	private ElementReference _scrollDiv;
+	private bool _busy = false;
+	private bool _allLoaded = false;
+	private int _skip = 0;
+	private const int PageSize = 20;
 
 	[Parameter]
 	[SupplyParameterFromQuery(Name = "search")]
@@ -65,39 +70,44 @@
 
 		if (SearchTerm != null) searchedTerm = SearchTerm;
 
-		if(Tab == "old") await HandleOldSelectorClick();
+		if (Tab == "old") await HandleOldSelectorClick();
 		else await HandleNewSelectorClick();
 
 		if (searchedTerm != null)
 		{
 			SearchTerm = searchedTerm;
-			ApplyFilter();
+			await ApplyFilter();
 		}
 	}
 
-	private async Task HandleNewSelectorClick()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		SearchTerm = string.Empty;
-		_now = CurrentDateTimeProvider.GetCurrentDateTime();
-		await LoadBookings(BookingTab.New);
-		_activeTab = BookingTab.New;
-	}
-
-	private async Task HandleOldSelectorClick()
-	{
-		SearchTerm = string.Empty;
-		_now = CurrentDateTimeProvider.GetCurrentDateTime();
-		await LoadBookings(BookingTab.Old);
-		_activeTab = BookingTab.Old;
-	}
-
-	private async Task LoadBookings(BookingTab bookingTab)
-	{
-		try
+		if (firstRender)
 		{
-			var bookings = bookingTab == BookingTab.New ? await BookingQuery.GetAllNewAsync() : await BookingQuery.GetAllOldAsync();
+			await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
+		}
+	}
 
-			_bookings = bookings.Select(b => new BookingViewModel(
+	[JSInvokable]
+	public async Task OnScrollToBottom()
+	{
+		if (!_busy && !_allLoaded)
+		{
+			_busy = true;
+			await LoadMoreAsync();
+			StateHasChanged();
+			await Task.Delay(1);
+			_busy = false;
+		}
+	}
+
+	private async Task LoadMoreAsync()
+	{
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+
+		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
+
+		var newBookings = more.Select(b => new BookingViewModel(
 				b.Id,
 				b.StartDateTime,
 				b.EndDateTime,
@@ -116,12 +126,33 @@
 				b.DurationMinutes,
 				b.Discount?.Name,
 				b.Discount?.Amount
-			)).OrderBy(b => b.StartDateTime).ToList();
+			))
+			.ToList();
 
-			_filteredBookings = _bookings;
+		_bookings.AddRange(newBookings);
+		_skip += PageSize;
+		if (newBookings.Count < PageSize)
+		{
+			_allLoaded = true;
 		}
-		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
-		catch (Exception) { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private async Task HandleNewSelectorClick()
+	{
+		_activeTab = BookingTab.New;
+		await HandleSelectorChanged();
+	}
+
+	private async Task HandleOldSelectorClick()
+	{
+		_activeTab = BookingTab.Old;
+		await HandleSelectorChanged();
+	}
+
+	private async Task HandleSelectorChanged()
+	{
+		SearchTerm = string.Empty;
+		await ApplyFilter();
 	}
 
 	private void HandleDeleteClick(Guid id)
@@ -140,25 +171,29 @@
 		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
 
 		_showDeleteModal = false;
-		
+
 		_bookings = _bookings.Where(b => b.Id != _bookingToDelete).ToList();
 		_bookingToDelete = default;
-		ApplyFilter();
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+		_count = _activeTab == BookingTab.New
+			? await BookingQuery.GetNewCountAsync(search)
+			: await BookingQuery.GetOldCountAsync(search);
+		_skip -= 1;
 		Snackbar.Add("Bookingen blev slettet.", Severity.Success);
 	}
 
-	private void ApplyFilter()
+	private async Task ApplyFilter()
 	{
-		_filteredBookings = _bookings.Where(b => 
-			b.CustomerFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.EmployeeFullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.CustomerAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.CustomerPhone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.CustomerEmail.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.TreatmentName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
-		).ToList();
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+
+		_bookings.Clear();
+		_skip = 0;
+		_allLoaded = false;
+		_count = _activeTab == BookingTab.New
+			? await BookingQuery.GetNewCountAsync(search)
+			: await BookingQuery.GetOldCountAsync(search);
+		
+		await LoadMoreAsync();
 	}
 }
 

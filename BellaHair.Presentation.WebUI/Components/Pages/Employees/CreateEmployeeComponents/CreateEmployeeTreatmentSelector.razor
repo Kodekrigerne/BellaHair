@@ -42,7 +42,7 @@
 
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
-                            <p style="font-weight: bold; color: #2b2b2b">@treatment.Name</p>
+                            <p style="font-weight: bold; color: #2b2b2b; max-width: 12rem;">@treatment.Name</p>
 
                             @* Skifter tjek-ikonet alt efter om den er valgt *@
 						<div>
@@ -107,10 +107,10 @@
     }
 
     // Nødvendig da vi arver fra InputBase men bliver ikke brugt
-    protected override bool TryParseValueFromString(string? value, out List<Guid> result, out string? validationErrorMessage)
+    protected override bool TryParseValueFromString(string? value, out List<Guid> result, out string validationErrorMessage)
     {
         result = CurrentValue ?? new List<Guid>();
-        validationErrorMessage = null;
+        validationErrorMessage = string.Empty;
         return true;
     }
 }

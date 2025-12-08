@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Domain.Treatments.ValueObjects
+﻿using SharedKernel;
+
+namespace BellaHair.Domain.Treatments.ValueObjects
 {
     //Mikkel Klitgaard
 
@@ -19,7 +21,7 @@
             Value = value;
         }
 
-        public static DurationMinutes FromInt(int duration) => new DurationMinutes(duration);
+        public static DurationMinutes FromInt(int duration) => new(duration);
 
         public static void ValidateDuration(int value)
         {
