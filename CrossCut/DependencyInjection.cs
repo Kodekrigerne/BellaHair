@@ -38,7 +38,7 @@ namespace CrossCut
         public static IServiceCollection AddBellaHairContext(this IServiceCollection serviceCollection, string connectionString)
         {
             serviceCollection.AddDbContext<BellaHairContext>(options =>
-                options.UseSqlite(connectionString));
+                options.UseSqlServer(connectionString));
 
             return serviceCollection;
         }
