@@ -12,8 +12,12 @@ namespace BellaHair.Ports.Bookings
     public interface IBookingQuery
     {
         Task<BookingWithRelationsDTO> GetWithRelationsAsync(GetWithRelationsQuery query);
-        Task<IEnumerable<BookingDTO>> GetAllNewAsync();
-        Task<IEnumerable<BookingDTO>> GetAllOldAsync();
+        Task<int> GetNewCountAsync(string? search = null);
+        Task<int> GetOldCountAsync(string? search = null);
+        Task<IEnumerable<BookingDTO>> GetAllNewAsync(string? search = null);
+        Task<IEnumerable<BookingDTO>> GetNewPaginatedAsync(int skip, int take, string? search = null);
+        Task<IEnumerable<BookingDTO>> GetAllOldAsync(string? search = null);
+        Task<IEnumerable<BookingDTO>> GetOldPaginatedAsync(int skip, int take, string? search = null);
         Task<IEnumerable<BookingCalendarDTO>> GetAllWithinPeriodOnEmployee(DateTime startDateTime, DateTime endDateTime, Guid employeeId);
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
     }
