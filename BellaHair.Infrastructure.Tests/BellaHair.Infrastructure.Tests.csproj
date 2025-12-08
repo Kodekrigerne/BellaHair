@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BellaHair.Infrastructure\BellaHair.Infrastructure.csproj" />
+    <ProjectReference Include="..\CrossCut\CrossCut.csproj" />
   </ItemGroup>
 
   <ItemGroup>

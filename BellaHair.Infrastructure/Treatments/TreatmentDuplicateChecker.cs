@@ -12,10 +12,12 @@ namespace BellaHair.Infrastructure.Treatments
 
         public async Task<bool> IsDuplicateAsync(string name, int duration)
         {
+#pragma warning disable CA1862
             return await _db.Treatments
                 .AsNoTracking()
-                .AnyAsync(t => t.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase)
+                .AnyAsync(t => t.Name.ToLower() == name.ToLower()
                                && t.DurationMinutes.Value == duration);
+#pragma warning restore CA1862
         }
     }
 }
