@@ -2,6 +2,7 @@
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.SharedValueObjects;
 using BellaHair.Ports.PrivateCustomers;
+using SharedKernel;
 
 namespace BellaHair.Application.PrivateCustomers
 {
@@ -107,12 +108,12 @@ namespace BellaHair.Application.PrivateCustomers
             await _privateCustomerRepo.SaveChangesAsync();
         }
 
-        private string FormatName(string? input)
+        private static string FormatName(string? input)
         {
-            if (string.IsNullOrEmpty(input)) return input;
+            if (string.IsNullOrEmpty(input)) return input!;
 
             string firstChar = input[0].ToString().ToUpperInvariant();
-            string restOfString = input.Substring(1).ToLowerInvariant();
+            string restOfString = input[1..].ToLowerInvariant();
 
             return firstChar + restOfString;
         }

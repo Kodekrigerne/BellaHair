@@ -107,10 +107,10 @@
     }
 
     // Nødvendig da vi arver fra InputBase men bliver ikke brugt
-    protected override bool TryParseValueFromString(string? value, out List<Guid> result, out string? validationErrorMessage)
+    protected override bool TryParseValueFromString(string? value, out List<Guid> result, out string validationErrorMessage)
     {
         result = CurrentValue ?? new List<Guid>();
-        validationErrorMessage = null;
+        validationErrorMessage = string.Empty;
         return true;
     }
 }

@@ -1,9 +1,9 @@
 ﻿@attribute [StreamRendering]
-@using BellaHair.Domain
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees.CreateEmployeeComponents
 @using BellaHair.Ports.Employees
+@using SharedKernel
 
 @page "/medarbejdere"
 
@@ -50,7 +50,7 @@
 		await LoadEmployees();
 	}
 
-	private async Task HandleDeleteClick(Guid Id)
+	private void HandleDeleteClick(Guid Id)
 	{
 		_employees = _employees?.Where(d => d.Id != Id).ToList();
 	}

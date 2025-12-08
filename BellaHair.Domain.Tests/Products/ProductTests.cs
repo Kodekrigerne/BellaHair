@@ -19,12 +19,12 @@ namespace BellaHair.Domain.Tests.Products
             var product = Product.Create(name, description, price);
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(product.Name, Is.EqualTo(name));
                 Assert.That(product.Description, Is.EqualTo(description));
                 Assert.That(product.Price, Is.EqualTo(price));
-            });
+            }
         }
     }
 }

@@ -25,10 +25,11 @@ namespace BellaHair.Infrastructure
 
         public async Task CommitTransactionAsync()
         {
+            ValidateTransactionBegun();
+
             try
             {
                 await SaveChangesAsync();
-
                 await _currentTransaction!.CommitAsync();
             }
             catch
@@ -38,22 +39,27 @@ namespace BellaHair.Infrastructure
             }
             finally
             {
-                if (_currentTransaction != null)
-                {
-                    await _currentTransaction.DisposeAsync();
-                    _currentTransaction = null;
-                }
+                await _currentTransaction!.DisposeAsync();
+                _currentTransaction = null;
             }
         }
 
         public async Task RollbackTransactionAsync()
         {
-            _currentTransaction?.RollbackAsync();
+            ValidateTransactionBegun();
+
+            await _currentTransaction!.RollbackAsync();
         }
 
         public async Task SaveChangesAsync()
         {
             await _db.SaveChangesAsync();
+        }
+
+        private void ValidateTransactionBegun()
+        {
+            if (_currentTransaction == null)
+                throw new InvalidOperationException("Must begin transaction before other operations");
         }
     }
 }

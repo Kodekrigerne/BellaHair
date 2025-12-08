@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Discounts;
+﻿using BellaHair.Domain.Discounts;
 
 namespace BellaHair.Domain.Tests.Discounts
 {
@@ -25,11 +20,11 @@ namespace BellaHair.Domain.Tests.Discounts
 
             // Assert
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(birthdayDiscount.Name, Is.EqualTo(name));
                 Assert.That(birthdayDiscount.DiscountPercent, Is.EqualTo(discountPercent));
-            });
+            }
 
         }
 

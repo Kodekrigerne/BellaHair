@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using SharedKernel;
+using System.Text.RegularExpressions;
 
 namespace BellaHair.Domain.SharedValueObjects
 {

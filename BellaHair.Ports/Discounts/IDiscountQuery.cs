@@ -16,5 +16,5 @@ namespace BellaHair.Ports.Discounts
 
     public record FindBestDiscountQuery(DateTime StartDateTime, Guid EmployeeId, Guid CustomerId, Guid TreatmentId, bool IncludeBirthdayDiscount, IEnumerable<CreateProductLine> ProductLines, Guid? BookingId = null);
 
-    public record BookingDiscountDTO(string Name, decimal Amount, DiscountTypeDTO Type);
+    public record BookingDiscountDTO(string Name, decimal Amount, DiscountType Type);
 }

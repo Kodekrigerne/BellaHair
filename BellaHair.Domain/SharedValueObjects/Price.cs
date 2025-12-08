@@ -1,4 +1,6 @@
-﻿namespace BellaHair.Domain.SharedValueObjects
+﻿using SharedKernel;
+
+namespace BellaHair.Domain.SharedValueObjects
 {
     // Mikkel Klitgaard
 
@@ -19,7 +21,7 @@
             Value = value;
         }
 
-        public static Price FromDecimal(decimal price) => new Price(price);
+        public static Price FromDecimal(decimal price) => new(price);
 
         public static void ValidatePrice(decimal value)
         {

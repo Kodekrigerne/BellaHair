@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain;
-using BellaHair.Ports.PrivateCustomers;
+﻿using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.PrivateCustomers
 {
@@ -51,10 +51,11 @@ namespace BellaHair.Infrastructure.PrivateCustomers
 
         async Task<List<PrivateCustomerDTO>> IPrivateCustomerQuery.GetPrivateCustomersAsync()
         {
-            var customers = await _db.PrivateCustomers.AsNoTracking()
+            var customers = await _db.PrivateCustomers
+                .AsNoTracking()
                 .ToListAsync();
 
-            List<PrivateCustomerDTO> pclist = new List<PrivateCustomerDTO>();
+            var pclist = new List<PrivateCustomerDTO>();
 
             foreach (var customer in customers)
             {

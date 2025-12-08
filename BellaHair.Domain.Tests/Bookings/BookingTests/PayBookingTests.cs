@@ -6,6 +6,7 @@ using BellaHair.Domain.Treatments;
 using FixtureBuilder;
 using Moq;
 using NUnit.Framework.Internal;
+using SharedKernel;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {

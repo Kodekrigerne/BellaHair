@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BellaHair.Domain.Treatments;
+﻿using BellaHair.Domain.Treatments;
 using Microsoft.EntityFrameworkCore;
 
 namespace BellaHair.Infrastructure.Treatments
@@ -17,10 +12,12 @@ namespace BellaHair.Infrastructure.Treatments
 
         public async Task<bool> IsDuplicateAsync(string name, int duration)
         {
+#pragma warning disable CA1862
             return await _db.Treatments
                 .AsNoTracking()
                 .AnyAsync(t => t.Name.ToLower() == name.ToLower()
                                && t.DurationMinutes.Value == duration);
+#pragma warning restore CA1862
         }
     }
 }

@@ -11,8 +11,10 @@ using BellaHair.Infrastructure;
 using BellaHair.Ports.Bookings;
 using Bogus;
 using FixtureBuilder;
+using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
-namespace BellaHair.Presentation.WebUI
+namespace CrossCut
 {
     // Dennis, Linnea, Mikkel Dahlmann
     /// <summary>
@@ -32,8 +34,8 @@ namespace BellaHair.Presentation.WebUI
         }
 
         // Settings
-        private const int NoOfPastBookings = 100;
-        private const int NoOfFutureBookings = 100;
+        private const int NoOfPastBookings = 10;
+        private const int NoOfFutureBookings = 10;
         private const int NoOfCustomers = 50;
 
         // Lists
@@ -161,7 +163,7 @@ namespace BellaHair.Presentation.WebUI
                             }
                             var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
                             var bookingMinutes = f.Random.Int(0, Math.Max(0, 60 - treatment.DurationMinutes.Value));
-                            bookingMinutes -= (bookingMinutes % 15);
+                            bookingMinutes -= bookingMinutes % 15;
 
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
@@ -173,7 +175,7 @@ namespace BellaHair.Presentation.WebUI
 
                     scope.Dispose();
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                catch { }
             }
         }
 
@@ -211,7 +213,7 @@ namespace BellaHair.Presentation.WebUI
                             }
                             var bookingHour = f.Random.Int(10, 17 - treatment.DurationMinutes.Value / 60);
                             var bookingMinutes = f.Random.Int(0, Math.Max(0, 60 - treatment.DurationMinutes.Value));
-                            bookingMinutes -= (bookingMinutes % 15);
+                            bookingMinutes -= bookingMinutes % 15;
 
                             return new CreateBookingCommand(new DateTime(bookingDate.Year, bookingDate.Month, bookingDate.Day, bookingHour, bookingMinutes, 0), employee.Id, customer.Id, treatment.Id, productLines);
                         });
@@ -219,7 +221,7 @@ namespace BellaHair.Presentation.WebUI
                     createBookingCommands.Add(bookingFaker.Generate());
                 }
 
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                catch { }
             }
 
             createBookingCommands = createBookingCommands.OrderBy(c => c.StartDateTime).ToList();
@@ -240,7 +242,7 @@ namespace BellaHair.Presentation.WebUI
 
                     scope.Dispose();
                 }
-                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                catch { }
             }
         }
 
@@ -271,7 +273,7 @@ namespace BellaHair.Presentation.WebUI
                     _customers.Add(customer);
                     _db.Add(customer);
                 }
-                catch (Exception) { }
+                catch { }
             }
         }
 

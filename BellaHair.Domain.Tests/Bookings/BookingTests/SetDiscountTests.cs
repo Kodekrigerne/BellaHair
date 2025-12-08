@@ -18,11 +18,11 @@ namespace BellaHair.Domain.Tests.Bookings.BookingTests
             booking.SetDiscount(discount);
 
             //Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(booking.Discount, Is.Not.Null);
                 Assert.That(booking.Discount!.Name, Is.EqualTo(discount.Name));
-            });
+            }
         }
 
         [Test]

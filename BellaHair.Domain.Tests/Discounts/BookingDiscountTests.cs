@@ -17,12 +17,12 @@ namespace BellaHair.Domain.Tests.Discounts
             var bookingDiscount = BookingDiscount.Active(name, discountAmount, type);
 
             //Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(bookingDiscount.Name, Is.EqualTo(name));
                 Assert.That(bookingDiscount.Amount, Is.EqualTo(discountAmount));
                 Assert.That(bookingDiscount.DiscountActive, Is.True);
-            });
+            }
         }
 
         [Test]
@@ -33,14 +33,14 @@ namespace BellaHair.Domain.Tests.Discounts
             var type = DiscountType.LoyaltyDiscount;
 
             //Act
-            var bookingDiscount = BookingDiscount.Inactive(name,type);
+            var bookingDiscount = BookingDiscount.Inactive(name, type);
 
             //Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(bookingDiscount.Name, Is.EqualTo(name));
                 Assert.That(bookingDiscount.DiscountActive, Is.False);
-            });
+            }
         }
     }
 }
