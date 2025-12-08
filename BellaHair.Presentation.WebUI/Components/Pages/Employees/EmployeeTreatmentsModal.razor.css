@@ -16,6 +16,8 @@
 .treatments-employees-container
 {
     align-items: center;
+    max-height: 30rem;
+    overflow-y: scroll;
 }
 
 .emp-treatments-header {
