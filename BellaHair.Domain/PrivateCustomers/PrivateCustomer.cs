@@ -1,5 +1,6 @@
 ﻿using BellaHair.Domain.Bookings;
 using BellaHair.Domain.SharedValueObjects;
+using SharedKernel;
 
 namespace BellaHair.Domain.PrivateCustomers
 {

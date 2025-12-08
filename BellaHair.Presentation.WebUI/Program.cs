@@ -1,12 +1,10 @@
-using BellaHair.Application;
-using BellaHair.Application.Invoices;
-using BellaHair.Infrastructure;
-using BellaHair.Ports.Bookings;
 using BellaHair.Presentation.WebUI.Components;
+using CrossCut;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
 using Radzen;
+using SharedKernel;
 
 namespace BellaHair.Presentation.WebUI
 {
@@ -20,16 +18,16 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddDbContext<BellaHairContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("BellaHairContext"))
-            );
+            builder.Services.AddBellaHairContext(builder.Configuration.GetConnectionString("BellaHairContext")!);
 
-            // Dette fjerner væggen af sql i konsollen så vi kan se vores consone writelines
+            // Dette fjerner væggen af sql i konsollen så vi kan se vores console writelines
             // Kommenter den ud hvis du skal se den sql der bliver kørt
             builder.Logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
 
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructureServices();
+            builder.Services.AddDbConfigure();
+            builder.Services.AddDataProvider();
 
             builder.Services.AddScoped<DataProvider>();
 
@@ -57,15 +55,10 @@ namespace BellaHair.Presentation.WebUI
 
             using (var scope = app.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
+                var dbConfigure = scope.ServiceProvider.GetRequiredService<DbConfigure>();
+                dbConfigure.ConfigureDb();
 
-                var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
-
-                context.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
-
-                var dataProvider = new DataProvider(context, scope.ServiceProvider);
+                var dataProvider = scope.ServiceProvider.GetRequiredService<DataProvider>();
                 dataProvider.AddData().Wait();
             }
 

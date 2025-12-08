@@ -1,4 +1,5 @@
 ﻿using BellaHair.Infrastructure;
+using CrossCut;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

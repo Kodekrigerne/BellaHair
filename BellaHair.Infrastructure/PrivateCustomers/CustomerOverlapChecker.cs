@@ -21,7 +21,7 @@ namespace BellaHair.Infrastructure.PrivateCustomers
         // Tjekker for overlapende kunder baseret på telefonnummer eller email.
         // CustomerID gives med for at undgå at sammenligne med sig selv ved opdatering af en eksisterende kunde.
         // CustomerID er nullable og sættes default til null, da metoden også kan bruges ved oprettelse af nye kunder.
-        async Task ICustomerOverlapChecker.OverlapsWithCustomer(string phoneNumber, string email, Guid? customerId = null)
+        async Task ICustomerOverlapChecker.OverlapsWithCustomer(string phoneNumber, string email, Guid? customerId)
         {
             if (await _db.PrivateCustomers
                 .Where(p => p.Id != customerId)

@@ -1,195 +1,195 @@
-﻿using BellaHair.Application.Invoices;
-using BellaHair.Domain.Invoices;
+﻿using BellaHair.Domain.Invoices;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using SharedKernel;
 using System.Reflection;
 
-// Mikkel Dahlmann
-
-/// <summary>
-/// Represents an invoice document that can be composed and rendered using the provided invoice model data.
-/// </summary>
-
-public class InvoiceDocument : IDocument
+namespace BellaHair.Application.Invoices
 {
-    public InvoiceData Data { get; }
-    public Byte[] LogoContent { get; }
-    public BusinessInfoSettings BusinessInfoSettings { get; }
-    public InvoiceDocument(InvoiceData data, BusinessInfoSettings businessInfoSettings)
+
+    // Mikkel Dahlmann
+
+    /// <summary>
+    /// Represents an invoice document that can be composed and rendered using the provided invoice model data.
+    /// </summary>
+
+    public class InvoiceDocument : IDocument
     {
-        Data = data;
-        BusinessInfoSettings = businessInfoSettings;
-
-        // Logo er gemt som embedded resource, dvs. skrevet ind i .dll-filen.
-        // For at tilgå logo fra .dll skal vi bruge Assembly klassen, og
-        // "udlæse" logoet som en stream.
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = "BellaHair.Application.Invoices.BellaHairLogo.png";
-
-        using var stream = assembly.GetManifestResourceStream(resourceName);
-        if (stream == null)
+        public InvoiceData Data { get; }
+        public byte[] LogoContent { get; }
+        public BusinessInfoSettings BusinessInfoSettings { get; }
+        public InvoiceDocument(InvoiceData data, BusinessInfoSettings businessInfoSettings)
         {
-            throw new FileNotFoundException($"Could not find the embedded resource: {resourceName}");
+            Data = data;
+            BusinessInfoSettings = businessInfoSettings;
+
+            // Logo er gemt som embedded resource, dvs. skrevet ind i .dll-filen.
+            // For at tilgå logo fra .dll skal vi bruge Assembly klassen, og
+            // "udlæse" logoet som en stream.
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "BellaHair.Application.Invoices.BellaHairLogo.png";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName)
+                ?? throw new FileNotFoundException($"Could not find the embedded resource: {resourceName}");
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            LogoContent = ms.ToArray();
         }
 
-        using var ms = new MemoryStream();
-        stream.CopyTo(ms);
-        LogoContent = ms.ToArray();
-    }
+        public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+        public DocumentSettings GetSettings() => DocumentSettings.Default;
 
-    public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
-    public DocumentSettings GetSettings() => DocumentSettings.Default;
-
-    public void Compose(IDocumentContainer container)
-    {
-        container
-            .Page(page =>
-            {
-                page.Margin(50);
-
-                page.Header().Element(ComposeHeader);
-                page.Content().Element(ComposeContent);
-
-                page.Footer().AlignCenter().Text(x =>
-                {
-                    x.CurrentPageNumber();
-                    x.Span(" / ");
-                    x.TotalPages();
-                });
-            });
-    }
-
-    public void ComposeHeader(IContainer container)
-    {
-        container.Row(row =>
+        public void Compose(IDocumentContainer container)
         {
-            row.RelativeItem().Column(column =>
-            {
-                column.Item()
-                    .Text($"Faktura #{Data.Id}")
-                    .FontSize(24).Bold().FontColor(Colors.Black);
-
-                column.Item().Text(text =>
+            container
+                .Page(page =>
                 {
-                    text.Span("Fakturadato: ").SemiBold();
-                    text.Span($"{Data.IssueDate:d}");
+                    page.Margin(50);
+
+                    page.Header().Element(ComposeHeader);
+                    page.Content().Element(ComposeContent);
+
+                    page.Footer().AlignCenter().Text(x =>
+                    {
+                        x.CurrentPageNumber();
+                        x.Span(" / ");
+                        x.TotalPages();
+                    });
+                });
+        }
+
+        public void ComposeHeader(IContainer container)
+        {
+            container.Row(row =>
+            {
+                row.RelativeItem().Column(column =>
+                {
+                    column.Item()
+                        .Text($"Faktura #{Data.Id}")
+                        .FontSize(24).Bold().FontColor(Colors.Black);
+
+                    column.Item().Text(text =>
+                    {
+                        text.Span("Fakturadato: ").SemiBold();
+                        text.Span($"{Data.IssueDate:d}");
+                    });
+
+                    column.Item().Text(text =>
+                    {
+                        text.Span("Betalt: ").SemiBold();
+                        text.Span($"{Data.IssueDate:d}");
+                    });
                 });
 
-                column.Item().Text(text =>
+                row.ConstantItem(150).Height(90).Image(LogoContent);
+            });
+        }
+
+        public void ComposeContent(IContainer container)
+        {
+            container.PaddingVertical(40).Column(column =>
+            {
+                column.Spacing(5);
+
+                column.Item().Row(row =>
                 {
-                    text.Span("Betalt: ").SemiBold();
-                    text.Span($"{Data.IssueDate:d}");
+                    row.RelativeItem().Component(new ContactComponent("Afsender:", BusinessInfoSettings.Address, BusinessInfoSettings.Name, BusinessInfoSettings.Email, BusinessInfoSettings.PhoneNumber, BusinessInfoSettings.CvrNumber));
+                    row.ConstantItem(50);
+                    row.RelativeItem().Component(new ContactComponent("Modtager:", Data.Customer.FullAddress, Data.Customer.FullName, Data.Customer.Email, Data.Customer.PhoneNumber));
                 });
+
+                column.Item().PaddingTop(30).Element(ComposeTable);
+
+                if (Data.Discount != null)
+                {
+                    var totalNoDiscountNoTax = Data.Total * 0.8m;
+                    var discountNoTax = Data.Discount.Amount * 0.8m;
+                    var totalWithDiscountNoTax = totalNoDiscountNoTax - discountNoTax;
+                    var tax = totalWithDiscountNoTax * 0.25m;
+                    var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
+
+                    column.Item().PaddingTop(10).AlignRight().Text($"Heraf moms (25%): kr {tax:N2}").FontSize(12);
+                    column.Item().AlignRight().Text($"I alt inkl. moms:  kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold().Underline();
+                }
+                else
+                {
+                    var totalNoDiscountNoTax = Data.Total * 0.8m;
+                    var tax = totalNoDiscountNoTax * 0.25m;
+                    var totalWithTax = totalNoDiscountNoTax * 1.25m;
+
+                    column.Item().PaddingTop(10).AlignRight().Text($"Heraf moms (25%): kr {tax:N2}").FontSize(12);
+                    column.Item().AlignRight().Text($"I alt inkl. moms:  kr {totalWithTax:N2}").FontSize(15).SemiBold().Underline();
+                }
             });
+        }
 
-            row.ConstantItem(150).Height(90).Image(LogoContent);
-        });
-    }
-
-    public void ComposeContent(IContainer container)
-    {
-        container.PaddingVertical(40).Column(column =>
+        public void ComposeTable(IContainer container)
         {
-            column.Spacing(5);
-
-            column.Item().Row(row =>
+            container.Table(table =>
             {
-                row.RelativeItem().Component(new ContactComponent("Afsender:", BusinessInfoSettings.Address, BusinessInfoSettings.Name, BusinessInfoSettings.Email, BusinessInfoSettings.PhoneNumber, BusinessInfoSettings.CvrNumber));
-                row.ConstantItem(50);
-                row.RelativeItem().Component(new ContactComponent("Modtager:", Data.Customer.FullAddress, Data.Customer.FullName, Data.Customer.Email, Data.Customer.PhoneNumber));
-            });
+                table.ColumnsDefinition(columns =>
+                {
+                    columns.ConstantColumn(25);
+                    columns.RelativeColumn(3);
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                    columns.RelativeColumn();
+                });
 
-            column.Item().PaddingTop(30).Element(ComposeTable);
+                table.Header(header =>
+                {
+                    header.Cell().Element(CellStyle).Text("#");
+                    header.Cell().Element(CellStyle).Text("Service");
+                    header.Cell().Element(CellStyle).AlignRight().Text("Enhedspris");
+                    header.Cell().Element(CellStyle).AlignRight().Text("Antal");
+                    header.Cell().Element(CellStyle).AlignRight().Text("Pris");
 
-            if (Data.Discount != null)
-            {
-                var totalNoDiscountNoTax = Data.Total * 0.8m;
-                var discountNoTax = Data.Discount.Amount * 0.8m;
-                var totalWithDiscountNoTax = totalNoDiscountNoTax - discountNoTax;
-                var tax = totalWithDiscountNoTax * 0.25m;
-                var totalWithDiscountTax = totalWithDiscountNoTax * 1.25m;
+                    static IContainer CellStyle(IContainer container)
+                    {
+                        return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                    }
+                });
 
-                column.Item().PaddingTop(10).AlignRight().Text($"Heraf moms (25%): kr {tax:N2}").FontSize(12);
-                column.Item().AlignRight().Text($"I alt inkl. moms:  kr {totalWithDiscountTax:N2}").FontSize(15).SemiBold().Underline();
-            }
-            else
-            {
-                var totalNoDiscountNoTax = Data.Total * 0.8m;
-                var tax = totalNoDiscountNoTax * 0.25m;
-                var totalWithTax = totalNoDiscountNoTax * 1.25m;
-
-                column.Item().PaddingTop(10).AlignRight().Text($"Heraf moms (25%): kr {tax:N2}").FontSize(12);
-                column.Item().AlignRight().Text($"I alt inkl. moms:  kr {totalWithTax:N2}").FontSize(15).SemiBold().Underline();
-            }
-        });
-    }
-
-    public void ComposeTable(IContainer container)
-    {
-        container.Table(table =>
-        {
-            table.ColumnsDefinition(columns =>
-            {
-                columns.ConstantColumn(25);
-                columns.RelativeColumn(3);
-                columns.RelativeColumn();
-                columns.RelativeColumn();
-                columns.RelativeColumn();
-            });
-
-            table.Header(header =>
-            {
-                header.Cell().Element(CellStyle).Text("#");
-                header.Cell().Element(CellStyle).Text("Service");
-                header.Cell().Element(CellStyle).AlignRight().Text("Enhedspris");
-                header.Cell().Element(CellStyle).AlignRight().Text("Antal");
-                header.Cell().Element(CellStyle).AlignRight().Text("Pris");
+                table.Cell().Element(CellStyle).Text("1");
+                table.Cell().Element(CellStyle).Text(Data.Treatment.Name);
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price:N2}");
+                table.Cell().Element(CellStyle).AlignRight().Text("1");
+                table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price:N2}");
 
                 static IContainer CellStyle(IContainer container)
                 {
-                    return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                }
+
+                foreach (var product in Data.Products)
+                {
+                    table.Cell().Element(CellStyle2).Text((Data.Products.ToList().IndexOf(product) + 2).ToString());
+                    table.Cell().Element(CellStyle2).Text(product.Name);
+                    table.Cell().Element(CellStyle2).AlignRight().Text($"kr {product.Price:N2}");
+                    table.Cell().Element(CellStyle2).AlignRight().Text($"{product.Quantity}");
+                    table.Cell().Element(CellStyle2).AlignRight().Text($"kr {product.Price * product.Quantity:N2}");
+
+                    static IContainer CellStyle2(IContainer container)
+                    {
+                        return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                    }
+                }
+
+                if (Data.Discount != null)
+                {
+                    table.Cell().Element(CellStyle1).Text("");
+                    table.Cell().Element(CellStyle1).Text($"Rabat: {Data.Discount.Name}");
+                    table.Cell().Element(CellStyle1).AlignRight().Text("");
+                    table.Cell().Element(CellStyle1).AlignRight().Text("");
+                    table.Cell().Element(CellStyle1).AlignRight().Text($"kr -{Data.Discount.Amount:N2}");
+
+                    static IContainer CellStyle1(IContainer container)
+                    {
+                        return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                    }
                 }
             });
-
-            table.Cell().Element(CellStyle).Text(("1"));
-            table.Cell().Element(CellStyle).Text(Data.Treatment.Name);
-            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price:N2}");
-            table.Cell().Element(CellStyle).AlignRight().Text("1");
-            table.Cell().Element(CellStyle).AlignRight().Text($"kr {Data.Treatment.Price:N2}");
-
-            static IContainer CellStyle(IContainer container)
-            {
-                return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-            }
-
-            foreach (var product in Data.Products)
-            {
-                table.Cell().Element(CellStyle2).Text((Data.Products.ToList().IndexOf(product) + 2).ToString());
-                table.Cell().Element(CellStyle2).Text(product.Name);
-                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {product.Price:N2}");
-                table.Cell().Element(CellStyle2).AlignRight().Text($"{product.Quantity}");
-                table.Cell().Element(CellStyle2).AlignRight().Text($"kr {product.Price * product.Quantity:N2}");
-
-                static IContainer CellStyle2(IContainer container)
-                {
-                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-                }
-            }
-
-            if (Data.Discount != null)
-            {
-                table.Cell().Element(CellStyle1).Text("");
-                table.Cell().Element(CellStyle1).Text($"Rabat: {Data.Discount.Name}");
-                table.Cell().Element(CellStyle1).AlignRight().Text("");
-                table.Cell().Element(CellStyle1).AlignRight().Text("");
-                table.Cell().Element(CellStyle1).AlignRight().Text($"kr -{Data.Discount.Amount:N2}");
-
-                static IContainer CellStyle1(IContainer container)
-                {
-                    return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
-                }
-            }
-        });
+        }
     }
 }

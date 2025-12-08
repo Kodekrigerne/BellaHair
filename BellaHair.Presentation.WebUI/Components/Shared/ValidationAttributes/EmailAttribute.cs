@@ -1,8 +1,5 @@
-﻿using BellaHair.Domain.SharedValueObjects;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using static MudBlazor.Colors;
 
 namespace BellaHair.Presentation.WebUI.Components.Shared.ValidationAttributes;
 

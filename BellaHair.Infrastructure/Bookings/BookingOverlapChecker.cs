@@ -1,6 +1,6 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Bookings
 {
@@ -17,7 +17,7 @@ namespace BellaHair.Infrastructure.Bookings
             _currentDateTimeProvider = currentDateTimeProvider;
         }
 
-        async Task<bool> IBookingOverlapChecker.OverlapsWithBooking(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId, Guid? bookingId = null)
+        async Task<bool> IBookingOverlapChecker.OverlapsWithBooking(DateTime startDateTime, int durationMinutes, Guid employeeId, Guid customerId, Guid? bookingId)
         {
             if (await CheckEmployeeOverlap(startDateTime, durationMinutes, employeeId, bookingId)) return true;
             if (await CheckCustomerOverlap(startDateTime, durationMinutes, customerId, bookingId)) return true;

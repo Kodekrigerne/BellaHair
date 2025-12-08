@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain;
-using BellaHair.Domain.Bookings;
+﻿using BellaHair.Domain.Bookings;
 using BellaHair.Infrastructure.PrivateCustomers;
 using BellaHair.Ports.Bookings;
 using BellaHair.Ports.Discounts;
@@ -7,12 +6,13 @@ using BellaHair.Ports.Employees;
 using BellaHair.Ports.PrivateCustomers;
 using BellaHair.Ports.Treatments;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace BellaHair.Infrastructure.Bookings
 {
     //Dennis
     /// <inheritdoc cref="IBookingQuery"/>
-    internal class BookingQueryHandler : IBookingQuery
+    public class BookingQueryHandler : IBookingQuery
     {
         private readonly BellaHairContext _db;
         private readonly ICurrentDateTimeProvider _currentDateTimeProvider;
@@ -80,7 +80,7 @@ namespace BellaHair.Infrastructure.Bookings
                 ? new DiscountDTO(
                     booking.Discount.Name,
                     booking.Discount.Amount,
-                    (DiscountTypeDTO)booking.Discount.Type)
+                    (DiscountType)booking.Discount.Type)
                 : null;
 
             return new BookingWithRelationsDTO(
@@ -127,7 +127,7 @@ namespace BellaHair.Infrastructure.Bookings
 
         async Task<bool> IBookingQuery.BookingHasOverlap(BookingIsAvailableQuery query)
         {
-            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.bookingId);
+            return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.BookingId);
         }
 
         private static IEnumerable<BookingDTO> MapToBookingDTOs(IEnumerable<Booking> bookings)
@@ -160,7 +160,7 @@ namespace BellaHair.Infrastructure.Bookings
                 // Hvis den ikke er betalt (:) bruger vi værdien fra relationen
                 b.IsPaid ? b.TreatmentSnapshot!.DurationMinutes : b.Treatment!.DurationMinutes.Value,
 
-                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountTypeDTO)b.Discount.Type) : null
+                b.Discount != null ? new DiscountDTO(b.Discount.Name, b.Discount.Amount, (DiscountType)b.Discount.Type) : null
                 );
             });
         }

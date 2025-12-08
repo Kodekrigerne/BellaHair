@@ -41,7 +41,6 @@
 	{
 		try { _products = (await ProductQuery.GetAllAsync()).ToList(); }
 		catch { Snackbar.Add("Noget gik galt ved hentning af produkter.", Severity.Error); }
-		Console.WriteLine($"TEST {_products.Count}");
 	}
 
 	private async Task HandleProductClick(ProductDTO product)

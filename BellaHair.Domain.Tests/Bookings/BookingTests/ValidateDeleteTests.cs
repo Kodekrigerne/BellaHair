@@ -1,6 +1,7 @@
 ﻿using BellaHair.Domain.Bookings;
 using FixtureBuilder;
 using Moq;
+using SharedKernel;
 
 namespace BellaHair.Domain.Tests.Bookings.BookingTests
 {

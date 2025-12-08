@@ -23,6 +23,8 @@ namespace BellaHair.Infrastructure
                 Vedhæftet: 
                 {Invoice}
                 """);
+
+            await Task.Delay(1);
         }
     }
 }

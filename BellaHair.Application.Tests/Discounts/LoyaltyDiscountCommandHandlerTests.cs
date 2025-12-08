@@ -21,12 +21,12 @@ namespace BellaHair.Application.Tests.Discounts
             //Assert
             var discountFromDb = _db.Discounts.Single() as LoyaltyDiscount;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(discountFromDb!.Name, Is.EqualTo(command.Name));
                 Assert.That(discountFromDb!.MinimumVisits, Is.EqualTo(command.MinimumVisits));
                 Assert.That(discountFromDb!.TreatmentDiscountPercent.Value, Is.EqualTo(command.DiscountPercent));
-            });
+            }
         }
 
         [Test]

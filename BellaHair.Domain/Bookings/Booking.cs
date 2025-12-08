@@ -4,6 +4,7 @@ using BellaHair.Domain.Invoices;
 using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Domain.Products;
 using BellaHair.Domain.Treatments;
+using SharedKernel;
 
 namespace BellaHair.Domain.Bookings
 {
@@ -60,6 +61,7 @@ namespace BellaHair.Domain.Bookings
             CreatedDateTime = currentDateTime;
             IsPaid = false;
             _productLines = [.. productLines];
+            _productLineSnapshots = [];
             UpdateEndDateTime();
         }
 

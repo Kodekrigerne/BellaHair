@@ -35,5 +35,5 @@ namespace BellaHair.Presentation.WebUI.Components.Pages.Bookings
         
     public record BookingTimesOnlyViewModel(Guid Id, DateTime StartDateTime, DateTime EndDateTime);
 
-    public record BookingDiscountViewModel(string Name, decimal Amount, DiscountTypeDTO Type);
+    public record BookingDiscountViewModel(string Name, decimal Amount, DiscountType Type);
 }

@@ -19,13 +19,13 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             //Assert
             var discountFromDb = _db.Discounts.Single() as LoyaltyDiscount;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(discountFromDb!.Id, Is.EqualTo(discount.Id));
                 Assert.That(discountFromDb!.Name, Is.EqualTo(discount.Name));
                 Assert.That(discountFromDb!.MinimumVisits, Is.EqualTo(discount.MinimumVisits));
                 Assert.That(discountFromDb!.TreatmentDiscountPercent.Value, Is.EqualTo(discount.TreatmentDiscountPercent.Value));
-            });
+            }
         }
 
         [Test]
@@ -62,13 +62,13 @@ namespace BellaHair.Infrastructure.Tests.Discounts
             var discountFromRepo = repo.GetAsync(discount.Id).GetAwaiter().GetResult();
 
             //Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(discountFromRepo.Id, Is.EqualTo(discount.Id));
                 Assert.That(discountFromRepo.Name, Is.EqualTo(discount.Name));
                 Assert.That(discountFromRepo.MinimumVisits, Is.EqualTo(discount.MinimumVisits));
                 Assert.That(discountFromRepo.TreatmentDiscountPercent.Value, Is.EqualTo(discount.TreatmentDiscountPercent.Value));
-            });
+            }
         }
 
         [Test]

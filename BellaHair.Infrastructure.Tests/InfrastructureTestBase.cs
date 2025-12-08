@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CrossCut;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BellaHair.Infrastructure.Tests
@@ -16,7 +17,7 @@ namespace BellaHair.Infrastructure.Tests
         // Sti til skrivebord på afviklende maskine hentes gennem Environment-klassen.
         private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         private readonly string _dbPath = Path.Combine(_desktopPath, "test.sqlite");
-        protected DbContextOptions<BellaHairContext> _options;
+        protected DbContextOptions<BellaHairContext> _options = null!;
         protected BellaHairContext _db;
         protected IServiceProvider ServiceProvider;
 

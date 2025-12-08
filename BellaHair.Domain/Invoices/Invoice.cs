@@ -1,4 +1,5 @@
 ﻿using BellaHair.Domain.Bookings;
+using SharedKernel;
 
 namespace BellaHair.Domain.Invoices
 {

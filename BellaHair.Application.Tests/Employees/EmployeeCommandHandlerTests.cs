@@ -20,7 +20,7 @@ namespace BellaHair.Application.Tests.Employees
             var employeeFromDB = _db.Employees.FirstOrDefault();
 
             // Assert
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(employeeFromDB!.Name.FirstName, Is.EqualTo(command.FirstName));
                 Assert.That(employeeFromDB!.Name.MiddleName, Is.EqualTo(command.MiddleName));
@@ -31,8 +31,8 @@ namespace BellaHair.Application.Tests.Employees
                 Assert.That(employeeFromDB!.Address.City, Is.EqualTo(command.City));
                 Assert.That(employeeFromDB!.Address.StreetNumber, Is.EqualTo(command.StreetNumber));
                 Assert.That(employeeFromDB!.Address.ZipCode, Is.EqualTo(command.ZipCode));
-                Assert.That(employeeFromDB!.Treatments.Count, Is.EqualTo(command.TreatmentIds.Count()));
-            });
+                Assert.That(employeeFromDB!.Treatments, Has.Count.EqualTo(command.TreatmentIds.Count()));
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿<!-- Dennis -->
 @page "/bookings"
 
-@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Presentation.WebUI.Components.Shared
 @using Microsoft.AspNetCore.WebUtilities
 @using System.Globalization
+@using SharedKernel
 
 @rendermode InteractiveServer
 
@@ -29,7 +29,7 @@
 <div class="kk-container bookings-container">
 	<div class="search-bar-container">
 		<h6>Bookings (@_filteredBookings.Count)</h6>
-		<input type="text" class="form-control booking-search" placeholder="Søg efter booking"
+		<input type="search" class="form-control booking-search" placeholder="Søg efter booking"
 			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
 
 	</div>
@@ -156,8 +156,9 @@
 			b.CustomerPhone.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.CustomerEmail.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
 			b.TreatmentName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+			(b.DiscountName?.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
 			b.StartDateTime.ToString("dddd. MMMM. yyyy", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			b.StartDateTime.ToString("dd/MM", new CultureInfo("da-DK")).Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
+			b.StartDateTime.ToString("dd/MM").Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)
 		).ToList();
 	}
 }

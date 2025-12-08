@@ -1,9 +1,9 @@
 ﻿@page "/"
-@using BellaHair.Domain
 @using BellaHair.Ports.Bookings
 @using BellaHair.Ports.Discounts
 @using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Ports.Treatments
+@using SharedKernel
 
 @inject ICampaignDiscountQuery CampaignDiscountQuery
 @inject IPrivateCustomerQuery CustomerQuery
@@ -144,10 +144,9 @@
 		{
 			Snackbar.Add(dex.Message, Severity.Error);
 		}
-		catch (Exception ex)
+		catch (Exception)
 		{
 			Snackbar.Add($"Der skete en fejl under indlæsningen af statistikkerne.", Severity.Error);
 		}
 	}
-
 }
