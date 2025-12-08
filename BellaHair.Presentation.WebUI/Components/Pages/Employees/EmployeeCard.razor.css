@@ -147,10 +147,8 @@
 .treatment-calendar-button-container {
     display: flex;
     width: 100%;
-    justify-content: flex-end;
     gap: 0.5rem;
-    align-items: center;
-    margin-bottom: 10px;
+    margin-top: 5rem;
 }
 
 .calendar-button {
