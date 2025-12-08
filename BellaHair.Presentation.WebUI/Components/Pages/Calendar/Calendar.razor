@@ -45,9 +45,11 @@
 
     <RadzenWeekView StartTime="@(TimeSpan.FromHours(OpeningTimes.Value.OpeningTime.Hour))"
                     EndTime="@(TimeSpan.FromHours(OpeningTimes.Value.ClosingTime.Hour))"
-                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" />
+                    MinutesPerSlot="30" TimeFormat="HH:mm" HeaderFormat="ddd, MMM d" 
+                    Text="Uge"/>
 
-    <RadzenMonthView />
+    <RadzenMonthView 
+        Text="Måned"/>
 
 </Radzen.Blazor.RadzenScheduler>
 

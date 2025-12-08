@@ -1,20 +1,29 @@
 ﻿
 @using BellaHair.Presentation.WebUI.Components.Pages.Treatments
 
+<h3>Behandlinger på @EmployeeName</h3>
+
+<hr/>
+
+<div class="treatments-on-emp-descript ">
+	@EmployeeName kan udføre følgende @Treatments.Count behandlinger: </div>
 
 <div class="treatments-employees-container">					@*Contains all treatments and makes it possible to position them together*@
-						@foreach (var treatment in _treatments)
+						@foreach (var treatment in Treatments)
 							{															
-								<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
+		<div class="treatment-employee-card">@treatment.Name</div>	@*Contains individual treatment and their layout*@
 							}
 						</div>
+
+						<br/>
 
 
 @code {
 	[Parameter, EditorRequired]
-	public required List<EmployeeTreatmentViewModel> _treatments { get; set; }
+	public required List<EmployeeTreatmentViewModel> Treatments { get; set; }
 
-
+	[Parameter, EditorRequired]
+	public required string EmployeeName { get; set; }
 
 
 }

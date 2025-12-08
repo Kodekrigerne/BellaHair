@@ -72,7 +72,7 @@
 																	 e.StreetNumber,
 																	 e.ZipCode,
 																	 e.FullAddress,
-																	 e.Treatments.Select(t => new EmployeeTreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).ToList(),
+																	 e.Treatments.Select(t => new EmployeeTreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).OrderBy(t => t.Name).ToList(),
 																	 e.Floor))
 																	 .OrderBy(e => e.FirstName)
 																	 .ToList();
