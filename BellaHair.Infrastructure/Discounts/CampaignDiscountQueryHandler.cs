@@ -1,4 +1,3 @@
-using System.Linq;
 using BellaHair.Domain.Discounts;
 using BellaHair.Ports.Discounts;
 using Microsoft.EntityFrameworkCore;
@@ -27,14 +26,27 @@ namespace BellaHair.Infrastructure.Discounts
 
         async Task<List<CampaignDiscountDTO>> ICampaignDiscountQuery.GetAllAsync()
         {
+            // Vi henter alle kampagner ud
             var campaigns = await _db.Discounts
                 .AsNoTracking()
                 .OfType<CampaignDiscount>()
                 .ToListAsync();
 
+            // Så hentes alle behandlings id'er ud på alle kampagner 
+            var allTreatmentIds = campaigns
+                .SelectMany(c => c.TreatmentIds)
+                .Distinct()
+                .ToList();
 
-            // Jeg bruger en CampaignTreatmentDTO for at hente id ud på alle behandlinger
-            // og finder det dertilhørende behandlingsnavn
+            // Så trækker vi de behandlinger ud fra vores allTreatmentIds liste
+            // og tager både navn og id fra disse, som gemmes i en dictionary (id, navn)
+            var treatmentsDict = await _db.Treatments
+                .AsNoTracking()
+                .Where(t => allTreatmentIds.Contains(t.Id))
+                .ToDictionaryAsync(t => t.Id, t => t.Name);
+
+            // Til sidst returnerer vi vores CampaignDiscountDTO som nu indeholder navn og id 
+            // på behandlingerne som er tilknyttet vores kampagnerabatter.
             return campaigns.Select(c => new CampaignDiscountDTO(
                 c.Id,
                 c.Name,
@@ -42,9 +54,9 @@ namespace BellaHair.Infrastructure.Discounts
                 c.StartDate,
                 c.EndDate,
                 c.TreatmentIds.Select(id => new CampaignTreatmentDTO(
-                    id, 
-                    _db.Treatments.Find(id)?.Name ?? "Ukendt behandling"))
-                )).ToList();
+                    id,
+                    treatmentsDict.GetValueOrDefault(id, "Ukendt behandling")))
+            )).ToList();
         }
 
         async Task<int> ICampaignDiscountQuery.GetCountAsync()
