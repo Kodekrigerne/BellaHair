@@ -284,155 +284,158 @@
 </div>
 
 @code {
-    public enum BookingMode { New, View, Edit }
+	public enum BookingMode { New, View, Edit }
 
-    [Parameter, EditorRequired]
-    public required BookingMode Mode { get; set; }
+	[Parameter, EditorRequired]
+	public required BookingMode Mode { get; set; }
 
-    [Parameter]
-    public Guid? Id { get; set; }
-    private bool _isPaid;
-    private List<ProductLineModel> _productLines = [];
+	[Parameter]
+	public Guid? Id { get; set; }
+	private bool _isPaid;
+	private List<ProductLineModel> _productLines = [];
 
-    private enum Picker { None, Customers, Treatments, Employee, Time, Products }
-    private Picker _activePicker = Picker.None;
+	private enum Picker { None, Customers, Treatments, Employee, Time, Products }
+	private Picker _activePicker = Picker.None;
 
-    private bool _showDeleteModal = false;
+	private bool _showDeleteModal = false;
 
-    private DateTime _now;
+	private DateTime _now;
 
-    private MudDatePicker? _datePickerRef;
-    private MudTimePicker? _timePickerRef;
-    private bool _ignoreDateChanged = false;
+	private MudDatePicker? _datePickerRef;
+	private MudTimePicker? _timePickerRef;
+	private bool _ignoreDateChanged = false;
 
-    private PrivateCustomerViewModel? _customer;
-    private TreatmentViewModel? _treatment;
-    private EmployeeNameWithBookingsViewModel? _employee;
-    private BookingDiscountViewModel? _discount;
+	private PrivateCustomerViewModel? _customer;
+	private TreatmentViewModel? _treatment;
+	private EmployeeNameWithBookingsViewModel? _employee;
+	private BookingDiscountViewModel? _discount;
 
-    private DateTime? _startDate;
-    private TimeSpan? _startTime;
-    private TimeSpan? _endTime;
+	private DateTime? _startDate;
+	private TimeSpan? _startTime;
+	private TimeSpan? _endTime;
 
-    private bool? _timeIsAvailable;
-    private string? _statusMessage;
+	private bool? _timeIsAvailable;
+	private string? _statusMessage;
 
-    private List<PrivateCustomerViewModel> _customers = [];
-    private List<TreatmentViewModel> _treatments = [];
-    private List<EmployeeNameWithBookingsViewModel> _employees = [];
+	private List<PrivateCustomerViewModel> _customers = null!;
+	private List<TreatmentViewModel> _treatments = [];
+	private List<EmployeeNameWithBookingsViewModel> _employees = [];
 
-    private bool _useBirthdayDiscount = true;
-    private bool _showBirthdayOption;
+	private bool _useBirthdayDiscount = true;
+	private bool _showBirthdayOption;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
 
-        _now = CurrentDateTimeProvider.GetCurrentDateTime();
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 
-        if (Id == null && (Mode == BookingMode.View || Mode == BookingMode.Edit))
-        {
-            Snackbar.Add("Noget gik galt.", Severity.Error);
-            NavigationManager.NavigateTo("/bookings");
-        }
+		if (Id == null && (Mode == BookingMode.View || Mode == BookingMode.Edit))
+		{
+			Snackbar.Add("Noget gik galt.", Severity.Error);
+			NavigationManager.NavigateTo("/bookings");
+		}
 
-        if (Mode == BookingMode.New) await HandlePickCustomerClick();
-        else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
-    }
+		if (Mode == BookingMode.New) await HandlePickCustomerClick();
+		else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
+	}
 
-    private async Task LoadBooking()
-    {
-        try
-        {
-            var booking = await BookingQuery.GetWithRelationsAsync(new GetWithRelationsQuery(Id!.Value));
-            _startDate = booking.StartDateTime.Date;
-            _startTime = booking.StartDateTime.TimeOfDay;
-            _isPaid = booking.IsPaid;
+	private async Task LoadBooking()
+	{
+		try
+		{
+			var booking = await BookingQuery.GetWithRelationsAsync(new GetWithRelationsQuery(Id!.Value));
+			_startDate = booking.StartDateTime.Date;
+			_startTime = booking.StartDateTime.TimeOfDay;
+			_isPaid = booking.IsPaid;
 
-            if (booking.Discount != null) {
-                _discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
-            }
+			if (booking.Discount != null) {
+				_discount = new BookingDiscountViewModel(booking.Discount.Name, booking.Discount.Amount, booking.Discount.Type);
+			}
 
-            _customer = new PrivateCustomerViewModel(
-                booking.Customer.Id,
-                booking.Customer.FullName,
-                booking.Customer.Birthday,
-                booking.Customer.Email,
-                booking.Customer.PhoneNumber,
-                booking.Customer.FullAddress,
-                booking.Customer.Visits);
+			_customer = new PrivateCustomerViewModel(
+				booking.Customer.Id,
+				booking.Customer.FullName,
+				booking.Customer.Birthday,
+				booking.Customer.Email,
+				booking.Customer.PhoneNumber,
+				booking.Customer.FullAddress,
+				booking.Customer.Visits);
 
-            _treatment = new TreatmentViewModel(
-                booking.Treatment.Id,
-                booking.Treatment.Name,
-                booking.Treatment.Price,
-                booking.Treatment.Duration,
-                booking.Treatment.EmployeeCount);
+			_treatment = new TreatmentViewModel(
+				booking.Treatment.Id,
+				booking.Treatment.Name,
+				booking.Treatment.Price,
+				booking.Treatment.Duration,
+				booking.Treatment.EmployeeCount);
 
-            _employee = new EmployeeNameWithBookingsViewModel(
-                booking.Employee.Id,
-                booking.Employee.Name,
-                booking.Employee.Bookings
-                    .Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
+			_employee = new EmployeeNameWithBookingsViewModel(
+				booking.Employee.Id,
+				booking.Employee.Name,
+				booking.Employee.Bookings
+					.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime)).ToList());
 
-            _productLines = booking.Products.Select(p => new ProductLineModel(p.ProductId, p.Name, p.Price, p.Quantity)).ToList();
+			_productLines = booking.Products.Select(p => new ProductLineModel(p.ProductId, p.Name, p.Price, p.Quantity)).ToList();
 
-            _endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
-            _timeIsAvailable = true;
+			_endTime = _startTime.Value.Add(TimeSpan.FromMinutes(_treatment.DurationMinutes));
+			_timeIsAvailable = true;
 
-            if (Mode == BookingMode.View)
-                _statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
-            else if (Mode == BookingMode.Edit)
-                _statusMessage = string.Empty;
+			if (Mode == BookingMode.View)
+				_statusMessage = booking.IsPaid ? "Denne booking er betalt" : "Denne booking er ikke betalt";
+			else if (Mode == BookingMode.Edit)
+				_statusMessage = string.Empty;
 
-            if (!_isPaid) await GetBestDiscount();
-        }
-        //Ingen DomainExceptions i queries, derfor kun generelle exceptions
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-            // NavigationManager.NavigateTo("/bookings");
-        }
-    }
+			if (!_isPaid) await GetBestDiscount();
+		}
+		//Ingen DomainExceptions i queries, derfor kun generelle exceptions
+		catch (Exception ex)
+		{
+			Snackbar.Add(ex.Message, Severity.Error);
+			// NavigationManager.NavigateTo("/bookings");
+		}
+	}
 
-    private bool IsEditable()
-    {
-        if (_startDate == null || _startTime == null) return false;
-        if (_isPaid) return false;
-        var endTime = _startDate.Value.Add(_endTime!.Value);
-        if (endTime < _now.AddHours(-2)) return false;
-        return true;
-    }
+	private bool IsEditable()
+	{
+		if (_startDate == null || _startTime == null) return false;
+		if (_isPaid) return false;
+		var endTime = _startDate.Value.Add(_endTime!.Value);
+		if (endTime < _now.AddHours(-2)) return false;
+		return true;
+	}
 
-    private decimal GetTotalBase()
-    {
-        var totalBase = 0m;
-        totalBase += _treatment?.Price ?? 0m;
-        totalBase += _productLines.Sum(pl => pl.Price * pl.Quantity);
+	private decimal GetTotalBase()
+	{
+		var totalBase = 0m;
+		totalBase += _treatment?.Price ?? 0m;
+		totalBase += _productLines.Sum(pl => pl.Price * pl.Quantity);
 
-        return totalBase;
-    }
+		return totalBase;
+	}
 
-    private decimal GetTotalWithDiscount()
-    {
-        return GetTotalBase() - _discount?.Amount ?? 0;
-    }
+	private decimal GetTotalWithDiscount()
+	{
+		return GetTotalBase() - _discount?.Amount ?? 0;
+	}
 
-    private void SetNulls()
-    {
-        _startDate = null;
-        _startTime = null;
-        _endTime = null;
-        _timeIsAvailable = null;
-        _discount = null;
-        _statusMessage = null;
-    }
+	private void SetNulls()
+	{
+		_startDate = null;
+		_startTime = null;
+		_endTime = null;
+		_timeIsAvailable = null;
+		_discount = null;
+		_statusMessage = null;
+	}
 
-    private async Task HandlePickCustomerClick()
-    {
-        try
-        {
-            _customers = (await CustomerQuery.GetPrivateCustomersAsync())
+	private async Task HandlePickCustomerClick()
+	{
+		if (_customers != null) return;
+
+		try
+		{
+			_customers = [];
+			_customers = (await CustomerQuery.GetPrivateCustomersAsync())
             .Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
             .OrderBy(e => e.FullName)
             .ToList();
