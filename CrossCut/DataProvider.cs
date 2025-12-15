@@ -34,9 +34,9 @@ namespace CrossCut
         }
 
         // Settings
-        private const int NoOfPastBookings = 10;
-        private const int NoOfFutureBookings = 10;
-        private const int NoOfCustomers = 50;
+        private const int NoOfPastBookings = 1000;
+        private const int NoOfFutureBookings = 400;
+        private const int NoOfCustomers = 200;
 
         // Lists
         private readonly List<Employee> _employees = [];
@@ -323,7 +323,6 @@ namespace CrossCut
 
         private void AddLoyaltyDiscounts()
         {
-            _db.Add(LoyaltyDiscount.Create("Loyalty test", 1, DiscountPercent.FromDecimal(0.50m)));
             _db.Add(LoyaltyDiscount.Create("Stamkunde Bronze", 5, DiscountPercent.FromDecimal(0.05m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Sølv", 10, DiscountPercent.FromDecimal(0.10m), DiscountPercent.FromDecimal(0.5m)));
             _db.Add(LoyaltyDiscount.CreateWithProductDiscount("Stamkunde Guld", 20, DiscountPercent.FromDecimal(0.15m), DiscountPercent.FromDecimal(0.10m)));
@@ -340,44 +339,6 @@ namespace CrossCut
 
         private void AddCampaignDiscounts()
         {
-            // Test Campaign
-            _db.Add(CampaignDiscount.Create("Firesale",
-                DiscountPercent.FromDecimal(0.20m),
-                new DateTime(2025, 06, 1, 12, 0, 0),
-                new DateTime(2025, 12, 30, 12, 0, 0),
-                new List<Guid> {
-                    _herreklipUdenVaskFøn!.Id,
-                    _herreklipMedVaskFøn!.Id,
-                    _damefrisureInklVaskFøn!.Id,
-                    _damefrisureBlæs!.Id,
-                    _lilleTilretning!.Id,
-                    _storKlipning!.Id,
-                    _luksusKur!.Id,
-                    _retFarveBryn!.Id,
-                    _ordneBrynVipper!.Id,
-                    _herreKlipPermanent!.Id,
-                    _helfarveHalvkortHårUdenKlip!.Id,
-                    _helfarveHalvKortHårMedKlip!.Id,
-                    _helfarveLangtHårUdenKlip!.Id,
-                    _helfarveLangtHårMedKlip!.Id,
-                    _hætteStriberIHalvkortHårMedKlip!.Id,
-                    _hætteStriberILangtHårMedKlip!.Id,
-                    _permanentHalvkortHårMedKlip!.Id,
-                    _permanentHalvkortHårUdenKlip!.Id,
-                    _permanentLangtHårUdenKlip!.Id,
-                    _permanentLangtHårMedKlip!.Id,
-                    _staniolStriberIHalvkortHårUdenKlip!.Id,
-                    _staniolStriberIHalvkortHårMedKlip!.Id,
-                    _staniolStriberILangtHårUdenKlip!.Id,
-                    _staniolStriberILangtHårMedKlip!.Id,
-                    _balayageUdenKlip!.Id,
-                    _balayageMedKlip!.Id,
-                    _hårOpsætningStruktur!.Id,
-                    _hårOpsætningElegance!.Id,
-                    _hårOpsætningKompleks!.Id
-                }));
-
-
             // Sommerklip udsalg
             _db.Add(CampaignDiscount.Create("Sommerklip",
                 DiscountPercent.FromDecimal(0.20m),
