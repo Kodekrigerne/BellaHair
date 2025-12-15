@@ -20,7 +20,7 @@ namespace BellaHair.Presentation.WebUI
                 .AddInteractiveServerComponents();
 
             builder.Services.AddDbContext<BellaHairContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("SimplyConnectionString"))
+                options.UseSqlServer(builder.Configuration.GetConnectionString("BellaHairContext"))
             );
 
             // Dette fjerner væggen af sql i konsollen så vi kan se vores console writelines
