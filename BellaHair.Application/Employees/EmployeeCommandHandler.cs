@@ -40,7 +40,7 @@ namespace BellaHair.Application.Employees
 
 
             var treatmentsToRemove = employeeToUpdate.Treatments.Select(t => t.Id).ToList().Except(command.TreatmentIds);
-            if (await _employeeFutureBookingsChecker.EmployeeHasFutureBookingsWithTreatments(employeeToUpdate.Id, [.. treatmentsToRemove]))
+            if (treatmentsToRemove.Any() && await _employeeFutureBookingsChecker.EmployeeHasFutureBookingsWithTreatments(employeeToUpdate.Id, [.. treatmentsToRemove]))
                 throw new EmployeeException("Medarbejderen har fremtidige bookinger med den behandling, du forsøger at fjerne.");
 
             var updatedTreatments = await _treatmentRepo.GetAsync(command.TreatmentIds);
