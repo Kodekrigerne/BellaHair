@@ -1,3 +1,4 @@
+using BellaHair.Infrastructure;
 using BellaHair.Presentation.WebUI.Components;
 using CrossCut;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,9 @@ namespace BellaHair.Presentation.WebUI
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddBellaHairContext(builder.Configuration.GetConnectionString("BellaHairContext")!);
+            builder.Services.AddDbContext<BellaHairContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("BellaHairContext"))
+            );
 
             // Dette fjerner væggen af sql i konsollen så vi kan se vores console writelines
             // Kommenter den ud hvis du skal se den sql der bliver kørt
@@ -53,14 +56,15 @@ namespace BellaHair.Presentation.WebUI
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbConfigure = scope.ServiceProvider.GetRequiredService<DbConfigure>();
-                dbConfigure.ConfigureDb();
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
 
-                var dataProvider = scope.ServiceProvider.GetRequiredService<DataProvider>();
-                dataProvider.AddData().Wait();
-            }
+            //    var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+
+            //    var dataProvider = new DataProvider(context, scope.ServiceProvider);
+            //    dataProvider.AddData().Wait();
+            //}
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
