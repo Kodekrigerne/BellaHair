@@ -1,5 +1,4 @@
 using BellaHair.Infrastructure;
-using BellaHair.Ports.Bookings;
 using BellaHair.Presentation.WebUI.Components;
 using CrossCut;
 using Microsoft.EntityFrameworkCore;
@@ -57,19 +56,15 @@ namespace BellaHair.Presentation.WebUI
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
-                //context.Database.EnsureDeleted();
-                //context.Database.EnsureCreated();
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var context = scope.ServiceProvider.GetRequiredService<BellaHairContext>();
 
-                var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
+            //    var commandHandler = scope.ServiceProvider.GetRequiredService<IBookingCommand>();
 
-                //context.Database.ExecuteSqlRaw("PRAGMA journal_mode=DELETE;");
-
-                var dataProvider = new DataProvider(context, scope.ServiceProvider);
-                dataProvider.AddData().Wait();
-            }
+            //    var dataProvider = new DataProvider(context, scope.ServiceProvider);
+            //    dataProvider.AddData().Wait();
+            //}
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
