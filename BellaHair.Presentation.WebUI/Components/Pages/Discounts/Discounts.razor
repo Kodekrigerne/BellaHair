@@ -145,8 +145,9 @@ else if (_activeTab == DiscountTab.Campaign)
 		{
 			Snackbar.Add(dex.Message, Severity.Error);
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
+			Console.WriteLine(ex.Message);
 			Snackbar.Add("Noget gik galt.", Severity.Error);
 		}
 
