@@ -51,12 +51,13 @@
     private Guid _selectedTreatmentId;
     private List<TreatmentViewModel>? _treatments = null;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await base.OnInitializedAsync();
-
-        await LoadTreatments();
+	    await base.OnAfterRenderAsync(firstRender);
+        
+        if (firstRender) await LoadTreatments();
     }
+
 
     private async Task LoadTreatments()
     {
@@ -69,6 +70,7 @@
                 .OrderBy(t => t.Name)
                 .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
                 .ToList();
+            StateHasChanged();
         }
         catch (DomainException dex)
         {

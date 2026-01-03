@@ -10,6 +10,7 @@ public interface ITreatmentQuery
 {
     Task<TreatmentDTO> GetAsync(GetQuery query);
     Task<List<TreatmentDTO>> GetAllAsync();
+    Task<int> GetCountAsync();
 }
 
 public record GetQuery(Guid Id);

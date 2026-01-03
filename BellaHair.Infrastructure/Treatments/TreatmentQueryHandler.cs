@@ -29,6 +29,11 @@ namespace BellaHair.Infrastructure.Treatments
                 .ToListAsync();
         }
 
+        async Task<int> ITreatmentQuery.GetCountAsync()
+        {
+            return await _db.Treatments.AsNoTracking().CountAsync();
+        }
+
         async Task<TreatmentDTO> ITreatmentQuery.GetAsync(GetQuery query)
         {
             return await _db.Treatments
