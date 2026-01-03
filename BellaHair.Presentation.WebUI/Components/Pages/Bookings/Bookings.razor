@@ -89,16 +89,15 @@
 	{
 		if (!_busy && !_allLoaded)
 		{
-			_busy = true;
 			await LoadMoreAsync();
 			StateHasChanged();
 			await Task.Delay(1);
-			_busy = false;
 		}
 	}
 
 	private async Task LoadMoreAsync()
 	{
+		_busy = true;
 		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
 		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
@@ -131,6 +130,7 @@
 		{
 			_allLoaded = true;
 		}
+		_busy = false;
 	}
 
 	private async Task HandleNewSelectorClick()
