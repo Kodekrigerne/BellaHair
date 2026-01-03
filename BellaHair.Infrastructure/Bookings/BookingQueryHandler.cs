@@ -166,6 +166,13 @@ namespace BellaHair.Infrastructure.Bookings
             return await _bookingOverlapChecker.OverlapsWithBooking(query.StartDateTime, query.DurationMinutes, query.EmployeeId, query.CustomerId, query.BookingId);
         }
 
+        async Task<int> IBookingQuery.GetAllTodayCountAsync()
+        {
+            return await _db.Bookings.AsNoTracking()
+                .Where(b => b.StartDateTime.Date == _currentDateTimeProvider.GetCurrentDateTime().Date)
+                .CountAsync();
+        }
+
         /// <summary>
         /// Returns all bookings on specific employee within a specific range of date.
         /// Only used for booking calendar view to limit bookings loaded for effeciency.

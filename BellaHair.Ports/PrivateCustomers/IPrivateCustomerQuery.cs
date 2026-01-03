@@ -11,6 +11,7 @@
         Task<List<PrivateCustomerDTO>> GetPrivateCustomersAsync();
         Task<PrivateCustomerDTO> GetPrivateCustomerAsync(GetPrivateCustomerQuery query);
         Task<bool> PCFutureBookingsCheck(Guid id);
+        Task<int> GetCountAsync();
     }
 
     public record GetPrivateCustomerQuery(Guid Id);

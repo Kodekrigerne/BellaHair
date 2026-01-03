@@ -122,22 +122,17 @@
 
 	private async Task LoadDataAsync()
 	{
-		var today = CurrentDateTimeProvider.GetCurrentDateTime().Date;
-
 		try
 		{
 			_campaignCount = await CampaignDiscountQuery.GetActiveCountAsync();
 
-			var customer = await CustomerQuery.GetPrivateCustomersAsync();
-			_customerCount = customer.Count;
+			_customerCount = await CustomerQuery.GetCountAsync();
 
-			var bookings = await BookingQuery.GetAllNewAsync();
-			_bookingCount = bookings.Count();
+			_bookingCount = await BookingQuery.GetNewCountAsync();
 
-			_bookingsToday = bookings.Where(b => b.StartDateTime.Date == today).Count();
+			_bookingsToday = await BookingQuery.GetAllTodayCountAsync();
 
-			var treatments = await TreatmentQuery.GetAllAsync();
-			_treatmentCount = treatments.Count();
+			_treatmentCount = await TreatmentQuery.GetCountAsync();
 
 		}
 		catch (DomainException dex)

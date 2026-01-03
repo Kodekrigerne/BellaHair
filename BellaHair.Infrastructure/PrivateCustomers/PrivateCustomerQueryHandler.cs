@@ -1,4 +1,5 @@
-﻿using BellaHair.Ports.PrivateCustomers;
+﻿using BellaHair.Domain.Discounts;
+using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -88,6 +89,11 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             return await _db.PrivateCustomers
                 .Where(p => p.Id == id)
                 .AnyAsync(p => p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
+        }
+
+        async Task<int> IPrivateCustomerQuery.GetCountAsync()
+        {
+            return await _db.PrivateCustomers.AsNoTracking().CountAsync();
         }
     }
 }
