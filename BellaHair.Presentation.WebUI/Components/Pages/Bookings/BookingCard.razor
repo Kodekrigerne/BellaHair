@@ -69,11 +69,14 @@
 
 	private DateTime _now;
 
-	protected override async Task OnInitializedAsync()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnInitializedAsync();
+		await base.OnAfterRenderAsync(firstRender);
 
-		_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		if (firstRender)
+		{
+			_now = CurrentDateTimeProvider.GetCurrentDateTime();
+		}
 	}
 
 	private void HandleBookingClick()

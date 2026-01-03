@@ -123,7 +123,8 @@ namespace BellaHair.Infrastructure.Bookings
             var ordered = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime > _currentDateTimeProvider.GetCurrentDateTime())
-                .OrderBy(b => b.EndDateTime);
+                .OrderBy(b => b.StartDateTime)
+                .ThenBy(b => b.EndDateTime);
 
             var filtered = FilterNullBookings(ordered);
             var searched = search != null ? ApplySearchFilter(filtered, search) : filtered;
@@ -146,7 +147,8 @@ namespace BellaHair.Infrastructure.Bookings
             var ordered = _db.Bookings
                 .AsNoTracking()
                 .Where(b => b.EndDateTime < _currentDateTimeProvider.GetCurrentDateTime())
-                .OrderByDescending(b => b.EndDateTime);
+                .OrderByDescending(b => b.StartDateTime)
+                .ThenByDescending(b => b.EndDateTime);
 
             var filtered = FilterNullBookings(ordered);
             var searched = search != null ? ApplySearchFilter(filtered, search) : filtered;

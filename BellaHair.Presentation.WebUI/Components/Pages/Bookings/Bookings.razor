@@ -62,29 +62,25 @@
 	[SupplyParameterFromQuery(Name = "tab")]
 	public string? Tab { get; set; }
 
-	protected async override Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
-
-		string? searchedTerm = null;
-
-		if (SearchTerm != null) searchedTerm = SearchTerm;
-
-		if (Tab == "old") await HandleOldSelectorClick();
-		else await HandleNewSelectorClick();
-
-		if (searchedTerm != null)
-		{
-			SearchTerm = searchedTerm;
-			await ApplyFilter();
-		}
-	}
-
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
+			string? searchedTerm = null;
+
+			if (SearchTerm != null) searchedTerm = SearchTerm;
+
+			if (Tab == "old") await HandleOldSelectorClick();
+			else await HandleNewSelectorClick();
+
+			if (searchedTerm != null)
+			{
+				SearchTerm = searchedTerm;
+				await ApplyFilter();
+			}
+
 			await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
+			StateHasChanged();
 		}
 	}
 

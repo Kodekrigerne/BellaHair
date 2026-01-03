@@ -4,6 +4,8 @@
 @using System.Globalization
 @using Microsoft.Extensions.Options
 
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IOptions<OpeningTimesSettings> OpeningTimes
@@ -94,8 +96,8 @@
     {
         await base.OnInitializedAsync();
 
-        _hours = Enumerable.Range(OpeningTimes.Value.OpeningTime.Hour, (OpeningTimes.Value.ClosingTime.Hour - OpeningTimes.Value.OpeningTime.Hour)).ToArray();
-        _openingHour = OpeningTimes.Value.OpeningTime.Hour;
+            _hours = Enumerable.Range(OpeningTimes.Value.OpeningTime.Hour, (OpeningTimes.Value.ClosingTime.Hour - OpeningTimes.Value.OpeningTime.Hour)).ToArray();
+            _openingHour = OpeningTimes.Value.OpeningTime.Hour;
     }
 
     private string GetBookingStart(BookingTimesOnlyViewModel booking)
