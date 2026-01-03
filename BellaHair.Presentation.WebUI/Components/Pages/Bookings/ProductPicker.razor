@@ -1,6 +1,8 @@
 ﻿<!-- Dennis -->
 @using BellaHair.Ports.Products
 
+@rendermode InteractiveServer
+
 @inject IProductQuery ProductQuery
 @inject ISnackbar Snackbar
 
@@ -30,11 +32,15 @@
 
 	private List<ProductDTO> _products = [];
 
-	protected override async Task OnInitializedAsync()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnInitializedAsync();
+		await base.OnAfterRenderAsync(firstRender);
 
-		await LoadProducts();
+		if (firstRender)
+		{
+			await LoadProducts();
+			StateHasChanged();
+		}
 	}
 
 	private async Task LoadProducts()

@@ -26,19 +26,23 @@ else if(_bookingMode == BookingMode.View || _bookingMode == BookingMode.Edit)
 
 	private BookingMode _bookingMode;
 
-	protected override async Task OnInitializedAsync()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnInitializedAsync();
+		await base.OnAfterRenderAsync(firstRender);
 
-		var route = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-
-		if (route.EndsWith("/ny")) _bookingMode = BookingMode.New;
-		else if (route.EndsWith($"/{Id.ToString()}")) _bookingMode = BookingMode.View;
-		else if (route.EndsWith("/rediger")) _bookingMode = BookingMode.Edit;
-		else
+		if (firstRender)
 		{
-			Snackbar.Add("Noget gik galt.", Severity.Error);
-			NavigationManager.NavigateTo("/bookings");
+			var route = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+			if (route.EndsWith("/ny")) _bookingMode = BookingMode.New;
+			else if (route.EndsWith($"/{Id.ToString()}")) _bookingMode = BookingMode.View;
+			else if (route.EndsWith("/rediger")) _bookingMode = BookingMode.Edit;
+			else
+			{
+				Snackbar.Add("Noget gik galt.", Severity.Error);
+				NavigationManager.NavigateTo("/bookings");
+			}
+			StateHasChanged();
 		}
 	}
 }

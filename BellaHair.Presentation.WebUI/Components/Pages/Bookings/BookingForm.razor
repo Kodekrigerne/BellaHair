@@ -13,6 +13,8 @@
 @using Microsoft.Extensions.Options
 @using SharedKernel
 
+@rendermode InteractiveServer
+
 @inject ISnackbar Snackbar;
 @inject IPrivateCustomerQuery CustomerQuery;
 @inject ITreatmentQuery TreatmentQuery;
@@ -324,20 +326,24 @@
 	private bool _useBirthdayDiscount = true;
 	private bool _showBirthdayOption;
 
-	protected override async Task OnInitializedAsync()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnInitializedAsync();
+		await base.OnAfterRenderAsync(firstRender);
 
-		_now = CurrentDateTimeProvider.GetCurrentDateTime();
-
-		if (Id == null && (Mode == BookingMode.View || Mode == BookingMode.Edit))
+		if (firstRender)
 		{
-			Snackbar.Add("Noget gik galt.", Severity.Error);
-			NavigationManager.NavigateTo("/bookings");
-		}
+			_now = CurrentDateTimeProvider.GetCurrentDateTime();
 
-		if (Mode == BookingMode.New) await HandlePickCustomerClick();
-		else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
+			if (Id == null && (Mode == BookingMode.View || Mode == BookingMode.Edit))
+			{
+				Snackbar.Add("Noget gik galt.", Severity.Error);
+				NavigationManager.NavigateTo("/bookings");
+			}
+
+			if (Mode == BookingMode.New) await HandlePickCustomerClick();
+			else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
+			StateHasChanged();
+		}
 	}
 
 	private async Task LoadBooking()
