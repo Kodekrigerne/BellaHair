@@ -6,7 +6,7 @@
 @using Microsoft.Extensions.Options
 @using Radzen
 @using SharedKernel
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IBookingQuery BookingQuery
 @inject IEmployeeQuery EmployeeQuery
 @inject ISnackbar Snackbar
@@ -14,7 +14,6 @@
 @inject IJSRuntime JSRuntime
 @inject IOptions<OpeningTimesSettings> OpeningTimes
 @inject ICurrentDateTimeProvider CurrentDateTime
-
 
 <div class="header-and-employee">
     <div>
@@ -64,6 +63,8 @@
     private DateTime _currentDate;
     private Guid _pickedEmployeeId;
 
+    private SemaphoreSlim _dbLock = new SemaphoreSlim(1, 1);
+
     private bool _checkForInitialLoad = false;
 
     [SupplyParameterFromQuery(Name = "date")]
@@ -73,13 +74,17 @@
 
     protected async override Task OnInitializedAsync()
     {
-        await LoadEmployees();
+        // Vi sætter denne til sand så vi kan følge i OnLoadData() om data loades ifbm initialisering eller om det er til når vi ændrer på dato
+        _checkForInitialLoad = true;
 
         if (UrlDate != null) _currentDate = UrlDate.Value;
         else _currentDate = CurrentDateTime.GetCurrentDateTime();
+        _currentDate = DateToThisWeeksMonday(_currentDate);
 
-        // Vi sætter denne til sand så vi kan følge i OnLoadData() om data loades ifbm initialisering eller om det er til når vi ændrer på dato
-        _checkForInitialLoad = true;
+        if (UrlEmployeeId != null) _pickedEmployeeId = UrlEmployeeId.Value;
+
+        await LoadEmployees();
+        if (_pickedEmployeeId == Guid.Empty) _pickedEmployeeId = _employees.First().Id;
     }
 
     protected override void OnParametersSet()
@@ -108,6 +113,8 @@
 
     private async Task OnLoadData(SchedulerLoadDataEventArgs args)
     {
+        await _dbLock.WaitAsync();
+
         if (_checkForInitialLoad && _scheduler != null) { args.Start = _currentDate; args.End = _currentDate.AddDays(7); _scheduler.CurrentDate = args.Start; }
         _checkForInitialLoad = false;
 
@@ -128,6 +135,8 @@
             await JSRuntime.InvokeVoidAsync("window.history.replaceState", null, "", newUrl);
         }
         catch { /* Ignorerer exceptions fra Javascript */ }
+
+        _dbLock.Release();
     }
 
     private async Task HandlePickedEmployee(object value)
@@ -137,12 +146,14 @@
 
     private async Task LoadEmployees()
     {
+        await _dbLock.WaitAsync();
         try
         {
             var employees = await EmployeeQuery.GetAllEmployeesSimpleAsync();
             _employees = employees.Select(e => new EmployeeNameViewModel(e.Id, e.FullName)).OrderBy(e => e.FullName).ToList();
         }
         catch (Exception e) { Snackbar.Add($"Fejl: {e.Message}", Severity.Error); }
+        finally { _dbLock.Release(); }
     }
 
     private async Task LoadBookings(DateTime start, DateTime end, Guid empId)
