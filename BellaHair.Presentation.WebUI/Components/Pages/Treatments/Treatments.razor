@@ -7,10 +7,9 @@
 
 @page "/behandlinger"
 
-@rendermode InteractiveServer
 @inject ITreatmentQuery TreatmentQuery
-@inject ITreatmentCommand TreatmentCommand
 @inject ISnackbar Snackbar
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <Modal @bind-IsVisible="@_showNewModal">
 
@@ -51,11 +50,10 @@
     private Guid _selectedTreatmentId;
     private List<TreatmentViewModel>? _treatments = null;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-	    await base.OnAfterRenderAsync(firstRender);
-        
-        if (firstRender) await LoadTreatments();
+        await base.OnInitializedAsync();
+        await LoadTreatments();
     }
 
 

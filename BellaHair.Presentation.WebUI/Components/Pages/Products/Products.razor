@@ -11,7 +11,7 @@
 @inject IProductQuery ProductQuery
 
 @attribute [StreamRendering]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <!-- Header til siden -->
 <PageHeader HeaderText="Produktkatalog" HeaderSubText="Administrer og tilføj produkter" NewButtonText="Tilføj nyt produkt" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
