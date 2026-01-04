@@ -644,7 +644,7 @@ namespace CrossCut
             _staniolStriberILangtHårUdenKlip = CreateAndAddTreatment("Staniol striber i langt hår uden klip", 725m, 195);
             _staniolStriberILangtHårMedKlip = CreateAndAddTreatment("Staniol striber i langt hår med klip", 500m, 150);
             _balayageUdenKlip = CreateAndAddTreatment("Balayage uden klip", 950m, 195);
-            _balayageMedKlip = CreateAndAddTreatment("Balyage med klip", 1300m, 180);
+            _balayageMedKlip = CreateAndAddTreatment("Balayage med klip", 1300m, 180);
             _hårOpsætningStruktur = CreateAndAddTreatment("Håropsætning Struktur", 250m, 30);
             _hårOpsætningElegance = CreateAndAddTreatment("Håropsætning Elegance", 450m, 60);
             _hårOpsætningKompleks = CreateAndAddTreatment("Håropsætning Kompleks", 800m, 120);
