@@ -7,8 +7,9 @@
 
 @page "/medarbejdere"
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IEmployeeQuery EmployeeQuery
+@inject ISnackbar Snackbar
 
 <PageHeader HeaderText="Medarbejdere" HeaderSubText="Administrer og tilføj medarbejdere" NewButtonText="Opret ny medarbejder" OnNewButtonClicked="@(() => { _showNewModal = true; })" />
 
@@ -19,30 +20,19 @@
 
 @* Viser alle medarbejdere, hvis der findes nogen vha EmployeeCard komponentet *@
 <div class="kk-container employees-container">
-		@if (_errorMessage != null) { <p>@_errorMessage</p>}
-		@if (_employees == null) {<p>Loading...</p>}
-		else
-		{ 
-			@if (_employees.Count == 0)
-			{
-				<p>Der er ingen medarbejdere i øjeblikket.</p>
-			}
-
 			@foreach (var employee in _employees)
 			{
 				<EmployeeCard Employee="employee" OnDelete="@HandleDeleteClick" OnChange="LoadEmployees"></EmployeeCard>
 			}
-		}
 </div>
 
 @code {
 	private bool _showNewModal = false;
-	private string? _errorMessage;
 
 	/// <summary>
 	/// List of viewmodels used to store employee data
 	/// </summary>
-	private List<EmployeeViewModel>? _employees = null;
+	private List<EmployeeViewModel> _employees = [];
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -52,7 +42,7 @@
 
 	private void HandleDeleteClick(Guid Id)
 	{
-		_employees = _employees?.Where(d => d.Id != Id).ToList();
+		_employees = _employees.Where(d => d.Id != Id).ToList();
 	}
 
 	private async Task LoadEmployees()
@@ -61,32 +51,28 @@
 		{
 			var employees = await EmployeeQuery.GetAllEmployeesAsync();
 			_employees = employees.Select(e => new EmployeeViewModel(e.Id,
-																	 e.FirstName,
-																	 e.MiddleName,
-																	 e.LastName,
-																	 e.FullName,
-																	 e.Email,
-																	 e.PhoneNumber,
-																	 e.StreetName,
-																	 e.City,
-																	 e.StreetNumber,
-																	 e.ZipCode,
-																	 e.FullAddress,
-																	 e.Treatments.Select(t => new EmployeeTreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).OrderBy(t => t.Name).ToList(),
-																	 e.Floor))
-																	 .OrderBy(e => e.FirstName)
-																	 .ToList();
+				e.FirstName,
+				e.MiddleName,
+				e.LastName,
+				e.FullName,
+				e.Email,
+				e.PhoneNumber,
+				e.StreetName,
+				e.City,
+				e.StreetNumber,
+				e.ZipCode,
+				e.FullAddress,
+				e.Treatments.Select(t => new EmployeeTreatmentViewModel(t.Id, t.Name, t.Price, t.Duration)).OrderBy(t => t.Name).ToList(),
+				e.Floor))
+				.OrderBy(e => e.FirstName)
+				.ToList();
 		}
-
-		catch (DomainException ex)
-		{
-
-			_errorMessage = ex.Message;
-		}
+		catch (DomainException ex) { Snackbar.Add(ex.Message, Severity.Error); }
 
 		catch (Exception ex)
 		{
-			_errorMessage = ex.Message; // TODO: "Noget gik galt"
+			Snackbar.Add("Noget gik galt.", Severity.Error);
+			Console.WriteLine($"Fejl ved indlæsning af medarbejdere: { ex.Message}");
 		}
 
 	}
