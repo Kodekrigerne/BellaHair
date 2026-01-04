@@ -12,11 +12,13 @@
 <br />
 <p style="text-align: center">Rediger medarbejderens oplysninger dér, hvor de skal ændres.</p>
 
-<EditForm EditContext="@editContext" OnValidSubmit="@UpdateEmployee">
+@if (editContext != null)
+{
+    <EditForm EditContext="@editContext" OnValidSubmit="@UpdateEmployee">
 
-    <DataAnnotationsValidator/>
+        <DataAnnotationsValidator/>
 
-    <div class="inputs-container">
+        <div class="inputs-container">
 
             <div>
                 <CreateEmployeeInputs EmployeeModel="EmployeeModel" />
@@ -25,15 +27,16 @@
             <div class="inputs-items-container">
                 <CreateEmployeeTreatmentSelector @bind-Value="SelectedTreatmentIds" Treatments="_treatments"/>
             </div>
-    </div>
+        </div>
 
-    <div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
-        <button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
-        <button class="btn-remove" type="reset" @onclick="@HandleReset">Nulstil ændringer</button>
-        <button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
-    </div>
+        <div class="d-flex flex-sm-grow-0 gap-md-2 justify-content-end">
+            <button class="btn-add" disabled="@(!InputHasChanged)" type="submit">Opdater</button>
+            <button class="btn-remove" type="reset" @onclick="@HandleReset">Nulstil ændringer</button>
+            <button class="btn-remove" type="button" @onclick="@HandleCancel">Annuller</button>
+        </div>
 
-</EditForm>
+    </EditForm>
+}
 
 
 
@@ -57,7 +60,7 @@
 
     private List<TreatmentViewModel> _treatments { get; set; } = new List<TreatmentViewModel>();
 
-    protected async override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         if (EmployeeToUpdate != null)
         {
@@ -166,6 +169,14 @@
         catch (Exception ex)
         {
             Snackbar.Add($"Der skete en fejl under indlæsning af behandlinger: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void Dispose()
+    {
+        if (editContext != null)
+        {
+            editContext.OnFieldChanged -= HandleFieldChanged!;
         }
     }
 

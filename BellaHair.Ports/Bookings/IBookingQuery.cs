@@ -20,6 +20,7 @@ namespace BellaHair.Ports.Bookings
         Task<IEnumerable<BookingDTO>> GetOldPaginatedAsync(int skip, int take, string? search = null);
         Task<IEnumerable<BookingCalendarDTO>> GetAllWithinPeriodOnEmployee(DateTime startDateTime, DateTime endDateTime, Guid employeeId);
         Task<bool> BookingHasOverlap(BookingIsAvailableQuery query);
+        Task<int> GetAllTodayCountAsync();
     }
 
     public record BookingWithRelationsDTO(

@@ -1,4 +1,5 @@
-﻿using BellaHair.Domain.PrivateCustomers;
+﻿using BellaHair.Domain.Discounts;
+using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -178,6 +179,11 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             }
 
             return pclist;
+        }
+
+        async Task<int> IPrivateCustomerQuery.GetCountAsync()
+        {
+            return await _db.PrivateCustomers.AsNoTracking().CountAsync();
         }
     }
 }

@@ -345,11 +345,11 @@ namespace CrossCut
                 new DateTime(2026, 6, 1, 12, 0, 0),
                 new DateTime(2026, 8, 1, 12, 0, 0),
                 new List<Guid> {
-                    _damefrisureInklVaskFøn.Id,
-                    _damefrisureBlæs.Id,
-                    _storKlipning.Id,
-                    _herreklipMedVaskFøn.Id,
-                    _herreklipUdenVaskFøn.Id
+                    _damefrisureInklVaskFøn!.Id,
+                    _damefrisureBlæs!.Id,
+                    _storKlipning!.Id,
+                    _herreklipMedVaskFøn!.Id,
+                    _herreklipUdenVaskFøn!.Id
                 }));
 
             // Vinter Permanent Udsalg (afsluttet)
@@ -358,11 +358,11 @@ namespace CrossCut
                 new DateTime(2025, 1, 15, 9, 0, 0),
                 new DateTime(2025, 2, 28, 18, 0, 0),
                 new List<Guid> {
-                    _permanentHalvkortHårMedKlip.Id,
-                    _permanentHalvkortHårUdenKlip.Id,
-                    _permanentLangtHårUdenKlip.Id,
-                    _permanentLangtHårMedKlip.Id,
-                    _herreKlipPermanent.Id
+                    _permanentHalvkortHårMedKlip!.Id,
+                    _permanentHalvkortHårUdenKlip!.Id,
+                    _permanentLangtHårUdenKlip!.Id,
+                    _permanentLangtHårMedKlip!.Id,
+                    _herreKlipPermanent!.Id
                 }));
 
             // Galla & Fest Klar
@@ -371,10 +371,10 @@ namespace CrossCut
                 _currentDateTimeProvider.GetCurrentDateTime().AddMonths(2),
                 _currentDateTimeProvider.GetCurrentDateTime().AddMonths(3),
                 new List<Guid> {
-                    _hårOpsætningElegance.Id,
-                    _hårOpsætningKompleks.Id,
-                    _ordneBrynVipper.Id,
-                    _damefrisureBlæs.Id
+                    _hårOpsætningElegance!.Id,
+                    _hårOpsætningKompleks!.Id,
+                    _ordneBrynVipper!.Id,
+                    _damefrisureBlæs!.Id
                 }));
 
             // Farve Fornyelse
@@ -383,13 +383,13 @@ namespace CrossCut
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(-12),
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(18),
                 new List<Guid> {
-                    _helfarveHalvKortHårMedKlip.Id,
-                    _helfarveLangtHårMedKlip.Id,
-                    _balayageUdenKlip.Id,
-                    _staniolStriberIHalvkortHårMedKlip.Id,
-                    _staniolStriberILangtHårMedKlip.Id,
-                    _hætteStriberIHalvkortHårMedKlip.Id,
-                    _hætteStriberILangtHårMedKlip.Id
+                    _helfarveHalvKortHårMedKlip!.Id,
+                    _helfarveLangtHårMedKlip!.Id,
+                    _balayageUdenKlip!.Id,
+                    _staniolStriberIHalvkortHårMedKlip!.Id,
+                    _staniolStriberILangtHårMedKlip!.Id,
+                    _hætteStriberIHalvkortHårMedKlip!.Id,
+                    _hætteStriberILangtHårMedKlip!.Id
                 }));
 
             // Balayage Mesterværk
@@ -399,11 +399,11 @@ namespace CrossCut
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(11),
                 new List<Guid> {
                     _balayageUdenKlip.Id,
-                    _balayageMedKlip.Id,
-                    _staniolStriberIHalvkortHårMedKlip.Id,
-                    _staniolStriberIHalvkortHårUdenKlip.Id,
+                    _balayageMedKlip!.Id,
+                    _staniolStriberIHalvkortHårMedKlip!.Id,
+                    _staniolStriberIHalvkortHårUdenKlip!.Id,
                     _staniolStriberILangtHårMedKlip.Id,
-                    _staniolStriberILangtHårUdenKlip.Id
+                    _staniolStriberILangtHårUdenKlip!.Id
                 }));
 
             // Hurtig Tilretning Tirsdag
@@ -412,7 +412,7 @@ namespace CrossCut
                 new DateTime(2027, 2, 2, 10, 0, 0),
                 new DateTime(2027, 2, 2, 16, 0, 0),
                 new List<Guid> {
-                    _lilleTilretning.Id
+                    _lilleTilretning!.Id
                 }));
 
             // Forkælelsestider 
@@ -422,8 +422,8 @@ namespace CrossCut
                 _currentDateTimeProvider.GetCurrentDateTime().AddDays(2),
                 new List<Guid>
                 {
-                    _luksusKur.Id,
-                    _retFarveBryn.Id,
+                    _luksusKur!.Id,
+                    _retFarveBryn!.Id,
                 }));
 
             // Langt Hår Helfarve Tilbud
@@ -433,7 +433,7 @@ namespace CrossCut
                 new DateTime(2027, 2, 15, 18, 0, 0),
                 new List<Guid> {
                     _helfarveLangtHårMedKlip.Id,
-                    _helfarveLangtHårUdenKlip.Id,
+                    _helfarveLangtHårUdenKlip!.Id,
                     _helfarveHalvKortHårMedKlip.Id
                 }));
 

@@ -62,29 +62,25 @@
 	[SupplyParameterFromQuery(Name = "tab")]
 	public string? Tab { get; set; }
 
-	protected async override Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
-
-		string? searchedTerm = null;
-
-		if (SearchTerm != null) searchedTerm = SearchTerm;
-
-		if (Tab == "old") await HandleOldSelectorClick();
-		else await HandleNewSelectorClick();
-
-		if (searchedTerm != null)
-		{
-			SearchTerm = searchedTerm;
-			await ApplyFilter();
-		}
-	}
-
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
 		{
+			string? searchedTerm = null;
+
+			if (SearchTerm != null) searchedTerm = SearchTerm;
+
+			if (Tab == "old") await HandleOldSelectorClick();
+			else await HandleNewSelectorClick();
+
+			if (searchedTerm != null)
+			{
+				SearchTerm = searchedTerm;
+				await ApplyFilter();
+			}
+
 			await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
+			StateHasChanged();
 		}
 	}
 
@@ -93,16 +89,15 @@
 	{
 		if (!_busy && !_allLoaded)
 		{
-			_busy = true;
 			await LoadMoreAsync();
 			StateHasChanged();
 			await Task.Delay(1);
-			_busy = false;
 		}
 	}
 
 	private async Task LoadMoreAsync()
 	{
+		_busy = true;
 		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
 		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
@@ -135,6 +130,7 @@
 		{
 			_allLoaded = true;
 		}
+		_busy = false;
 	}
 
 	private async Task HandleNewSelectorClick()

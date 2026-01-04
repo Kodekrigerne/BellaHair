@@ -13,6 +13,7 @@
         Task<IEnumerable<PrivateCustomerDTO>> GetCustomersPaginatedAsync(int skip, int take, string? search = null);
         Task<int> GetCustomerCountAsync(string? search = null);
         Task<bool> PCFutureBookingsCheck(Guid id);
+        Task<int> GetCountAsync();
     }
 
     public record GetPrivateCustomerQuery(Guid Id);

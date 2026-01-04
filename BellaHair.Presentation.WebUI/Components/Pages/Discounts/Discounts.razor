@@ -30,7 +30,7 @@
 	<hr />
 </div>
 
-@if (_discounts == null) { <p>Loading</p> }
+@if (_discounts == null) { <p>Loading...</p> }
 else if (_activeTab == DiscountTab.General)
 {
 	<h4>Stamkunderabat (@LoyaltyCount)</h4>
@@ -74,13 +74,18 @@ else if (_activeTab == DiscountTab.Campaign)
 
 	private BirthdayDiscountViewModel? _birthdayDiscount;
 
-	protected override async Task OnInitializedAsync()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnInitializedAsync();
+		await base.OnAfterRenderAsync(firstRender);
 
-		await UpdateCounts();
-		await HandleGeneralSelectorClick();
+		if (firstRender)
+		{
+			await UpdateCounts();
+			await HandleGeneralSelectorClick();
+			StateHasChanged();
+		}
 	}
+
 
 	private async Task HandleOnCreateCampaign()
 	{
