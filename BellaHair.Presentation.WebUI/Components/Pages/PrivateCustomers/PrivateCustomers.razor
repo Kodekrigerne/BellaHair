@@ -8,7 +8,7 @@
 @using SharedKernel
 
 @attribute [StreamRendering]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
@@ -67,26 +67,21 @@
 	private CancellationTokenSource? _searchCts;
 	private const int DebounceDelayMs = 300;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async Task OnInitializedAsync()
 	{
-		await base.OnAfterRenderAsync(firstRender);
+		await base.OnInitializedAsync();
 
-		if (firstRender)
+		string? searchedTerm = null;
+
+		if (SearchTerm != null)
 		{
-			string? searchedTerm = null;
-
-			if (SearchTerm != null)
-			{
-				searchedTerm = SearchTerm;
-				await ApplyFilter();
-			}
-
-			await LoadLoyaltyDiscounts();
-
-			await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
-
-			StateHasChanged();
+			searchedTerm = SearchTerm;
+			await ApplyFilter();
 		}
+
+		await LoadLoyaltyDiscounts();
+
+		await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
 	}
 
 	[JSInvokable]
