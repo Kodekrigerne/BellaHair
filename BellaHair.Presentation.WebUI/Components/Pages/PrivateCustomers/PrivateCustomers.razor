@@ -12,6 +12,7 @@
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
+@inject IJSRuntime JSRuntime
 
 
 <PageHeader HeaderText="Kundekatalog" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
@@ -23,26 +24,26 @@
 </Modal>
 
 <!-- Container til privatecustomer 'cards' -->
-<div class="kk-container privatecustomer-container">
+<div class="kk-container privatecustomer-container" @ref="_scrollDiv">
 
     <!-- Search bar til at filtrere kunder samt vise antal kunder fundet -->
 	<div class="search-bar-container">
-		<h4>Kunder (@filteredCustomers!.Count)</h4>
+		<h4>Kunder (@_count)</h4>
 		<input type="text" class="form-control customer-search" placeholder="Søg efter kunde" 
 		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
 
 	</div>
 	
-	@if (filteredCustomers is null)
+	@if (_customers is null)
 	{
 		<h1>Der kunne ikke findes nogen kunder i databasen.</h1>
 	}
 	else
 	{
-		foreach (var customer in filteredCustomers)
+		foreach (var customer in _customers)
 		{
 			<!-- Card komponent der tager imod en customer. OnChange er komponentens EventCallBack. -->
-			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers" LoyaltyDiscounts="loyaltyDiscounts"></PrivateCustomerCard>
+			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadMoreCustomersAsync" LoyaltyDiscounts="loyaltyDiscounts"></PrivateCustomerCard>
 		}
 	}
 </div>
@@ -50,66 +51,105 @@
 @code {
 	private bool showCreateModal = false;
 
-	private List<PrivateCustomerDTO>? allCustomers = [];
-	private List<PrivateCustomerDTO>? filteredCustomers = [];
-	private List<LoyaltyDiscountDTO>? loyaltyDiscounts = [];
+	private List<PrivateCustomerDTO> _customers = [];
+	private int _count;
+
+	private List<LoyaltyDiscountDTO> loyaltyDiscounts = [];
 
 	private string SearchTerm { get; set; } = string.Empty;
 
-	protected override async Task OnInitializedAsync()
+	private ElementReference _scrollDiv;
+	private bool _busy = false;
+	private bool _allLoaded = false;
+	private int _skip = 0;
+	private const int PageSize = 20;
+
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await base.OnInitializedAsync();
+		await base.OnAfterRenderAsync(firstRender);
 
-		await LoadCustomers();
+		if (firstRender)
+		{
+			string? searchedTerm = null;
 
-		await LoadLoyaltyDiscounts();
+			if (SearchTerm != null)
+			{
+				searchedTerm = SearchTerm;
+				await ApplyFilter();
+			}
+
+			await LoadLoyaltyDiscounts();
+
+			await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
+
+            StateHasChanged();
+		}
 	}
 
-	private async Task LoadCustomers()
+	[JSInvokable]
+	public async Task OnScrollToBottom()
 	{
-		// Forsøger at populate allCustomers-listen med alle privatkunder.
-		try
+		if (!_busy && !_allLoaded)
 		{
-			allCustomers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			filteredCustomers = allCustomers;
+			_busy = true;
+			await LoadMoreCustomersAsync();
+			StateHasChanged();
+			await Task.Delay(1);
+			_busy = false;
 		}
+	}
 
-		catch (DomainException ex)
-		{
-			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
-		}
+	private async Task LoadMoreCustomersAsync()
+	{
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
-		catch (Exception ex)
+		var more = await PrivateCustomerQuery.GetCustomersPaginatedAsync(_skip, PageSize, search);
+
+		var newCustomers = more.Select(c => new PrivateCustomerDTO(
+				c.Id,
+		c.FirstName,
+		c.MiddleName,
+		c.LastName,
+		c.FullName,
+		c.StreetName,
+		c.City,
+		c.StreetNumber,
+		c.ZipCode,
+		c.Floor,
+		c.FullAddress,
+		c.PhoneNumber,
+		c.Email,
+		c.Birthday,
+		c.Visits))
+			.ToList();
+
+		_customers.AddRange(newCustomers);
+		_skip += PageSize;
+		if (newCustomers.Count < PageSize)
 		{
-			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
+			_allLoaded = true;
 		}
 	}
 
 	// Metode til at filtrere kunder baseret på søgetermen.
-	private void ApplyFilter()
+	
+	private async Task ApplyFilter()
 	{
-		if (string.IsNullOrWhiteSpace(SearchTerm))
-		{
-			filteredCustomers = allCustomers;
-		}
-		else
-		{
-			filteredCustomers = allCustomers!
-			.Where(c => c.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.FullAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.PhoneNumber.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.Birthday.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-			.ToList();
-		}
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
-		StateHasChanged();
+		_customers.Clear();
+		_skip = 0;
+		_allLoaded = false;
+		_count = await PrivateCustomerQuery.GetCustomerCountAsync(search);
+
+		await LoadMoreCustomersAsync();
 	}
 
 	private async Task HandleCreate()
 	{
 		showCreateModal = false;
-		await LoadCustomers();
+		await LoadMoreCustomersAsync();
 	}
 
 	private void HandleCancel()

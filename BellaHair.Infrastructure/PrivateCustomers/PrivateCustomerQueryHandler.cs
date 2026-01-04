@@ -1,4 +1,5 @@
-﻿using BellaHair.Ports.PrivateCustomers;
+﻿using BellaHair.Domain.PrivateCustomers;
+using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
@@ -82,12 +83,101 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             return pclist;
         }
 
+        async Task<int> IPrivateCustomerQuery.GetCustomerCountAsync(string? search)
+        {
+            var query = _db.PrivateCustomers
+                .AsNoTracking();
+
+            var searched = search != null ? ApplySearchFilter(query, search) : query;
+
+            return await searched.CountAsync();
+        }
+
         // Checker om der findes nogen bookings for kunden, der ligger i fremtiden.
         async Task<bool> IPrivateCustomerQuery.PCFutureBookingsCheck(Guid id)
         {
             return await _db.PrivateCustomers
                 .Where(p => p.Id == id)
                 .AnyAsync(p => p.Bookings.Any(b => b.StartDateTime > _currentDateTimeProvider.GetCurrentDateTime()));
+        }
+
+        async Task<IEnumerable<PrivateCustomerDTO>> IPrivateCustomerQuery.GetCustomersPaginatedAsync(int skip, int take, string? search)
+        {
+            var ordered = _db.PrivateCustomers
+                .AsNoTracking()
+                .OrderBy(c => c.Name.LastName);
+
+            var searched = search != null ? ApplySearchFilter(ordered, search) : ordered;
+            var paginated = searched
+                .Skip(skip)
+                .Take(take);
+
+            return await MapToPrivateCustomerDTOs(paginated);
+        }
+
+        private static IQueryable<PrivateCustomer> ApplySearchFilter(IQueryable<PrivateCustomer> query, string search)
+        {
+            if (search == null || search == string.Empty) return query;
+            search = search.ToLower();
+
+            return query.Where(c =>
+            c.Name.FullName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+            c.Address.FullAddress.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+            c.Email.Value.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+            c.PhoneNumber.Value.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+            c.Birthday.ToString().Contains(search, StringComparison.OrdinalIgnoreCase)
+            );
+        }
+
+        private async Task<IEnumerable<PrivateCustomerDTO>> MapToPrivateCustomerDTOs(IQueryable<PrivateCustomer> query)
+        {
+            //return await query
+            //.Select(customer => new PrivateCustomerDTO(
+            //    customer.Id,
+            //    customer.Name.FirstName,
+            //    customer.Name.MiddleName,
+            //    customer.Name.LastName,
+            //    customer.Name.FullName,
+            //    customer.Address.StreetName,
+            //    customer.Address.City,
+            //    customer.Address.StreetNumber,
+            //    customer.Address.ZipCode,
+            //    customer.Address.Floor,
+            //    customer.Address.FullAddress,
+            //    customer.PhoneNumber.Value,
+            //    customer.Email.Value,
+            //    customer.Birthday,
+            //    0
+            //    ))
+            //.ToListAsync();
+
+            var customers = await query.ToListAsync();
+
+            var pclist = new List<PrivateCustomerDTO>();
+
+            foreach (var customer in customers)
+            {
+                var visits = await _customerVisitsService.GetCustomerVisitsAsync(customer.Id);
+
+                pclist.Add(new PrivateCustomerDTO(
+                        customer.Id,
+                        customer.Name.FirstName,
+                        customer.Name.MiddleName,
+                        customer.Name.LastName,
+                        customer.Name.FullName,
+                        customer.Address.StreetName,
+                        customer.Address.City,
+                        customer.Address.StreetNumber,
+                        customer.Address.ZipCode,
+                        customer.Address.Floor,
+                        customer.Address.FullAddress,
+                        customer.PhoneNumber.Value,
+                        customer.Email.Value,
+                        customer.Birthday,
+                        visits));
+            }
+
+            return pclist;
         }
     }
 }
