@@ -8,10 +8,11 @@
 @using SharedKernel
 
 @attribute [StreamRendering]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 @inject IPrivateCustomerQuery PrivateCustomerQuery
 @inject ISnackbar Snackbar
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
+@inject IJSRuntime JSRuntime
 
 
 <PageHeader HeaderText="Kundekatalog" HeaderSubText="Administrer og tilføj kunder" NewButtonText="Opret ny kunde" OnNewButtonClicked="@(() => { showCreateModal = true; })" />
@@ -23,26 +24,26 @@
 </Modal>
 
 <!-- Container til privatecustomer 'cards' -->
-<div class="kk-container privatecustomer-container">
+<div class="kk-container privatecustomer-container" @ref="_scrollDiv">
 
     <!-- Search bar til at filtrere kunder samt vise antal kunder fundet -->
 	<div class="search-bar-container">
-		<h4>Kunder (@filteredCustomers!.Count)</h4>
+		<h4>Kunder (@_count)</h4>
 		<input type="text" class="form-control customer-search" placeholder="Søg efter kunde" 
-		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
+		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@OnSearchTermChanged" />
 
 	</div>
 	
-	@if (filteredCustomers is null)
+	@if (_customers is null)
 	{
 		<h1>Der kunne ikke findes nogen kunder i databasen.</h1>
 	}
 	else
 	{
-		foreach (var customer in filteredCustomers)
+		foreach (var customer in _customers)
 		{
 			<!-- Card komponent der tager imod en customer. OnChange er komponentens EventCallBack. -->
-			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadCustomers" LoyaltyDiscounts="loyaltyDiscounts"></PrivateCustomerCard>
+			<PrivateCustomerCard PrivateCustomer="@customer" OnChange="@LoadMoreCustomersAsync" LoyaltyDiscounts="loyaltyDiscounts"></PrivateCustomerCard>
 		}
 	}
 </div>
@@ -50,66 +51,122 @@
 @code {
 	private bool showCreateModal = false;
 
-	private List<PrivateCustomerDTO>? allCustomers = [];
-	private List<PrivateCustomerDTO>? filteredCustomers = [];
-	private List<LoyaltyDiscountDTO>? loyaltyDiscounts = [];
+	private List<PrivateCustomerDTO> _customers = [];
+	private int _count;
+
+	private List<LoyaltyDiscountDTO> loyaltyDiscounts = [];
 
 	private string SearchTerm { get; set; } = string.Empty;
+
+	private ElementReference _scrollDiv;
+	private bool _busy = false;
+	private bool _allLoaded = false;
+	private int _skip = 0;
+	private const int PageSize = 20;
+
+	private CancellationTokenSource? _searchCts;
+	private const int DebounceDelayMs = 300;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 
-		await LoadCustomers();
+		string? searchedTerm = null;
+
+		if (SearchTerm != null)
+		{
+			searchedTerm = SearchTerm;
+			await ApplyFilter();
+		}
 
 		await LoadLoyaltyDiscounts();
+
+		await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
 	}
 
-	private async Task LoadCustomers()
+	[JSInvokable]
+	public async Task OnScrollToBottom()
 	{
-		// Forsøger at populate allCustomers-listen med alle privatkunder.
+		if (!_busy && !_allLoaded)
+		{
+			_busy = true;
+			await LoadMoreCustomersAsync();
+			StateHasChanged();
+			await Task.Delay(1);
+			_busy = false;
+		}
+	}
+
+	private async Task LoadMoreCustomersAsync()
+	{
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+
+		var more = await PrivateCustomerQuery.GetCustomersPaginatedAsync(_skip, PageSize, search);
+
+		var newCustomers = more.Select(c => new PrivateCustomerDTO(
+				c.Id,
+		c.FirstName,
+		c.MiddleName,
+		c.LastName,
+		c.FullName,
+		c.StreetName,
+		c.City,
+		c.StreetNumber,
+		c.ZipCode,
+		c.Floor,
+		c.FullAddress,
+		c.PhoneNumber,
+		c.Email,
+		c.Birthday,
+		c.Visits))
+			.ToList();
+
+		_customers.AddRange(newCustomers);
+		_skip += PageSize;
+		if (newCustomers.Count < PageSize)
+		{
+			_allLoaded = true;
+		}
+	}
+
+	private async Task OnSearchTermChanged()
+	{
+		_searchCts?.Cancel();
+		_searchCts?.Dispose();
+		_searchCts = new CancellationTokenSource();
+
+		var token = _searchCts.Token;
+
 		try
 		{
-			allCustomers = await PrivateCustomerQuery.GetPrivateCustomersAsync();
-			filteredCustomers = allCustomers;
-		}
+			await Task.Delay(DebounceDelayMs, token);
 
-		catch (DomainException ex)
-		{
-			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
+			await ApplyFilter();
 		}
-
-		catch (Exception ex)
+		catch (TaskCanceledException)
 		{
-			Snackbar.Add($"Noget gik galt. Fejlbesked: {ex.Message}", Severity.Error);
+			// Search blev cancelled af et nyere input - dette er forventeligt.
 		}
 	}
 
-	// Metode til at filtrere kunder baseret på søgetermen.
-	private void ApplyFilter()
-	{
-		if (string.IsNullOrWhiteSpace(SearchTerm))
-		{
-			filteredCustomers = allCustomers;
-		}
-		else
-		{
-			filteredCustomers = allCustomers!
-			.Where(c => c.FullName.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.FullAddress.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.Email.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.PhoneNumber.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-			c.Birthday.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-			.ToList();
-		}
 
-		StateHasChanged();
+	// Metode til at filtrere kunder baseret på søgetermen.
+	private async Task ApplyFilter()
+	{
+		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+
+		_customers.Clear();
+		_skip = 0;
+		_allLoaded = false;
+		_count = await PrivateCustomerQuery.GetCustomerCountAsync(search);
+
+		await LoadMoreCustomersAsync();
 	}
 
 	private async Task HandleCreate()
 	{
 		showCreateModal = false;
-		await LoadCustomers();
+		await LoadMoreCustomersAsync();
 	}
 
 	private void HandleCancel()
