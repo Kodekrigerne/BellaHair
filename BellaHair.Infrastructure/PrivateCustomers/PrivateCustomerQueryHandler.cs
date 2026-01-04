@@ -1,5 +1,4 @@
-﻿using BellaHair.Domain.Discounts;
-using BellaHair.Domain.PrivateCustomers;
+﻿using BellaHair.Domain.PrivateCustomers;
 using BellaHair.Ports.PrivateCustomers;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
@@ -122,36 +121,15 @@ namespace BellaHair.Infrastructure.PrivateCustomers
             search = search.ToLower();
 
             return query.Where(c =>
-            c.Name.FullName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-            c.Address.FullAddress.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-            c.Email.Value.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-            c.PhoneNumber.Value.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-            c.Birthday.ToString().Contains(search, StringComparison.OrdinalIgnoreCase)
-            );
+                (c.Name.FullName.ToLower()).Contains(search) ||
+                (c.Address.FullAddress.ToLower()).Contains(search) ||
+                (c.Email.Value.ToLower()).Contains(search) ||
+                (c.PhoneNumber.Value.ToLower()).Contains(search) ||
+                (c.Birthday.ToString().ToLower()).Contains(search));
         }
 
         private async Task<IEnumerable<PrivateCustomerDTO>> MapToPrivateCustomerDTOs(IQueryable<PrivateCustomer> query)
         {
-            //return await query
-            //.Select(customer => new PrivateCustomerDTO(
-            //    customer.Id,
-            //    customer.Name.FirstName,
-            //    customer.Name.MiddleName,
-            //    customer.Name.LastName,
-            //    customer.Name.FullName,
-            //    customer.Address.StreetName,
-            //    customer.Address.City,
-            //    customer.Address.StreetNumber,
-            //    customer.Address.ZipCode,
-            //    customer.Address.Floor,
-            //    customer.Address.FullAddress,
-            //    customer.PhoneNumber.Value,
-            //    customer.Email.Value,
-            //    customer.Birthday,
-            //    0
-            //    ))
-            //.ToListAsync();
-
             var customers = await query.ToListAsync();
 
             var pclist = new List<PrivateCustomerDTO>();

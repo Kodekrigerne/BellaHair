@@ -30,7 +30,7 @@
 	<div class="search-bar-container">
 		<h4>Kunder (@_count)</h4>
 		<input type="text" class="form-control customer-search" placeholder="Søg efter kunde" 
-		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
+		@bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@OnSearchTermChanged" />
 
 	</div>
 	
@@ -64,6 +64,8 @@
 	private int _skip = 0;
 	private const int PageSize = 20;
 
+	private CancellationTokenSource? _searchCts;
+	private const int DebounceDelayMs = 300;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -83,7 +85,7 @@
 
 			await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
 
-            StateHasChanged();
+			StateHasChanged();
 		}
 	}
 
@@ -132,8 +134,28 @@
 		}
 	}
 
+	private async Task OnSearchTermChanged()
+	{
+		_searchCts?.Cancel();
+		_searchCts?.Dispose();
+		_searchCts = new CancellationTokenSource();
+
+		var token = _searchCts.Token;
+
+		try
+		{
+			await Task.Delay(DebounceDelayMs, token);
+
+			await ApplyFilter();
+		}
+		catch (TaskCanceledException)
+		{
+			// Search blev cancelled af et nyere input - dette er forventeligt.
+		}
+	}
+
+
 	// Metode til at filtrere kunder baseret på søgetermen.
-	
 	private async Task ApplyFilter()
 	{
 		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
