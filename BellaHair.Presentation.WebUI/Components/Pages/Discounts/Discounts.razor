@@ -10,7 +10,7 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Discounts.CampaignDiscount
 @using SharedKernel
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @inject ILoyaltyDiscountQuery LoyaltyDiscountQuery
 @inject ISnackbar Snackbar;
@@ -74,16 +74,12 @@ else if (_activeTab == DiscountTab.Campaign)
 
 	private BirthdayDiscountViewModel? _birthdayDiscount;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async Task OnInitializedAsync()
 	{
-		await base.OnAfterRenderAsync(firstRender);
+		await base.OnInitializedAsync();
 
-		if (firstRender)
-		{
 			await UpdateCounts();
 			await HandleGeneralSelectorClick();
-			StateHasChanged();
-		}
 	}
 
 
