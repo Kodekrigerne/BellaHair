@@ -6,7 +6,7 @@
 @using SharedKernel
 @inject IInvoiceQuery InvoiceQuery
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @inject NavigationManager NavigationManager;
 @inject ISnackbar Snackbar;
@@ -69,14 +69,11 @@
 
 	private DateTime _now;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
+	protected override async Task OnInitializedAsync()
 	{
-		await base.OnAfterRenderAsync(firstRender);
+		await base.OnInitializedAsync();
 
-		if (firstRender)
-		{
-			_now = CurrentDateTimeProvider.GetCurrentDateTime();
-		}
+		_now = CurrentDateTimeProvider.GetCurrentDateTime();
 	}
 
 	private void HandleBookingClick()
