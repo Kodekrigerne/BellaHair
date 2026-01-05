@@ -103,7 +103,7 @@
 					}
 				</div>
 			</div>
-			<div class="left-container">
+			<div class="left-container" style="margin-bottom: 2rem;">
 				<div class="pick-container">
 					@if (_productLines.Count == 0 && (Mode == BookingMode.Edit || Mode == BookingMode.New))
 					{
@@ -124,6 +124,16 @@
 					}
 				</div>
 			</div>
+			@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
+			{
+				<EmployeeDailyCalendar EmployeeBookingData="_employees"
+									   StartDate="_startDate"
+									   StartTime="_startTime"
+									   EndTime="_endTime"
+									   Employee="_employee"
+									   CurrentDate="_startDate.Value"
+									   CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
+			}
 		</div>
 		<div class="body-right">
 			<div class="right-picker">
@@ -269,17 +279,6 @@
 			}
 		</div>
 	</div>
-	@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
-	{
-		<EmployeeDailyCalendar
-			EmployeeBookingData="_employees"
-			StartDate="_startDate"
-			StartTime="_startTime"
-			EndTime="_endTime"
-			Employee="_employee"
-			CurrentDate="_startDate.Value"
-			CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
-	} 
 </div>
 
 @code {
