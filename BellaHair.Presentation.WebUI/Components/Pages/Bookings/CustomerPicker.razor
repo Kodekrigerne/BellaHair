@@ -1,19 +1,23 @@
 ﻿@using BellaHair.Ports.PrivateCustomers
 @using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
 
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@rendermode @(new InteractiveServerRenderMode(prerender: true))
 
 @inject IPrivateCustomerQuery CustomerQuery
 @inject ISnackbar Snackbar
+@inject IJSRuntime JSRuntime
 
-@foreach (var customer in _customers)
-{
-	<button class="picker-btn" @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
-}
+<div class="right-picker" @ref="_scrollDiv">
+	@foreach (var customer in _customers)
+	{
+		<button class="picker-btn" @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
+	}
+</div>
 
 @code {
 	private List<PrivateCustomerViewModel> _customers = [];
 
+	private ElementReference _scrollDiv;
 	private bool _busy = false;
 	private bool _allLoaded = false;
 	private int _skip = 0;
@@ -27,20 +31,40 @@
 		await base.OnInitializedAsync();
 
 		await LoadMoreCustomers();
+
+		await JSRuntime.InvokeVoidAsync("attachDotNetScrollHandler", _scrollDiv, DotNetObjectReference.Create(this));
 	}
 
 	private async Task LoadMoreCustomers()
 	{
-		_busy = true;
+		try {
+			_busy = true;
 
-		var more = (await CustomerQuery.GetCustomersPaginatedAsync(_skip, PageSize))
-			.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
-			.ToList();
+			var more = (await CustomerQuery.GetCustomersPaginatedAsync(_skip, PageSize))
+				.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
+				.ToList();
 
-		_customers.AddRange(more);
-		_skip += PageSize;
-		if (more.Count < PageSize) _allLoaded = true;
-		_busy = false;
+			_customers.AddRange(more);
+			_skip += PageSize;
+			if (more.Count < PageSize) _allLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add("Indlæsning af kunder fejlede.", Severity.Error);
+			Console.WriteLine(ex.Message);
+		}
+		finally { _busy = false; }
+	}
+
+	[JSInvokable]
+	public async Task OnScrollToBottom()
+	{
+		if (!_busy && !_allLoaded)
+		{
+			await LoadMoreCustomers();
+			StateHasChanged();
+			await Task.Delay(1);
+		}
 	}
 
 	private async Task HandleCustomerPickerClick(Guid customerId)
@@ -50,3 +74,17 @@
 		if (OnCustomerPicked.HasDelegate) await OnCustomerPicked.InvokeAsync(customer);
 	}
 }
+
+<style>
+	.right-picker {
+		display: flex;
+		flex-direction: column;
+		height: 20rem;
+		border-style: solid;
+		border-width: 1px;
+		border-color: black;
+		border-radius: 6px;
+		overflow-x: auto;
+		overflow-y: scroll;
+	}
+</style>

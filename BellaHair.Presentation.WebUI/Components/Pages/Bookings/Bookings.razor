@@ -100,37 +100,44 @@
 
 	private async Task LoadMoreAsync()
 	{
-		_busy = true;
-		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+		try {
+			_busy = true;
+			var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
-		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
+			var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
 
-		var newBookings = more.Select(b => new BookingViewModel(
-				b.Id,
-				b.StartDateTime,
-				b.EndDateTime,
-				DateOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.EndDateTime),
-				b.IsPaid,
-				b.TotalBase,
-				b.TotalWithDiscount,
-				b.EmployeeFullName,
-				b.CustomerFullName,
-				b.CustomerAddress,
-				b.CustomerPhone,
-				b.CustomerEmail,
-				b.TreatmentName,
-				b.DurationMinutes,
-				b.Discount?.Name,
-				b.Discount?.Amount
-			))
-			.ToList();
+			var newBookings = more.Select(b => new BookingViewModel(
+					b.Id,
+					b.StartDateTime,
+					b.EndDateTime,
+					DateOnly.FromDateTime(b.StartDateTime),
+					TimeOnly.FromDateTime(b.StartDateTime),
+					TimeOnly.FromDateTime(b.EndDateTime),
+					b.IsPaid,
+					b.TotalBase,
+					b.TotalWithDiscount,
+					b.EmployeeFullName,
+					b.CustomerFullName,
+					b.CustomerAddress,
+					b.CustomerPhone,
+					b.CustomerEmail,
+					b.TreatmentName,
+					b.DurationMinutes,
+					b.Discount?.Name,
+					b.Discount?.Amount
+				))
+				.ToList();
 
-		_bookings.AddRange(newBookings);
-		_skip += PageSize;
-		if (newBookings.Count < PageSize) _allLoaded = true;
-		_busy = false;
+			_bookings.AddRange(newBookings);
+			_skip += PageSize;
+			if (newBookings.Count < PageSize) _allLoaded = true;
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add("Indlæsning af bookinger fejlede.", Severity.Error);
+			Console.WriteLine(ex.Message);
+		}
+		finally { _busy = false; }
 	}
 
 	private async Task HandleNewSelectorClick()
@@ -199,6 +206,7 @@
 		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
 		_bookings.Clear();
+		StateHasChanged();
 		_skip = 0;
 		_allLoaded = false;
 		_count = _activeTab == BookingTab.New
