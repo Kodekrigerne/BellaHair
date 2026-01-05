@@ -1,0 +1,40 @@
+﻿@using BellaHair.Ports.PrivateCustomers
+@using BellaHair.Presentation.WebUI.Components.Pages.PrivateCustomers
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+@inject IPrivateCustomerQuery CustomerQuery
+@inject ISnackbar Snackbar
+
+@foreach (var customer in _customers)
+{
+	<button class="picker-btn" @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
+}
+
+@code {
+	private List<PrivateCustomerViewModel> _customers = [];
+
+	[Parameter]
+	public EventCallback<PrivateCustomerViewModel> OnCustomerPicked { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		try
+		{
+			_customers = (await CustomerQuery.GetPrivateCustomersAsync())
+			.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
+			.OrderBy(e => e.FullName)
+			.ToList();
+		}
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private async Task HandleCustomerPickerClick(Guid customerId)
+	{
+		var customer = _customers.Find(c => c.Id == customerId);
+
+		if (OnCustomerPicked.HasDelegate) await OnCustomerPicked.InvokeAsync(customer);
+	}
+}
