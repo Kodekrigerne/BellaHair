@@ -156,6 +156,8 @@
 		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
 		_customers.Clear();
+		StateHasChanged();
+
 		_skip = 0;
 		_allLoaded = false;
 		_count = await PrivateCustomerQuery.GetCustomerCountAsync(search);
