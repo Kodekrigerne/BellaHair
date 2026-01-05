@@ -3,12 +3,14 @@
 @using BellaHair.Presentation.WebUI.Components.Pages.Employees
 @using System.Globalization
 @using Microsoft.Extensions.Options
+@using SharedKernel
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IOptions<OpeningTimesSettings> OpeningTimes
+@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 
 <div class="day-container">
     @if (EmployeeBookingData.Count == 0) { <p>Ingen medarbejdere fundet med den valgte behandling</p> }
@@ -87,6 +89,7 @@
     [Parameter]
     public EmployeeNameWithBookingsViewModel? Employee { get; set; }
 
+    private DateTime _now;
     private int[] _hours = [];
     private const int HourWidthRem = 4;
     private const int MinutesPerHour = 60;
@@ -96,8 +99,9 @@
     {
         await base.OnInitializedAsync();
 
-            _hours = Enumerable.Range(OpeningTimes.Value.OpeningTime.Hour, (OpeningTimes.Value.ClosingTime.Hour - OpeningTimes.Value.OpeningTime.Hour)).ToArray();
-            _openingHour = OpeningTimes.Value.OpeningTime.Hour;
+        _now = CurrentDateTimeProvider.GetCurrentDateTime();    
+        _hours = Enumerable.Range(OpeningTimes.Value.OpeningTime.Hour, (OpeningTimes.Value.ClosingTime.Hour - OpeningTimes.Value.OpeningTime.Hour)).ToArray();
+        _openingHour = OpeningTimes.Value.OpeningTime.Hour;
     }
 
     private string GetBookingStart(BookingTimesOnlyViewModel booking)
@@ -134,6 +138,8 @@
 
     private async Task HandlePreviousDateClick()
     {
+        if (CurrentDate.Date <= _now.Date) return;
+
         int daysToMove;
         if (CurrentDate.DayOfWeek == DayOfWeek.Monday) daysToMove = -3;
         else daysToMove = -1;

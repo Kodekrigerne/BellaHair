@@ -103,7 +103,7 @@
 					}
 				</div>
 			</div>
-			<div class="left-container">
+			<div class="left-container" style="margin-bottom: 2rem;">
 				<div class="pick-container">
 					@if (_productLines.Count == 0 && (Mode == BookingMode.Edit || Mode == BookingMode.New))
 					{
@@ -124,6 +124,16 @@
 					}
 				</div>
 			</div>
+			@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
+			{
+				<EmployeeDailyCalendar EmployeeBookingData="_employees"
+									   StartDate="_startDate"
+									   StartTime="_startTime"
+									   EndTime="_endTime"
+									   Employee="_employee"
+									   CurrentDate="_startDate.Value"
+									   CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
+			}
 		</div>
 		<div class="body-right">
 			<div class="right-picker">
@@ -135,10 +145,7 @@
 				{
 					@if (_activePicker == Picker.Customers)
 					{
-						@foreach (var customer in _customers)
-						{
-							<button class="picker-btn" @onclick="() => HandleCustomerPickerClick(customer.Id)">@customer.FullName</button>
-						}
+						<CustomerPicker OnCustomerPicked="HandleCustomerPicked" />
 					}
 					else if (_activePicker == Picker.Treatments)
 					{
@@ -272,17 +279,6 @@
 			}
 		</div>
 	</div>
-	@if (_startDate != null && (Mode == BookingMode.New || Mode == BookingMode.Edit))
-	{
-		<EmployeeDailyCalendar
-			EmployeeBookingData="_employees"
-			StartDate="_startDate"
-			StartTime="_startTime"
-			EndTime="_endTime"
-			Employee="_employee"
-			CurrentDate="_startDate.Value"
-			CurrentDateChanged="HandleAvailabilityCalenderDateChanged" />
-	} 
 </div>
 
 @code {
@@ -319,7 +315,6 @@
 	private bool? _timeIsAvailable;
 	private string? _statusMessage;
 
-	private List<PrivateCustomerViewModel> _customers = null!;
 	private List<TreatmentViewModel> _treatments = [];
 	private List<EmployeeNameWithBookingsViewModel> _employees = [];
 
@@ -340,7 +335,7 @@
 				NavigationManager.NavigateTo("/bookings");
 			}
 
-			if (Mode == BookingMode.New) await HandlePickCustomerClick();
+			if (Mode == BookingMode.New) HandlePickCustomerClick();
 			else if (Mode == BookingMode.View || Mode == BookingMode.Edit) await LoadBooking();
 			StateHasChanged();
 		}
@@ -434,109 +429,97 @@
 		_statusMessage = null;
 	}
 
-	private async Task HandlePickCustomerClick()
+	private void HandlePickCustomerClick()
 	{
-		if (_customers != null) return;
+		_activePicker = Picker.Customers;
+	}
+
+	private async Task HandlePickTreatmentClick()
+	{
+		if (_customer == null) return;
+
+		try {
+
+			_treatments = (await TreatmentQuery.GetAllAsync())
+			.Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
+			.OrderBy(t => t.Name)
+			.ToList();
+
+			_activePicker = Picker.Treatments;
+		}
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
+
+	private async Task HandlePickEmployeeClick()
+	{
+		if (_treatment == null) return;
+
+		await LoadEmployees();
+		await SetStartDateToNextOpen();
+
+		_activePicker = Picker.Employee;
+	}
+
+	private async Task LoadEmployees()
+	{
+		if (_treatment == null) return;
 
 		try
 		{
-			_customers = [];
-			_customers = (await CustomerQuery.GetPrivateCustomersAsync())
-            .Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
-            .OrderBy(e => e.FullName)
-            .ToList();
+			_employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
+				.Select(e => new EmployeeNameWithBookingsViewModel(
+					e.Id,
+					e.Name,
+					e.Bookings
+						.Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime))
+						.ToList()))
+				.OrderBy(e => e.Name)
+				.ToList();
+		}
+		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+	}
 
-            _activePicker = Picker.Customers;
-        }
-        catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
-    }
+	private async Task SetStartDateToNextOpen()
+	{
+		var openToDate = _now.Date;
 
-    private async Task HandlePickTreatmentClick()
-    {
-        if (_customer == null) return;
+		if (openToDate.TimeOfDay.Hours >= 18) openToDate = openToDate.Date.AddDays(1);
+		if (openToDate.DayOfWeek == DayOfWeek.Saturday) openToDate = openToDate.Date.AddDays(2);
+		else if (openToDate.DayOfWeek == DayOfWeek.Sunday) openToDate = openToDate.Date.AddDays(1);
 
-        try {
+		await SetStartDate(openToDate);
+	}
 
-            _treatments = (await TreatmentQuery.GetAllAsync())
-            .Select(t => new TreatmentViewModel(t.Id, t.Name, t.Price, t.Duration, t.EmployeeCount))
-            .OrderBy(t => t.Name)
-            .ToList();
+	private async Task SetStartDate(DateTime newStartDate)
+	{
+		//Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
+		//_ignoreDateChanged er nødvendigt her pga. en bug i Mudblazor hvor opdatering af _startDate
+		//	fører til kald af dens DateChanged (HandleDateChanged), selvom det er one-way binding.
+		//Da blazor batcher state changes opdaterer _startDateTime først når vi kalder Task.Delay
+		_ignoreDateChanged = true;
+		_startDate = newStartDate;
+		await Task.Delay(1);
+		_ignoreDateChanged = false;
+	}
 
-            _activePicker = Picker.Treatments;
-        }
-        catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
-    }
+	private async Task HandlePickStartDateTimeClick()
+	{
+		if (_employee == null) return;
 
-    private async Task HandlePickEmployeeClick()
-    {
-        if (_treatment == null) return;
+		if (_startDate == null) await SetStartDateToNextOpen();
 
-        await LoadEmployees();
-        await SetStartDateToNextOpen();
+		_activePicker = Picker.Time;
+		await Task.Delay(1);
 
-        _activePicker = Picker.Employee;
-    }
+		if (_datePickerRef != null) {
+			await _datePickerRef.OpenAsync();
+		}
+	}
 
-    private async Task LoadEmployees()
-    {
-        if (_treatment == null) return;
-
-        try
-        {
-            _employees = (await EmployeeQuery.GetHasTreatmentAndWithFutureBookingsAsync(_treatment.Id))
-                .Select(e => new EmployeeNameWithBookingsViewModel(
-                    e.Id,
-                    e.Name,
-                    e.Bookings
-                        .Select(b => new BookingTimesOnlyViewModel(b.Id, b.StartDateTime, b.EndDateTime))
-                        .ToList()))
-                .OrderBy(e => e.Name)
-                .ToList();
-        }
-        catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
-    }
-
-    private async Task SetStartDateToNextOpen()
-    {
-        var openToDate = _now.Date;
-
-        if (openToDate.TimeOfDay.Hours >= 18) openToDate = openToDate.Date.AddDays(1);
-        if (openToDate.DayOfWeek == DayOfWeek.Saturday) openToDate = openToDate.Date.AddDays(2);
-        else if (openToDate.DayOfWeek == DayOfWeek.Sunday) openToDate = openToDate.Date.AddDays(1);
-
-        await SetStartDate(openToDate);
-    }
-
-    private async Task SetStartDate(DateTime newStartDate)
-    {
-        //Det er nødvendigt at un-batche state changes her så DatePickeren bliver vist før vi kalder Open på den.
-        //_ignoreDateChanged er nødvendigt her pga. en bug i Mudblazor hvor opdatering af _startDate
-        //	fører til kald af dens DateChanged (HandleDateChanged), selvom det er one-way binding.
-        //Da blazor batcher state changes opdaterer _startDateTime først når vi kalder Task.Delay
-        _ignoreDateChanged = true;
-        _startDate = newStartDate;
-        await Task.Delay(1);
-        _ignoreDateChanged = false;
-    }
-
-    private async Task HandlePickStartDateTimeClick()
-    {
-        if (_employee == null) return;
-
-        if (_startDate == null) await SetStartDateToNextOpen();
-
-        _activePicker = Picker.Time;
-        await Task.Delay(1);
-
-        if (_datePickerRef != null) {
-            await _datePickerRef.OpenAsync();
-        }
-    }
-
-    private async Task HandleCustomerPickerClick(Guid customerId)
-    {
-        _customer = _customers.Find(c => c.Id == customerId);
-        await HandlePickTreatmentClick();
+	private async Task HandleCustomerPicked(PrivateCustomerViewModel customer)
+	{
+		_customer = customer;
+		await HandlePickTreatmentClick();
     }
 
     private async Task HandleTreatmentPickerClick(Guid treatmentId)
@@ -610,7 +593,7 @@
         _statusMessage = _timeIsAvailable == true ? "Denne tid er ledig" : "Denne tid er ikke ledig";
     }
 
-    private async Task HandleChangeCustomerClick()
+    private void HandleChangeCustomerClick()
     {
         if (Mode == BookingMode.Edit || Mode == BookingMode.View) return;
 
@@ -619,8 +602,7 @@
         _employee = null;
         SetNulls();
 
-        if (_customers.Count == 0) await HandlePickCustomerClick();
-        else _activePicker = Picker.Customers;
+        _activePicker = Picker.Customers;
     }
 
     private async Task HandleChangeTreatmentClick()

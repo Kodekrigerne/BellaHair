@@ -30,7 +30,7 @@
 	<div class="search-bar-container">
 		<h6>Bookings (@_count)</h6>
 		<input type="search" class="form-control booking-search" placeholder="Søg efter booking"
-			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@ApplyFilter" />
+			   @bind-value="@SearchTerm" @bind-value:event="oninput" @bind-value:after="@OnSearchTermChanged" />
 
 	</div>
 	@foreach (var booking in _bookings)
@@ -53,6 +53,9 @@
 	private bool _allLoaded = false;
 	private int _skip = 0;
 	private const int PageSize = 20;
+
+	private const int DebounceDelayMs = 300;
+	private CancellationTokenSource? _searchCts;
 
 	[Parameter]
 	[SupplyParameterFromQuery(Name = "search")]
@@ -97,40 +100,44 @@
 
 	private async Task LoadMoreAsync()
 	{
-		_busy = true;
-		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
+		try {
+			_busy = true;
+			var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
-		var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
+			var more = _activeTab == BookingTab.New ? await BookingQuery.GetNewPaginatedAsync(_skip, PageSize, search) : await BookingQuery.GetOldPaginatedAsync(_skip, PageSize, search);
 
-		var newBookings = more.Select(b => new BookingViewModel(
-				b.Id,
-				b.StartDateTime,
-				b.EndDateTime,
-				DateOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.StartDateTime),
-				TimeOnly.FromDateTime(b.EndDateTime),
-				b.IsPaid,
-				b.TotalBase,
-				b.TotalWithDiscount,
-				b.EmployeeFullName,
-				b.CustomerFullName,
-				b.CustomerAddress,
-				b.CustomerPhone,
-				b.CustomerEmail,
-				b.TreatmentName,
-				b.DurationMinutes,
-				b.Discount?.Name,
-				b.Discount?.Amount
-			))
-			.ToList();
+			var newBookings = more.Select(b => new BookingViewModel(
+					b.Id,
+					b.StartDateTime,
+					b.EndDateTime,
+					DateOnly.FromDateTime(b.StartDateTime),
+					TimeOnly.FromDateTime(b.StartDateTime),
+					TimeOnly.FromDateTime(b.EndDateTime),
+					b.IsPaid,
+					b.TotalBase,
+					b.TotalWithDiscount,
+					b.EmployeeFullName,
+					b.CustomerFullName,
+					b.CustomerAddress,
+					b.CustomerPhone,
+					b.CustomerEmail,
+					b.TreatmentName,
+					b.DurationMinutes,
+					b.Discount?.Name,
+					b.Discount?.Amount
+				))
+				.ToList();
 
-		_bookings.AddRange(newBookings);
-		_skip += PageSize;
-		if (newBookings.Count < PageSize)
-		{
-			_allLoaded = true;
+			_bookings.AddRange(newBookings);
+			_skip += PageSize;
+			if (newBookings.Count < PageSize) _allLoaded = true;
 		}
-		_busy = false;
+		catch (Exception ex)
+		{
+			Snackbar.Add("Indlæsning af bookinger fejlede.", Severity.Error);
+			Console.WriteLine(ex.Message);
+		}
+		finally { _busy = false; }
 	}
 
 	private async Task HandleNewSelectorClick()
@@ -178,11 +185,28 @@
 		Snackbar.Add("Bookingen blev slettet.", Severity.Success);
 	}
 
+	private async Task OnSearchTermChanged()
+	{
+		_searchCts?.Cancel();
+		_searchCts?.Dispose();
+		_searchCts = new CancellationTokenSource();
+
+		var token = _searchCts.Token;
+
+		try
+		{
+			await Task.Delay(DebounceDelayMs, token);
+			await ApplyFilter();
+		}
+		catch (TaskCanceledException) { }
+	}
+
 	private async Task ApplyFilter()
 	{
 		var search = string.IsNullOrWhiteSpace(SearchTerm.Trim()) ? null : SearchTerm.Trim();
 
 		_bookings.Clear();
+		StateHasChanged();
 		_skip = 0;
 		_allLoaded = false;
 		_count = _activeTab == BookingTab.New
