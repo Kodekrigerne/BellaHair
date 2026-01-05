@@ -129,10 +129,7 @@
 
 		_bookings.AddRange(newBookings);
 		_skip += PageSize;
-		if (newBookings.Count < PageSize)
-		{
-			_allLoaded = true;
-		}
+		if (newBookings.Count < PageSize) _allLoaded = true;
 		_busy = false;
 	}
 

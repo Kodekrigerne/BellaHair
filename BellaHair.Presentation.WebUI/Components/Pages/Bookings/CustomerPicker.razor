@@ -14,6 +14,11 @@
 @code {
 	private List<PrivateCustomerViewModel> _customers = [];
 
+	private bool _busy = false;
+	private bool _allLoaded = false;
+	private int _skip = 0;
+	private const int PageSize = 20;
+
 	[Parameter]
 	public EventCallback<PrivateCustomerViewModel> OnCustomerPicked { get; set; }
 
@@ -21,14 +26,21 @@
 	{
 		await base.OnInitializedAsync();
 
-		try
-		{
-			_customers = (await CustomerQuery.GetPrivateCustomersAsync())
+		await LoadMoreCustomers();
+	}
+
+	private async Task LoadMoreCustomers()
+	{
+		_busy = true;
+
+		var more = (await CustomerQuery.GetCustomersPaginatedAsync(_skip, PageSize))
 			.Select(c => new PrivateCustomerViewModel(c.Id, c.FullName, c.Birthday, c.Email, c.PhoneNumber, c.FullAddress, c.Visits))
-			.OrderBy(e => e.FullName)
 			.ToList();
-		}
-		catch { Snackbar.Add("Noget gik galt.", Severity.Error); }
+
+		_customers.AddRange(more);
+		_skip += PageSize;
+		if (more.Count < PageSize) _allLoaded = true;
+		_busy = false;
 	}
 
 	private async Task HandleCustomerPickerClick(Guid customerId)
