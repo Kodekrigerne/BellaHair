@@ -186,7 +186,7 @@
 	private void CalculateLoyaltyLevel()
 	{
 		var discount = LoyaltyDiscounts
-		.Where(ld => ld.MinimumVisits < PrivateCustomer.Visits)
+		.Where(ld => ld.MinimumVisits <= PrivateCustomer.Visits)
 		.MaxBy(ld => ld.MinimumVisits);
 
 		if (discount != null)
