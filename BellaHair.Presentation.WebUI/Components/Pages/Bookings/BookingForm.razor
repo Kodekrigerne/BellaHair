@@ -319,7 +319,7 @@
 	private List<EmployeeNameWithBookingsViewModel> _employees = [];
 
 	private bool _useBirthdayDiscount = true;
-	private bool _showBirthdayOption;
+	private bool _showBirthdayOption = false;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -653,11 +653,7 @@
 
             var discountDTO = await DiscountQuery.FindBestDiscount(query);
 
-            if (discountDTO == null)
-            {
-                _showBirthdayOption = false;
-			}
-            else if (discountDTO.Type == DiscountType.BirthdayDiscount)
+			if (discountDTO != null && discountDTO.Type == DiscountType.BirthdayDiscount)
             {
                 _showBirthdayOption = true;
                 _useBirthdayDiscount = true;
