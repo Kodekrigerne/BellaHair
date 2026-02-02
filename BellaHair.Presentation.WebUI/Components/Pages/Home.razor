@@ -8,7 +8,6 @@
 @inject ICampaignDiscountQuery CampaignDiscountQuery
 @inject IPrivateCustomerQuery CustomerQuery
 @inject IBookingQuery BookingQuery
-@inject ICurrentDateTimeProvider CurrentDateTimeProvider
 @inject ITreatmentQuery TreatmentQuery
 @inject ISnackbar Snackbar
 
@@ -133,7 +132,6 @@
 			_bookingsToday = await BookingQuery.GetAllTodayCountAsync();
 
 			_treatmentCount = await TreatmentQuery.GetCountAsync();
-
 		}
 		catch (DomainException dex)
 		{
